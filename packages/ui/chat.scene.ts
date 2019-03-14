@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask, Vector4 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -249,12 +249,13 @@ function createMessagesScrollbar(parent: UIShape, changed: (ev: IEvents['onChang
 function createChatHeader(parent: UIShape) {
   const container = new UIContainerRectShape(parent)
   container.id = 'gui-container-header'
-  container.vAlign = 'top'
-  container.hAlign = 'left'
-  container.width = '400px'
-  container.height = '45px'
+  /* container.vAlign = 'top'
+  container.hAlign = 'left' */
+  container.sizeInPixels = true
+  container.width = 400
+  container.height = 45
   container.thickness = 0
-  container.background = 'black'
+  container.color = new Vector4(0, 0, 0, 255)
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -412,16 +413,17 @@ function addEntryAndResize(messageEntry: MessageEntry) {
 
 const container = new UIContainerRectShape(parent)
 container.id = 'gui-container'
-container.vAlign = 'bottom'
-container.hAlign = 'left'
-container.width = '400px'
-container.height = '250px'
-container.cornerRadius = 20
-container.left = '20px'
-container.top = '-20px'
-container.color = PRIMARY_TEXT_COLOR
+/* container.vAlign = 'bottom'
+container.hAlign = 'left' */
+container.sizeInPixels = true
+container.width = 400
+container.height = 250
+// container.cornerRadius = 20
+container.horizontalOffset = 0.1
+container.verticalOffset = -0.1
+container.color = new Vector4(0, 0, 0, 255)
 container.thickness = 0
-container.background = 'black'
+// container.background = 'black'
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -432,10 +434,10 @@ messageContainer.left = '15px'
 messageContainer.height = '200px'
 
 const footerContainer = new UIContainerRectShape(container)
-footerContainer.adaptHeight = true
+/* footerContainer.adaptHeight = true
 footerContainer.adaptWidth = true
 footerContainer.vAlign = 'bottom'
-footerContainer.hAlign = 'left'
+footerContainer.hAlign = 'left' */
 
 const textInput = createTextInput(footerContainer, onInputChanged)
 
@@ -453,14 +455,14 @@ createMinimizeButton(chatHeader.container, toggleChat)
 function initializeMinimizedChat(parent: UIFullScreenShape) {
   const containerMinimized = new UIContainerRectShape(parent)
   containerMinimized.id = 'gui-container-minimized'
-  containerMinimized.adaptHeight = true
+  /* containerMinimized.adaptHeight = true
   containerMinimized.adaptWidth = true
   containerMinimized.vAlign = 'bottom'
-  containerMinimized.hAlign = 'left'
-  containerMinimized.left = '20px'
-  containerMinimized.top = '-15px'
+  containerMinimized.hAlign = 'left' */
+  containerMinimized.horizontalOffset = 0.1
+  containerMinimized.verticalOffset = 0.1
   containerMinimized.thickness = 0
-  containerMinimized.background = 'transparent'
+  containerMinimized.color = new Vector4(0, 0, 0, 0)
 
   const minimizedIcon = new UIImageShape(containerMinimized)
   minimizedIcon.id = 'minimize-icon'
@@ -488,16 +490,17 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
 
 const helpContainer = new UIContainerRectShape(parent)
 helpContainer.id = 'gui-container-commands'
-helpContainer.vAlign = 'bottom'
-helpContainer.hAlign = 'left'
-helpContainer.width = '400px'
-helpContainer.height = '250px'
-helpContainer.cornerRadius = 20
-helpContainer.left = '20px'
-helpContainer.top = '-20px'
-helpContainer.color = PRIMARY_TEXT_COLOR
+/* helpContainer.vAlign = 'bottom'
+helpContainer.hAlign = 'left' */
+helpContainer.sizeInPixels = true
+helpContainer.width = 400
+helpContainer.height = 250
+// helpContainer.cornerRadius = 20
+helpContainer.horizontalOffset = 0.1
+helpContainer.verticalOffset = 0.1
+helpContainer.color = new Vector4(0, 0, 0, 255)
 helpContainer.thickness = 0
-helpContainer.background = 'black'
+// helpContainer.background = 'black'
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -532,21 +535,22 @@ sliderEntity.addComponentOrReplace(new OnChanged(onHelpSliderChanged))
 engine.addEntity(sliderEntity)
 
 const closeButtonContainer = new UIContainerRectShape(helpContainer)
-closeButtonContainer.adaptHeight = true
+/* closeButtonContainer.adaptHeight = true
 closeButtonContainer.adaptWidth = true
 closeButtonContainer.vAlign = 'bottom'
-closeButtonContainer.hAlign = 'right'
+closeButtonContainer.hAlign = 'right' */
 
 createHelpCloseButton(closeButtonContainer, closeHelp)
 
 const headerContainer = new UIContainerRectShape(helpContainer)
 headerContainer.id = 'gui-container-header'
-headerContainer.vAlign = 'top'
-headerContainer.hAlign = 'left'
-headerContainer.width = '400px'
-headerContainer.height = '45px'
+/* headerContainer.vAlign = 'top'
+headerContainer.hAlign = 'left' */
+headerContainer.sizeInPixels = true
+headerContainer.width = 400
+headerContainer.height = 45
 headerContainer.thickness = 0
-headerContainer.background = 'black'
+headerContainer.color = new Vector4(0, 0, 0, 255)
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR

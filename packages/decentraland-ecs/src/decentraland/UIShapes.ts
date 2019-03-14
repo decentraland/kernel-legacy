@@ -1,5 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
+import { Vector4, Vector2 } from './math'
 
 /**
  * @alpha
@@ -91,43 +92,28 @@ export class UIContainerRectShape extends UIShape {
   id: string | null = null
 
   @ObservableComponent.field
-  opacity: number = 1
-
-  @ObservableComponent.field
-  adaptWidth: boolean = false
-
-  @ObservableComponent.field
-  adaptHeight: boolean = false
-
-  @ObservableComponent.field
   thickness: number = 0
 
   @ObservableComponent.field
-  cornerRadius: number = 0
+  width: number = 1
 
   @ObservableComponent.field
-  width: string = '100%'
+  height: number = 1
 
   @ObservableComponent.field
-  height: string = '100%'
+  verticalOffset: number = 0
 
   @ObservableComponent.field
-  top: string = '0px'
+  horizontalOffset: number = 0
 
   @ObservableComponent.field
-  left: string = '0px'
+  color: Vector4 = new Vector4(0, 0, 0, 255)
 
   @ObservableComponent.field
-  color: string = 'white'
+  pivot: Vector2 = new Vector2(0.5, 0.5)
 
   @ObservableComponent.field
-  background: string = 'transparent'
-
-  @ObservableComponent.field
-  hAlign: string = 'center'
-
-  @ObservableComponent.field
-  vAlign: string = 'center'
+  sizeInPixels: boolean = false
 
   @ObservableComponent.field
   visible: boolean = true
