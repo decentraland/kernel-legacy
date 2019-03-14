@@ -5,7 +5,7 @@ import { cleanupAssetContainer, processColliders } from 'engine/entities/utils/p
 import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { scene, engine } from 'engine/renderer'
 import { probe } from 'engine/renderer/ambientLights'
-import { DEBUG } from 'config'
+import { DEBUG, EDITOR } from 'config'
 import { log } from 'util'
 import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures, isSceneTexture } from 'engine/renderer/monkeyLoader'
@@ -53,23 +53,25 @@ export class GLTFShape extends DisposableComponent {
 
       const loadingEntity = new BABYLON.TransformNode('loading-padding')
 
-      entity.setObject3D(BasicShape.nameInEntity, loadingEntity)
+      if (EDITOR) {
+        entity.setObject3D(BasicShape.nameInEntity, loadingEntity)
 
-      {
-        const loadingInstance = loadingShape.createInstance('a')
-        loadingInstance.parent = loadingEntity
-        loadingInstance.position.y = 0.8
-        const animationDisposable = scene.onAfterRenderObservable.add(() => {
-          loadingInstance.rotation.set(0, 0, loadingInstance.rotation.z - engine.getDeltaTime() * 0.01)
-          loadingInstance.billboardMode = 7
-        })
+        {
+          const loadingInstance = loadingShape.createInstance('a')
+          loadingInstance.parent = loadingEntity
+          loadingInstance.position.y = 0.8
+          const animationDisposable = scene.onAfterRenderObservable.add(() => {
+            loadingInstance.rotation.set(0, 0, loadingInstance.rotation.z - engine.getDeltaTime() * 0.01)
+            loadingInstance.billboardMode = 7
+          })
 
-        loadingEntity.onDisposeObservable.add(() => {
-          loadingEntity.parent = null
-          loadingInstance.parent = null
-          loadingInstance.dispose()
-          scene.onAfterRenderObservable.remove(animationDisposable)
-        })
+          loadingEntity.onDisposeObservable.add(() => {
+            loadingEntity.parent = null
+            loadingInstance.parent = null
+            loadingInstance.dispose()
+            scene.onAfterRenderObservable.remove(animationDisposable)
+          })
+        }
       }
 
       BABYLON.SceneLoader.LoadAssetContainer(

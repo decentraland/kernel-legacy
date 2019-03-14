@@ -3,6 +3,7 @@ import * as BABYLON from 'babylonjs'
 import { error } from '../logger'
 import { isRunningTest, DEBUG } from 'config'
 import { scene, engineMicroQueue } from '../renderer'
+import { defaultLogger } from 'shared/logger'
 
 // tslint:disable-next-line:whitespace
 type SharedSceneContext = import('../entities/SharedSceneContext').SharedSceneContext
@@ -16,7 +17,8 @@ const registeredContext = new Map<string, SharedSceneContext>()
 const dclRE = /^dcl:\/\/([^/]+)\/(.*)$/
 
 export const loadingManager = new BABYLON.AssetsManager(scene)
-export const loadedTextures = new Map<string, IFuture<BABYLON.Texture>>()
+export type PendingTexture = BABYLON.Texture & { isPending?: boolean }
+export const loadedTextures = new Map<string, PendingTexture>()
 export const loadedFiles = new Map<string, IFuture<ArrayBuffer>>()
 
 /// --- PRIVATE ---
@@ -128,12 +130,7 @@ export function deleteUnusedTextures() {
 
     loadedTextures.forEach(async (value, key) => {
       if (!value.isPending && !usedTextures.has(key)) {
-        loadedTextures.get(key).then(
-          $ => {
-            $.dispose()
-          },
-          () => void 0
-        )
+        loadedTextures.get(key).dispose()
       }
     })
 
@@ -169,7 +166,7 @@ export async function loadFile(url: string, useArrayBuffer = true): Promise<Arra
   return defer
 }
 
-export async function loadTextureFromAB(
+export function loadTextureFromAB(
   url: string,
   ab: BlobPart,
   mimeType: string,
@@ -179,26 +176,25 @@ export async function loadTextureFromAB(
     return loadedTextures.get(url)
   }
 
-  const defer = future<BABYLON.Texture>()
-  loadedTextures.set(url, defer)
-
-  const texture = new BABYLON.Texture(
+  const texture: PendingTexture = new BABYLON.Texture(
     null,
     scene,
     samplerData ? samplerData.noMipMaps : false,
     samplerData ? false : true,
     samplerData ? samplerData.samplingMode : BABYLON.Texture.BILINEAR_SAMPLINGMODE,
     () => {
+      texture.isPending = false
       markSceneTexture(texture, url)
-      defer.resolve(texture)
     },
     (message, exception) => {
-      defer.reject(message || exception || `Error loading texture (base64)`)
+      defaultLogger.error(message || exception || `Error loading texture (base64)`, exception)
       loadedTextures.delete(url)
     },
     null,
     false
   )
+
+  texture.isPending = true
 
   const dataUrl = `data:${url}`
   texture.updateURL(dataUrl, new Blob([ab], { type: mimeType }))
@@ -208,13 +204,13 @@ export async function loadTextureFromAB(
     texture.wrapV = samplerData.wrapV
   }
 
-  return defer
+  return texture
 }
 
-export async function loadTexture(
+export function loadTexture(
   url: string,
-  samplerData?: BABYLON.GLTF2.Loader._ISamplerData
-): Promise<BABYLON.Texture> {
+  samplerData?: BABYLON.GLTF2.Loader._ISamplerData & { invertY?: boolean }
+): BABYLON.Texture {
   if (url.startsWith('dcl://')) {
     const { domain, path } = readDclUrl(url)
 
@@ -229,57 +225,61 @@ export async function loadTexture(
     return loadedTextures.get(url)
   }
 
-  const defer = future<BABYLON.Texture>()
-  loadedTextures.set(url, defer)
-
   if (url.match(/^data:[^\/]+\/[^;]+;base64,/)) {
-    const texture = new BABYLON.Texture(
+    const texture: PendingTexture = new BABYLON.Texture(
       url,
       scene,
       samplerData ? samplerData.noMipMaps : false,
-      samplerData ? false : true,
+      samplerData ? samplerData.invertY || false : false,
       samplerData ? samplerData.samplingMode : BABYLON.Texture.BILINEAR_SAMPLINGMODE,
       () => void 0,
       (message, exception) => {
-        defer.reject(message || exception || `Error loading texture (base64)`)
+        defaultLogger.error(message || exception || `Error loading texture (base64)`, exception)
         loadedTextures.delete(url)
       },
       url,
       true
     )
 
+    texture.isPending = false
     markSceneTexture(texture, url)
-    defer.resolve(texture)
 
     if (samplerData) {
       texture.wrapU = samplerData.wrapU
       texture.wrapV = samplerData.wrapV
     }
+
+    loadedTextures.set(url, texture)
+    return texture
   } else {
-    const texture = new BABYLON.Texture(
+    const texture: PendingTexture = new BABYLON.Texture(
       url,
       scene,
       samplerData ? samplerData.noMipMaps : false,
-      samplerData ? false : true,
+      samplerData ? samplerData.invertY || false : false,
       samplerData ? samplerData.samplingMode : BABYLON.Texture.BILINEAR_SAMPLINGMODE,
       () => {
+        texture.isPending = false
         markSceneTexture(texture, url)
-        defer.resolve(texture)
       },
       (message, exception) => {
         loadedTextures.delete(url)
         if (!this._disposed) {
-          defer.reject(message || exception || `Error loading texture (${url})`)
+          defaultLogger.error(message || exception || `Error loading texture (${url})`, exception)
         }
       }
     )
+
+    texture.isPending = true
 
     if (samplerData) {
       texture.wrapU = samplerData.wrapU
       texture.wrapV = samplerData.wrapV
     }
+
+    loadedTextures.set(url, texture)
+    return texture
   }
-  return defer
 }
 
 export function initMonkeyLoader() {
@@ -438,9 +438,9 @@ export function initMonkeyLoader() {
     if (!image._data) {
       if (image.uri) {
         if (BABYLON.Tools.IsBase64(image.uri)) {
-          babylonTexture = await loadTexture(image.uri, samplerData)
+          babylonTexture = loadTexture(image.uri, samplerData)
         } else {
-          babylonTexture = await loadTexture((this as any)._rootUrl + image.uri, samplerData)
+          babylonTexture = loadTexture((this as any)._rootUrl + image.uri, samplerData)
         }
       } else {
         const bufferView = BABYLON.GLTF2.ArrayItem.Get(`${context}/bufferView`, this.gltf.bufferViews, image.bufferView)
@@ -452,7 +452,7 @@ export function initMonkeyLoader() {
       const data = await image._data
       const name = image.uri || `${(this as any)._fileName}#image${image.index}`
       const dataUrl = `${(this as any)._rootUrl}${name}`
-      babylonTexture = await loadTextureFromAB(dataUrl, data, image.mimeType, samplerData)
+      babylonTexture = loadTextureFromAB(dataUrl, data, image.mimeType, samplerData)
     }
 
     babylonTexture.wrapU = samplerData.wrapU
