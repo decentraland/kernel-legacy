@@ -66,7 +66,7 @@ export class Texture extends DisposableComponent {
         samplingMode: samplingMode,
         wrapU: wrap,
         wrapV: wrap,
-        invertY: true
+        invertY: false
       })
 
       this.contributions.textures.add(this.texture)

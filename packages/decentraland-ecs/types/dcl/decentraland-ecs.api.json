@@ -24424,7 +24424,7 @@
       "members": {
         "__constructor": {
           "kind": "constructor",
-          "signature": "constructor(src: string);",
+          "signature": "constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);",
           "parameters": {
             "src": {
               "name": "src",
@@ -24432,6 +24432,13 @@
               "isOptional": false,
               "isSpread": false,
               "type": "string"
+            },
+            "opts": {
+              "name": "opts",
+              "description": [],
+              "isOptional": true,
+              "isSpread": false,
+              "type": "Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>"
             }
           },
           "deprecatedMessage": [],
@@ -24464,9 +24471,9 @@
         },
         "hasAlpha": {
           "kind": "property",
-          "signature": "hasAlpha: boolean;",
+          "signature": "readonly hasAlpha: boolean;",
           "isOptional": false,
-          "isReadOnly": false,
+          "isReadOnly": true,
           "isStatic": false,
           "type": "boolean",
           "deprecatedMessage": [],
@@ -24485,9 +24492,9 @@
         },
         "samplingMode": {
           "kind": "property",
-          "signature": "samplingMode: number;",
+          "signature": "readonly samplingMode: number;",
           "isOptional": false,
-          "isReadOnly": false,
+          "isReadOnly": true,
           "isStatic": false,
           "type": "number",
           "deprecatedMessage": [],
@@ -24522,9 +24529,9 @@
         },
         "wrap": {
           "kind": "property",
-          "signature": "wrap: number;",
+          "signature": "readonly wrap: number;",
           "isOptional": false,
-          "isReadOnly": false,
+          "isReadOnly": true,
           "isStatic": false,
           "type": "number",
           "deprecatedMessage": [],

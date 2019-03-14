@@ -337,7 +337,7 @@ export class Texture extends ObservableComponent {
    * |     3 | TRILINEAR |
    */
   @ObservableComponent.readonly
-  readonly samplingMode: number
+  readonly samplingMode!: number
 
   /**
    * Enables texture wrapping for this material.
@@ -348,13 +348,13 @@ export class Texture extends ObservableComponent {
    * |     3 | MIRROR    |
    */
   @ObservableComponent.readonly
-  readonly wrap: number
+  readonly wrap!: number
 
   /**
    * Defines if this texture has an alpha channel
    */
   @ObservableComponent.readonly
-  readonly hasAlpha: boolean
+  readonly hasAlpha!: boolean
 
   constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>) {
     super()
@@ -362,7 +362,7 @@ export class Texture extends ObservableComponent {
 
     if (opts) {
       for (let i in opts) {
-        this[i] = opts[i]
+        this[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
       }
     }
   }

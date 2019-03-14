@@ -3945,7 +3945,7 @@ declare class Texture extends ObservableComponent {
    * |     2 | BILINEAR  |
    * |     3 | TRILINEAR |
    */
-  samplingMode: number
+  readonly samplingMode: number
   /**
    * Enables texture wrapping for this material.
    * | Value | Type      |
@@ -3954,12 +3954,12 @@ declare class Texture extends ObservableComponent {
    * |     2 | WRAP      |
    * |     3 | MIRROR    |
    */
-  wrap: number
+  readonly wrap: number
   /**
    * Defines if this texture has an alpha channel
    */
-  hasAlpha: boolean
-  constructor(src: string)
+  readonly hasAlpha: boolean
+  constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>)
 }
 
 declare const ToGammaSpace: number
