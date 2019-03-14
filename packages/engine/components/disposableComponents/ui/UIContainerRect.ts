@@ -2,7 +2,7 @@ import { DisposableComponent } from '../DisposableComponent'
 import { CLASS_ID } from 'decentraland-ecs/src'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
-import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
+// import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
 import { UIControl } from './UIControl'
 import { UIContainerRectShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 
@@ -45,19 +45,19 @@ export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI
 
   async updateData(data: UIContainerRectShape): Promise<void> {
     this.data = schemaValidator(data)
-    this.control.adaptWidthToChildren = this.data.adaptWidth
-    this.control.adaptHeightToChildren = this.data.adaptHeight
-    this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
-    this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
+    // this.control.adaptWidthToChildren = this.data.adaptWidth
+    // this.control.adaptHeightToChildren = this.data.adaptHeight
+    // this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
+    // this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.thickness = this.data.thickness
-    this.control.cornerRadius = this.data.cornerRadius
-    this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
+    // this.control.cornerRadius = this.data.cornerRadius
+    // this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.left = this.data.left
-    this.control.top = this.data.top
-    this.control.color = this.data.color
-    this.control.background = this.data.background
+    // this.control.left = this.data.left
+    // this.control.top = this.data.top
+    // this.control.color = this.data.color
+    // this.control.background = this.data.background
     this.control.isVisible = this.data.visible
 
     this.setParent(this.data.parentComponent)
