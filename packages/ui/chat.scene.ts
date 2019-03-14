@@ -251,7 +251,7 @@ function createChatHeader(parent: UIShape) {
   container.id = 'gui-container-header'
   container.vAlign = 'top'
   container.hAlign = 'left'
-  container.sizeInPixels = true
+  // a container.sizeInPixels = true
   container.width = 400
   container.height = 45
   container.thickness = 0
@@ -415,7 +415,7 @@ const container = new UIContainerRectShape(parent)
 container.id = 'gui-container'
 container.vAlign = 'bottom'
 container.hAlign = 'left'
-container.sizeInPixels = true
+// a container.sizeInPixels = true
 container.width = 400
 container.height = 250
 container.position.x = 0.1
@@ -491,7 +491,7 @@ const helpContainer = new UIContainerRectShape(parent)
 helpContainer.id = 'gui-container-commands'
 helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
-helpContainer.sizeInPixels = true
+// a helpContainer.sizeInPixels = true
 helpContainer.width = 400
 helpContainer.height = 250
 // a helpContainer.cornerRadius = 20
@@ -542,7 +542,7 @@ createHelpCloseButton(closeButtonContainer, closeHelp)
 
 const headerContainer = new UIContainerRectShape(helpContainer)
 headerContainer.id = 'gui-container-header'
-headerContainer.sizeInPixels = true
+// a headerContainer.sizeInPixels = true
 headerContainer.width = 400
 headerContainer.height = 45
 headerContainer.thickness = 0
