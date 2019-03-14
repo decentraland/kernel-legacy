@@ -125,10 +125,16 @@ export class UIContainerRectShape extends UIShape {
   vAlign: string = 'center'
 
   @ObservableComponent.field
+  alignmentUsesSize: boolean = true
+
+  @ObservableComponent.field
   visible: boolean = true
 
   @ObservableComponent.field
   isPointerBlocker: boolean = false
+
+  @ObservableComponent.field
+  sizeInPixels: boolean = true
 }
 
 /**
