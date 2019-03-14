@@ -215,30 +215,12 @@ declare class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  texture: string
+  texture?: Texture
   /**
    * A number between 0 and 1.
    * Any pixel with an alpha lower than this value will be shown as transparent.
    */
   alphaTest: number
-  /**
-   * Enables crisper images based on the provided sampling mode.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | NEAREST   |
-   * |     2 | BILINEAR  |
-   * |     3 | TRILINEAR |
-   */
-  samplingMode: number
-  /**
-   * Enables texture wrapping for this material.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | CLAMP     |
-   * |     2 | WRAP      |
-   * |     3 | MIRROR    |
-   */
-  wrap: number
 }
 
 /**
@@ -597,7 +579,11 @@ declare class Color3 {
   /**
    * Serializes Color3
    */
-  toJSON(): string
+  toJSON(): {
+    r: number
+    g: number
+    b: number
+  }
 }
 
 /**
@@ -1680,23 +1666,23 @@ declare class Material extends ObservableComponent {
   /**
    * Texture applied as material.
    */
-  albedoTexture?: string
+  albedoTexture?: Texture
   /**
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
-  alphaTexture?: string
+  alphaTexture?: Texture
   /**
    * Emissive texture.
    */
-  emissiveTexture?: string
+  emissiveTexture?: Texture
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
-  bumpTexture?: string
+  bumpTexture?: Texture
   /**
    * Stores the refracted light information in a texture.
    */
-  refractionTexture?: string
+  refractionTexture?: Texture
   /**
    * If sets to true, disables all the lights affecting the material.
    * Defaults to false.
@@ -2677,6 +2663,7 @@ declare class ObservableComponent {
   dirty: boolean
   data: any
   private subscriptions
+  static component(target: ObservableComponent, propertyKey: string): void
   static field(target: ObservableComponent, propertyKey: string): void
   static readonly(target: ObservableComponent, propertyKey: string): void
   onChange(fn: ObservableComponentSubscription): void
@@ -3943,6 +3930,36 @@ declare class TextShape extends Shape {
   isPickable: boolean
   billboard: boolean
   constructor(value?: string)
+}
+
+/**
+ * @public
+ */
+declare class Texture extends ObservableComponent {
+  readonly src: string
+  /**
+   * Enables crisper images based on the provided sampling mode.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | NEAREST   |
+   * |     2 | BILINEAR  |
+   * |     3 | TRILINEAR |
+   */
+  samplingMode: number
+  /**
+   * Enables texture wrapping for this material.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | CLAMP     |
+   * |     2 | WRAP      |
+   * |     3 | MIRROR    |
+   */
+  wrap: number
+  /**
+   * Defines if this texture has an alpha channel
+   */
+  hasAlpha: boolean
+  constructor(src: string)
 }
 
 declare const ToGammaSpace: number

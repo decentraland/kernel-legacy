@@ -1,4 +1,4 @@
-import { engine, Material, Entity, Transform, PlaneShape, Vector3, Billboard } from 'decentraland-ecs/src'
+import { engine, Material, Entity, Transform, PlaneShape, Vector3, Billboard, Texture } from 'decentraland-ecs/src'
 
 const root = new Entity()
 engine.addEntity(root)
@@ -13,8 +13,8 @@ const t1 = new Transform({
 
 mat1.metallic = 1
 mat1.roughness = 1
-mat1.albedoTexture = 'img.png'
-mat1.alphaTexture = 'img.png'
+mat1.alphaTexture = mat1.albedoTexture = new Texture('img.png', { hasAlpha: true })
+
 ent1.setParent(root)
 ent1.addComponentOrReplace(new Billboard())
 ent1.addComponentOrReplace(mat1)
@@ -28,10 +28,11 @@ const shape2 = new PlaneShape()
 const t2 = new Transform({
   position: new Vector3(4, 1.6, 5)
 })
+
 mat2.metallic = 0
 mat2.roughness = 1
-mat2.albedoTexture = 'img.png'
-mat2.hasAlpha = true
+mat2.albedoTexture = new Texture('img.png', { hasAlpha: true })
+
 ent2.addComponentOrReplace(new Billboard())
 ent2.addComponentOrReplace(mat2)
 ent2.addComponentOrReplace(t2)
