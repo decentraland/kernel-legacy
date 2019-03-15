@@ -251,11 +251,10 @@ function createChatHeader(parent: UIShape) {
   container.id = 'gui-container-header'
   container.vAlign = 'top'
   container.hAlign = 'left'
-  // a container.sizeInPixels = true
   container.width = 400
   container.height = 45
   container.thickness = 0
-  container.color = new Color4(0, 0, 0, 1)
+  container.background = new Color4(0, 0, 0, 1)
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -415,13 +414,13 @@ const container = new UIContainerRectShape(parent)
 container.id = 'gui-container'
 container.vAlign = 'bottom'
 container.hAlign = 'left'
-// a container.sizeInPixels = true
 container.width = 400
 container.height = 250
-container.position.x = 0.1
-container.position.y = -0.1
-container.color = new Color4(0, 0, 0, 1)
+container.position.x = 20
+container.position.y = 20
+container.color = new Color4(1, 1, 1, 1)
 container.thickness = 0
+container.background = new Color4(0, 0, 0, 1)
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -432,8 +431,8 @@ messageContainer.left = '15px'
 messageContainer.height = '200px'
 
 const footerContainer = new UIContainerRectShape(container)
-// a footerContainer.adaptHeight = true
-// a footerContainer.adaptWidth = true
+footerContainer.adaptHeight = true
+footerContainer.adaptWidth = true
 footerContainer.vAlign = 'bottom'
 footerContainer.hAlign = 'left'
 
@@ -453,15 +452,14 @@ createMinimizeButton(chatHeader.container, toggleChat)
 function initializeMinimizedChat(parent: UIFullScreenShape) {
   const containerMinimized = new UIContainerRectShape(parent)
   containerMinimized.id = 'gui-container-minimized'
-  // a containerMinimized.adaptHeight = true
-  // a containerMinimized.adaptWidth = true
-
+  containerMinimized.adaptHeight = true
+  containerMinimized.adaptWidth = true
   containerMinimized.vAlign = 'bottom'
   containerMinimized.hAlign = 'left'
-  containerMinimized.position.x = 0.1
-  containerMinimized.position.y = 0.1
+  containerMinimized.position.x = 20
+  containerMinimized.position.y = 15
   containerMinimized.thickness = 0
-  containerMinimized.color = new Color4(0, 0, 0, 0)
+  containerMinimized.background = new Color4(0, 0, 0, 0)
 
   const minimizedIcon = new UIImageShape(containerMinimized)
   minimizedIcon.id = 'minimize-icon'
@@ -491,14 +489,13 @@ const helpContainer = new UIContainerRectShape(parent)
 helpContainer.id = 'gui-container-commands'
 helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
-// a helpContainer.sizeInPixels = true
 helpContainer.width = 400
 helpContainer.height = 250
-// a helpContainer.cornerRadius = 20
-helpContainer.position.x = 0.1
-helpContainer.position.y = 0.1
-helpContainer.color = new Color4(0, 0, 0, 1)
+helpContainer.position.x = 20
+helpContainer.position.y = 20
+helpContainer.color = new Color4(1, 1, 1, 1)
 helpContainer.thickness = 0
+helpContainer.background = new Color4(0, 0, 0, 1)
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -533,8 +530,8 @@ sliderEntity.addComponentOrReplace(new OnChanged(onHelpSliderChanged))
 engine.addEntity(sliderEntity)
 
 const closeButtonContainer = new UIContainerRectShape(helpContainer)
-// a closeButtonContainer.adaptHeight = true
-// a closeButtonContainer.adaptWidth = true
+closeButtonContainer.adaptHeight = true
+closeButtonContainer.adaptWidth = true
 closeButtonContainer.vAlign = 'bottom'
 closeButtonContainer.hAlign = 'right'
 
@@ -542,11 +539,12 @@ createHelpCloseButton(closeButtonContainer, closeHelp)
 
 const headerContainer = new UIContainerRectShape(helpContainer)
 headerContainer.id = 'gui-container-header'
-// a headerContainer.sizeInPixels = true
+headerContainer.vAlign = 'top'
+headerContainer.hAlign = 'left'
 headerContainer.width = 400
 headerContainer.height = 45
 headerContainer.thickness = 0
-headerContainer.color = new Color4(0, 0, 0, 255)
+headerContainer.background = new Color4(0, 0, 0, 1)
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR
