@@ -5,7 +5,6 @@ import { scene } from '../../renderer'
 import { probe } from '../../renderer/ambientLights'
 import { CLASS_ID, Observer } from 'decentraland-ecs/src'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
-import { Texture } from './Texture'
 
 const defaults = {
   alpha: 1,
@@ -134,50 +133,79 @@ export class PBRMaterial extends DisposableComponent {
     }
 
     if (data.albedoTexture) {
-      const texture = await Texture.getFromComponent(this.context, data.albedoTexture)
+      const src = validators.string(data.albedoTexture, defaults.albedoTexture)
+      if (src) {
+        const texture = await this.context.getTexture(src)
 
-      if (texture) {
-        m.albedoTexture = texture
+        if (texture) {
+          m.albedoTexture = texture
+        }
       }
     }
 
     if ('hasAlpha' in data) {
       m.useAlphaFromAlbedoTexture = validators.boolean(data.hasAlpha, defaults.hasAlpha)
+
+      if (m.albedoTexture) {
+        m.albedoTexture.hasAlpha = m.useAlphaFromAlbedoTexture
+      }
     }
 
     if (data.albedoTexture === data.alphaTexture) {
       m.opacityTexture = m.albedoTexture
     } else if (data.alphaTexture) {
-      const texture = await Texture.getFromComponent(this.context, data.alphaTexture)
+      const src = validators.string(data.alphaTexture, defaults.alphaTexture)
+      if (src) {
+        const texture = await this.context.getTexture(src)
 
-      if (texture) {
-        m.opacityTexture = texture
+        if (texture) {
+          m.opacityTexture = texture
+        }
       }
     }
 
     if (data.emissiveTexture) {
-      const texture = await Texture.getFromComponent(this.context, data.emissiveTexture)
+      const src = validators.string(data.emissiveTexture, defaults.emissiveTexture)
+      if (src) {
+        const texture = await this.context.getTexture(src)
 
-      if (texture) {
-        m.emissiveTexture = texture
+        if (texture) {
+          m.emissiveTexture = texture
+        }
       }
     }
 
     if (data.bumpTexture) {
-      const texture = await Texture.getFromComponent(this.context, data.bumpTexture)
+      const src = validators.string(data.bumpTexture, defaults.bumpTexture)
+      if (src) {
+        const texture = await this.context.getTexture(src)
 
-      if (texture) {
-        m.bumpTexture = texture
+        if (texture) {
+          m.bumpTexture = texture
+        }
       }
     }
 
     if (data.refractionTexture) {
-      const texture = await Texture.getFromComponent(this.context, data.refractionTexture)
+      const src = validators.string(data.refractionTexture, defaults.refractionTexture)
+      if (src) {
+        const texture = await this.context.getTexture(src)
 
-      if (texture) {
-        m.refractionTexture = texture
+        if (texture) {
+          m.refractionTexture = texture
+        }
       }
     }
+
+    this.contributions.textures.clear()
+
+    m.bumpTexture && this.contributions.textures.add(m.bumpTexture)
+    m.albedoTexture && this.contributions.textures.add(m.albedoTexture)
+    m.albedoTexture && this.contributions.textures.add(m.albedoTexture)
+    m.ambientTexture && this.contributions.textures.add(m.ambientTexture)
+    m.opacityTexture && this.contributions.textures.add(m.opacityTexture)
+    m.emissiveTexture && this.contributions.textures.add(m.emissiveTexture)
+    m.refractionTexture && this.contributions.textures.add(m.refractionTexture)
 
     this.loadingDone = true
 
