@@ -6,9 +6,9 @@ uiEntity.addComponentOrReplace(ui)
 engine.addEntity(uiEntity)
 
 const container = new UIContainerRectShape(ui)
-container.width = '100%'
-container.height = '100%'
-container.color = 'white' // we set global text color here
+container.width = 1
+container.height = 1
+container.color = new Color4(1, 1, 1, 1) // we set global text color here
 container.hAlign = 'center'
 container.vAlign = 'center'
 
@@ -16,8 +16,9 @@ container.vAlign = 'center'
 const bg = new UIContainerRectShape(container)
 bg.opacity = 0.2
 bg.thickness = 1
-bg.cornerRadius = 10
-bg.background = 'green'
+// TODO: UI-Migration
+// a bg.cornerRadius = 10
+bg.background = new Color4(0, 0, 0, 1)
 
 // --- INVENTORY
 
@@ -37,11 +38,12 @@ function generateInventoryItem(index: number) {
   const bg = new UIContainerRectShape(inventoryContainer)
   bg.id = `hmmm-${index}`
   bg.thickness = 1
-  bg.background = 'green'
+  bg.background = new Color4(0, 0, 1, 1)
   // If `inventoryContainer.adaptWidth` OR `inventoryContainer.adaptHeight`
   // are set to true, you have to set width OR height of its children in pixels!
-  bg.width = '100%'
-  bg.height = '60px'
+  bg.width = 1
+  // TODO: UI-Migration
+  bg.height = 1 // 60px
   bg.hAlign = 'center'
   bg.vAlign = 'top'
 
