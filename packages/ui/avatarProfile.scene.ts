@@ -1,4 +1,4 @@
-import { Entity, engine, OnClick, executeTask, Color4 } from 'decentraland-ecs/src'
+import { Entity, engine, OnClick, executeTask } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIContainerRectShape,
@@ -207,13 +207,12 @@ const screenSpaceUI = new UIFullScreenShape()
 
 // Main container
 const guiContainerComponent = new UIContainerRectShape(screenSpaceUI)
-// a guiContainerComponent.sizeInPixels = true
-guiContainerComponent.width = 300
-guiContainerComponent.height = 400
+guiContainerComponent.width = '300px'
+guiContainerComponent.height = '400px'
 guiContainerComponent.hAlign = 'right'
-// a guiContainerComponent.cornerRadius = 40
-guiContainerComponent.color = new Color4(1, 1, 1, 1)
-guiContainerComponent.position.x = -0.3
+guiContainerComponent.cornerRadius = 40
+guiContainerComponent.background = 'white'
+guiContainerComponent.left = '-200px' // TODO: make it possible to do offsetX || '400px'
 guiContainerComponent.visible = false
 
 // background
@@ -242,17 +241,16 @@ publicKeyComponent.top = '30px'
 
 // Friend, follow etc..
 const friendshipsContainer = new UIContainerRectShape(guiContainerComponent)
-// a friendshipsContainer.sizeInPixels = true
-friendshipsContainer.width = 450
-friendshipsContainer.position.y = -0.15
-friendshipsContainer.position.x = -0.1
+friendshipsContainer.width = '450px'
+friendshipsContainer.top = '150px'
+friendshipsContainer.left = '-100px'
 
 createWinkButton(friendshipsContainer, follow)
 createFriendButton(friendshipsContainer, addFriend)
 
 // Block, mute, etc...
 const blockAndMuteContainer = new UIContainerRectShape(friendshipsContainer)
-blockAndMuteContainer.position.x = 0.1
+blockAndMuteContainer.left = '140px'
 
 let muteButton = createMuteButton(blockAndMuteContainer, toggleMute)
 let blockButton = createBlockButton(blockAndMuteContainer, toggleBlock)

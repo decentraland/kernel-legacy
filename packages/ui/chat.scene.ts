@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color4 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -251,10 +251,10 @@ function createChatHeader(parent: UIShape) {
   container.id = 'gui-container-header'
   container.vAlign = 'top'
   container.hAlign = 'left'
-  container.width = 400
-  container.height = 45
+  container.width = '400px'
+  container.height = '45px'
   container.thickness = 0
-  container.background = new Color4(0, 0, 0, 1)
+  container.background = 'black'
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -414,13 +414,14 @@ const container = new UIContainerRectShape(parent)
 container.id = 'gui-container'
 container.vAlign = 'bottom'
 container.hAlign = 'left'
-container.width = 400
-container.height = 250
-container.position.x = 20
-container.position.y = 20
-container.color = new Color4(1, 1, 1, 1)
+container.width = '400px'
+container.height = '250px'
+container.cornerRadius = 20
+container.left = '20px'
+container.top = '-20px'
+container.color = PRIMARY_TEXT_COLOR
 container.thickness = 0
-container.background = new Color4(0, 0, 0, 1)
+container.background = 'black'
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -456,10 +457,10 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.adaptWidth = true
   containerMinimized.vAlign = 'bottom'
   containerMinimized.hAlign = 'left'
-  containerMinimized.position.x = 20
-  containerMinimized.position.y = 15
+  containerMinimized.left = '20px'
+  containerMinimized.top = '-15px'
   containerMinimized.thickness = 0
-  containerMinimized.background = new Color4(0, 0, 0, 0)
+  containerMinimized.background = 'transparent'
 
   const minimizedIcon = new UIImageShape(containerMinimized)
   minimizedIcon.id = 'minimize-icon'
@@ -489,13 +490,14 @@ const helpContainer = new UIContainerRectShape(parent)
 helpContainer.id = 'gui-container-commands'
 helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
-helpContainer.width = 400
-helpContainer.height = 250
-helpContainer.position.x = 20
-helpContainer.position.y = 20
-helpContainer.color = new Color4(1, 1, 1, 1)
+helpContainer.width = '400px'
+helpContainer.height = '250px'
+helpContainer.cornerRadius = 20
+helpContainer.left = '20px'
+helpContainer.top = '-20px'
+helpContainer.color = PRIMARY_TEXT_COLOR
 helpContainer.thickness = 0
-helpContainer.background = new Color4(0, 0, 0, 1)
+helpContainer.background = 'black'
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -541,10 +543,10 @@ const headerContainer = new UIContainerRectShape(helpContainer)
 headerContainer.id = 'gui-container-header'
 headerContainer.vAlign = 'top'
 headerContainer.hAlign = 'left'
-headerContainer.width = 400
-headerContainer.height = 45
+headerContainer.width = '400px'
+headerContainer.height = '45px'
 headerContainer.thickness = 0
-headerContainer.background = new Color4(0, 0, 0, 1)
+headerContainer.background = 'black'
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR

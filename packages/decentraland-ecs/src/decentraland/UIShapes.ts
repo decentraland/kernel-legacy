@@ -1,6 +1,5 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color4, Vector2 } from './math'
 
 /**
  * @alpha
@@ -104,19 +103,25 @@ export class UIContainerRectShape extends UIShape {
   thickness: number = 0
 
   @ObservableComponent.field
-  width: number = 1
+  cornerRadius: number = 0
 
   @ObservableComponent.field
-  height: number = 1
+  width: string = '100%'
 
   @ObservableComponent.field
-  position: Vector2 = new Vector2(0, 0)
+  height: string = '100%'
 
   @ObservableComponent.field
-  color: Color4 = new Color4(1, 1, 1, 1)
+  top: string = '0px'
 
   @ObservableComponent.field
-  background: Color4 = new Color4(0, 0, 0, 1)
+  left: string = '0px'
+
+  @ObservableComponent.field
+  color: string = 'white'
+
+  @ObservableComponent.field
+  background: string = 'transparent'
 
   @ObservableComponent.field
   hAlign: string = 'center'
@@ -125,16 +130,10 @@ export class UIContainerRectShape extends UIShape {
   vAlign: string = 'center'
 
   @ObservableComponent.field
-  alignmentUsesSize: boolean = true
-
-  @ObservableComponent.field
   visible: boolean = true
 
   @ObservableComponent.field
   isPointerBlocker: boolean = false
-
-  @ObservableComponent.field
-  sizeInPixels: boolean = true
 }
 
 /**

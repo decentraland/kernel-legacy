@@ -11,11 +11,13 @@ const schemaValidator = createSchemaValidator({
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   thickness: { type: 'number', default: 0 },
-  width: { type: 'number', default: 1 },
-  height: { type: 'number', default: 1 },
-  position: { type: 'vector2', default: { x: 0, y: 0 } },
-  color: { type: 'color4', default: new BABYLON.Color4(1, 1, 1, 1) },
-  background: { type: 'color4', default: new BABYLON.Color4(0, 0, 0, 0) },
+  cornerRadius: { type: 'number', default: 0 },
+  width: { type: 'string', default: '100%' },
+  height: { type: 'string', default: '100%' },
+  top: { type: 'string', default: '0px' },
+  left: { type: 'string', default: '0px' },
+  color: { type: 'string', default: 'white' },
+  background: { type: 'string', default: 'transparent' },
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
   visible: { type: 'boolean', default: true }
@@ -48,13 +50,14 @@ export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.thickness = this.data.thickness
+    this.control.cornerRadius = this.data.cornerRadius
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.top = -this.data.position.y
-    this.control.left = this.data.position.x
-    this.control.color = this.data.color.toHexString()
-    this.control.background = this.data.background.toHexString()
+    this.control.left = this.data.left
+    this.control.top = this.data.top
+    this.control.color = this.data.color
+    this.control.background = this.data.background
     this.control.isVisible = this.data.visible
 
     this.setParent(this.data.parentComponent)
