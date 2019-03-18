@@ -6,7 +6,7 @@ import { WebWorkerTransport } from 'decentraland-rpc'
 import { error } from 'engine/logger'
 
 import { Adapter } from './src/adapter'
-import { enableParcelSceneLoading, setUserPosition, finishScenePreload } from './src/parcelSceneManager'
+import { enableParcelSceneLoading, setUserPosition } from './src/parcelSceneManager'
 import { ParcelScene } from './src/parcelScene'
 import { InitializationOptions, configure } from './src/config'
 
@@ -20,10 +20,6 @@ const connector = new Adapter(WebWorkerTransport(self as any))
   connector.on('User.setPosition', (opt: { position: { x: number; y: number } }) => {
     setUserPosition(opt.position.x, opt.position.y)
   })
-
-  connector.on('Scene.preload', (opt: { id: string }) => {
-    finishScenePreload(opt.id)
-  })
 }
 
 async function initialize(opt: InitializationOptions) {
@@ -31,5 +27,5 @@ async function initialize(opt: InitializationOptions) {
     connector.notify('ParcelScenes.notify', { parcelScenes: parcelScenes.filter($ => !!$.data).map($ => $.data) })
   })
 
-  await enableParcelSceneLoading(opt.enablePreloading)
+  await enableParcelSceneLoading()
 }

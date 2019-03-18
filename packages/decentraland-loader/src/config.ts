@@ -7,7 +7,6 @@ export type InitializationOptions = {
   contractAddress: string
   radius: number
   contentServer: string
-  enablePreloading: boolean
 }
 
 export let sendParcelScenes: (parcelScenes: ParcelScene[]) => Promise<any> = () =>

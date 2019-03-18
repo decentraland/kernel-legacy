@@ -4,7 +4,7 @@ import { initShared } from '../shared'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObserver, lastPlayerPosition } from '../shared/world/positionThings'
-import { enableParcelSceneLoading, getParcelById, preloadScene } from '../shared/world/parcelSceneManager'
+import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
@@ -14,6 +14,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 
 let gameInstance: GameInstance = null
+const preloadedScenes = new Set<string>()
 
 const positionEvent = {
   position: Vector3.Zero(),
@@ -41,7 +42,7 @@ const browserInterface = {
   },
 
   PreloadFinished(data: { sceneId: string }) {
-    preloadScene(data.sceneId)
+    preloadedScenes.add(data.sceneId)
   }
 }
 
@@ -70,6 +71,10 @@ const unityInterface = {
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   }
+}
+
+export function finishScenePreload(id: string): void {
+  preloadedScenes.add(id)
 }
 
 window['unityInterface'] = unityInterface
@@ -130,6 +135,9 @@ export async function initializeEngine(_gameInstance: GameInstance) {
 
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
+    shouldLoadParcelScene: scene => {
+      return preloadedScenes.has(scene.data.id)
+    },
     onLoadParcelScenes: scenes => {
       unityInterface.LoadParcelScenes(
         scenes.map($ => {
@@ -138,8 +146,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
           return x
         })
       )
-    },
-    enablePreloading: true
+    }
   })
 
   return {
