@@ -64,7 +64,7 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
     this.control.sourceTop = parseInt(this.data.sourceTop, 10)
     this.control.sourceWidth = parseInt(this.data.sourceWidth, 10)
     this.control.sourceHeight = parseInt(this.data.sourceHeight, 10)
-    this.control.source = this.data.source
+    this.control.source = this.context.resolveUrl(this.data.source)
     this.control.width = this.data.width
     this.control.height = this.data.height
     this.control.top = this.data.top
