@@ -2,10 +2,11 @@ const ui = new UIScreenSpaceShape()
 
 const container = new UIContainerRectShape(ui)
 container.id = 'testRectContainer'
-container.color = new Color4(0, 255, 0, 255)
+container.color = Color3.Green()
 container.sizeInPixels = false
 container.width = 0.5
 container.height = 0.5
+container.visible = true
 
 const image = new UIImageShape(container, 'img.png')
 image.id = 'testUIImage'

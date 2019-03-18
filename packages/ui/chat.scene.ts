@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color4, Vector2 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask, Vector2, Color3 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -252,7 +252,7 @@ function createChatHeader(parent: UIShape) {
   container.width = 400
   container.height = 45
   container.thickness = 0
-  container.background = new Color4(0, 0, 0, 1)
+  container.background = Color3.Black()
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -416,9 +416,9 @@ container.width = 400
 container.height = 250
 container.position.x = 20
 container.position.y = 20
-container.color = new Color4(1, 1, 1, 1)
+container.color = Color3.White()
 container.thickness = 0
-container.background = new Color4(0, 0, 0, 1)
+container.background = Color3.Black()
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -457,7 +457,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.position.x = 20
   containerMinimized.position.y = 15
   containerMinimized.thickness = 0
-  containerMinimized.background = new Color4(0, 0, 0, 0)
+  containerMinimized.background = Color3.Black()
 
   const minimizedIcon = new UIImageShape(containerMinimized, UI_CHAT)
   minimizedIcon.id = 'minimize-icon'
@@ -491,9 +491,9 @@ helpContainer.width = 400
 helpContainer.height = 250
 helpContainer.position.x = 20
 helpContainer.position.y = 20
-helpContainer.color = new Color4(1, 1, 1, 1)
+helpContainer.color = Color3.White()
 helpContainer.thickness = 0
-helpContainer.background = new Color4(0, 0, 0, 1)
+helpContainer.background = Color3.Black()
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -542,7 +542,7 @@ headerContainer.hAlign = 'left'
 headerContainer.width = 400
 headerContainer.height = 45
 headerContainer.thickness = 0
-headerContainer.background = new Color4(0, 0, 0, 1)
+headerContainer.background = Color3.Black()
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR

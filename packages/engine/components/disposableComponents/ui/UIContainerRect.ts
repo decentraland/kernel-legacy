@@ -14,8 +14,8 @@ const schemaValidator = createSchemaValidator({
   width: { type: 'number', default: 1 },
   height: { type: 'number', default: 1 },
   position: { type: 'vector2', default: { x: 0, y: 0 } },
-  color: { type: 'color4', default: new BABYLON.Color4(1, 1, 1, 1) },
-  background: { type: 'color4', default: new BABYLON.Color4(0, 0, 0, 0) },
+  color: { type: 'color', default: BABYLON.Color3.White() },
+  background: { type: 'color', default: BABYLON.Color3.Black() },
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
   visible: { type: 'boolean', default: true }

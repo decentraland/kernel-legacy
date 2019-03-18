@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color4, Vector2 } from './math'
+import { Vector2, Color3 } from './math'
 
 /**
  * @alpha
@@ -113,10 +113,10 @@ export class UIContainerRectShape extends UIShape {
   position: Vector2 = new Vector2(0, 0)
 
   @ObservableComponent.field
-  color: Color4 = new Color4(1, 1, 1, 1)
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
-  background: Color4 = new Color4(0, 0, 0, 1)
+  background: Color3 = Color3.Black()
 
   @ObservableComponent.field
   hAlign: string = 'center'

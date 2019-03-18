@@ -8,7 +8,7 @@ engine.addEntity(uiEntity)
 const container = new UIContainerRectShape(ui)
 container.width = 1
 container.height = 1
-container.color = new Color4(1, 1, 1, 1) // we set global text color here
+container.color = Color3.White() // we set global text color here
 container.hAlign = 'center'
 container.vAlign = 'center'
 
@@ -18,7 +18,7 @@ bg.opacity = 0.2
 bg.thickness = 1
 // TODO: UI-Migration
 // a bg.cornerRadius = 10
-bg.background = new Color4(0, 0, 0, 1)
+bg.background = Color3.Black()
 
 // --- INVENTORY
 
@@ -38,7 +38,7 @@ function generateInventoryItem(index: number) {
   const bg = new UIContainerRectShape(inventoryContainer)
   bg.id = `hmmm-${index}`
   bg.thickness = 1
-  bg.background = new Color4(0, 0, 1, 1)
+  bg.background = Color3.Blue()
   // If `inventoryContainer.adaptWidth` OR `inventoryContainer.adaptHeight`
   // are set to true, you have to set width OR height of its children in pixels!
   bg.width = 1
@@ -103,15 +103,15 @@ engine.addEntity(inputEntity)
 const sendButton = new Entity()
 const sendButtonShape = new UIImageShape(container, SEND_ICON)
 sendButtonShape.source = SEND_ICON
-sendButtonShape.sourceWidth = '64px'
-sendButtonShape.sourceHeight = '64px'
-sendButtonShape.sourceTop = '0px'
-sendButtonShape.sourceLeft = '0px'
-sendButtonShape.width = '30px'
-sendButtonShape.height = '30px'
+sendButtonShape.sourceWidth = 64
+sendButtonShape.sourceHeight = 64
+sendButtonShape.sourceTop = 0
+sendButtonShape.sourceLeft = 0
+sendButtonShape.width = 30
+sendButtonShape.height = 30
 sendButtonShape.hAlign = 'right'
-sendButtonShape.top = '-40px'
-sendButtonShape.left = '-20px'
+sendButtonShape.position.y = -40
+sendButtonShape.position.x = -20
 sendButton.addComponentOrReplace(
   new OnClick(() => {
     if (inputTextState) {

@@ -4033,8 +4033,8 @@ declare class UIContainerRectShape extends UIShape {
   width: number
   height: number
   position: Vector2
-  color: Color4
-  background: Color4
+  color: Color3
+  background: Color3
   hAlign: string
   vAlign: string
   alignmentUsesSize: boolean
@@ -4087,6 +4087,7 @@ declare class UIImageShape extends UIShape {
   visible: boolean
   isPointerBlocker: boolean
   sizeInPixels: boolean
+  constructor(parent: UIShape, source: string)
 }
 
 /**

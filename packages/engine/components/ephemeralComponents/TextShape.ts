@@ -7,8 +7,8 @@ import { CLASS_ID, TextShape as ECSTextShape } from 'decentraland-ecs/src'
 
 const schemaValidator = createSchemaValidator({
   outlineWidth: { type: 'number', default: 0 },
-  outlineColor: { type: 'string', default: '#ffffff' },
-  color: { type: 'string', default: '#ffffff' },
+  outlineColor: { type: 'color', default: BABYLON.Color3.White() },
+  color: { type: 'color', default: BABYLON.Color3.White() },
   fontFamily: { type: 'string', default: 'Arial' },
   fontSize: { type: 'number', default: 100 },
   fontWeight: { type: 'number', default: 'normal' },
@@ -21,7 +21,7 @@ const schemaValidator = createSchemaValidator({
   shadowBlur: { type: 'number', default: 0 },
   shadowOffsetX: { type: 'number', default: 0 },
   shadowOffsetY: { type: 'number', default: 0 },
-  shadowColor: { type: 'string', default: '#ffffff' },
+  shadowColor: { type: 'color', default: BABYLON.Color3.White() },
   zIndex: { type: 'number', default: 0 },
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },

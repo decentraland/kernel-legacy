@@ -1,4 +1,4 @@
-import { Entity, engine, OnClick, executeTask, Color4, Vector2 } from 'decentraland-ecs/src'
+import { Entity, engine, OnClick, executeTask, Vector2, Color3 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIContainerRectShape,
@@ -211,7 +211,7 @@ guiContainerComponent.width = 300
 guiContainerComponent.height = 400
 guiContainerComponent.hAlign = 'right'
 // a guiContainerComponent.cornerRadius = 40
-guiContainerComponent.color = new Color4(1, 1, 1, 1)
+guiContainerComponent.color = Color3.White()
 guiContainerComponent.position.x = -0.3
 guiContainerComponent.visible = false
 

@@ -1,5 +1,6 @@
 import * as BABYLON from 'babylonjs'
 import { ReadOnlyVector2, ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
+import { DEBUG } from 'config'
 
 export type ISchema<Keys> = { [key: string]: { type: keyof Keys; default?: any } }
 export type Validator<T = any> = (x: any, defaultValue: T) => T
@@ -134,27 +135,39 @@ export const validators = {
       const v = x.trim()
       if (v.startsWith('#')) {
         color.copyFrom(BABYLON.Color3.FromHexString(x))
+      } else {
+        // tslint:disable-next-line:no-console
+        DEBUG && console.warn('Cannot parse color3', x)
       }
     } else if (typeof x === 'object' && (x.r !== undefined && x.g !== undefined && x.b !== undefined)) {
       color.copyFrom(x)
     } else if (typeof x === 'number') {
       color.copyFrom(BABYLON.Color3.FromHexString('#' + ('000000' + (x | 0).toString(16)).substr(-6)))
+    } else {
+      // tslint:disable-next-line:no-console
+      DEBUG && console.warn('Cannot parse color3', x)
     }
     return color
   },
 
   color4(x, def: BABYLON.Color3) {
     if (x === null || x === undefined) return def
-    const color = new BABYLON.Color4(0, 0, 0, 0)
+    const color = new BABYLON.Color4(0, 0, 0, 1)
     if (typeof x === 'string') {
       const v = x.trim()
       if (v.startsWith('#')) {
         color.copyFrom(BABYLON.Color4.FromHexString(x))
+      } else {
+        // tslint:disable-next-line:no-console
+        DEBUG && console.warn('Cannot parse color4', x)
       }
     } else if (typeof x === 'object' && (x.r !== undefined && x.g !== undefined && x.b !== undefined)) {
       color.copyFrom(x)
     } else if (typeof x === 'number') {
       color.copyFrom(BABYLON.Color4.FromHexString('#' + ('00000000' + (x | 0).toString(16)).substr(-8)))
+    } else {
+      // tslint:disable-next-line:no-console
+      DEBUG && console.warn('Cannot parse color4', x)
     }
     return color
   },
