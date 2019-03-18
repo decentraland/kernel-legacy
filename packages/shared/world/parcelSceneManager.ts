@@ -1,4 +1,4 @@
-import { initParcelSceneWorker } from '../../decentraland-loader/worker'
+import { initParcelSceneWorker, LandLoaderServer } from '../../decentraland-loader/worker'
 import { ETHEREUM_NETWORK } from '../../config'
 import { positionObserver, teleportObserver } from './positionThings'
 import { worldToGrid } from '../../atomicHelpers/parcelScenePositions'
@@ -10,6 +10,7 @@ export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: {
     new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI
   }
+  enablePreloading: boolean
   onLoadParcelScenes?(x: ILand[]): void
 }
 
@@ -28,8 +29,11 @@ export function getParcelById(id: string) {
   return null
 }
 
+let server: LandLoaderServer = null
+
 export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, options: EnableParcelSceneLoadingOptions) {
-  const ret = await initParcelSceneWorker(network)
+  const ret = await initParcelSceneWorker(network, options.enablePreloading)
+  server = ret.server
   const position = Vector2.Zero()
 
   function setParcelScenes(parcelScenes: ILand[]) {
@@ -93,4 +97,10 @@ export function enablePositionReporting() {
       }
     }
   })
+}
+
+export function preloadScene(id) {
+  if (server) {
+    server.notify('Scene.preload', { id })
+  }
 }

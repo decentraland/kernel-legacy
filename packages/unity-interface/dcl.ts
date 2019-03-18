@@ -4,7 +4,7 @@ import { initShared } from '../shared'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObserver, lastPlayerPosition } from '../shared/world/positionThings'
-import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
+import { enableParcelSceneLoading, getParcelById, preloadScene } from '../shared/world/parcelSceneManager'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
@@ -29,7 +29,6 @@ const browserInterface = {
     positionEvent.position.set(data.position.x, data.position.y, data.position.z)
     positionEvent.quaternion.set(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w)
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
-
     positionObserver.notifyObservers(positionEvent)
   },
 
@@ -39,6 +38,10 @@ const browserInterface = {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
     }
+  },
+
+  PreloadFinished(data: { sceneId: string }) {
+    preloadScene(data.sceneId)
   }
 }
 
@@ -135,7 +138,8 @@ export async function initializeEngine(_gameInstance: GameInstance) {
           return x
         })
       )
-    }
+    },
+    enablePreloading: true
   })
 
   return {

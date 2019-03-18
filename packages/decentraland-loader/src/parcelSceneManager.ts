@@ -10,10 +10,20 @@ let userX = 0
 let userY = 0
 let positionDidChange = false
 
+const preloadedScenes = new Set<string>()
+
+function isScenePreloaded(parcelScene: ParcelScene): boolean {
+  return preloadedScenes.has(parcelScene.id)
+}
+
+export function finishScenePreload(id: string): void {
+  preloadedScenes.add(id)
+}
+
 /**
  * Given a list of visible parcels, returns the closest not-loaded parcelScene
  */
-function getParcelSceneToLoad(parcelsInRadius: Map<string, number>): ParcelScene | null {
+function getParcelSceneToLoad(parcelsInRadius: Map<string, number>, enablePreloading: boolean): ParcelScene | null {
   const loadList: { dist: number; position: string }[] = []
 
   parcelsInRadius.forEach((dist, position) => {
@@ -29,7 +39,9 @@ function getParcelSceneToLoad(parcelsInRadius: Map<string, number>): ParcelScene
   for (let { position } of loadList) {
     const parcelScene = parcelSceneMap.get(position)
     if (parcelScene && parcelScene.isPending) {
-      return parcelScene
+      if (!enablePreloading || isScenePreloaded(parcelScene)) {
+        return parcelScene
+      }
     }
   }
   return null
@@ -67,12 +79,15 @@ async function reconciliateParcelScene(parcelScene: ParcelScene) {
  * Given a list of visible parcels, it loads and sends the loaded and valid parcelScenes to the client.
  * It does that iteratively until we receive a new user position or there are no more parcelScenes to load.
  */
-async function loadAndSendCloseParcelScenes(expectedParcelsInUserRadius: Map<string, number>) {
+async function loadAndSendCloseParcelScenes(
+  expectedParcelsInUserRadius: Map<string, number>,
+  enablePreloading: boolean
+) {
   while (true) {
     if (positionDidChange) return
 
     /** Picks the closest not-loaded parcelScene and loads it */
-    const parcelSceneToLoad = getParcelSceneToLoad(expectedParcelsInUserRadius)
+    const parcelSceneToLoad = getParcelSceneToLoad(expectedParcelsInUserRadius, enablePreloading)
 
     if (parcelSceneToLoad) {
       try {
@@ -121,7 +136,7 @@ export function setUserPosition(x: number, y: number) {
   }
 }
 
-export async function enableParcelSceneLoading() {
+export async function enableParcelSceneLoading(enablePreloading: boolean) {
   async function iteration() {
     try {
       positionDidChange = false
@@ -130,7 +145,7 @@ export async function enableParcelSceneLoading() {
       const expectedParcelsInUserRadius = getParcelsInRadius(userX, userY, options!.radius)
 
       await ensureParcelScenesInMap(expectedParcelsInUserRadius)
-      await loadAndSendCloseParcelScenes(expectedParcelsInUserRadius)
+      await loadAndSendCloseParcelScenes(expectedParcelsInUserRadius, enablePreloading)
       await sendLocalList(expectedParcelsInUserRadius)
     } catch (e) {
       error('error refreshing parcelScenes', e)

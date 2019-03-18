@@ -22,7 +22,7 @@ export class LandLoaderServer extends TransportBasedServer {
   }
 }
 
-export async function initParcelSceneWorker(network: ETHEREUM_NETWORK) {
+export async function initParcelSceneWorker(network: ETHEREUM_NETWORK, enablePreloading: boolean) {
   const server = new LandLoaderServer(WebWorkerTransport(worker))
 
   const ethConfig = networkConfigurations[network]
@@ -37,7 +37,8 @@ export async function initParcelSceneWorker(network: ETHEREUM_NETWORK) {
     radius: parcelLimits.visibleRadius,
 
     // @ts-ignore
-    contentServer: DEBUG ? resolveUrl(document.location.origin, '/local-ipfs') : ethConfig.content
+    contentServer: DEBUG ? resolveUrl(document.location.origin, '/local-ipfs') : ethConfig.content,
+    enablePreloading
   })
 
   const prev = worker.onerror
