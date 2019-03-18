@@ -1,4 +1,4 @@
-import { Entity, engine, OnClick, executeTask, Color4 } from 'decentraland-ecs/src'
+import { Entity, engine, OnClick, executeTask, Color4, Vector2 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIContainerRectShape,
@@ -35,14 +35,14 @@ const internalState: IState = {
 function createAvatar(parent: UIShape) {
   const component = new UIImageShape(parent)
   component.id = 'avatar'
-  component.width = '128px'
-  component.height = '128px'
+  component.width = 128
+  component.height = 128
   component.source = ATLAS_PATH
-  component.sourceLeft = '0px'
-  component.sourceTop = '0px'
-  component.sourceWidth = '128px'
-  component.sourceHeight = '128px'
-  component.top = '-85px'
+  component.sourceLeft = 0
+  component.sourceTop = 0
+  component.sourceWidth = 128
+  component.sourceHeight = 128
+  component.position = new Vector2(0, 85)
   component.visible = true
 
   return { component }
@@ -51,13 +51,13 @@ function createAvatar(parent: UIShape) {
 function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'wink'
-  component.width = '48px'
-  component.height = '48px'
+  component.width = 48
+  component.height = 48
   component.source = ATLAS_PATH
-  component.sourceLeft = '347px'
-  component.sourceTop = '132px'
-  component.sourceWidth = '48px'
-  component.sourceHeight = '48px'
+  component.sourceLeft = 347
+  component.sourceTop = 132
+  component.sourceWidth = 48
+  component.sourceHeight = 48
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -70,14 +70,14 @@ function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'friend'
-  component.width = '48px'
-  component.height = '48px'
+  component.width = 48
+  component.height = 48
   component.source = ATLAS_PATH
-  component.sourceLeft = '396px'
-  component.sourceTop = '132px'
-  component.sourceWidth = '48px'
-  component.sourceHeight = '48px'
-  component.left = '55px'
+  component.sourceLeft = 396
+  component.sourceTop = 132
+  component.sourceWidth = 48
+  component.sourceHeight = 48
+  component.position = new Vector2(55, 0)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -90,13 +90,13 @@ function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) 
 function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'mute'
-  component.width = '52px'
-  component.height = '48px'
+  component.width = 52
+  component.height = 48
   component.source = ATLAS_PATH
-  component.sourceLeft = '347px'
-  component.sourceTop = '181px'
-  component.sourceWidth = '52px'
-  component.sourceHeight = '48px'
+  component.sourceLeft = 347
+  component.sourceTop = 181
+  component.sourceWidth = 52
+  component.sourceHeight = 48
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -109,14 +109,14 @@ function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'block'
-  component.width = '52px'
-  component.height = '48px'
+  component.width = 52
+  component.height = 48
   component.source = ATLAS_PATH
-  component.sourceLeft = '400px'
-  component.sourceTop = '181px'
-  component.sourceWidth = '52px'
-  component.sourceHeight = '48px'
-  component.left = '55px'
+  component.sourceLeft = 400
+  component.sourceTop = 181
+  component.sourceWidth = 52
+  component.sourceHeight = 48
+  component.position = new Vector2(55, 0)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -129,15 +129,14 @@ function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) =
 function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'close'
-  component.width = '48px'
-  component.height = '48px'
+  component.width = 48
+  component.height = 48
   component.source = ATLAS_PATH
-  component.sourceLeft = '350px'
-  component.sourceTop = '278px'
-  component.sourceWidth = '48px'
-  component.sourceHeight = '48px'
-  component.left = '130px'
-  component.top = '-170px'
+  component.sourceLeft = 350
+  component.sourceTop = 278
+  component.sourceWidth = 48
+  component.sourceHeight = 48
+  component.position = new Vector2(130, 170)
   component.isPointerBlocker = true
   component.visible = false
 
@@ -159,7 +158,7 @@ const hide = () => {
 const toggleMute = async () => {
   const isMuted = !internalState.isMuted
   internalState.isMuted = isMuted
-  muteButton.component.sourceTop = isMuted ? '230px' : '181px'
+  muteButton.component.sourceTop = isMuted ? 230 : 181
 
   if (isMuted) {
     await execute('SocialController', 'mute', [internalState.publicKey])
@@ -171,7 +170,7 @@ const toggleMute = async () => {
 const toggleBlock = async () => {
   const isBlocked = !internalState.isBlocked
   internalState.isBlocked = isBlocked
-  blockButton.component.sourceTop = isBlocked ? '230px' : '181px'
+  blockButton.component.sourceTop = isBlocked ? 230 : 181
 
   if (isBlocked) {
     await execute('SocialController', 'block', [internalState.publicKey])
@@ -219,14 +218,14 @@ guiContainerComponent.visible = false
 // background
 const bgComponent = new UIImageShape(guiContainerComponent)
 bgComponent.id = 'avatar_bg'
-bgComponent.width = '96px'
-bgComponent.height = '96px'
+bgComponent.width = 96
+bgComponent.height = 96
 bgComponent.source = ATLAS_PATH
-bgComponent.sourceLeft = '347px'
-bgComponent.sourceTop = '1px'
-bgComponent.sourceWidth = '96px'
-bgComponent.sourceHeight = '96px'
-bgComponent.top = '-80px'
+bgComponent.sourceLeft = 347
+bgComponent.sourceTop = 1
+bgComponent.sourceWidth = 96
+bgComponent.sourceHeight = 96
+bgComponent.position = new Vector2(0, 80)
 
 let avatarIcon = createAvatar(guiContainerComponent)
 
@@ -276,10 +275,10 @@ const show = (data: ShowProfileMessage) => {
   publicKeyComponent.value = pubKeyShortened
 
   internalState.isMuted = data.isMuted
-  muteButton.component.sourceTop = data.isMuted ? '230px' : '181px'
+  muteButton.component.sourceTop = data.isMuted ? 230 : 181
 
   internalState.isBlocked = data.isBlocked
-  blockButton.component.sourceTop = data.isBlocked ? '230px' : '181px'
+  blockButton.component.sourceTop = data.isBlocked ? 230 : 181
 }
 
 function follow() {

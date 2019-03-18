@@ -4070,23 +4070,23 @@ declare class UIContainerStackShape extends UIShape {
 declare class UIImageShape extends UIShape {
   id: string | null
   opacity: number
-  sourceLeft: string | null
-  sourceTop: string | null
-  sourceWidth: string | null
-  sourceHeight: string | null
+  sourceLeft: number
+  sourceTop: number
+  sourceWidth: number
+  sourceHeight: number
   source: string | null
-  width: string
-  height: string
-  top: string
-  left: string
+  width: number
+  height: number
+  position: Vector2
   hAlign: string
   vAlign: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
   visible: boolean
   isPointerBlocker: boolean
+  sizeInPixels: boolean
 }
 
 /**

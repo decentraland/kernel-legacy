@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color4 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask, Color4, Vector2 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -35,16 +35,15 @@ type MessageEntry = {
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'minimize-icon'
-  component.width = '20px'
-  component.height = '20px'
+  component.width = 20
+  component.height = 20
   component.source = UI_CHAT
-  component.sourceWidth = '40px'
-  component.sourceHeight = '40px'
-  component.sourceTop = '10px'
-  component.sourceLeft = '130px'
+  component.sourceWidth = 40
+  component.sourceHeight = 40
+  component.sourceTop = 10
+  component.sourceLeft = 130
   component.hAlign = 'right'
-  component.top = '0px'
-  component.left = '-10px'
+  component.position = new Vector2(-10, 0)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -58,15 +57,15 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
 function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'send-icon'
-  component.width = '23px'
-  component.height = '23px'
+  component.width = 23
+  component.height = 23
   component.source = UI_CHAT
-  component.sourceWidth = '48px'
-  component.sourceHeight = '48px'
-  component.sourceTop = '0px'
-  component.sourceLeft = '48px'
+  component.sourceWidth = 48
+  component.sourceHeight = 48
+  component.sourceTop = 0
+  component.sourceLeft = 48
   component.hAlign = 'right'
-  component.left = '-10px'
+  component.position = new Vector2(-10, 0)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -80,15 +79,15 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'help-icon'
-  component.width = '23px'
-  component.height = '23px'
+  component.width = 23
+  component.height = 23
   component.source = UI_CHAT
-  component.sourceWidth = '48px'
-  component.sourceHeight = '48px'
-  component.sourceTop = '0px'
-  component.sourceLeft = '0px'
+  component.sourceWidth = 48
+  component.sourceHeight = 48
+  component.sourceTop = 0
+  component.sourceLeft = 0
   component.hAlign = 'right'
-  component.left = '-10px'
+  component.position = new Vector2(-10, 0)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -102,15 +101,15 @@ function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'close-icon'
-  component.width = '20px'
-  component.height = '20px'
+  component.width = 20
+  component.height = 20
   component.source = UI_CHAT
-  component.sourceWidth = '35px'
-  component.sourceHeight = '35px'
-  component.sourceTop = '5px'
-  component.sourceLeft = '96px'
+  component.sourceWidth = 35
+  component.sourceHeight = 35
+  component.sourceTop = 5
+  component.sourceLeft = 96
   component.hAlign = 'right'
-  component.left = '-10px'
+  component.position = new Vector2(-10, 0)
   component.isPointerBlocker = true
   component.visible = false
 
@@ -125,16 +124,15 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
 function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent)
   component.id = 'help-close-icon'
-  component.width = '25px'
-  component.height = '25px'
+  component.width = 25
+  component.height = 25
   component.source = UI_CHAT
-  component.sourceWidth = '59px'
-  component.sourceHeight = '60px'
-  component.sourceTop = '-5px'
-  component.sourceLeft = '75px'
+  component.sourceWidth = 59
+  component.sourceHeight = 60
+  component.sourceTop = -5
+  component.sourceLeft = 75
   component.hAlign = 'right'
-  component.left = '-10px'
-  component.top = '-5px'
+  component.position = new Vector2(-10, 5)
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -463,13 +461,13 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
 
   const minimizedIcon = new UIImageShape(containerMinimized)
   minimizedIcon.id = 'minimize-icon'
-  minimizedIcon.width = '230px'
-  minimizedIcon.height = '55px'
+  minimizedIcon.width = 230
+  minimizedIcon.height = 55
   minimizedIcon.source = UI_CHAT
-  minimizedIcon.sourceWidth = '210px'
-  minimizedIcon.sourceHeight = '50px'
-  minimizedIcon.sourceTop = '50px'
-  minimizedIcon.sourceLeft = '0px'
+  minimizedIcon.sourceWidth = 210
+  minimizedIcon.sourceHeight = 50
+  minimizedIcon.sourceTop = 50
+  minimizedIcon.sourceLeft = 0
   minimizedIcon.hAlign = 'right'
   minimizedIcon.vAlign = 'top'
   minimizedIcon.isPointerBlocker = true
@@ -480,7 +478,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   engine.addEntity(minimizedIconEntity)
 
   const helpIcon = createHelpButton(containerMinimized, openHelp)
-  helpIcon.component.top = '-5px'
+  helpIcon.component.position = new Vector2(0, 5)
 
   return containerMinimized
 }

@@ -10,21 +10,21 @@ import { UIControl } from './UIControl'
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
   opacity: { type: 'number', default: 1 },
-  sourceLeft: { type: 'string', default: null },
-  sourceTop: { type: 'string', default: null },
-  sourceWidth: { type: 'string', default: null },
-  sourceHeight: { type: 'string', default: null },
+  sourceLeft: { type: 'number', default: 0 },
+  sourceTop: { type: 'number', default: 0 },
+  sourceWidth: { type: 'number', default: 1 },
+  sourceHeight: { type: 'number', default: 1 },
   source: { type: 'string', default: null },
-  width: { type: 'string', default: '100%' },
-  height: { type: 'string', default: '100%' },
-  top: { type: 'string', default: '0px' },
-  left: { type: 'string', default: '0px' },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 100 },
+  position: { type: 'vector2', default: { x: 0, y: 0 } },
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
-  paddingTop: { type: 'string', default: '0px' },
-  paddingRight: { type: 'string', default: '0px' },
-  paddingBottom: { type: 'string', default: '0px' },
-  paddingLeft: { type: 'string', default: '0px' },
+  paddingTop: { type: 'number', default: 0 },
+  paddingRight: { type: 'number', default: 0 },
+  paddingBottom: { type: 'number', default: 0 },
+  paddingLeft: { type: 'number', default: 0 },
+  sizeInPixels: { type: 'boolean', default: true },
   visible: { type: 'boolean', default: true },
   isPointerBlocker: { type: 'boolean', default: false }
 })
@@ -60,22 +60,23 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
   async updateData(data: UIImageShape): Promise<void> {
     this.data = schemaValidator(data)
 
-    this.control.sourceLeft = parseInt(this.data.sourceLeft, 10)
-    this.control.sourceTop = parseInt(this.data.sourceTop, 10)
-    this.control.sourceWidth = parseInt(this.data.sourceWidth, 10)
-    this.control.sourceHeight = parseInt(this.data.sourceHeight, 10)
+    this.control.sourceLeft = this.data.sourceLeft
+    this.control.sourceTop = this.data.sourceTop
+    this.control.sourceWidth = this.data.sourceWidth
+    this.control.sourceHeight = this.data.sourceHeight
     this.control.source = this.context.resolveUrl(this.data.source)
-    this.control.width = this.data.width
-    this.control.height = this.data.height
-    this.control.top = this.data.top
-    this.control.left = this.data.left
+    this.control.width = `${this.data.width}px`
+    this.control.height = `${this.data.height}px`
+    this.control.top = `${-this.data.position.y}px`
+    this.control.left = `${this.data.position.x}px`
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     // missing this.uiEntity.fontWeight = this.data.fontWeight
-    this.control.paddingTop = this.data.paddingTop
-    this.control.paddingRight = this.data.paddingRight
-    this.control.paddingBottom = this.data.paddingBottom
+    this.control.paddingTop = `${this.data.paddingTop}px`
+    this.control.paddingLeft = `${this.data.paddingLeft}px`
+    this.control.paddingRight = `${this.data.paddingRight}px`
+    this.control.paddingBottom = `${this.data.paddingBottom}px`
     this.control.isVisible = this.data.visible
     this.control.isPointerBlocker = this.data.isPointerBlocker
 

@@ -488,31 +488,28 @@ export class UIImageShape extends UIShape {
   opacity: number = 1
 
   @ObservableComponent.field
-  sourceLeft: string | null = null
+  sourceLeft: number = 0
 
   @ObservableComponent.field
-  sourceTop: string | null = null
+  sourceTop: number = 0
 
   @ObservableComponent.field
-  sourceWidth: string | null = null
+  sourceWidth: number = 1
 
   @ObservableComponent.field
-  sourceHeight: string | null = null
+  sourceHeight: number = 1
 
   @ObservableComponent.field
   source: string | null = null
 
   @ObservableComponent.field
-  width: string = '100%'
+  width: number = 1
 
   @ObservableComponent.field
-  height: string = '100%'
+  height: number = 1
 
   @ObservableComponent.field
-  top: string = '0px'
-
-  @ObservableComponent.field
-  left: string = '0px'
+  position: Vector2 = new Vector2(0, 0)
 
   @ObservableComponent.field
   hAlign: string = 'center'
@@ -521,22 +518,25 @@ export class UIImageShape extends UIShape {
   vAlign: string = 'center'
 
   @ObservableComponent.field
-  paddingTop: string = '0px'
+  paddingTop: number = 0
 
   @ObservableComponent.field
-  paddingRight: string = '0px'
+  paddingRight: number = 0
 
   @ObservableComponent.field
-  paddingBottom: string = '0px'
+  paddingBottom: number = 0
 
   @ObservableComponent.field
-  paddingLeft: string = '0px'
+  paddingLeft: number = 0
 
   @ObservableComponent.field
   visible: boolean = true
 
   @ObservableComponent.field
   isPointerBlocker: boolean = false
+
+  @ObservableComponent.field
+  sizeInPixels: boolean = true
 }
 
 /**
