@@ -33,7 +33,7 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, UI_CHAT)
   component.id = 'minimize-icon'
   component.width = 20
   component.height = 20
@@ -55,7 +55,7 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
 }
 
 function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, UI_CHAT)
   component.id = 'send-icon'
   component.width = 23
   component.height = 23
@@ -77,7 +77,7 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, UI_CHAT)
   component.id = 'help-icon'
   component.width = 23
   component.height = 23
@@ -99,7 +99,7 @@ function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, UI_CHAT)
   component.id = 'close-icon'
   component.width = 20
   component.height = 20
@@ -122,7 +122,7 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
 }
 
 function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, UI_CHAT)
   component.id = 'help-close-icon'
   component.width = 25
   component.height = 25
@@ -459,7 +459,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.thickness = 0
   containerMinimized.background = new Color4(0, 0, 0, 0)
 
-  const minimizedIcon = new UIImageShape(containerMinimized)
+  const minimizedIcon = new UIImageShape(containerMinimized, UI_CHAT)
   minimizedIcon.id = 'minimize-icon'
   minimizedIcon.width = 230
   minimizedIcon.height = 55

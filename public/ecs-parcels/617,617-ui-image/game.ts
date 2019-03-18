@@ -7,7 +7,7 @@ container.sizeInPixels = false
 container.width = 0.5
 container.height = 0.5
 
-const image = new UIImageShape(container)
+const image = new UIImageShape(container, 'img.png')
 image.id = 'testUIImage'
 image.width = 256
 image.height = 256

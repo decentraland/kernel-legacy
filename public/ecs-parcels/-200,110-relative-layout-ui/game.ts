@@ -101,7 +101,7 @@ inputEntity.addComponentOrReplace(
 engine.addEntity(inputEntity)
 
 const sendButton = new Entity()
-const sendButtonShape = new UIImageShape(container)
+const sendButtonShape = new UIImageShape(container, SEND_ICON)
 sendButtonShape.source = SEND_ICON
 sendButtonShape.sourceWidth = '64px'
 sendButtonShape.sourceHeight = '64px'

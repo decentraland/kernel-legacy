@@ -537,6 +537,11 @@ export class UIImageShape extends UIShape {
 
   @ObservableComponent.field
   sizeInPixels: boolean = true
+
+  constructor(parent: UIShape, source: string) {
+    super(parent)
+    this.source = source
+  }
 }
 
 /**

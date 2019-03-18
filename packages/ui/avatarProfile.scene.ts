@@ -33,7 +33,7 @@ const internalState: IState = {
 // -----------------------------
 
 function createAvatar(parent: UIShape) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'avatar'
   component.width = 128
   component.height = 128
@@ -49,7 +49,7 @@ function createAvatar(parent: UIShape) {
 }
 
 function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'wink'
   component.width = 48
   component.height = 48
@@ -68,7 +68,7 @@ function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'friend'
   component.width = 48
   component.height = 48
@@ -88,7 +88,7 @@ function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) 
 }
 
 function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'mute'
   component.width = 52
   component.height = 48
@@ -107,7 +107,7 @@ function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'block'
   component.width = 52
   component.height = 48
@@ -127,7 +127,7 @@ function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) =
 }
 
 function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent)
+  const component = new UIImageShape(parent, ATLAS_PATH)
   component.id = 'close'
   component.width = 48
   component.height = 48
@@ -216,7 +216,7 @@ guiContainerComponent.position.x = -0.3
 guiContainerComponent.visible = false
 
 // background
-const bgComponent = new UIImageShape(guiContainerComponent)
+const bgComponent = new UIImageShape(guiContainerComponent, ATLAS_PATH)
 bgComponent.id = 'avatar_bg'
 bgComponent.width = 96
 bgComponent.height = 96
