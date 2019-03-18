@@ -3,6 +3,7 @@ import { WebGLScene } from 'dcl/WebGLScene'
 import { SceneWorker } from 'shared/world/SceneWorker'
 import { ChatController } from 'dcl/api/ChatController'
 import { SocialController } from 'shared/apis/SocialController'
+import { createLogger } from 'shared/logger'
 
 const chatWorkerRaw = require('raw-loader!../../../static/systems/chat.scene.js')
 const chatWorkerBLOB = new Blob([chatWorkerRaw])
@@ -33,6 +34,7 @@ export class WebGLUIScene extends WebGLScene<any> {
 
 export async function initHudSystem(): Promise<WebGLUIScene> {
   const context = new SharedSceneContext('/', 'ui-context-hud', false)
+  context.logger = createLogger('hud-scene: ')
   const scene = new WebGLUIScene('hud', hudWorkerUrl, context)
   const system = await scene.worker.system
 
@@ -45,6 +47,7 @@ export async function initHudSystem(): Promise<WebGLUIScene> {
 
 export async function initChatSystem(): Promise<WebGLUIScene> {
   const context = new SharedSceneContext('/', 'ui-context-chat', false)
+  context.logger = createLogger('chat-scene: ')
   const scene = new WebGLUIScene('chat', chatWorkerUrl, context)
   const system = await scene.worker.system
 

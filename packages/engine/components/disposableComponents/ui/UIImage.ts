@@ -64,7 +64,13 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
     this.control.sourceTop = this.data.sourceTop
     this.control.sourceWidth = this.data.sourceWidth
     this.control.sourceHeight = this.data.sourceHeight
-    this.control.source = this.context.resolveUrl(this.data.source)
+
+    if (this.data.source) {
+      this.control.source = this.context.resolveUrl(this.data.source)
+    } else {
+      this.context.logger.warn('Warning UIImage.source is empty')
+    }
+
     this.control.width = `${this.data.width}px`
     this.control.height = `${this.data.height}px`
     this.control.top = `${-this.data.position.y}px`
