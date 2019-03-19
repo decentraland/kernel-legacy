@@ -8,7 +8,7 @@ import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
-  shouldLoadParcelScene: (ILand) => boolean
+  shouldLoadParcelScene: (parcelToLoad: ILand) => boolean
   onLoadParcelScenes?(x: ILand[]): void
 }
 
