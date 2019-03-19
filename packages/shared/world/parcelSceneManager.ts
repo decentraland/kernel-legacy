@@ -7,10 +7,8 @@ import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 
 export type EnableParcelSceneLoadingOptions = {
-  parcelSceneClass: {
-    new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI
-  }
-  shouldLoadParcelScene: (ParcelSceneAPI) => boolean
+  parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
+  shouldLoadParcelScene: (ILand) => boolean
   onLoadParcelScenes?(x: ILand[]): void
 }
 
@@ -34,6 +32,8 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
   const position = Vector2.Zero()
 
   function setParcelScenes(parcelScenes: ILand[]) {
+    // tslint:disable-next-line: no-console
+    console.log('executing setParcelScenes', parcelScenes.length)
     const completeListOfParcelsThatShouldBeLoaded = parcelScenes.map($ => $.mappingsResponse.root_cid)
 
     for (let i = 0; i < parcelScenes.length; i++) {
@@ -44,9 +44,7 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
 
         let parcelSceneWorker
 
-        if (options.shouldLoadParcelScene(parcelScene)) {
-          parcelSceneWorker = new SceneWorker(parcelScene)
-        }
+        parcelSceneWorker = new SceneWorker(parcelScene)
 
         if (parcelSceneWorker) {
           loadedParcelSceneWorkers.add(parcelSceneWorker)
@@ -73,7 +71,7 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
   enablePositionReporting()
 
   ret.server.on('ParcelScenes.notify', (data: { parcelScenes: ILand[] }) => {
-    setParcelScenes(data.parcelScenes)
+    setParcelScenes(data.parcelScenes.filter(land => options.shouldLoadParcelScene(land)))
     if (options.onLoadParcelScenes) {
       options.onLoadParcelScenes(data.parcelScenes)
     }

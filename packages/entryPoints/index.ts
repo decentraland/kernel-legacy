@@ -14,9 +14,7 @@ export async function loadClient(net: ETHEREUM_NETWORK) {
 
   await enableParcelSceneLoading(net, {
     parcelSceneClass: WebGLParcelScene,
-    shouldLoadParcelScene: scene => {
-      return scene.data.id === '-102,100'
-    }
+    shouldLoadParcelScene: () => true
   })
 
   document.body.classList.remove('dcl-loading')
