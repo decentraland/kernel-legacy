@@ -136,7 +136,10 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
     shouldLoadParcelScene: land => {
-      return preloadedScenes.has(land.scene.scene.base)
+      return true
+      // TODO integrate with unity the preloading feature
+      // tslint:disable-next-line: no-commented-out-code
+      // return preloadedScenes.has(land.scene.scene.base)
     },
     onLoadParcelScenes: scenes => {
       unityInterface.LoadParcelScenes(
