@@ -33,7 +33,6 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
 
   function setParcelScenes(parcelScenes: ILand[]) {
     // tslint:disable-next-line: no-console
-    console.log('executing setParcelScenes', parcelScenes.length)
     const completeListOfParcelsThatShouldBeLoaded = parcelScenes.map($ => $.mappingsResponse.root_cid)
 
     for (let i = 0; i < parcelScenes.length; i++) {
