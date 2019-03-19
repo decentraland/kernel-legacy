@@ -44,7 +44,7 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
 
         let parcelSceneWorker
 
-        parcelSceneWorker = new SceneWorker(parcelScene)
+        const parcelSceneWorker = new SceneWorker(parcelScene)
 
         if (parcelSceneWorker) {
           loadedParcelSceneWorkers.add(parcelSceneWorker)
