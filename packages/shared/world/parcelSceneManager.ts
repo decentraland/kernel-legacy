@@ -42,7 +42,6 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
       if (!getParcelById(parcelSceneToLoad.mappingsResponse.root_cid)) {
         const parcelScene = new options.parcelSceneClass(ILandToLoadableParcelScene(parcelSceneToLoad))
 
-        let parcelSceneWorker
 
         const parcelSceneWorker = new SceneWorker(parcelScene)
 
