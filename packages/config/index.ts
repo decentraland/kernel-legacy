@@ -45,10 +45,15 @@ export namespace parcelLimits {
 
   export const visibleRadius = 6
 
-  export const maxParcelX = 3000
-  export const maxParcelZ = 3000
-  export const minParcelX = -3000
-  export const minParcelZ = -3000
+  export const maxX = 3000
+  export const maxZ = 3000
+  export const minX = -3000
+  export const minZ = -3000
+
+  export const maxParcelX = 150
+  export const maxParcelZ = 150
+  export const minParcelX = -150
+  export const minParcelZ = -150
 
   export const minLandCoordinateX = -150
   export const minLandCoordinateY = -150
@@ -85,10 +90,10 @@ export const AVOID_WEB3: boolean = !!(global as any).avoidWeb3 || EDITOR
 
 export const DEBUG = location.search.indexOf('DEBUG') !== -1 || !!(global as any).mocha || PREVIEW || EDITOR
 export const MOBILE_DEBUG = location.search.indexOf('MOBILE_DEBUG') !== -1
-export const DEBUG_METRICS = DEBUG && location.search.indexOf('DEBUG_METRICS') !== -1
+export const DEBUG_METRICS = location.search.indexOf('DEBUG_METRICS') !== -1
 
 export namespace commConfigurations {
-  export const debug = DEBUG
+  export const debug = DEBUG_METRICS
   export const commRadius = 4
 
   export const peerTtlMs = 60 * 1000
