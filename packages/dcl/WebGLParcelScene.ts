@@ -15,7 +15,7 @@ import { WebGLScene } from './WebGLScene'
 import { isScreenSpaceComponent } from 'engine/components/helpers/ui'
 import { IEvents } from 'decentraland-ecs/src/decentraland/Types'
 import { camera, scene } from 'engine/renderer'
-import { positionObserver } from 'shared/world/positionThings'
+import { positionObservable } from 'shared/world/positionThings'
 
 const auxVec2 = BABYLON.Vector2.Zero()
 
@@ -99,7 +99,7 @@ export class WebGLParcelScene extends WebGLScene<LoadableParcelScene> {
 
     scene.onAfterRenderObservable.add(this.afterRender)
 
-    positionObserver.add(this.checkUserInPlace)
+    positionObservable.add(this.checkUserInPlace)
   }
 
   afterRender = () => {
@@ -127,7 +127,7 @@ export class WebGLParcelScene extends WebGLScene<LoadableParcelScene> {
   dispose(): void {
     super.dispose()
     scene.onAfterRenderObservable.removeCallback(this.afterRender)
-    positionObserver.removeCallback(this.checkUserInPlace)
+    positionObservable.removeCallback(this.checkUserInPlace)
   }
 
   /**
@@ -185,12 +185,16 @@ export class WebGLParcelScene extends WebGLScene<LoadableParcelScene> {
     this.context.entities.forEach(entity => checkParcelSceneBoundaries(this.parcelCenters, newSet, entity))
     // remove the highlight from the entities that were outside but they are no longer outside
     this.setOfEntitiesOutsideBoundaries.forEach($ => {
-      if (!newSet.has($) && this.context.entities.has($.id)) {
-        removeEntityHighlight($)
-        $.setEnabled(true)
-        this.context.emit('entityBackInScene', { entityId: $.uuid })
-
+      if (!newSet.has($)) {
         this.setOfEntitiesOutsideBoundaries.delete($)
+
+        if (this.context.entities.has($.id)) {
+          removeEntityHighlight($)
+
+          $.setEnabled(true)
+          this.context.emit('entityBackInScene', { entityId: $.uuid })
+        }
+
         didChange = true
       }
     })

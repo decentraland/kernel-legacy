@@ -3,7 +3,7 @@ type GameInstance = { SendMessage(object: string, method: string, ...args: (numb
 import { initShared } from '../shared'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
-import { positionObserver, lastPlayerPosition } from '../shared/world/positionThings'
+import { positionObservable, lastPlayerPosition } from '../shared/world/positionThings'
 import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
@@ -12,8 +12,10 @@ import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
+import { DEBUG } from '../config'
 
 let gameInstance: GameInstance = null
+const preloadedScenes = new Set<string>()
 
 const positionEvent = {
   position: Vector3.Zero(),
@@ -29,8 +31,7 @@ const browserInterface = {
     positionEvent.position.set(data.position.x, data.position.y, data.position.z)
     positionEvent.quaternion.set(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w)
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
-
-    positionObserver.notifyObservers(positionEvent)
+    positionObservable.notifyObservers(positionEvent)
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
@@ -39,6 +40,10 @@ const browserInterface = {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
     }
+  },
+
+  PreloadFinished(data: { sceneId: string }) {
+    preloadedScenes.add(data.sceneId)
   }
 }
 
@@ -46,6 +51,9 @@ let lastParcelScenesSent = ''
 
 const unityInterface = {
   debug: false,
+  SetDebug() {
+    gameInstance.SendMessage('SceneController', 'SetDebug')
+  },
   /** Sends the camera position to the engine */
   SetPosition(x: number, y: number, z: number) {
     let theY = y <= 0 ? 2 : y
@@ -67,6 +75,10 @@ const unityInterface = {
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   }
+}
+
+export function finishScenePreload(id: string): void {
+  preloadedScenes.add(id)
 }
 
 window['unityInterface'] = unityInterface
@@ -125,8 +137,18 @@ export async function initializeEngine(_gameInstance: GameInstance) {
 
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
+  if (DEBUG) {
+    unityInterface.SetDebug()
+  }
+
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
+    shouldLoadParcelScene: land => {
+      return true
+      // TODO integrate with unity the preloading feature
+      // tslint:disable-next-line: no-commented-out-code
+      // return preloadedScenes.has(land.scene.scene.base)
+    },
     onLoadParcelScenes: scenes => {
       unityInterface.LoadParcelScenes(
         scenes.map($ => {
