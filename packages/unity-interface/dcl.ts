@@ -60,8 +60,22 @@ const unityInterface = {
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
     const parcelScenes = JSON.stringify({ parcelsToLoad })
     if (parcelScenes !== lastParcelScenesSent) {
+
       lastParcelScenesSent = parcelScenes
-      gameInstance.SendMessage('SceneController', 'LoadParcelScenes', parcelScenes)
+      var finalJson: string = "";
+
+      //NOTE(Brian): split json to be able to throttle the json parsing process in engine's side
+      for (var i = 0; i < parcelsToLoad.length; i++) {
+        var parcel = parcelsToLoad[i]
+        const json = JSON.stringify(parcel)
+
+        finalJson += json;
+
+        if (i < parcelsToLoad.length - 1)
+          finalJson += "<break>"
+      }
+
+      gameInstance.SendMessage('SceneController', 'LoadParcelScenes', finalJson)
     }
   },
   sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
