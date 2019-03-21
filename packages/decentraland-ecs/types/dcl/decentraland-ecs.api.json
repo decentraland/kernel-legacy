@@ -408,6 +408,30 @@
           "isOverride": false,
           "isEventProperty": false
         },
+        "restart": {
+          "kind": "method",
+          "signature": "restart(): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": false,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Restarts the animation. If it was playing, it rewinds the animation"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "setParams": {
           "kind": "method",
           "signature": "setParams(params: AnimationParams): void;",
@@ -460,6 +484,30 @@
           "isVirtual": false,
           "isOverride": false,
           "isEventProperty": false
+        },
+        "stop": {
+          "kind": "method",
+          "signature": "stop(): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": false,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Stops the animation and resets it to the beginning state"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
         },
         "weight": {
           "kind": "property",

@@ -1228,7 +1228,7 @@ describe('ECS', () => {
       let gltf: GLTFShape[] = []
       let animators: Animator[] = []
 
-      loadTestParcel('test animatios', -100, 111, function(_root, futureScene, futureWorker) {
+      loadTestParcel('test animations', -100, 111, function(_root, futureScene, futureWorker) {
         it('must have one gltf', async () => {
           const scene = await futureScene
           scene.context.disposableComponents.forEach($ => {
@@ -1240,7 +1240,7 @@ describe('ECS', () => {
           expect(gltf.length).to.eq(1)
         })
 
-        it('must have two animators', async () => {
+        it('must have three animators', async () => {
           const scene = await futureScene
           scene.context.entities.forEach($ => {
             for (let i in $.components) {
@@ -1250,7 +1250,7 @@ describe('ECS', () => {
             }
           })
 
-          expect(animators.length).to.eq(2)
+          expect(animators.length).to.eq(3)
         })
 
         it('wait some seconds', async () => {

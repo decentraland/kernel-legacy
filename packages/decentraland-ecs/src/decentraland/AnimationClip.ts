@@ -50,6 +50,13 @@ export class AnimationClip extends ObservableComponent {
   @ObservableComponent.field
   public speed: number = defaultParams.speed
 
+  /**
+   * Has the animation been reset after starting? default: false
+   */
+  // @internal
+  @ObservableComponent.field
+  public resetSinceStart: boolean = false
+
   // @internal
   @ObservableComponent.readonly
   readonly name: string = newId('AnimClip')
@@ -73,6 +80,27 @@ export class AnimationClip extends ObservableComponent {
    */
   play() {
     this.playing = true
+    this.resetSinceStart = false
+  }
+
+  /**
+   * Restarts the animation. If it was playing, it rewinds the animation
+   */
+  restart() {
+    this.playing = true
+    this.resetSinceStart = true
+    this.dirty = true
+    this.data.nonce = Math.random()
+  }
+
+  /**
+   * Stops the animation and resets it to the beginning state
+   */
+  stop() {
+    this.playing = false
+    this.resetSinceStart = true
+    this.dirty = true
+    this.data.nonce = Math.random()
   }
 
   /**

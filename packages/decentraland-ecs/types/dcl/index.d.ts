@@ -73,6 +73,14 @@ declare class AnimationClip extends ObservableComponent {
    */
   play(): void
   /**
+   * Restarts the animation. If it was playing, it rewinds the animation
+   */
+  restart(): void
+  /**
+   * Stops the animation and resets it to the beginning state
+   */
+  stop(): void
+  /**
    * Pauses the animation
    */
   pause(): void
