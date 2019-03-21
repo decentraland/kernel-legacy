@@ -68,7 +68,7 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
     if (this.data.source) {
       this.control.source = this.context.resolveUrl(this.data.source)
     } else {
-      this.context.logger.warn('Warning UIImage.source is empty')
+      this.context.logger.warn(`Warning UIImage.source for ${this.data.id} is empty`)
     }
 
     this.control.width = `${this.data.width}px`
