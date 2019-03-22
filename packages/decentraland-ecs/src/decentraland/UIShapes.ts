@@ -135,6 +135,9 @@ export class UIContainerRectShape extends UIShape {
 
   @ObservableComponent.field
   sizeInPixels: boolean = true
+
+  @ObservableComponent.field
+  positionInPixels: boolean = true
 }
 
 /**
@@ -537,6 +540,9 @@ export class UIImageShape extends UIShape {
 
   @ObservableComponent.field
   sizeInPixels: boolean = true
+
+  @ObservableComponent.field
+  positionInPixels: boolean = true
 
   constructor(parent: UIShape, source: string) {
     super(parent)

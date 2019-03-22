@@ -4041,6 +4041,7 @@ declare class UIContainerRectShape extends UIShape {
   visible: boolean
   isPointerBlocker: boolean
   sizeInPixels: boolean
+  positionInPixels: boolean
 }
 
 /**
@@ -4087,6 +4088,7 @@ declare class UIImageShape extends UIShape {
   visible: boolean
   isPointerBlocker: boolean
   sizeInPixels: boolean
+  positionInPixels: boolean
   constructor(parent: UIShape, source: string)
 }
 
