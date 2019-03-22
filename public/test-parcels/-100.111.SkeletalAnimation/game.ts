@@ -7,7 +7,9 @@ import {
   OnPointerDown,
   AnimationClip,
   Animator,
-  log
+  log,
+  BoxShape,
+  TextShape
 } from 'decentraland-ecs/src'
 
 // First way to
@@ -22,7 +24,7 @@ clip.play()
 shark.addComponentOrReplace(shape)
 shark.addComponentOrReplace(
   new Transform({
-    position: new Vector3(2, 1, 6)
+    position: new Vector3(2.5, 1, 6)
   })
 )
 
@@ -103,3 +105,143 @@ declare var dcl: any
 dcl.onEvent(function(event: any) {
   log('event', event)
 })
+
+// set shark 3 bite looping on/off
+let button1 = new Entity()
+button1.addComponent(new BoxShape())
+button1.addComponent(
+  new Transform({
+    position: new Vector3(9, 1, 2),
+    scale: new Vector3(0.5, 0.5, 0.5)
+  })
+)
+button1.addComponent(
+  new OnPointerDown(e => {
+    const clip = animator3.getClip('shark_skeleton_bite')
+    clip.looping != clip.looping
+    log('looping: ', clip.looping)
+  })
+)
+engine.addEntity(button1)
+
+let label1 = new Entity()
+label1.addComponent(new TextShape('toggle loop'))
+label1.setParent(button1)
+label1.addComponent(
+  new Transform({
+    position: new Vector3(0, 2, 0)
+  })
+)
+engine.addEntity(label1)
+
+// set shark 3 bite playing
+let button2 = new Entity()
+button2.addComponent(new BoxShape())
+button2.addComponent(
+  new Transform({
+    position: new Vector3(10, 1, 2),
+    scale: new Vector3(0.5, 0.5, 0.5)
+  })
+)
+button2.addComponent(
+  new OnPointerDown(e => {
+    const clip = animator3.getClip('shark_skeleton_bite')
+    clip.play()
+    log('clip playing')
+  })
+)
+engine.addEntity(button2)
+
+let label2 = new Entity()
+label2.addComponent(new TextShape('Play'))
+label2.setParent(button2)
+label2.addComponent(
+  new Transform({
+    position: new Vector3(0, 2, 0)
+  })
+)
+engine.addEntity(label2)
+
+// set shark 3 bite restart
+let button3 = new Entity()
+button3.addComponent(new BoxShape())
+button3.addComponent(
+  new Transform({
+    position: new Vector3(11, 1, 2),
+    scale: new Vector3(0.5, 0.5, 0.5)
+  })
+)
+button3.addComponent(
+  new OnPointerDown(e => {
+    const clip = animator3.getClip('shark_skeleton_bite')
+    clip.restart()
+    log('clip restart')
+  })
+)
+engine.addEntity(button3)
+
+let label3 = new Entity()
+label3.addComponent(new TextShape('Restart'))
+label3.setParent(button3)
+label3.addComponent(
+  new Transform({
+    position: new Vector3(0, 2, 0)
+  })
+)
+engine.addEntity(label3)
+
+// set shark 3 bite pause
+let button4 = new Entity()
+button4.addComponent(new BoxShape())
+button4.addComponent(
+  new Transform({
+    position: new Vector3(12, 1, 2),
+    scale: new Vector3(0.5, 0.5, 0.5)
+  })
+)
+button4.addComponent(
+  new OnPointerDown(e => {
+    const clip = animator3.getClip('shark_skeleton_bite')
+    clip.pause()
+    log('clip pause')
+  })
+)
+engine.addEntity(button4)
+
+let label4 = new Entity()
+label4.addComponent(new TextShape('Pause'))
+label4.setParent(button4)
+label4.addComponent(
+  new Transform({
+    position: new Vector3(0, 2, 0)
+  })
+)
+engine.addEntity(label4)
+
+// set shark 3 bite stop
+let button5 = new Entity()
+button5.addComponent(new BoxShape())
+button5.addComponent(
+  new Transform({
+    position: new Vector3(13, 1, 2),
+    scale: new Vector3(0.5, 0.5, 0.5)
+  })
+)
+button5.addComponent(
+  new OnPointerDown(e => {
+    const clip = animator3.getClip('shark_skeleton_bite')
+    clip.stop()
+    log('clip stop')
+  })
+)
+engine.addEntity(button5)
+
+let label5 = new Entity()
+label5.addComponent(new TextShape('Stop'))
+label5.setParent(button5)
+label5.addComponent(
+  new Transform({
+    position: new Vector3(0, 2, 0)
+  })
+)
+engine.addEntity(label5)
