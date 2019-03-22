@@ -76,7 +76,7 @@ const unityInterface = {
         finalJson += json;
 
         if (i < parcelsToLoad.length - 1) {
-          finalJson += "<break>"
+          finalJson += "}{"
         }
       }
 
