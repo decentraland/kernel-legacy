@@ -1,4 +1,5 @@
 import 'engine'
+import * as qs from 'query-string'
 
 import { ETHEREUM_NETWORK, DEBUG } from '../config'
 import { initBabylonClient } from '../dcl'
@@ -7,13 +8,31 @@ import { initShared } from '../shared'
 import { enableParcelSceneLoading } from '../shared/world/parcelSceneManager'
 import { WebGLParcelScene } from '../dcl/WebGLParcelScene'
 import { enableMiniMap } from '../dcl/widgets/minimap'
+import { movePlayerToSpawnpoint } from '../shared/world/positionThings'
 
 export async function loadClient(net: ETHEREUM_NETWORK) {
   await initBabylonClient()
   document.body.appendChild(enableMiniMap())
 
+  let initialized = false
+  const spawnpointLand = qs.parse(location.search).position
+
   await enableParcelSceneLoading(net, {
     parcelSceneClass: WebGLParcelScene,
+    onLoadParcelScenes: lands => {
+      if (initialized) {
+        return
+      }
+
+      const land = lands.find(land => land.scene.scene.base === spawnpointLand)
+
+      if (!land) {
+        return
+      }
+
+      movePlayerToSpawnpoint(land)
+      initialized = true
+    },
     shouldLoadParcelScene: () => true
   })
 
