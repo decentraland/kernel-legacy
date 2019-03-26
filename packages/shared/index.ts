@@ -1,4 +1,6 @@
-import './apis'
+import './apis/index'
+import './events'
+
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { ETHEREUM_NETWORK, MOBILE_DEBUG, networkConfigurations, PREVIEW, EDITOR, AVOID_WEB3 } from '../config'
 import { getERC721 } from './ethereum/ERC721'
