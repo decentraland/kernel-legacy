@@ -4,7 +4,7 @@ import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, networkConfiguratio
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
 import { positionObservable } from 'shared/world/positionThings'
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
-import { Stats, NetworkStats, PkgStats } from './debug'
+import { Stats } from './debug'
 
 import {
   getCurrentPeer,
@@ -21,7 +21,7 @@ import {
 
 import { ChatData, PositionData, ProfileData } from './commproto_pb'
 import { chatObservable, ChatEvent } from './chat'
-import { WorldInstanceConnection, TopicHandler } from './worldInstanceConnection'
+import { WorldInstanceConnection } from './worldInstanceConnection'
 import { ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { UserInformation, Pose } from './types'
 
@@ -33,6 +33,7 @@ export class PeerTrackingInfo {
   public profile: UserInformation | null = null
   public lastPositionUpdate: Timestamp = 0
   public lastProfileUpdate: Timestamp = 0
+  public lastUpdate: Timestamp = 0
   public receivedPublicChatMessages = new Set<string>()
 }
 
@@ -53,7 +54,6 @@ export class Context {
     this.userProfile = userProfile
     this.network = network || null
 
-    this.stats = commConfigurations.debug ? new Stats(this) : null
     this.commRadius = commConfigurations.commRadius
   }
 }
@@ -99,20 +99,13 @@ function ensurePeerTrackingInfo(context: Context, alias: string): PeerTrackingIn
   return peerTrackingInfo
 }
 
-export function processChatMessage(
-  context: Context,
-  conn: WorldInstanceConnection,
-  fromAlias: string,
-  data: Uint8Array | string
-): PkgStats | null {
-  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
 
-  const chatData = ChatData.deserializeBinary(data)
-  const msgId = chatData.getMessageId()
+export function processChatMessage(context: Context, fromAlias: string, data: ChatData) {
+  const msgId = data.getMessageId()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
   if (!peerTrackingInfo.receivedPublicChatMessages.has(msgId)) {
-    const text = chatData.getText()
+    const text = data.getText()
     peerTrackingInfo.receivedPublicChatMessages.add(msgId)
 
     const user = getUser(fromAlias)
@@ -128,27 +121,18 @@ export function processChatMessage(
       chatObservable.notifyObservers({ type: ChatEvent.MESSAGE_RECEIVED, messageEntry: entry })
     }
   }
-
-  return conn.stats ? conn.stats.chat : null
 }
 
-export function processProfileMessage(
-  context: Context,
-  conn: WorldInstanceConnection,
-  fromAlias: string,
-  data: Uint8Array | string
-): PkgStats | null {
-  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
 
-  const profileData = ProfileData.deserializeBinary(data)
-  const msgTimestamp = profileData.getTime()
+export function processProfileMessage(context: Context, fromAlias: string, data: ProfileData) {
+  const msgTimestamp = data.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
 
   if (msgTimestamp > peerTrackingInfo.lastProfileUpdate) {
-    const publicKey = profileData.getPublicKey()
-    const avatarType = profileData.getAvatarType()
-    const displayName = profileData.getDisplayName()
+    const publicKey = data.getPublicKey()
+    const avatarType = data.getAvatarType()
+    const displayName = data.getDisplayName()
 
     peerTrackingInfo.profile = {
       displayName,
@@ -157,19 +141,13 @@ export function processProfileMessage(
     }
 
     peerTrackingInfo.lastProfileUpdate = msgTimestamp
+    peerTrackingInfo.lastUpdate = Date.now()
   }
-  return conn.stats ? conn.stats.profile : null
 }
 
-export function processPositionMessage(
-  context: Context,
-  conn: WorldInstanceConnection,
-  fromAlias: string,
-  data: Uint8Array | string
-): PkgStats | null {
-  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
 
-  const positionData = PositionData.deserializeBinary(data)
+export function processPositionMessage(context: Context, fromAlias: string, positionData: PositionData) {
+
   const msgTimestamp = positionData.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -186,9 +164,8 @@ export function processPositionMessage(
 
     peerTrackingInfo.position = p
     peerTrackingInfo.lastPositionUpdate = msgTimestamp
+    peerTrackingInfo.lastUpdate = Date.now()
   }
-
-  return conn.stats ? conn.stats.position : null
 }
 
 type ProcessingPeerInfo = {
@@ -211,35 +188,22 @@ export function onPositionUpdate(context: Context, p: Position) {
   if (!sameParcel(oldParcel, newParcel)) {
     const commArea = new CommunicationArea(newParcel, context.commRadius)
 
-    const positionHandler = (fromAlias: string, data: Uint8Array | string) =>
-      processPositionMessage(context, worldConnection, fromAlias, data)
-
-    const profileHandler = (fromAlias: string, data: Uint8Array | string) =>
-      processProfileMessage(context, worldConnection, fromAlias, data)
-
-    const chatHandler = (fromAlias: string, data: Uint8Array | string) =>
-      processChatMessage(context, worldConnection, fromAlias, data)
-
     const xMin = ((commArea.vMin.x + parcelLimits.maxParcelX) >> 2) << 2
     const xMax = ((commArea.vMax.x + parcelLimits.maxParcelX) >> 2) << 2
     const zMin = ((commArea.vMin.z + parcelLimits.maxParcelZ) >> 2) << 2
     const zMax = ((commArea.vMax.z + parcelLimits.maxParcelZ) >> 2) << 2
 
-    const subscriptions = new Map<string, TopicHandler>()
     let rawTopics = ''
     for (let x = xMin; x <= xMax; x += 4) {
       for (let z = zMin; z <= zMax; z += 4) {
         const hash = `${x >> 2}:${z >> 2}`
         let topic = `position:${hash}`
-        subscriptions.set(topic, positionHandler)
         rawTopics += topic + ' '
 
         topic = `profile:${hash}`
-        subscriptions.set(topic, profileHandler)
         rawTopics += topic + ' '
 
         topic = `chat:${hash}`
-        subscriptions.set(topic, chatHandler)
         rawTopics += topic
 
         if (x !== xMax || z !== zMax) {
@@ -248,7 +212,7 @@ export function onPositionUpdate(context: Context, p: Position) {
       }
     }
 
-    worldConnection.updateSubscriptions(subscriptions, rawTopics)
+    context.worldInstanceConnection.updateSubscriptions(rawTopics)
   }
 
   context.currentPosition = p
@@ -268,20 +232,22 @@ function collectInfo(context: Context) {
   const visiblePeers: ProcessingPeerInfo[] = []
   const commArea = new CommunicationArea(position2parcel(context.currentPosition), commConfigurations.commRadius)
   for (let [peerAlias, trackingInfo] of context.peerData) {
+    const msSinceLastUpdate = now - trackingInfo.lastUpdate
+
+    if (msSinceLastUpdate > commConfigurations.peerTtlMs) {
+      context.peerData.delete(peerAlias)
+      removeById(peerAlias)
+
+      context.stats.onPeerRemoved(peerAlias)
+      continue
+    }
+
     if (!trackingInfo.position || !trackingInfo.profile) {
       continue
     }
 
     if (!commArea.contains(trackingInfo.position)) {
       receiveUserVisible(peerAlias, false)
-      continue
-    }
-
-    const msSinceLastUpdate = now - Math.max(trackingInfo.lastPositionUpdate, trackingInfo.lastProfileUpdate)
-
-    if (msSinceLastUpdate > commConfigurations.peerTtlMs) {
-      context.peerData.delete(peerAlias)
-      removeById(peerAlias)
       continue
     }
 
@@ -318,6 +284,7 @@ function collectInfo(context: Context) {
 
   if (context.stats) {
     context.stats.visiblePeersCount = visiblePeers.length
+    context.stats.trackingPeersCount = context.peerData.size
     context.stats.collectInfoDuration.stop()
   }
 }
@@ -338,12 +305,16 @@ export async function connect(ethAddress: string, network: ETHEREUM_NETWORK) {
       avatarType: user.avatarType
     }
 
+    const connection = new WorldInstanceConnection(networkConfigurations[network].worldInstanceUrl)
+    connection.positionHandler = (alias, data) => processPositionMessage(context, alias, data)
+    connection.profileHandler = (alias, data) => processProfileMessage(context, alias, data)
+    connection.chatHandler = (alias, data) => processChatMessage(context, alias, data)
     context = new Context(userProfile, network)
-    context.worldInstanceConnection = new WorldInstanceConnection(networkConfigurations[network].worldInstanceUrl)
+    context.worldInstanceConnection = connection
 
-    if (context.stats) {
-      context.worldInstanceConnection.stats = new NetworkStats(context.worldInstanceConnection)
-      context.stats.primaryNetworkStats = context.worldInstanceConnection.stats
+    if (commConfigurations.debug) {
+      context.stats = new Stats(context)
+      context.worldInstanceConnection.stats = context.stats
     }
 
     context.worldInstanceConnection.connect()
