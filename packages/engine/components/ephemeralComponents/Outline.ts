@@ -10,7 +10,7 @@ const outlineColor = BABYLON.Color3.FromHexString('#1D82FF')
 export class Outline extends BaseComponent<{}> {
   readonly name = OUTLINE_NAME
 
-  transformValue(x) {
+  transformValue(x: any) {
     return {
       nonce: Math.random()
     }

@@ -67,10 +67,10 @@ const notifyPositionObservers = (() => {
   return () => {
     if (isEngineRunning) {
       const rotationCamera: BABYLON.TargetCamera = (vrHelper.isInVRMode
-        ? vrHelper.currentVRCamera.leftCamera || vrHelper.currentVRCamera
+        ? vrHelper.currentVRCamera!.leftCamera || vrHelper.currentVRCamera
         : scene.activeCamera) as BABYLON.TargetCamera
 
-      position.copyFrom(scene.activeCamera.position)
+      position.copyFrom(scene.activeCamera!.position)
 
       if (rotationCamera.rotationQuaternion) {
         quaternion.copyFrom(rotationCamera.rotationQuaternion)
@@ -120,7 +120,8 @@ function getMetrics(): Metrics {
     .reduce<IParcelSceneLimits>(
       (metrics, m) => {
         Object.keys(metrics).map(key => {
-          metrics[key] += m[key]
+          // tslint:disable-next-line:semicolon
+          ;(metrics as any)[key] += (m as any)[key]
         })
         return metrics
       },
@@ -130,7 +131,7 @@ function getMetrics(): Metrics {
 
 function updateMetrics(): void {
   const metrics = getMetrics()
-  if (!EDITOR) {
+  if (!EDITOR && parcelMetrics) {
     parcelMetrics.update(metrics)
   }
 }
@@ -159,11 +160,11 @@ export async function initBabylonClient() {
   initLocalPlayer(lastPlayerPosition)
 
   if (isMobile()) {
-    enableVirtualJoystick(engine.getRenderingCanvas())
+    enableVirtualJoystick(engine.getRenderingCanvas()!)
   } else if (!EDITOR) {
     await initHudSystem()
   }
-  enableMouseLock(engine.getRenderingCanvas())
+  enableMouseLock(engine.getRenderingCanvas()!)
 
   initKeyboard()
   initDebugCommands()

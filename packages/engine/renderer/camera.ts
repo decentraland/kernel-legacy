@@ -14,7 +14,7 @@ const CAMERA_RIGHT = BABYLON.Quaternion.RotationYawPitchRoll(-Math.PI / 2, 0, 0)
 const CAMERA_FORWARD = BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0)
 const CAMERA_BACKWARD = BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0)
 
-const vrCamera = vrHelper.deviceOrientationCamera
+const vrCamera = vrHelper.deviceOrientationCamera as BABYLON.DeviceOrientationCamera
 
 const arcCamera = new BABYLON.ArcRotateCamera(
   'arc-camera',
@@ -124,11 +124,11 @@ export function setCamera(thirdPerson: boolean) {
   if (!thirdPerson && scene.activeCamera === vrCamera) return
 
   if (thirdPerson) {
-    arcCamera.target.copyFrom(scene.activeCamera.position)
+    arcCamera.target.copyFrom(scene.activeCamera!.position)
     scene.switchActiveCamera(arcCamera)
     scene.cameraToUseForPointers = scene.activeCamera
   } else {
-    vrCamera.position.copyFrom(scene.activeCamera.position)
+    vrCamera.position.copyFrom(scene.activeCamera!.position)
     scene.switchActiveCamera(vrCamera)
     scene.cameraToUseForPointers = scene.activeCamera
   }
@@ -142,7 +142,7 @@ export function setCameraPosition(position: BABYLON.Vector3) {
   if (scene.activeCamera === arcCamera) {
     arcCamera.target.copyFrom(position)
   } else {
-    scene.activeCamera.position.copyFrom(position)
+    scene.activeCamera!.position.copyFrom(position)
   }
 }
 
@@ -150,7 +150,7 @@ export function cameraPositionToRef(ref: BABYLON.Vector3) {
   if (scene.activeCamera === arcCamera) {
     ref.copyFrom(arcCamera.target)
   } else {
-    ref.copyFrom(scene.activeCamera.position)
+    ref.copyFrom(scene.activeCamera!.position)
   }
 }
 
@@ -160,21 +160,21 @@ export function rayToGround(screenX: number, screenY: number) {
 }
 
 function unprojectToPlane(vec: BABYLON.Vector3) {
-  const viewport = scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight())
+  const viewport = scene.activeCamera!.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight())
 
   let onPlane = BABYLON.Vector3.Unproject(
     vec,
     viewport.width,
     viewport.height,
     BABYLON.Matrix.Identity(),
-    scene.activeCamera.getViewMatrix(),
-    scene.activeCamera.getProjectionMatrix()
+    scene.activeCamera!.getViewMatrix(),
+    scene.activeCamera!.getProjectionMatrix()
   )
 
-  let dir = onPlane.subtract(scene.activeCamera.position).normalize()
-  let distance = -scene.activeCamera.position.y / dir.y
+  let dir = onPlane.subtract(scene.activeCamera!.position).normalize()
+  let distance = -scene.activeCamera!.position.y / dir.y
   dir.scaleInPlace(distance)
-  onPlane = scene.activeCamera.position.add(dir)
+  onPlane = scene.activeCamera!.position.add(dir)
   return onPlane
 }
 

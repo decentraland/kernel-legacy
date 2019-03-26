@@ -117,7 +117,7 @@ export function createParcelOutline(positions: string) {
     }
   }
 
-  const ground = BABYLON.Mesh.MergeMeshes(groundMeshes, true)
+  const ground = BABYLON.Mesh.MergeMeshes(groundMeshes, true) as BABYLON.Mesh
   ground.isPickable = false
 
   const lines = BABYLON.MeshBuilder.CreateLineSystem('lines', { lines: points }, scene)

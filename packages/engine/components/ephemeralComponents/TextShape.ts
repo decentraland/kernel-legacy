@@ -35,9 +35,9 @@ const schemaValidator = createSchemaValidator({
 
 export class TextShape extends BaseComponent<ECSTextShape> {
   currentFont: any = null
-  textBlock: BABYLON.GUI.TextBlock
-  texture: BABYLON.GUI.AdvancedDynamicTexture
-  private mesh: BABYLON.Mesh
+  textBlock!: BABYLON.GUI.TextBlock | void
+  texture!: BABYLON.GUI.AdvancedDynamicTexture | void
+  private mesh!: BABYLON.Mesh | void
 
   transformValue(value: any) {
     return schemaValidator(value)
@@ -80,7 +80,7 @@ export class TextShape extends BaseComponent<ECSTextShape> {
   detach() {
     this.entity.removeObject3D('text')
 
-    if (this.texture) {
+    if (this.texture && this.textBlock) {
       this.texture.removeControl(this.textBlock)
       this.textBlock.dispose()
       this.texture.dispose()
@@ -122,8 +122,11 @@ export class TextShape extends BaseComponent<ECSTextShape> {
     this.textBlock.paddingRight = this.value.paddingRight
     this.textBlock.paddingBottom = this.value.paddingBottom
     this.textBlock.paddingLeft = this.value.paddingLeft
-    this.mesh.isPickable = this.value.isPickable
-    this.mesh.billboardMode = this.value.billboard ? 7 : 0
+
+    if (this.mesh) {
+      this.mesh.isPickable = this.value.isPickable
+      this.mesh.billboardMode = this.value.billboard ? 7 : 0
+    }
   }
 }
 

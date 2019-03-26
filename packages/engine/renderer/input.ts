@@ -102,6 +102,7 @@ function enableMovementJoystick() {
 
   joystick.onMove(e => {
     const cameraTransform = BABYLON.Matrix.RotationYawPitchRoll(vrCamera.rotation.y, vrCamera.rotation.x, 0)
+
     const deltaTransform = BABYLON.Vector3.TransformCoordinates(
       new BABYLON.Vector3((e.deltaX * joystickSensibility) / 10, 0, ((e.deltaY * joystickSensibility) / 10) * -1),
       cameraTransform
@@ -155,7 +156,7 @@ function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(
   handleClick(pointerEvent: 'pointerUp' | 'pointerDown', pointerId: number, pickingResult: BABYLON.PickingInfo): void
 } | null {
   // Find the next entity parent to dispatch the event
-  let parent: BABYLON.Node = node.parent
+  let parent: BABYLON.Node | null = node.parent
 
   while (parent && !('isDCLEntity' in parent)) {
     parent = parent.parent
@@ -168,18 +169,18 @@ function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(
 }
 
 export function interactWithScene(pointerEvent: 'pointerUp' | 'pointerDown', x: number, y: number, pointerId: number) {
-  const pickingResult = scene.pick(x, y, null, false)
+  const pickingResult = scene.pick(x, y, void 0, false)
 
-  const mesh = pickingResult.pickedMesh
+  const mesh = pickingResult!.pickedMesh
 
   const entity = mesh && findParentEntity(mesh)
 
   if (entity) {
-    entity.handleClick(pointerEvent, pointerId, pickingResult)
+    entity.handleClick(pointerEvent, pointerId, pickingResult!)
   } else {
     for (let scene of loadedParcelSceneWorkers) {
       if (scene.parcelScene instanceof WebGLScene) {
-        scene.parcelScene.context.sendPointerEvent(pointerEvent, pointerId, null, pickingResult)
+        scene.parcelScene.context.sendPointerEvent(pointerEvent, pointerId, null as any, pickingResult!)
       }
     }
   }

@@ -1,3 +1,6 @@
+declare var global: any
+declare var window: any
+
 global['preview'] = window['preview'] = true
 global['avoidWeb3'] = window['avoidWeb3']
 
@@ -72,7 +75,7 @@ async function loadClient() {
 }
 
 {
-  global['handleServerMessage'] = function(message) {
+  global['handleServerMessage'] = function(message: any) {
     if (message.type === 'update') {
       loadScene()
     }

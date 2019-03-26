@@ -30,7 +30,7 @@ export async function initHudSystem(): Promise<WebGLUIScene> {
   context.baseUrl = document.location.origin
   const scene = new WebGLUIScene('hud', hudWorkerUrl, context)
 
-  await ensureUiApis(scene.worker)
+  await ensureUiApis(scene.worker!)
 
   return scene
 }

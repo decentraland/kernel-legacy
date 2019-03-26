@@ -9,9 +9,9 @@ enableVisualTests('Avatar visual validation', function(root) {
   //   status: 'Testing!!! 🎉🔥🚀'
   // }
 
-  let avatar1 = null
-  let avatar2 = null
-  let avatar3 = null
+  let avatar1: any = null
+  let avatar2: any = null
+  let avatar3: any = null
 
   let hud: ReturnType<typeof initHudSystem>
 
@@ -21,7 +21,7 @@ enableVisualTests('Avatar visual validation', function(root) {
   })
 
   it('wait for hud system', async () => {
-    await (await hud).worker.system
+    await (await hud).worker!.system
   })
 
   it('creates a test scene with avatars', async () => {
@@ -87,6 +87,6 @@ enableVisualTests('Avatar visual validation', function(root) {
     // })
 
     // avatarContext.dispose()
-    ;(await (await hud).worker).dispose()
+    ;(await (await hud).worker!).dispose()
   })
 })

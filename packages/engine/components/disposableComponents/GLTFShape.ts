@@ -118,7 +118,7 @@ export class GLTFShape extends DisposableComponent {
             // then add the textures to the $.textures
             assetContainer.materials.forEach((material: BABYLON.Material | BABYLON.PBRMaterial) => {
               for (let i in material) {
-                const t = material[i]
+                const t = (material as any)[i]
 
                 if (i.endsWith('Texture') && t instanceof BABYLON.Texture && t !== probe.cubeTexture) {
                   if (!assetContainer.textures.includes(t)) {
@@ -193,7 +193,7 @@ export class GLTFShape extends DisposableComponent {
 
           this.context.logger.error('Error loading GLTF', message, exception)
           this.onDetach(entity)
-          entity.assetContainer = null
+          entity.assetContainer = void 0
 
           const animator: Animator = entity.getBehaviorByName('animator') as Animator
           if (animator) {
@@ -215,7 +215,7 @@ export class GLTFShape extends DisposableComponent {
       entity.removeObject3D(BasicShape.nameInEntity)
     }
 
-    entity.assetContainer = null
+    entity.assetContainer = void 0
 
     const assetContainer = this.assetContainerEntity.get(entity.uuid)
 

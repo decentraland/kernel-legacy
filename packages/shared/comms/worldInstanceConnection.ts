@@ -167,6 +167,7 @@ export class WorldInstanceConnection {
           }
 
           if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
+            // @ts-ignore
             await this.webRtcConn!.addIceCandidate(sdp)
           } else if (msgType === MessageType.WEBRTC_OFFER) {
             try {
@@ -177,6 +178,7 @@ export class WorldInstanceConnection {
               const msg = new WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
               msg.setType(MessageType.WEBRTC_ANSWER)
+              // @ts-ignore
               msg.setSdp(desc.sdp)
               sendCoordinatorMessage(msg)
             } catch (err) {

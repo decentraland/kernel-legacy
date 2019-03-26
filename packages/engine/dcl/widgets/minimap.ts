@@ -41,8 +41,8 @@ export function enableMiniMap() {
   div.style.overflow = 'hidden'
 
   setInterval(() => {
-    const X = (mapScale * (-landSize * scene.activeCamera.position.x)) / parcelLimits.parcelSize
-    const Y = (mapScale * (-landSize * scene.activeCamera.position.z)) / parcelLimits.parcelSize
+    const X = (mapScale * (-landSize * scene.activeCamera!.position.x)) / parcelLimits.parcelSize
+    const Y = (mapScale * (-landSize * scene.activeCamera!.position.z)) / parcelLimits.parcelSize
 
     const halfMap = (mapSize * mapScale) / 2
 

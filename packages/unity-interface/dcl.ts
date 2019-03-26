@@ -1,4 +1,8 @@
-type GameInstance = { SendMessage(object: string, method: string, ...args: (number | string)[]) }
+declare var window: any
+
+type GameInstance = {
+  SendMessage(object: string, method: string, ...args: (number | string)[]): void
+}
 
 import { initShared } from '../shared'
 import { DevTools } from '../shared/apis/DevTools'
@@ -15,7 +19,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 import { DEBUG } from '../config'
 
-let gameInstance: GameInstance = null
+let gameInstance!: GameInstance
 const preloadedScenes = new Set<string>()
 
 const positionEvent = {
@@ -98,7 +102,7 @@ window['unityInterface'] = unityInterface
 
 class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
-  worker: SceneWorker
+  worker!: SceneWorker
   unitySceneId: string
   logger: ILogger
 
@@ -186,7 +190,8 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   return {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
-        browserInterface[type](message)
+        // tslint:disable-next-line:semicolon
+        ;(browserInterface as any)[type](message)
       } else {
         // tslint:disable-next-line:no-console
         console.log('MessageFromEngine', type, message)
