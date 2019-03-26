@@ -13,7 +13,7 @@ export interface BaseComponent<T> extends BABYLON.Behavior<BaseEntity> {
    * Called both when the component is initialized and whenever any of the component's properties is updated (via setProperties).
    * Used to modify the entity. If the new properties are the same as the old properties, this method won't be called.
    */
-  update(oldValue: T, newValue: T): void
+  update(oldValue: T | null, newValue: T): void
 
   /**
    * Called when the component is removed from the entity or when the entity is detached from the scene.
@@ -75,7 +75,7 @@ export class BaseComponent<T> implements BABYLON.Behavior<BaseEntity> {
     /* stub */
   }
 
-  update(oldProperties: T, newProperties: T) {
+  update(oldProperties: T | null, newProperties: T) {
     /* stub */
   }
 

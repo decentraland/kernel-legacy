@@ -64,7 +64,7 @@ export class OBJShape extends DisposableComponent {
             // then add the textures to the $.textures
             assetContainer.materials.forEach((material: BABYLON.Material | BABYLON.PBRMaterial) => {
               for (let i in material) {
-                const t = material[i]
+                const t = (material as any)[i]
 
                 if (i.endsWith('Texture') && t instanceof BABYLON.Texture && t !== probe.cubeTexture) {
                   if (!assetContainer.textures.includes(t)) {
@@ -125,7 +125,7 @@ export class OBJShape extends DisposableComponent {
     const mesh = entity.getObject3D(BasicShape.nameInEntity)
 
     if (mesh) {
-      entity.setObject3D(BasicShape.nameInEntity, null)
+      entity.removeObject3D(BasicShape.nameInEntity)
       mesh.dispose(true, false)
     }
 

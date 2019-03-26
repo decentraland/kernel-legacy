@@ -101,6 +101,7 @@ export class Stats {
   public profile = new PkgStats()
   public chat = new PkgStats()
   public webRtcSession = new PkgStats()
+
   public collectInfoDuration = new TrackAvgDuration()
   public dispatchTopicDuration = new TrackAvgDuration()
   public visiblePeersCount = 0

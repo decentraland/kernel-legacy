@@ -48,7 +48,7 @@ export class Context {
 
   public network: ETHEREUM_NETWORK | null
 
-  public worldInstanceConnection: WorldInstanceConnection | null
+  public worldInstanceConnection: WorldInstanceConnection | null = null
 
   constructor(userProfile: UserInformation, network?: ETHEREUM_NETWORK) {
     this.userProfile = userProfile
@@ -58,16 +58,19 @@ export class Context {
   }
 }
 
-let context: Context | null
+let context: Context | null = null
 
 export function sendPublicChatMessage(messageId: string, text: string) {
-  if (context.currentPosition) {
+  if (context && context.currentPosition && context.worldInstanceConnection) {
     context.worldInstanceConnection.sendChatMessage(context.currentPosition, messageId, text)
   }
 }
 
 export function persistCurrentUser(changes: Partial<UserInformation>): Readonly<UserInformation> {
   const peer = getCurrentPeer()
+
+  if (!peer || !localProfileUUID) throw new Error('cannotGetCurrentPeer')
+  if (!peer.user) throw new Error('cannotGetCurrentPeer.user')
 
   Object.assign(peer.user, changes)
 
@@ -96,6 +99,7 @@ function ensurePeerTrackingInfo(context: Context, alias: string): PeerTrackingIn
   return peerTrackingInfo
 }
 
+
 export function processChatMessage(context: Context, fromAlias: string, data: ChatData) {
   const msgId = data.getMessageId()
 
@@ -119,6 +123,7 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
   }
 }
 
+
 export function processProfileMessage(context: Context, fromAlias: string, data: ProfileData) {
   const msgTimestamp = data.getTime()
 
@@ -140,7 +145,9 @@ export function processProfileMessage(context: Context, fromAlias: string, data:
   }
 }
 
+
 export function processPositionMessage(context: Context, fromAlias: string, positionData: PositionData) {
+
   const msgTimestamp = positionData.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -169,7 +176,9 @@ type ProcessingPeerInfo = {
 }
 
 export function onPositionUpdate(context: Context, p: Position) {
-  if (!context.worldInstanceConnection.unreliableDataChannel || !context.worldInstanceConnection.reliableDataChannel) {
+  const worldConnection = context.worldInstanceConnection
+
+  if (!worldConnection || !worldConnection.unreliableDataChannel || !worldConnection.reliableDataChannel) {
     return
   }
 
@@ -207,7 +216,7 @@ export function onPositionUpdate(context: Context, p: Position) {
   }
 
   context.currentPosition = p
-  context.worldInstanceConnection.sendPositionMessage(p)
+  worldConnection.sendPositionMessage(p)
 }
 
 function collectInfo(context: Context) {
@@ -280,7 +289,7 @@ function collectInfo(context: Context) {
   }
 }
 
-export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
+export async function connect(ethAddress: string, network: ETHEREUM_NETWORK) {
   const peerId = ethAddress
 
   setLocalProfile(peerId, {
@@ -311,7 +320,7 @@ export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
     context.worldInstanceConnection.connect()
 
     setInterval(() => {
-      if (context.currentPosition) {
+      if (context && context.currentPosition && context.worldInstanceConnection) {
         context.worldInstanceConnection.sendProfileMessage(context.currentPosition, context.userProfile)
       }
     }, 1000)
@@ -334,10 +343,16 @@ export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
           obj.quaternion.w
         ] as Position
 
-        onPositionUpdate(context, p)
+        if (context) {
+          onPositionUpdate(context, p)
+        }
       }
     )
 
-    setInterval(() => collectInfo(context), 100)
+    setInterval(() => {
+      if (context) {
+        collectInfo(context)
+      }
+    }, 100)
   }
 }

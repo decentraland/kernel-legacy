@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 import { Message } from 'google-protobuf'
 import { log, error as logError } from 'engine/logger'
 import { Stats } from './debug'
@@ -38,7 +40,7 @@ class SendResult {
 
 type IDataChannel = {
   readyState: RTCDataChannelState
-  send(bytes: Uint8Array)
+  send(bytes: Uint8Array): void
 }
 
 export function positionHash(p: Position) {
@@ -49,8 +51,9 @@ export function positionHash(p: Position) {
 }
 
 export class WorldInstanceConnection {
-  public alias: string = null
+  public alias: string | null = null
   public ping: number = -1
+
   public commServerAlias: number | null = null
   public ws: WebSocket | null
   public webRtcConn: RTCPeerConnection | null
@@ -58,8 +61,8 @@ export class WorldInstanceConnection {
   public profileHandler: (fromAlias: string, profileData: ProfileData) => void
   public chatHandler: (fromAlias: string, chatData: ChatData) => void
   public authenticated = false
-  public reliableDataChannel: IDataChannel | null
-  public unreliableDataChannel: IDataChannel | null
+  public reliableDataChannel: IDataChannel | null = null
+  public unreliableDataChannel: IDataChannel | null = null
   public pingInterval: any = null
   public stats: Stats | null = null
 
@@ -80,10 +83,14 @@ export class WorldInstanceConnection {
         }
       }
     }, 10000)
-    this.webRtcConn = new RTCPeerConnection({ iceServers: commConfigurations.iceServers })
 
-    this.webRtcConn.onsignalingstatechange = e => log(`signaling state: ${this.webRtcConn.signalingState}`)
-    this.webRtcConn.oniceconnectionstatechange = e => log(`ice connection state: ${this.webRtcConn.iceConnectionState}`)
+    this.webRtcConn = new RTCPeerConnection({
+      iceServers: commConfigurations.iceServers
+    })
+
+    this.webRtcConn.onsignalingstatechange = (e: Event) => log(`signaling state: ${this.webRtcConn!.signalingState}`)
+    this.webRtcConn.oniceconnectionstatechange = (e: Event) =>
+      log(`ice connection state: ${this.webRtcConn!.iceConnectionState}`)
 
     this.ws = new WebSocket(this.url)
     this.ws.binaryType = 'arraybuffer'
@@ -156,7 +163,7 @@ export class WorldInstanceConnection {
             this.stats.webRtcSession.incrementRecv(msgSize)
           }
 
-          let message
+          let message: WebRtcMessage
           try {
             message = WebRtcMessage.deserializeBinary(msg)
           } catch (e) {
@@ -172,16 +179,18 @@ export class WorldInstanceConnection {
           }
 
           if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
-            await this.webRtcConn.addIceCandidate(sdp)
+            // @ts-ignore
+            await this.webRtcConn!.addIceCandidate(sdp)
           } else if (msgType === MessageType.WEBRTC_OFFER) {
             try {
-              await this.webRtcConn.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: sdp }))
-              const desc = await this.webRtcConn.createAnswer()
-              await this.webRtcConn.setLocalDescription(desc)
+              await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: sdp }))
+              const desc = await this.webRtcConn!.createAnswer()
+              await this.webRtcConn!.setLocalDescription(desc)
 
               const msg = new WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
               msg.setType(MessageType.WEBRTC_ANSWER)
+              // @ts-ignore
               msg.setSdp(desc.sdp)
               sendCoordinatorMessage(msg)
             } catch (err) {
@@ -189,7 +198,7 @@ export class WorldInstanceConnection {
             }
           } else if (msgType === MessageType.WEBRTC_ANSWER) {
             try {
-              await this.webRtcConn.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sdp }))
+              await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sdp }))
             } catch (err) {
               logError(err)
             }
@@ -210,17 +219,18 @@ export class WorldInstanceConnection {
       logError('socket error', event)
     }
 
-    this.webRtcConn.onicecandidate = async event => {
+    this.webRtcConn.onicecandidate = async (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate !== null) {
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
-        msg.setToAlias(this.commServerAlias)
+        // TODO: Ensure commServerAlias, it may be null
+        msg.setToAlias(this.commServerAlias!)
         msg.setSdp(event.candidate.candidate)
         sendCoordinatorMessage(msg)
       }
     }
 
-    this.webRtcConn.ondatachannel = e => {
+    this.webRtcConn.ondatachannel = (e: RTCDataChannelEvent) => {
       let dc = e.channel
 
       dc.onclose = () => log('dc has closed')
@@ -236,18 +246,19 @@ export class WorldInstanceConnection {
           authMessage.setMethod('noop')
           const bytes = authMessage.serializeBinary()
 
-          if (this.reliableDataChannel.readyState === 'open') {
-            this.reliableDataChannel.send(bytes)
+          if (dc.readyState === 'open') {
+            dc.send(bytes)
             this.authenticated = true
           } else {
             logError('cannot send authentication, data channel is not ready')
           }
+
         } else if (label === 'unreliable') {
           this.unreliableDataChannel = dc
         }
       }
 
-      dc.onmessage = e => {
+      dc.onmessage = (e: MessageEvent) => {
         if (this.stats) {
           this.stats.dispatchTopicDuration.start()
         }
@@ -276,7 +287,7 @@ export class WorldInstanceConnection {
             if (this.stats) {
               this.stats.topic.incrementRecv(msgSize)
             }
-            let message
+            let message: TopicMessage
             try {
               message = DataMessage.deserializeBinary(data)
             } catch (e) {
@@ -392,9 +403,9 @@ export class WorldInstanceConnection {
     const d = new ProfileData()
     d.setCategory(Category.PROFILE)
     d.setTime(Date.now())
-    d.setAvatarType(userProfile.avatarType)
-    d.setDisplayName(userProfile.displayName)
-    d.setPublicKey(userProfile.publicKey)
+    userProfile.avatarType && d.setAvatarType(userProfile.avatarType)
+    userProfile.displayName && d.setDisplayName(userProfile.displayName)
+    userProfile.publicKey && d.setPublicKey(userProfile.publicKey)
 
     const r = this.sendTopicMessage(true, topic, d)
     if (this.stats) {

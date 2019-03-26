@@ -2,9 +2,10 @@ import { DisposableComponent, BasicShape } from './DisposableComponent'
 import { BaseEntity } from '../../entities/BaseEntity'
 import { validators } from '../helpers/schemaValidator'
 import { scene } from '../../renderer'
-import { CLASS_ID, Observer } from 'decentraland-ecs/src'
+import { CLASS_ID } from 'decentraland-ecs/src'
 import { TextureSamplingMode, TextureWrapping } from 'shared/types'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
+import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 
 BABYLON.Effect.ShadersStore['dclShadelessVertexShader'] = `
   precision highp float;
@@ -57,11 +58,9 @@ const defaults = {
 export class BasicMaterial extends DisposableComponent {
   material: BABYLON.ShaderMaterial
 
-  meshObserver: Observer<{ type: string; object: BABYLON.TransformNode }>
-
-  constructor(ctx, uuid) {
+  constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
-    this.contributions.materials.add(this.material)
+
     this.material = new BABYLON.ShaderMaterial(
       '#' + this.uuid,
       scene,
@@ -75,10 +74,12 @@ export class BasicMaterial extends DisposableComponent {
         samplers: ['textureSampler']
       }
     )
+
+    this.contributions.materials.add(this.material)
     this.loadingDone = false
   }
 
-  updateMeshMaterial = (mesh: BABYLON.Mesh) => {
+  updateMeshMaterial = (mesh: BABYLON.Mesh | null) => {
     if (!mesh) return
     mesh.material = this.material
   }
@@ -88,9 +89,9 @@ export class BasicMaterial extends DisposableComponent {
     mesh.material = null
   }
 
-  meshObserverCallback = ({ type, object }) => {
+  meshObserverCallback = ({ type, object }: { type: string; object: BABYLON.TransformNode | null }) => {
     if (type === BasicShape.nameInEntity) {
-      this.updateMeshMaterial(object)
+      this.updateMeshMaterial(object as any)
     }
   }
 

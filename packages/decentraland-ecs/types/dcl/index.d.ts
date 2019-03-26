@@ -1162,7 +1162,7 @@ declare class Engine {
   readonly disposableComponents: Readonly<Record<string, DisposableComponentLike>>
   constructor()
   addEntity(entity: Entity): void
-  removeEntity(entity: Entity, removeChildren?: boolean, newParent?: Entity): void
+  removeEntity(entity: Entity): void
   addSystem(system: ISystem, priority?: number): void
   removeSystem(system: ISystem): void
   update(dt: number): void
@@ -1262,6 +1262,11 @@ declare class Entity {
 }
 
 declare const Epsilon = 0.000001
+
+/**
+ * @public
+ */
+declare function EventConstructor(eventName: string): ClassDecorator
 
 /**
  * @public

@@ -14,7 +14,7 @@ async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
 
   let isWhitelisted = location.hostname === 'localhost' || navigator.userAgent.includes('Oculus')
 
-  if (!isWhitelisted) {
+  if (!isWhitelisted && address) {
     const contract = await getERC721(requestManager, networkConfigurations[net].invite)
 
     const balance = await contract.balanceOf(address)
@@ -29,7 +29,7 @@ async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
   return isWhitelisted
 }
 
-function getNetworkFromDomain(): ETHEREUM_NETWORK {
+function getNetworkFromDomain(): ETHEREUM_NETWORK | null {
   const domain = window.location.host
 
   if (domain.endsWith('.decentraland.org') || domain.endsWith('.decentraland.today')) {

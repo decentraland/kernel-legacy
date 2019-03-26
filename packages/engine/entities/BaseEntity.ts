@@ -30,18 +30,18 @@ function matrixWorldDidUpdate(entity: BaseEntity): void {
 }
 
 export class BaseEntity extends BABYLON.AbstractMesh {
-  get parentEntity(): BaseEntity {
+  get parentEntity(): BaseEntity | null {
     return findParentEntity(this)
   }
 
-  assetContainer: BABYLON.AssetContainer
+  assetContainer!: BABYLON.AssetContainer | void
   isDCLEntity = true
 
   attrs: Props = {}
 
   components: { [key: string]: BaseComponent<any> } = {}
 
-  onChangeObject3DObservable = new Observable<{ type: string; object: BABYLON.TransformNode }>()
+  onChangeObject3DObservable = new Observable<{ type: string; object: BABYLON.TransformNode | null }>()
 
   sendPositionsPending = false
   loadingDone = true
@@ -57,7 +57,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
   constructor(public uuid: string, public context: SharedSceneContext) {
     super(uuid)
     context.entities.set(uuid, this)
-    this.onAfterWorldMatrixUpdateObservable.add(matrixWorldDidUpdate)
+    this.onAfterWorldMatrixUpdateObservable.add(matrixWorldDidUpdate as any)
   }
 
   removeUUIDEvent(type: IEventNames): void {
@@ -76,7 +76,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     this.disposableComponents.set(name, component)
   }
 
-  getLoadingEntity() {
+  getLoadingEntity(): BaseEntity | null {
     if (!this.loadingDone) {
       return this
     }
@@ -103,7 +103,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     throw e
   }
 
-  setParentEntity(newParent: BaseEntity): void {
+  setParentEntity(newParent: BaseEntity | null): void {
     const currentParent = this.parentEntity
 
     if (currentParent === newParent) {
@@ -264,7 +264,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     return ret
   }
 
-  toJSON() {
+  toJSON(): any {
     return {
       id: this.id,
       components: this.attrs ? Object.keys(this.attrs) : [],
@@ -453,7 +453,7 @@ export function findParentEntityOfType<T extends BaseEntity>(
   desiredClass: ConstructorOf<T>
 ): T | null {
   // Find the next entity parent to dispatch the event
-  let parent: T | BABYLON.Node = object.parent
+  let parent: T | BABYLON.Node | null = object.parent
 
   while (parent && !(parent instanceof desiredClass)) {
     parent = parent.parent
