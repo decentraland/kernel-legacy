@@ -55,11 +55,11 @@ export class WorldInstanceConnection {
   public ping: number = -1
 
   public commServerAlias: number | null = null
-  public ws: WebSocket | null
-  public webRtcConn: RTCPeerConnection | null
-  public positionHandler: (fromAlias: string, positionData: PositionData) => void
-  public profileHandler: (fromAlias: string, profileData: ProfileData) => void
-  public chatHandler: (fromAlias: string, chatData: ChatData) => void
+  public ws: WebSocket | null = null
+  public webRtcConn: RTCPeerConnection | null = null
+  public positionHandler: ((fromAlias: string, positionData: PositionData) => void) | null = null
+  public profileHandler: ((fromAlias: string, profileData: ProfileData) => void) | null = null
+  public chatHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   public authenticated = false
   public reliableDataChannel: IDataChannel | null = null
   public unreliableDataChannel: IDataChannel | null = null
@@ -252,7 +252,6 @@ export class WorldInstanceConnection {
           } else {
             logError('cannot send authentication, data channel is not ready')
           }
-
         } else if (label === 'unreliable') {
           this.unreliableDataChannel = dc
         }
@@ -287,7 +286,7 @@ export class WorldInstanceConnection {
             if (this.stats) {
               this.stats.topic.incrementRecv(msgSize)
             }
-            let message: TopicMessage
+            let message: DataMessage
             try {
               message = DataMessage.deserializeBinary(data)
             } catch (e) {
@@ -295,9 +294,9 @@ export class WorldInstanceConnection {
               break
             }
 
-            const body = message.getBody()
+            const body = message.getBody() as any
 
-            let dataHeader
+            let dataHeader: DataHeader
             try {
               dataHeader = DataHeader.deserializeBinary(body)
             } catch (e) {
@@ -317,7 +316,7 @@ export class WorldInstanceConnection {
                   this.stats.onPositionMessage(alias, positionData)
                 }
 
-                this.positionHandler(alias, positionData)
+                this.positionHandler && this.positionHandler(alias, positionData)
                 break
               }
               case Category.CHAT: {
@@ -328,7 +327,7 @@ export class WorldInstanceConnection {
                   this.stats.chat.incrementRecv(msgSize)
                 }
 
-                this.chatHandler(alias, chatData)
+                this.chatHandler && this.chatHandler(alias, chatData)
                 break
               }
               case Category.PROFILE: {
@@ -337,7 +336,7 @@ export class WorldInstanceConnection {
                   this.stats.dispatchTopicDuration.stop()
                   this.stats.profile.incrementRecv(msgSize)
                 }
-                this.profileHandler(alias, profileData)
+                this.profileHandler && this.profileHandler(alias, profileData)
                 break
               }
               default: {

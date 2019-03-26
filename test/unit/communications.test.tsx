@@ -21,20 +21,7 @@ import {
   Category
 } from '../../packages/shared/comms/commproto_pb'
 import { Position, CommunicationArea, Parcel, position2parcel } from 'shared/comms/utils'
-import {
-  PeerTrackingInfo,
-  Context,
-  onPositionUpdate,
-  processChatMessage,
-  processProfileMessage,
-  processPositionMessage
-} from 'shared/comms'
-import {
-  WorldInstanceConnection,
-  SocketReadyState,
-  TopicHandler,
-  positionHash
-} from 'shared/comms/worldInstanceConnection'
+import { WorldInstanceConnection, SocketReadyState, positionHash } from 'shared/comms/worldInstanceConnection'
 import {
   Context,
   processChatMessage,
@@ -43,7 +30,6 @@ import {
   PeerTrackingInfo,
   onPositionUpdate
 } from 'shared/comms'
-import { PkgStats } from 'shared/comms/debug'
 
 chai.use(sinonChai)
 
@@ -630,7 +616,7 @@ describe('Communications', function() {
 
       onPositionUpdate(context, [0, 0, 0, 0, 0, 0, 0])
 
-      expect(worldConn.updateSubscriptions).to.have.been.calledWithMatch(rawTopics => {
+      expect(worldConn.updateSubscriptions).to.have.been.calledWithMatch((rawTopics: string) => {
         expect(rawTopics.split(' ')).to.have.length(3)
         return true
       })

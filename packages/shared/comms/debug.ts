@@ -136,7 +136,8 @@ export class Stats {
 
       log('World instance: ')
 
-      const connection = context.worldInstanceConnection
+      const connection = context.worldInstanceConnection!
+
       const url = connection.url
       if (connection.ws && connection.ws.readyState === SocketReadyState.OPEN) {
         const state =

@@ -99,7 +99,6 @@ function ensurePeerTrackingInfo(context: Context, alias: string): PeerTrackingIn
   return peerTrackingInfo
 }
 
-
 export function processChatMessage(context: Context, fromAlias: string, data: ChatData) {
   const msgId = data.getMessageId()
 
@@ -123,7 +122,6 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
   }
 }
 
-
 export function processProfileMessage(context: Context, fromAlias: string, data: ProfileData) {
   const msgTimestamp = data.getTime()
 
@@ -145,9 +143,7 @@ export function processProfileMessage(context: Context, fromAlias: string, data:
   }
 }
 
-
 export function processPositionMessage(context: Context, fromAlias: string, positionData: PositionData) {
-
   const msgTimestamp = positionData.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -212,7 +208,7 @@ export function onPositionUpdate(context: Context, p: Position) {
       }
     }
 
-    context.worldInstanceConnection.updateSubscriptions(rawTopics)
+    worldConnection.updateSubscriptions(rawTopics)
   }
 
   context.currentPosition = p
@@ -238,7 +234,9 @@ function collectInfo(context: Context) {
       context.peerData.delete(peerAlias)
       removeById(peerAlias)
 
-      context.stats.onPeerRemoved(peerAlias)
+      if (context.stats) {
+        context.stats.onPeerRemoved(peerAlias)
+      }
       continue
     }
 
@@ -306,9 +304,9 @@ export async function connect(ethAddress: string, network: ETHEREUM_NETWORK) {
     }
 
     const connection = new WorldInstanceConnection(networkConfigurations[network].worldInstanceUrl)
-    connection.positionHandler = (alias, data) => processPositionMessage(context, alias, data)
-    connection.profileHandler = (alias, data) => processProfileMessage(context, alias, data)
-    connection.chatHandler = (alias, data) => processChatMessage(context, alias, data)
+    connection.positionHandler = (alias, data) => processPositionMessage(context!, alias, data)
+    connection.profileHandler = (alias, data) => processProfileMessage(context!, alias, data)
+    connection.chatHandler = (alias, data) => processChatMessage(context!, alias, data)
     context = new Context(userProfile, network)
     context.worldInstanceConnection = connection
 
