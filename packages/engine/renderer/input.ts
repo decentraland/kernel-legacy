@@ -6,7 +6,7 @@ import Joystick from './controls/joystick'
 import PlaneCanvasControl from './controls/planeCanvasControl'
 import { isThirdPersonCamera, vrCamera } from './camera'
 import { loadedParcelSceneWorkers } from 'shared/world/parcelSceneManager'
-import { WebGLScene } from 'dcl/WebGLScene'
+import { WebGLScene } from '../dcl/WebGLScene'
 
 /**
  * This is a map of keys (see enum Keys): boolean

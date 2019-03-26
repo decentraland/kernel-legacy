@@ -91,7 +91,7 @@ export class NetworkStats {
 }
 
 export class Stats {
-  public primaryNetworkStats: NetworkStats | null
+  public primaryNetworkStats: NetworkStats | null = null
   public collectInfoDuration = new TrackAvgDuration()
   public visiblePeersCount = 0
 

@@ -1,5 +1,5 @@
-import { scene } from '../../engine/renderer'
-import { parcelLimits } from '../../config'
+import { parcelLimits } from '../../../config'
+import { scene } from '../../renderer'
 
 export function enableMiniMap() {
   const div = document.createElement('div')

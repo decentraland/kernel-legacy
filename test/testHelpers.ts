@@ -10,7 +10,7 @@ import { setSize, scene, initDCL, onWindowResize, engineMicroQueue } from 'engin
 import { initKeyboard } from 'engine/renderer/input'
 import { reposition } from 'engine/renderer/ambientLights'
 
-import { start, stop } from 'dcl'
+import { start, stop } from 'engine/dcl'
 
 import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { sleep, untilNextFrame } from 'atomicHelpers/sleep'
@@ -20,7 +20,7 @@ import { BaseEntity } from 'engine/entities/BaseEntity'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 import { EngineAPI } from 'shared/apis/EngineAPI'
 import { loadedParcelSceneWorkers } from 'shared/world/parcelSceneManager'
-import { WebGLParcelScene } from 'dcl/WebGLParcelScene'
+import { WebGLParcelScene } from 'engine/dcl/WebGLParcelScene'
 import { ILandToLoadableParcelScene, ILand, MappingsResponse, IScene } from 'shared/types'
 import { SceneWorker } from 'shared/world/SceneWorker'
 import { MemoryTransport } from 'decentraland-rpc'

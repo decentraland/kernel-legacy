@@ -39,7 +39,7 @@ import { interactWithScene } from 'engine/renderer/input'
 import { scene } from 'engine/renderer'
 import { BasicShape } from 'engine/components/disposableComponents/DisposableComponent'
 import { PBRMaterial } from 'engine/components/disposableComponents/PBRMaterial'
-import { WebGLParcelScene } from 'dcl/WebGLParcelScene'
+import { WebGLParcelScene } from 'engine/dcl/WebGLParcelScene'
 import { BoxShape } from 'engine/components/disposableComponents/BoxShape'
 import { UIScreenSpace } from 'engine/components/disposableComponents/ui/UIScreenSpace'
 
@@ -665,7 +665,7 @@ describe('ECS', () => {
     it('should recursively remove entities', () => {
       // cleanup previous stuff
       for (let key in engine['_entities']) {
-        engine.removeEntity(engine['_entities'][key], true)
+        engine.removeEntity(engine['_entities'][key])
       }
 
       const ent1 = new Entity()
@@ -679,7 +679,7 @@ describe('ECS', () => {
       engine.addEntity(ent2)
       engine.addEntity(ent3)
 
-      engine.removeEntity(ent1, true)
+      engine.removeEntity(ent1)
 
       expect(Object.keys(engine['_entities']).length).to.eq(0)
     })

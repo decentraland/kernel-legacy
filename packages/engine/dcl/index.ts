@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs'
 import * as TWEEN from '@tweenjs/tween.js'
 
 // register the interfaces that will be used by the entity system
-import './api'
+import 'shared/apis'
 
 // Our imports
 import { DEBUG, PREVIEW, NETWORK_HZ, EDITOR } from 'config'
@@ -22,13 +22,11 @@ import { vrCamera } from 'engine/renderer/camera'
 import { isMobile } from 'shared/comms/mobile'
 
 import { toggleColliderHighlight, toggleBoundingBoxes } from 'engine/entities/utils/colliders'
-import { initChatSystem, initHudSystem } from './widgets/ui'
+import { initHudSystem } from './widgets/ui'
 
 import { loadedParcelSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
-
-import './comms/peers'
 
 let isEngineRunning = false
 
@@ -163,7 +161,6 @@ export async function initBabylonClient() {
   if (isMobile()) {
     enableVirtualJoystick(engine.getRenderingCanvas())
   } else if (!EDITOR) {
-    await initChatSystem()
     await initHudSystem()
   }
   enableMouseLock(engine.getRenderingCanvas())

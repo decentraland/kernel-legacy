@@ -47,7 +47,7 @@ export class Context {
 
   public network: ETHEREUM_NETWORK | null
 
-  public worldInstanceConnection: WorldInstanceConnection | null
+  public worldInstanceConnection: WorldInstanceConnection | null = null
 
   constructor(userProfile: UserInformation, network?: ETHEREUM_NETWORK) {
     this.userProfile = userProfile
@@ -58,16 +58,19 @@ export class Context {
   }
 }
 
-let context: Context | null
+let context: Context | null = null
 
 export function sendPublicChatMessage(messageId: string, text: string) {
-  if (context.currentPosition) {
+  if (context && context.currentPosition && context.worldInstanceConnection) {
     context.worldInstanceConnection.sendChatMessage(context.currentPosition, messageId, text)
   }
 }
 
 export function persistCurrentUser(changes: Partial<UserInformation>): Readonly<UserInformation> {
   const peer = getCurrentPeer()
+
+  if (!peer || !localProfileUUID) throw new Error('cannotGetCurrentPeer')
+  if (!peer.user) throw new Error('cannotGetCurrentPeer.user')
 
   Object.assign(peer.user, changes)
 
@@ -100,8 +103,10 @@ export function processChatMessage(
   context: Context,
   conn: WorldInstanceConnection,
   fromAlias: string,
-  data: Uint8Array
-): PkgStats {
+  data: Uint8Array | string
+): PkgStats | null {
+  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
+
   const chatData = ChatData.deserializeBinary(data)
   const msgId = chatData.getMessageId()
 
@@ -131,8 +136,10 @@ export function processProfileMessage(
   context: Context,
   conn: WorldInstanceConnection,
   fromAlias: string,
-  data: Uint8Array
-): PkgStats {
+  data: Uint8Array | string
+): PkgStats | null {
+  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
+
   const profileData = ProfileData.deserializeBinary(data)
   const msgTimestamp = profileData.getTime()
 
@@ -158,8 +165,10 @@ export function processPositionMessage(
   context: Context,
   conn: WorldInstanceConnection,
   fromAlias: string,
-  data: Uint8Array
-): PkgStats {
+  data: Uint8Array | string
+): PkgStats | null {
+  if (typeof data === 'string') throw new Error('IDK what to do with a string here')
+
   const positionData = PositionData.deserializeBinary(data)
   const msgTimestamp = positionData.getTime()
 
@@ -190,7 +199,9 @@ type ProcessingPeerInfo = {
 }
 
 export function onPositionUpdate(context: Context, p: Position) {
-  if (!context.worldInstanceConnection.unreliableDataChannel || !context.worldInstanceConnection.reliableDataChannel) {
+  const worldConnection = context.worldInstanceConnection
+
+  if (!worldConnection || !worldConnection.unreliableDataChannel || !worldConnection.reliableDataChannel) {
     return
   }
 
@@ -200,14 +211,14 @@ export function onPositionUpdate(context: Context, p: Position) {
   if (!sameParcel(oldParcel, newParcel)) {
     const commArea = new CommunicationArea(newParcel, context.commRadius)
 
-    const positionHandler = (fromAlias: string, data: Uint8Array) =>
-      processPositionMessage(context, context.worldInstanceConnection, fromAlias, data)
+    const positionHandler = (fromAlias: string, data: Uint8Array | string) =>
+      processPositionMessage(context, worldConnection, fromAlias, data)
 
-    const profileHandler = (fromAlias: string, data: Uint8Array) =>
-      processProfileMessage(context, context.worldInstanceConnection, fromAlias, data)
+    const profileHandler = (fromAlias: string, data: Uint8Array | string) =>
+      processProfileMessage(context, worldConnection, fromAlias, data)
 
-    const chatHandler = (fromAlias: string, data: Uint8Array) =>
-      processChatMessage(context, context.worldInstanceConnection, fromAlias, data)
+    const chatHandler = (fromAlias: string, data: Uint8Array | string) =>
+      processChatMessage(context, worldConnection, fromAlias, data)
 
     const xMin = ((commArea.vMin.x + parcelLimits.maxParcelX) >> 2) << 2
     const xMax = ((commArea.vMax.x + parcelLimits.maxParcelX) >> 2) << 2
@@ -237,11 +248,11 @@ export function onPositionUpdate(context: Context, p: Position) {
       }
     }
 
-    context.worldInstanceConnection.updateSubscriptions(subscriptions, rawTopics)
+    worldConnection.updateSubscriptions(subscriptions, rawTopics)
   }
 
   context.currentPosition = p
-  context.worldInstanceConnection.sendPositionMessage(p)
+  worldConnection.sendPositionMessage(p)
 }
 
 function collectInfo(context: Context) {
@@ -311,7 +322,7 @@ function collectInfo(context: Context) {
   }
 }
 
-export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
+export async function connect(ethAddress: string, network: ETHEREUM_NETWORK) {
   const peerId = ethAddress
 
   setLocalProfile(peerId, {
@@ -338,7 +349,7 @@ export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
     context.worldInstanceConnection.connect()
 
     setInterval(() => {
-      if (context.currentPosition) {
+      if (context && context.currentPosition && context.worldInstanceConnection) {
         context.worldInstanceConnection.sendProfileMessage(context.currentPosition, context.userProfile)
       }
     }, 1000)
@@ -361,10 +372,16 @@ export async function connect(ethAddress: string, network?: ETHEREUM_NETWORK) {
           obj.quaternion.w
         ] as Position
 
-        onPositionUpdate(context, p)
+        if (context) {
+          onPositionUpdate(context, p)
+        }
       }
     )
 
-    setInterval(() => collectInfo(context), 100)
+    setInterval(() => {
+      if (context) {
+        collectInfo(context)
+      }
+    }, 100)
   }
 }

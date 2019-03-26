@@ -5,7 +5,7 @@ import 'engine'
 
 import { initLocalPlayer, domReadyFuture } from '../engine/renderer'
 
-import { initBabylonClient } from '../dcl'
+import { initBabylonClient } from '../engine/dcl'
 import { log } from '../engine/logger'
 import { bodyReadyFuture, engine } from '../engine/renderer/init'
 import { initShared } from '../shared'
@@ -13,7 +13,7 @@ import { loadedParcelSceneWorkers, enablePositionReporting } from '../shared/wor
 import { ETHEREUM_NETWORK, DEBUG, AVOID_WEB3 } from '../config'
 import { ILandToLoadableParcelScene, ILand, IScene, MappingsResponse } from '../shared/types'
 import { SceneWorker } from '../shared/world/SceneWorker'
-import { WebGLParcelScene } from '../dcl/WebGLParcelScene'
+import { WebGLParcelScene } from '../engine/dcl/WebGLParcelScene'
 
 let didStartPosition = false
 

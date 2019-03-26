@@ -4,7 +4,7 @@ import 'engine'
 
 import { initLocalPlayer, domReadyFuture, onWindowResize } from '../engine/renderer'
 
-import { initBabylonClient } from '../dcl'
+import { initBabylonClient } from '../engine/dcl'
 import * as _envHelper from '../engine/renderer/envHelper'
 import { canvas, scene } from '../engine/renderer/init'
 import { loadedParcelSceneWorkers, enablePositionReporting } from '../shared/world/parcelSceneManager'
@@ -18,7 +18,7 @@ import {
   normalizeContentMappings
 } from '../shared/types'
 import { SceneWorker } from '../shared/world/SceneWorker'
-import { WebGLParcelScene } from '../dcl/WebGLParcelScene'
+import { WebGLParcelScene } from '../engine/dcl/WebGLParcelScene'
 import { EventEmitter } from 'events'
 import { SharedSceneContext } from '../engine/entities/SharedSceneContext'
 import {

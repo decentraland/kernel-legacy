@@ -56,8 +56,6 @@ import './visualValidation/uiElements.test'
 import './visualValidation/lookAt.test'
 import './visualValidation/referenceCubes.test'
 
-import './visualValidation/ccPaymentUI.test'
-
 import * as engine from 'engine'
 import * as renderer from 'engine/renderer'
 global['engine'] = engine

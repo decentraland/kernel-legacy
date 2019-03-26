@@ -22,7 +22,7 @@ import {
 import { ILogger, defaultLogger } from 'shared/logger'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
-import { measureObject3D } from 'dcl/entities/utils/checkParcelSceneLimits'
+import { measureObject3D } from './utils/checkParcelSceneLimits'
 import { IEventNames, IEvents, PointerEvent } from 'decentraland-ecs/src/decentraland/Types'
 import { Observable } from 'decentraland-ecs/src'
 import { colliderMaterial } from './utils/colliders'

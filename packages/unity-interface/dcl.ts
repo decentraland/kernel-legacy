@@ -7,7 +7,8 @@ import { positionObservable, lastPlayerPosition } from '../shared/world/position
 import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
-import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
+import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
+import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
@@ -54,6 +55,16 @@ const unityInterface = {
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
+  CreateUIScene(data: { id: string }) {
+    // TODO: Implement this function in unity
+    /**
+     * UI Scenes are scenes that does not check any limit or boundary. The
+     * position is fixed at 0,0 and they are universe-wide. An example of this
+     * kind of scenes is the Avatar scene. All the avatars are just GLTFs in
+     * a scene.
+     */
+    gameInstance.SendMessage('SceneController', 'CreateUIScene', JSON.stringify(data))
+  },
   /** Sends the camera position to the engine */
   SetPosition(x: number, y: number, z: number) {
     let theY = y <= 0 ? 2 : y
@@ -85,14 +96,14 @@ window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class UnityParcelScene implements ParcelSceneAPI {
+class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
   worker: SceneWorker
   unitySceneId: string
   logger: ILogger
 
-  constructor(public data: EnvironmentData<LoadableParcelScene>) {
-    this.unitySceneId = data.data.id
+  constructor(public id: string, public data: EnvironmentData<T>) {
+    this.unitySceneId = id
     this.logger = createLogger(this.unitySceneId + ': ')
   }
 
@@ -105,15 +116,6 @@ class UnityParcelScene implements ParcelSceneAPI {
 
   registerWorker(worker: SceneWorker): void {
     this.worker = worker
-
-    this.worker.system
-      .then(system => {
-        system.getAPIInstance(DevTools).logger = this.logger
-
-        const parcelIdentity = system.getAPIInstance(ParcelIdentity)
-        parcelIdentity.land = this.data.data.land
-      })
-      .catch(e => this.logger.error('Error initializing system', e))
   }
 
   dispose(): void {
@@ -129,6 +131,25 @@ class UnityParcelScene implements ParcelSceneAPI {
   }
 }
 
+class UnityParcelScene extends UnityScene<LoadableParcelScene> {
+  constructor(public data: EnvironmentData<LoadableParcelScene>) {
+    super(data.data.id, data)
+  }
+
+  registerWorker(worker: SceneWorker): void {
+    super.registerWorker(worker)
+
+    this.worker.system
+      .then(system => {
+        system.getAPIInstance(DevTools).logger = this.logger
+
+        const parcelIdentity = system.getAPIInstance(ParcelIdentity)
+        parcelIdentity.land = this.data.data.land
+      })
+      .catch(e => this.logger.error('Error initializing system', e))
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 export async function initializeEngine(_gameInstance: GameInstance) {
@@ -140,6 +161,8 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (DEBUG) {
     unityInterface.SetDebug()
   }
+
+  await initializeDecentralandUI()
 
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
@@ -170,4 +193,20 @@ export async function initializeEngine(_gameInstance: GameInstance) {
       }
     }
   }
+}
+
+async function initializeDecentralandUI() {
+  const id = 'dcl-ui-scene'
+
+  const scene = new UnityScene(id, {
+    baseUrl: location.origin,
+    main: hudWorkerUrl,
+    data: {},
+    id,
+    mappings: []
+  })
+
+  await ensureUiApis(scene.worker)
+
+  unityInterface.CreateUIScene({ id: scene.unitySceneId })
 }
