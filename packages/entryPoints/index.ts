@@ -8,14 +8,19 @@ import { initShared } from '../shared'
 import { enableParcelSceneLoading } from '../shared/world/parcelSceneManager'
 import { WebGLParcelScene } from '../dcl/WebGLParcelScene'
 import { enableMiniMap } from '../dcl/widgets/minimap'
-import { movePlayerToSpawnpoint } from '../shared/world/positionThings'
+import { movePlayerToSpawnpoint, teleportObservable } from '../shared/world/positionThings'
 
 export async function loadClient(net: ETHEREUM_NETWORK) {
   await initBabylonClient()
   document.body.appendChild(enableMiniMap())
 
   let initialized = false
-  const spawnpointLand = qs.parse(location.search).position
+  let spawnpointLand = qs.parse(location.search).position
+
+  teleportObservable.add(position => {
+    initialized = false
+    spawnpointLand = `${position.x},${position.y}`
+  })
 
   await enableParcelSceneLoading(net, {
     parcelSceneClass: WebGLParcelScene,
