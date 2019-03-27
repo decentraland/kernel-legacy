@@ -9,19 +9,23 @@ import { UIControl } from './UIControl'
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
+  visible: { type: 'boolean', default: true },
+  hAlign: { type: 'string', default: 'center' },
+  vAlign: { type: 'string', default: 'center' },
+  zIndex: { type: 'number', default: 0 },
+  position: { type: 'vector2', default: new BABYLON.Vector2(0, 0) },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 20 },
+  isPointerBlocker: { type: 'boolean', default: false },
+
+  color: { type: 'string', default: 'white' },
   opacity: { type: 'number', default: 1 },
+
   cornerRadius: { type: 'number', default: 0 },
   fontFamily: { type: 'string', default: 'Arial' },
   fontSize: { type: 'number', default: 50 },
   fontWeight: { type: 'string', default: 'normal' },
-  width: { type: 'string', default: '100%' },
-  height: { type: 'string', default: '100%' },
-  top: { type: 'string', default: '0px' },
-  left: { type: 'string', default: '0px' },
-  color: { type: 'string', default: 'white' },
   background: { type: 'string', default: 'black' },
-  hAlign: { type: 'string', default: 'center' },
-  vAlign: { type: 'string', default: 'center' },
   paddingTop: { type: 'string', default: '0px' },
   paddingRight: { type: 'string', default: '0px' },
   paddingBottom: { type: 'string', default: '0px' },
@@ -31,9 +35,7 @@ const schemaValidator = createSchemaValidator({
   shadowOffsetY: { type: 'number', default: 0 },
   shadowColor: { type: 'string', default: '#fff' },
   thickness: { type: 'number', default: 0 },
-  text: { type: 'string', default: 'button' },
-  visible: { type: 'boolean', default: true },
-  isPointerBlocker: { type: 'boolean', default: false }
+  text: { type: 'string', default: 'button' }
 })
 
 class UIButton extends UIControl<UIButtonShape, BABYLON.GUI.Button> {
@@ -85,9 +87,9 @@ class UIButton extends UIControl<UIButtonShape, BABYLON.GUI.Button> {
     this.control.cornerRadius = this.data.cornerRadius
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.top = this.data.top
-    this.control.left = this.data.left
-    this.control.background = this.data.background
+    this.control.top = -this.data.position.y
+    this.control.left = this.data.position.x
+    this.control.background = this.data.background.toHexString()
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.paddingTop = this.data.paddingTop
@@ -97,7 +99,7 @@ class UIButton extends UIControl<UIButtonShape, BABYLON.GUI.Button> {
     this.control.shadowBlur = this.data.shadowBlur
     this.control.shadowOffsetX = this.data.shadowOffsetX
     this.control.shadowOffsetY = this.data.shadowOffsetY
-    this.control.shadowColor = this.data.shadowColor
+    this.control.shadowColor = this.data.shadowColor.toHexString()
     this.control.thickness = this.data.thickness
     this.control.isVisible = this.data.visible
     this.control.isPointerBlocker = this.data.isPointerBlocker
@@ -106,7 +108,7 @@ class UIButton extends UIControl<UIButtonShape, BABYLON.GUI.Button> {
     this.textBlock.fontSize = this.data.fontSize
     this.textBlock.fontWeight = this.data.fontWeight
     this.textBlock.text = this.data.text
-    this.textBlock.color = this.data.color
+    this.textBlock.color = this.data.color.toHexString()
 
     this.setParent(this.data.parentComponent)
   }

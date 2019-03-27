@@ -231,13 +231,15 @@ let avatarIcon = createAvatar(guiContainerComponent)
 
 // Display name
 const displayNameComponent = new UITextShape(guiContainerComponent)
-displayNameComponent.color = '#000'
+displayNameComponent.color = Color3.FromHexString('#000')
 displayNameComponent.fontSize = 24
 
 const publicKeyComponent = new UITextShape(guiContainerComponent)
-publicKeyComponent.color = '#999'
+publicKeyComponent.color = Color3.FromHexString('#999')
 publicKeyComponent.fontSize = 18
-publicKeyComponent.top = '30px'
+//publicKeyComponent.top = '30px'
+publicKeyComponent.position.y = 30
+publicKeyComponent.positionInPixels = true
 
 // Friend, follow etc..
 const friendshipsContainer = new UIContainerRectShape(guiContainerComponent)

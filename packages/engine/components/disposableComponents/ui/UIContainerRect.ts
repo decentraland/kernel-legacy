@@ -7,18 +7,23 @@ import { UIControl } from './UIControl'
 import { UIContainerRectShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 const schemaValidator = createSchemaValidator({
+  id: { type: 'string', default: null },
+  visible: { type: 'boolean', default: true },
+  hAlign: { type: 'string', default: 'center' },
+  vAlign: { type: 'string', default: 'center' },
+  zIndex: { type: 'number', default: 0 },
+  position: { type: 'vector2', default: new BABYLON.Vector2(0, 0) },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 20 },
+  isPointerBlocker: { type: 'boolean', default: false },
+
   opacity: { type: 'number', default: 1 },
+  color: { type: 'color', default: BABYLON.Color3.White() },
+
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   thickness: { type: 'number', default: 0 },
-  width: { type: 'number', default: 1 },
-  height: { type: 'number', default: 1 },
-  position: { type: 'vector2', default: { x: 0, y: 0 } },
-  color: { type: 'color', default: BABYLON.Color3.White() },
-  background: { type: 'color', default: BABYLON.Color3.Black() },
-  hAlign: { type: 'string', default: 'center' },
-  vAlign: { type: 'string', default: 'center' },
-  visible: { type: 'boolean', default: true }
+  background: { type: 'color', default: BABYLON.Color3.Black() }
 })
 
 export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI.Rectangle> {

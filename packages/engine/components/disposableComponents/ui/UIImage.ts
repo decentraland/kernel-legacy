@@ -6,27 +6,32 @@ import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entitie
 import { UIImageShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 import { UIControl } from './UIControl'
+import { Vector2 } from 'babylonjs';
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
+  visible: { type: 'boolean', default: true },
+  hAlign: { type: 'string', default: 'center' },
+  vAlign: { type: 'string', default: 'center' },
+  zIndex: { type: 'number', default: 0 },
+  position: { type: 'vector2', default: new Vector2(0, 0) },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 20 },
+  isPointerBlocker: { type: 'boolean', default: false },
+
   opacity: { type: 'number', default: 1 },
+
+  paddingTop: { type: 'number', default: 0 },
+  paddingRight: { type: 'number', default: 0 },
+  paddingBottom: { type: 'number', default: 0 },
+  paddingLeft: { type: 'number', default: 0 },
+
   sourceLeft: { type: 'number', default: 0 },
   sourceTop: { type: 'number', default: 0 },
   sourceWidth: { type: 'number', default: 1 },
   sourceHeight: { type: 'number', default: 1 },
   source: { type: 'string', default: null },
-  width: { type: 'number', default: 100 },
-  height: { type: 'number', default: 100 },
-  position: { type: 'vector2', default: { x: 0, y: 0 } },
-  hAlign: { type: 'string', default: 'center' },
-  vAlign: { type: 'string', default: 'center' },
-  paddingTop: { type: 'number', default: 0 },
-  paddingRight: { type: 'number', default: 0 },
-  paddingBottom: { type: 'number', default: 0 },
-  paddingLeft: { type: 'number', default: 0 },
-  sizeInPixels: { type: 'boolean', default: true },
-  visible: { type: 'boolean', default: true },
-  isPointerBlocker: { type: 'boolean', default: false }
+
 })
 
 class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {

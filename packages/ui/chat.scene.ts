@@ -11,6 +11,7 @@ import {
   UIShape
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
+
 declare var dcl: DecentralandInterface
 declare var require: any
 
@@ -20,8 +21,8 @@ const UI_CHAT = require('../../static/images/ui-chat.png')
 const parent = new UIFullScreenShape()
 
 const MAX_CHARS = 94
-const PRIMARY_TEXT_COLOR = 'white'
-const COMMAND_COLOR = '#d7a9ff'
+const PRIMARY_TEXT_COLOR = Color3.White()
+const COMMAND_COLOR = Color3.FromHexString('#d7a9ff')
 
 type MessageEntry = {
   id?: string
@@ -148,16 +149,17 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   component.id = 'input'
   component.autoStretchWidth = false
   component.color = PRIMARY_TEXT_COLOR
-  component.background = 'black'
-  component.focusedBackground = 'black'
+  component.background = Color3.Black()
+  component.focusedBackground = Color3.Black()
   component.placeholder = 'Type a message...'
   component.fontSize = 15
-  component.width = '400px'
-  component.height = '40px'
+  component.width = 400
+  component.height = 40
+  component.sizeInPixels = true
   component.thickness = 0
   component.vAlign = 'bottom'
   component.hAlign = 'left'
-  component.left = '5px'
+  component.position = new Vector2(5, 0)
   component.value = ''
   component.isPointerBlocker = true
 
@@ -169,7 +171,7 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   return { component }
 }
 
-function renderSender(parent: UIShape, props: { color: string; sender: string }) {
+function renderSender(parent: UIShape, props: { color: Color3; sender: string }) {
   const component = new UITextShape(parent)
   component.color = props.color
   component.value = `${props.sender}: `
@@ -184,14 +186,16 @@ function renderSender(parent: UIShape, props: { color: string; sender: string })
   return { component }
 }
 
-function renderMessage(parent: UIShape, props: { color: string; message: string }) {
+function renderMessage(parent: UIShape, props: { color: Color3; message: string }) {
   const component = new UITextShape(parent)
-  component.width = '320px'
+  component.width = 320
+  component.sizeInPixels = true
+  component.positionInPixels = true
   component.color = props.color
   component.value = props.message
   component.fontSize = 14
-  component.left = '10px'
-  component.height = '30px'
+  component.position = new Vector2(10, 0)
+  component.height = 30
   component.vTextAlign = 'top'
   component.hTextAlign = 'left'
   component.textWrapping = true
@@ -207,9 +211,10 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   stack.vertical = false
   stack.hAlign = 'left'
   stack.vAlign = 'bottom'
-  stack.height = '30px'
-  stack.width = '400px'
-  stack.top = '-50px'
+  stack.height = 30
+  stack.width = 400
+  stack.sizeInPixels = true
+  stack.position = new Vector2(0, 50)
 
   renderSender(stack, { color, sender })
   renderMessage(stack, { color, message })
@@ -220,20 +225,20 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
 function createMessagesScrollbar(parent: UIShape, changed: (ev: IEvents['onChange']) => void) {
   const component = new UISliderShape(parent)
   component.id = 'slider'
-  component.height = '170px'
-  component.width = '20px'
-  component.left = '185px'
+  component.height = 170
+  component.width = 20
+  component.position = new Vector2(185, 0)
   component.minimum = -45
   component.isVertical = true
   component.maximum = -45
   component.value = -45
-  component.paddingLeft = '0px'
+  component.paddingLeft = 0
   component.visible = false
   component.isThumbCircle = true
-  component.thumbWidth = '15px'
-  component.barOffset = '8px'
-  component.color = '#333333'
-  component.background = '#262626'
+  component.thumbWidth = 15
+  component.barOffset = 8
+  component.color = Color3.FromHexString('#333333')
+  component.background = Color3.FromHexString('#262626')
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -262,34 +267,38 @@ function createChatHeader(parent: UIShape) {
   headerTextComponent.vAlign = 'top'
   headerTextComponent.hTextAlign = 'left'
   headerTextComponent.vTextAlign = 'top'
-  headerTextComponent.top = '15px'
-  headerTextComponent.left = '15px'
-  headerTextComponent.width = '100px'
-  headerTextComponent.height = '40px'
+  headerTextComponent.position = new Vector2(15, 15)
+  headerTextComponent.width = 100
+  headerTextComponent.height = 40
+  headerTextComponent.sizeInPixels = true
+  headerTextComponent.positionInPixels = true
 
   return { container, headerTextComponent }
 }
 
 function createCommandHelper(parent: UIShape, props: { name: string; description: string }) {
   const container = new UIContainerStackShape(parent)
-  container.height = '55px'
+  container.height = 55
 
   const cmdNameComponent = new UITextShape(container)
   cmdNameComponent.color = COMMAND_COLOR
   cmdNameComponent.value = `/${props.name}`
   cmdNameComponent.fontSize = 14
   cmdNameComponent.fontWeight = 'bold'
-  cmdNameComponent.width = '100%'
-  cmdNameComponent.height = '25px'
+  cmdNameComponent.width = 100//'100%'
+  cmdNameComponent.height = 25//'25px'
+  cmdNameComponent.sizeInPixels = true
+
   cmdNameComponent.hTextAlign = 'left'
 
   const cmdDescriptionComponent = new UITextShape(container)
-  cmdDescriptionComponent.color = '#7d8499'
+  cmdDescriptionComponent.color = Color3.FromHexString('#7d8499')
   cmdDescriptionComponent.value = props.description
   cmdDescriptionComponent.fontSize = 13
   cmdDescriptionComponent.textWrapping = true
-  cmdDescriptionComponent.width = '100%'
-  cmdDescriptionComponent.height = '30px'
+  cmdDescriptionComponent.width = 100//'100%'
+  cmdDescriptionComponent.height = 30//'30px'
+  cmdDescriptionComponent.sizeInPixels = true
   cmdDescriptionComponent.vTextAlign = 'top'
   cmdDescriptionComponent.hTextAlign = 'left'
 }
@@ -347,13 +356,17 @@ function toggleChat() {
 function onSliderChanged(data: any) {
   const value = Math.round(data.value)
   sliderOpenedChat.component.value = value
-  messageContainer!.top = `${value}px`
+
+  //messageContainer!.top = `${value}px`
+  messageContainer!.position.y = value
 }
 
 function onHelpSliderChanged(data: any) {
   const value = Math.round(data.value)
   helpSliderComponent.value = value
-  commandsContainerStack.top = `${-value}px`
+  //commandsContainerStack.position.y = `${-value}px`
+  commandsContainerStack.position.y = -value
+
 }
 
 function onInputChanged(data: any) {
@@ -404,7 +417,8 @@ function addMessage(messageEntry: MessageEntry): void {
 }
 
 function addEntryAndResize(messageEntry: MessageEntry) {
-  messageContainer!.height = `${getMessagesListHeight()}px`
+  //messageContainer!.height = `${getMessagesListHeight()}px`
+  messageContainer!.height = getMessagesListHeight()
   createMessage(messageContainer, messageEntry)
 }
 
@@ -424,9 +438,11 @@ container.visible = false
 const messageContainer = new UIContainerStackShape(container)
 messageContainer.vAlign = 'bottom'
 messageContainer.hAlign = 'left'
-messageContainer.top = '-105px'
-messageContainer.left = '15px'
-messageContainer.height = '200px'
+//messageContainer.top = '-105px'
+//messageContainer.left = '15px'
+//messageContainer.height = '200px'
+messageContainer.height = 200
+messageContainer.position = new Vector2(15, -105)
 
 const footerContainer = new UIContainerRectShape(container)
 footerContainer.adaptHeight = true
@@ -499,27 +515,37 @@ helpContainer.visible = false
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
 commandsContainerStack.vAlign = 'top'
 commandsContainerStack.hAlign = 'left'
-commandsContainerStack.top = '50px'
-commandsContainerStack.left = '15px'
-commandsContainerStack.height = `55px`
-commandsContainerStack.width = '320px'
+// commandsContainerStack.top = '50px'
+// commandsContainerStack.left = '15px'
+// commandsContainerStack.height = `55px`
+// commandsContainerStack.width = '320px'
+commandsContainerStack.position = new Vector2(15, 50)
+commandsContainerStack.height = 55
+commandsContainerStack.width = 320
 
 const helpSliderComponent = new UISliderShape(helpContainer)
 helpSliderComponent.id = 'help-slider'
-helpSliderComponent.height = '170px'
-helpSliderComponent.width = '20px'
-helpSliderComponent.left = '185px'
+// helpSliderComponent.height = '170px'
+// helpSliderComponent.width = '20px'
+// helpSliderComponent.left = '185px'
+// helpSliderComponent.top = '10px'
+helpSliderComponent.position = new Vector2(185, 10)
 helpSliderComponent.minimum = 0
 helpSliderComponent.isVertical = true
 helpSliderComponent.value = 0
-helpSliderComponent.paddingLeft = '0px'
-helpSliderComponent.top = '10px'
+helpSliderComponent.paddingLeft = 0
+
+helpSliderComponent.height = 170
+helpSliderComponent.width = 20
+helpSliderComponent.sizeInPixels = true
+helpSliderComponent.positionInPixels = true
+
 helpSliderComponent.swapOrientation = true
 helpSliderComponent.isThumbCircle = true
-helpSliderComponent.thumbWidth = '15px'
-helpSliderComponent.barOffset = '8px'
-helpSliderComponent.color = '#333333'
-helpSliderComponent.background = '#262626'
+helpSliderComponent.thumbWidth = 15
+helpSliderComponent.barOffset = 8
+helpSliderComponent.color = Color3.FromHexString('#333333')
+helpSliderComponent.background = Color3.FromHexString('#262626')
 helpSliderComponent.isPointerBlocker = true
 
 const sliderEntity = new Entity()
@@ -552,9 +578,12 @@ headerTextComponent.hAlign = 'left'
 headerTextComponent.vAlign = 'top'
 headerTextComponent.hTextAlign = 'left'
 headerTextComponent.vTextAlign = 'top'
-headerTextComponent.top = '15px'
-headerTextComponent.left = '15px'
-headerTextComponent.height = '40px'
+// headerTextComponent.top = '15px'
+// headerTextComponent.left = '15px'
+headerTextComponent.position = new Vector2(15, 15)
+headerTextComponent.height = 40
+headerTextComponent.positionInPixels = true
+headerTextComponent.sizeInPixels = true
 
 async function execute(controller: string, method: string, args: Array<any>) {
   return executeTask(async () => {
@@ -587,7 +616,7 @@ async function initializeCommandsHelp() {
   const commandHeight = 55
   const commandsListHeight = commandsList.length * commandHeight
 
-  commandsContainerStack.height = `${commandsListHeight}px`
+  commandsContainerStack.height = commandsListHeight
   helpSliderComponent.maximum = commandsListHeight - commandHeight
 }
 
