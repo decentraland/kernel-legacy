@@ -52,7 +52,7 @@ bodyReadyFuture
 
     // Warn in case wallet is set in mainnet
     if (net === ETHEREUM_NETWORK.MAINNET && DEBUG) {
-      const style = document.createElement('style') as HTMLStyleElement
+      const style = document.createElement('style')
       style.appendChild(
         document.createTextNode(
           `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
@@ -61,11 +61,15 @@ bodyReadyFuture
       document.head.appendChild(style)
     }
 
-    domReadyFuture.then(canvas => {
-      body.appendChild(canvas)
-    })
+    domReadyFuture
+      .then(canvas => {
+        body.appendChild(canvas)
+      })
+      .catch(handleError)
   })
-  .catch(error => {
-    document.body.classList.remove('dcl-loading')
-    document.body.innerHTML = `<h3>${error.message}</h3>`
-  })
+  .catch(handleError)
+
+function handleError(e) {
+  document.body.classList.remove('dcl-loading')
+  document.body.innerHTML = `<h3>${e.message}</h3>`
+}
