@@ -12,7 +12,8 @@ export enum AvatarMessageType {
   USER_BLOCKED = 'USER_BLOCKED',
   USER_UNBLOCKED = 'USER_UNBLOCKED',
 
-  ADD_FRIEND = 'ADD_FRIEND'
+  ADD_FRIEND = 'ADD_FRIEND',
+  SHOW_WINDOW = 'SHOW_WINDOW'
 }
 
 export type ReceiveUserDataMessage = {
@@ -45,6 +46,7 @@ export type UserMessage = {
     | AvatarMessageType.USER_UNBLOCKED
     | AvatarMessageType.USER_MUTED
     | AvatarMessageType.USER_UNMUTED
+    | AvatarMessageType.SHOW_WINDOW
   uuid: string
 }
 

@@ -23,14 +23,17 @@ export class WebGLUIScene extends WebGLScene<any> {
   }
 }
 
+let hud: WebGLUIScene | null = null
+
 export async function initHudSystem(): Promise<WebGLUIScene> {
-  const context = new SharedSceneContext('/', 'ui-context-hud', false)
+  if (!hud) {
+    const context = new SharedSceneContext('/', 'ui-context-hud', false)
 
-  context.useMappings = false
-  context.baseUrl = document.location.origin
-  const scene = new WebGLUIScene('hud', hudWorkerUrl, context)
+    context.useMappings = false
+    context.baseUrl = document.location.origin
+    hud = new WebGLUIScene('hud', hudWorkerUrl, context)
 
-  await ensureUiApis(scene.worker!)
-
-  return scene
+    await ensureUiApis(hud.worker!)
+  }
+  return hud
 }

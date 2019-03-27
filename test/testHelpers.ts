@@ -28,6 +28,8 @@ import { MemoryTransport } from 'decentraland-rpc'
 import GamekitScene from '../packages/scene-system/scene.system'
 import { gridToWorld } from 'atomicHelpers/parcelScenePositions'
 import { BasicShape } from 'engine/components/disposableComponents/DisposableComponent'
+import { initHudSystem } from 'engine/dcl/widgets/ui'
+import { AVATAR_OBSERVABLE } from 'decentraland-ecs/src/decentraland/Types'
 
 const baseUrl = 'http://localhost:8080/local-ipfs/contents/'
 
@@ -537,3 +539,40 @@ export function testScene(
     })
   })
 }
+
+async function initHud() {
+  start()
+
+  let attempts = 0
+
+  while (!scene) {
+    if (attempts++ > 10) throw new Error('!scene')
+    await sleep(300)
+  }
+
+  await sleep(2000)
+
+  return initHudSystem()
+}
+
+let hud = initHud()
+
+export async function awaitHud() {
+  it('await hud system to be ready', async function() {
+    this.timeout(10000)
+    const hudScene = await hud
+    const system = await hudScene.worker!.system
+    const socialController = system.getAPIInstance(EngineAPI)
+    let attempts = 0
+
+    while (!(AVATAR_OBSERVABLE in socialController.subscribedEvents)) {
+      if (attempts++ > 10) throw new Error(AVATAR_OBSERVABLE + ' not subscribed')
+      await sleep(300)
+    }
+  })
+  return hud
+}
+
+describe('Avatar hud initialization', () => {
+  awaitHud()
+})

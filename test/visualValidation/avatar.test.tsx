@@ -1,5 +1,8 @@
-import { saveScreenshot, enableVisualTests, wait, waitToBeLoaded } from '../testHelpers'
-import { initHudSystem } from 'engine/dcl/widgets/ui'
+import { saveScreenshot, enableVisualTests, wait, waitToBeLoaded, awaitHud } from '../testHelpers'
+import { avatarMessageObservable } from 'shared/comms/peers'
+import { AvatarMessageType, Pose } from 'shared/comms/types'
+import { gridToWorld } from 'atomicHelpers/parcelScenePositions'
+import { Quaternion } from 'babylonjs'
 
 enableVisualTests('Avatar visual validation', function(root) {
   // const playerProfile = {
@@ -9,60 +12,53 @@ enableVisualTests('Avatar visual validation', function(root) {
   //   status: 'Testing!!! 🎉🔥🚀'
   // }
 
-  let avatar1: any = null
-  let avatar2: any = null
-  let avatar3: any = null
-
-  let hud: ReturnType<typeof initHudSystem>
-
-  it('initHudSystem', async () => {
-    hud = initHudSystem()
-    await hud
-  })
-
-  it('wait for hud system', async () => {
-    await (await hud).worker!.system
-  })
+  const hud = awaitHud()
 
   it('creates a test scene with avatars', async () => {
-    // avatar1 = new AvatarEntity('avatar1')
-    // avatar1.regenerateAvatar('square-robot')
-    // avatar1.rotation.set(0, 0, 0)
-    // gridToWorld(50, 0.3, avatar1.position)
-    // avatar1.position.y = 1.5
-    // avatar1.parent = root
-    // avatar2 = new AvatarEntity('avatar2')
-    // avatar2.regenerateAvatar('round-robot')
-    // avatar2.rotation.set(0, 0, 0)
-    // gridToWorld(51, 0.3, avatar2.position)
-    // avatar2.position.y = 1.5
-    // avatar2.parent = root
-    // avatar3 = new AvatarEntity('avatar3')
-    // avatar3.regenerateAvatar('fox')
-    // avatar3.rotation.set(0, 0, 0)
-    // gridToWorld(52, 0.3, avatar3.position)
-    // avatar3.position.y = 1.5
-    // avatar3.parent = root
+    const tmpPosition = { x: 0, y: 0, z: 0 }
+    const rotation = Quaternion.RotationYawPitchRoll(Math.PI, 0, 0)
+
+    function getPose(worldX: number, worldZ: number): Pose {
+      gridToWorld(worldX, worldZ, tmpPosition)
+      return [tmpPosition.x, tmpPosition.y, tmpPosition.z, rotation.x, rotation.y, rotation.z, rotation.w]
+    }
+
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_DATA,
+      uuid: 'avatar1',
+      data: { avatarType: 'avatar/main.gltf', pose: getPose(50, 0.3), publicKey: '1', displayName: 'Agus' }
+    })
+
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_DATA,
+      uuid: 'avatar2',
+      data: { avatarType: 'avatar/main.gltf', pose: getPose(51, 0.3), publicKey: '2', displayName: 'Dani' }
+    })
+
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_DATA,
+      uuid: 'avatar3',
+      data: { avatarType: 'avatar/main.gltf', pose: getPose(52, 0.3), publicKey: '3', displayName: 'Juancat' }
+    })
+
+    wait(2000)
+
+    await waitToBeLoaded((await hud).context.rootEntity)
   })
 
-  it('waits avatar2 to be loaded', async () => await waitToBeLoaded(avatar2))
   saveScreenshot(`avatar-round-robot.png`, { from: [51.0, 1.8, 0.6], lookAt: [51.0, 1.3, 0.3] })
-
-  it('waits avatar1 to be loaded', async function() {
-    await waitToBeLoaded(avatar1)
-  })
 
   saveScreenshot(`avatar-square-robot.png`, {
     from: [50.0, 1.8, 0.6],
     lookAt: [50.0, 1.3, 0.3]
   })
 
-  it('waits avatar3 to be loaded', async () => await waitToBeLoaded(avatar3))
   saveScreenshot(`avatar-fox.png`, { from: [52.0, 1.8, 0.6], lookAt: [52.0, 1.3, 0.3] })
 
   it('open profile ui for avatar1', async () => {
-    avatar1.dispatchUUIDEvent('onClick', {
-      entityId: avatar1.uuid
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.SHOW_WINDOW,
+      uuid: 'avatar3'
     })
   })
 
@@ -70,23 +66,20 @@ enableVisualTests('Avatar visual validation', function(root) {
 
   saveScreenshot(`avatar-profile-ui.png`, { from: [50.0, 1.8, 0.7], lookAt: [49.9, 1.3, 0.3] })
 
-  wait(2000)
-
   it('disposes all avatars', async () => {
-    avatar1.dispose()
-    avatar1 = null
-
-    avatar2.dispose()
-    avatar2 = null
-
-    avatar3.dispose()
-    avatar3 = null
-
-    // avatarContext.disposableComponents.forEach((_, id) => {
-    //   avatarContext.ComponentDisposed({ id })
-    // })
-
-    // avatarContext.dispose()
-    ;(await (await hud).worker!).dispose()
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_REMOVED,
+      uuid: 'avatar1'
+    })
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_REMOVED,
+      uuid: 'avatar2'
+    })
+    avatarMessageObservable.notifyObservers({
+      type: AvatarMessageType.USER_REMOVED,
+      uuid: 'avatar3'
+    })
   })
+
+  wait(2000)
 })

@@ -12,6 +12,7 @@ import {
   getMutedUsers
 } from 'shared/comms/peers'
 import { AvatarMessage } from 'shared/comms/types'
+import { AVATAR_OBSERVABLE } from 'decentraland-ecs/src/decentraland/Types'
 
 export interface IProfileData {
   displayName: string
@@ -32,7 +33,7 @@ export class SocialController extends ExposableAPI {
     const engineAPI = options.getAPIInstance(EngineAPI)
 
     avatarMessageObservable.add((event: any) => {
-      engineAPI.sendSubscriptionEvent('AVATAR_OBSERVABLE' as any, event)
+      engineAPI.sendSubscriptionEvent(AVATAR_OBSERVABLE as any, event)
     })
   }
 

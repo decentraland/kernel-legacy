@@ -10,8 +10,7 @@ import {
   Quaternion,
   Component,
   Scalar,
-  OnPointerDown,
-  LocalPointerEvent
+  OnPointerDown
 } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
@@ -150,7 +149,7 @@ export class AvatarEntity extends Entity {
     this.setVisible(true)
   }
 
-  clicked = (_: LocalPointerEvent) => {
+  clicked = () => {
     showAvatarWindow({
       displayName: this.displayName,
       isBlocked: this.blocked,
@@ -160,17 +159,17 @@ export class AvatarEntity extends Entity {
     })
   }
 
-  setBlocked(blocked: boolean, muted: boolean): any {
+  setBlocked(blocked: boolean, muted: boolean): void {
     this.blocked = blocked
     this.muted = muted
   }
 
-  setVisible(visible: boolean): any {
+  setVisible(visible: boolean): void {
     this.visible = visible
     this.updateVisibility()
   }
 
-  setUserData(userData: Partial<UserInformation>): any {
+  setUserData(userData: Partial<UserInformation>): void {
     if (userData.avatarType) {
       const model = getAvatarModel(userData.avatarType)
 
@@ -193,7 +192,7 @@ export class AvatarEntity extends Entity {
     this.displayName = name
   }
 
-  setPose(pose: Pose): any {
+  setPose(pose: Pose): void {
     const [x, y, z, Qx, Qy, Qz, Qw] = pose
 
     if (this.transform.position.equalsToFloats(0, 0, 0)) {
@@ -263,7 +262,7 @@ async function hideBlockedUsers(): Promise<void> {
   })
 }
 
-function handleUserData(message: ReceiveUserDataMessage) {
+function handleUserData(message: ReceiveUserDataMessage): void {
   const avatar = ensureAvatar(message.uuid)
 
   if (avatar) {
@@ -272,7 +271,7 @@ function handleUserData(message: ReceiveUserDataMessage) {
   }
 }
 
-function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage) {
+function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage): boolean {
   const avatar = ensureAvatar(uuid)
 
   if (!avatar) {
@@ -288,7 +287,7 @@ function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage) {
  * In some cases, like minimizing the window, the user will be invisible to the rest of the world.
  * This function handles those visible changes.
  */
-function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage) {
+function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
   const avatar = ensureAvatar(uuid)
 
   if (avatar) {
@@ -296,15 +295,22 @@ function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage) {
   }
 }
 
-function handleUserRemoved({ uuid }: UserRemovedMessage) {
+function handleUserRemoved({ uuid }: UserRemovedMessage): void {
   const avatar = avatarMap.get(uuid)
   if (avatar) {
     avatarMap.delete(uuid)
     engine.removeEntity(avatar)
   }
 }
+function handleShowWindow({ uuid }: UserMessage): void {
+  const avatar = avatarMap.get(uuid)
 
-function handleMutedBlockedMessages({ uuid }: UserMessage) {
+  if (avatar) {
+    avatar.clicked()
+  }
+}
+
+function handleMutedBlockedMessages({ uuid }: UserMessage): void {
   executeTask(hideBlockedUsers)
 }
 
@@ -325,5 +331,7 @@ avatarMessageObservable.add(evt => {
     handleMutedBlockedMessages(evt)
   } else if (evt.type === AvatarMessageType.USER_UNBLOCKED) {
     handleMutedBlockedMessages(evt)
+  } else if (evt.type === AvatarMessageType.SHOW_WINDOW) {
+    handleShowWindow(evt)
   }
 })

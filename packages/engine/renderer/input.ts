@@ -40,7 +40,10 @@ enum Keys {
 
 export { keyState, Keys }
 
+let didInit = false
 export function initKeyboard() {
+  if (didInit) return
+  didInit = true
   vrCamera.keysUp = [Keys.KEY_W as number] // W
   vrCamera.keysDown = [Keys.KEY_S as number] // S
   vrCamera.keysLeft = [Keys.KEY_A as number] // A
