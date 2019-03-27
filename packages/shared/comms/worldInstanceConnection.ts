@@ -179,20 +179,20 @@ export class WorldInstanceConnection {
           }
 
           if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
-            // @ts-ignore
-            await this.webRtcConn!.addIceCandidate(sdp)
+            await this.webRtcConn!.addIceCandidate({ candidate: sdp })
           } else if (msgType === MessageType.WEBRTC_OFFER) {
             try {
               await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: sdp }))
               const desc = await this.webRtcConn!.createAnswer()
               await this.webRtcConn!.setLocalDescription(desc)
 
-              const msg = new WebRtcMessage()
-              msg.setToAlias(this.commServerAlias)
-              msg.setType(MessageType.WEBRTC_ANSWER)
-              // @ts-ignore
-              msg.setSdp(desc.sdp)
-              sendCoordinatorMessage(msg)
+              if (desc.sdp) {
+                const msg = new WebRtcMessage()
+                msg.setToAlias(this.commServerAlias)
+                msg.setType(MessageType.WEBRTC_ANSWER)
+                msg.setSdp(desc.sdp)
+                sendCoordinatorMessage(msg)
+              }
             } catch (err) {
               logError(err)
             }
