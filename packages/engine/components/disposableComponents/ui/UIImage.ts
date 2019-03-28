@@ -31,6 +31,7 @@ const schemaValidator = createSchemaValidator({
   sourceTop: { type: 'number', default: 0 },
   sourceWidth: { type: 'number', default: 1 },
   sourceHeight: { type: 'number', default: 1 },
+  sizeInPixels: { type: 'boolean', default: true },
   source: { type: 'string', default: null },
 
 })

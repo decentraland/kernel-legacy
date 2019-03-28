@@ -1,7 +1,7 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
 import { Color3 } from './math'
-import { Color4 } from 'babylonjs';
+import { Color4 } from './math'
 
 /**
  * @alpha
@@ -407,13 +407,12 @@ export class UIImageShape extends UIShape {
   @ObservableComponent.field
   paddingLeft: number = 0
 
+  @ObservableComponent.field
+  sizeInPixels: boolean = true
+
   constructor(parent: UIShape, source: string) {
     super(parent)
     this.source = source
-  }
-
-  toJSON() {
-
   }
 }
 
