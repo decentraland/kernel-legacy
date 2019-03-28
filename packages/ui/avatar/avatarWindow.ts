@@ -6,8 +6,7 @@ import {
   OnClick,
   engine,
   UIContainerRectShape,
-  UITextShape,
-  log
+  UITextShape
 } from 'decentraland-ecs/src'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -31,6 +30,8 @@ const internalState: IState = {
   isBlocked: false,
   avatarUrl: ''
 }
+
+export let currentAvatarId: string | null = null
 
 // -----------------------------
 
@@ -240,6 +241,8 @@ export type ShowProfileMessage = {
 }
 
 export function showAvatarWindow(data: ShowProfileMessage) {
+  currentAvatarId = data.uuid
+
   internalState.visible = true
   closeButton.component.visible = true
   guiContainerComponent.visible = true
@@ -262,7 +265,6 @@ export function showAvatarWindow(data: ShowProfileMessage) {
 }
 
 export function hideAvatarWindow() {
-  log('hiding avatar-profile')
   internalState.visible = false
   closeButton.component.visible = false
   guiContainerComponent.visible = false

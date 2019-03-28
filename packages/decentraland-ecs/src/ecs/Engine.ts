@@ -258,7 +258,9 @@ export class Engine {
       if (component.onDispose) {
         component.onDispose()
       }
+      return true
     }
+    return false
   }
 
   updateComponent(component: DisposableComponentLike) {

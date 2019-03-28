@@ -6,14 +6,20 @@ import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { scene } from 'engine/renderer'
 import { probe } from 'engine/renderer/ambientLights'
 import { DEBUG } from 'config'
-import { isSceneTexture } from 'engine/renderer/monkeyLoader'
+import { isSceneTexture, deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 
 export class OBJShape extends DisposableComponent {
   assetContainerEntity = new Map<string, BABYLON.AssetContainer>()
   src: string | null = null
-  loadingDone = false
 
   private didFillContributions = false
+
+  loadingDone(entity: BaseEntity): boolean {
+    if (this.entities.has(entity)) {
+      return this.assetContainerEntity.has(entity.uuid)
+    }
+    return false
+  }
 
   onAttach(entity: BaseEntity): void {
     if (this.src) {
@@ -46,35 +52,35 @@ export class OBJShape extends DisposableComponent {
               })
           })
 
-          // TODO(menduz): what happens if the load ends when the entity got removed?
-          if (!entity.isDisposed()) {
-            processColliders(assetContainer)
+          processColliders(assetContainer)
 
-            // Find all the materials from all the meshes and add to $.materials
-            assetContainer.meshes.forEach(mesh => {
-              mesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
-              if (mesh.material) {
-                if (!assetContainer.materials.includes(mesh.material)) {
-                  assetContainer.materials.push(mesh.material)
-                }
+          // Find all the materials from all the meshes and add to $.materials
+          assetContainer.meshes.forEach(mesh => {
+            mesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
+            if (mesh.material) {
+              if (!assetContainer.materials.includes(mesh.material)) {
+                assetContainer.materials.push(mesh.material)
               }
-            })
+            }
+          })
 
-            // Find the textures in the materials that share the same domain as the context
-            // then add the textures to the $.textures
-            assetContainer.materials.forEach((material: BABYLON.Material | BABYLON.PBRMaterial) => {
-              for (let i in material) {
-                const t = (material as any)[i]
+          // Find the textures in the materials that share the same domain as the context
+          // then add the textures to the $.textures
+          assetContainer.materials.forEach((material: BABYLON.Material | BABYLON.PBRMaterial) => {
+            for (let i in material) {
+              const t = (material as any)[i]
 
-                if (i.endsWith('Texture') && t instanceof BABYLON.Texture && t !== probe.cubeTexture) {
-                  if (!assetContainer.textures.includes(t)) {
-                    if (isSceneTexture(t)) {
-                      assetContainer.textures.push(t)
-                    }
+              if (i.endsWith('Texture') && t instanceof BABYLON.Texture && t !== probe.cubeTexture) {
+                if (!assetContainer.textures.includes(t)) {
+                  if (isSceneTexture(t)) {
+                    assetContainer.textures.push(t)
                   }
                 }
               }
-            })
+            }
+          })
+
+          if (this.isStillValid(entity)) {
             this.assetContainerEntity.set(entity.uuid, assetContainer)
 
             const node = new BABYLON.AbstractMesh('obj')
@@ -107,14 +113,13 @@ export class OBJShape extends DisposableComponent {
             entity.setObject3D(BasicShape.nameInEntity, node)
           } else {
             cleanupAssetContainer(assetContainer)
+            deleteUnusedTextures()
           }
-          this.loadingDone = true
         },
         null,
         (_scene, message, exception) => {
           this.context.logger.error('Error loading OBJ', message, exception)
           this.onDetach(entity)
-          this.loadingDone = true
         },
         '.obj'
       )
@@ -135,6 +140,12 @@ export class OBJShape extends DisposableComponent {
       cleanupAssetContainer(assetContainer)
       this.assetContainerEntity.delete(entity.uuid)
     }
+
+    deleteUnusedTextures()
+  }
+
+  isStillValid(entity: BaseEntity) {
+    return !entity.isDisposed() && this.entities.has(entity)
   }
 
   async updateData(data: any): Promise<void> {

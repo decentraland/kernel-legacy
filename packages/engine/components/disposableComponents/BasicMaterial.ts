@@ -57,7 +57,7 @@ const defaults = {
 
 export class BasicMaterial extends DisposableComponent {
   material: BABYLON.ShaderMaterial
-
+  loadingDonePrivate: boolean = false
   constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
 
@@ -76,7 +76,7 @@ export class BasicMaterial extends DisposableComponent {
     )
 
     this.contributions.materials.add(this.material)
-    this.loadingDone = false
+    this.loadingDonePrivate = false
   }
 
   updateMeshMaterial = (mesh: BABYLON.Mesh | null) => {
@@ -116,7 +116,7 @@ export class BasicMaterial extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
+    this.loadingDonePrivate = false
     if (data.texture) {
       const src = validators.string(data.texture, defaults.texture)
       if (src) {
@@ -142,7 +142,10 @@ export class BasicMaterial extends DisposableComponent {
 
       deleteUnusedTextures()
     }
-    this.loadingDone = true
+    this.loadingDonePrivate = true
+  }
+  loadingDone() {
+    return this.loadingDonePrivate
   }
 }
 

@@ -33,12 +33,12 @@ const defaults = {
 
 export class PBRMaterial extends DisposableComponent {
   material: BABYLON.PBRMaterial
+  loadingDonePrivate: boolean = false
 
   constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
     this.material = new BABYLON.PBRMaterial('#' + this.uuid, scene)
     this.contributions.materials.add(this.material)
-    this.loadingDone = false
   }
 
   updateMeshMaterial = (mesh: BABYLON.Mesh) => {
@@ -78,7 +78,7 @@ export class PBRMaterial extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
+    this.loadingDonePrivate = false
     const m = this.material
 
     m.albedoColor.copyFrom(validators.color(data.albedoColor, defaults.albedoColor))
@@ -207,9 +207,13 @@ export class PBRMaterial extends DisposableComponent {
     m.emissiveTexture && this.contributions.textures.add(m.emissiveTexture)
     m.refractionTexture && this.contributions.textures.add(m.refractionTexture)
 
-    this.loadingDone = true
+    this.loadingDonePrivate = true
 
     deleteUnusedTextures()
+  }
+
+  loadingDone() {
+    return this.loadingDonePrivate
   }
 }
 

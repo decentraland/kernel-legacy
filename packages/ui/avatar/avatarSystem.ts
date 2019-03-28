@@ -26,7 +26,7 @@ import {
 } from 'shared/comms/types'
 import { execute } from './rpc'
 import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
-import { showAvatarWindow } from './avatarWindow'
+import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -63,6 +63,19 @@ function cleanupUnusedModels() {
    *   if M is not present in S
    *     remove M from the engine and modeld
    */
+  let usedModels: Set<GLTFShape> = new Set()
+  avatarMap.forEach($ => {
+    const model = $.body.getComponentOrNull(GLTFShape)
+    if (model) {
+      usedModels.add(model)
+    }
+  })
+
+  new Map(models).forEach(($, key) => {
+    if (!usedModels.has($)) {
+      models.delete(key)
+    }
+  })
 }
 
 @Component('animatedTransform')
@@ -301,7 +314,12 @@ function handleUserRemoved({ uuid }: UserRemovedMessage): void {
     avatarMap.delete(uuid)
     engine.removeEntity(avatar)
   }
+  if (uuid === currentAvatarId) {
+    hideAvatarWindow()
+  }
+  cleanupUnusedModels()
 }
+
 function handleShowWindow({ uuid }: UserMessage): void {
   const avatar = avatarMap.get(uuid)
 

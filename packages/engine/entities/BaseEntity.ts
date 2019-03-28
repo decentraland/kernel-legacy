@@ -70,6 +70,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
   attachDisposableComponent(name: string, component: DisposableComponent) {
     const current = this.disposableComponents.get(name)
     if (current && current !== component) {
+      this.context.logger.log('Removing component', name, current, component)
       current.removeFrom(this)
     }
     component.attachTo(this)
@@ -82,7 +83,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     }
 
     for (let [, component] of this.disposableComponents) {
-      if (!component.loadingDone) {
+      if (!component.loadingDone(this)) {
         return this
       }
     }

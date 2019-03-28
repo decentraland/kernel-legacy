@@ -1169,7 +1169,7 @@ declare class Engine {
   getEntitiesWithComponent(component: string): Record<string, any>
   getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, Entity>
   registerComponent(component: DisposableComponentLike): void
-  disposeComponent(component: DisposableComponentLike): void
+  disposeComponent(component: DisposableComponentLike): boolean
   updateComponent(component: DisposableComponentLike): void
   getComponentGroup(...requires: ComponentConstructor<any>[]): ComponentGroup
   removeComponentGroup(componentGroup: ComponentGroup): void

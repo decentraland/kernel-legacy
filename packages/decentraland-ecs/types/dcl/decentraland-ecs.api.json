@@ -7042,12 +7042,12 @@
         },
         "disposeComponent": {
           "kind": "method",
-          "signature": "disposeComponent(component: DisposableComponentLike): void;",
+          "signature": "disposeComponent(component: DisposableComponentLike): boolean;",
           "accessModifier": "",
           "isOptional": false,
           "isStatic": false,
           "returnValue": {
-            "type": "void",
+            "type": "boolean",
             "description": []
           },
           "parameters": {

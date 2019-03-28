@@ -10,7 +10,7 @@ import { setSize, scene, initDCL, onWindowResize, engineMicroQueue } from 'engin
 import { initKeyboard } from 'engine/renderer/input'
 import { reposition } from 'engine/renderer/ambientLights'
 
-import { start, stop } from 'engine/dcl'
+import { start } from 'engine/dcl'
 
 import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { sleep, untilNextFrame } from 'atomicHelpers/sleep'
@@ -131,6 +131,18 @@ function getSceneNumbers() {
   }
 }
 
+async function initEngine() {
+  initKeyboard()
+  const canvas = initDCL()
+  const body = await bodyReadyFuture
+  if (!canvas.parentElement) {
+    body.appendChild(canvas)
+  }
+  // Test output will be 800x600
+  setSize(800, 600)
+  onWindowResize()
+}
+
 /**
  * Enables visual tests
  * This method should be located directly inside a `describe` body.
@@ -165,16 +177,7 @@ export function enableVisualTests(name: string, cb: (root: BABYLON.TransformNode
     })
 
     it('start the renderer', async () => {
-      initKeyboard()
-      start()
-      const canvas = initDCL()
-      const body = await bodyReadyFuture
-      if (!canvas.parentElement) {
-        body.appendChild(canvas)
-      }
-      // Test output will be 800x600
-      setSize(800, 600)
-      onWindowResize()
+      await initEngine()
     })
 
     try {
@@ -199,8 +202,6 @@ export function enableVisualTests(name: string, cb: (root: BABYLON.TransformNode
       engineMicroQueue.flushTaskQueue()
 
       await untilNextFrame()
-
-      stop()
 
       if (typeof gc === 'function') {
         gc()
@@ -541,7 +542,9 @@ export function testScene(
 }
 
 async function initHud() {
-  start()
+  await initEngine()
+
+  await untilNextFrame()
 
   let attempts = 0
 
@@ -550,9 +553,22 @@ async function initHud() {
     await sleep(300)
   }
 
-  await sleep(2000)
+  const hudScene = await initHudSystem()
+  const system = await hudScene.worker!.system
+  const socialController = system.getAPIInstance(EngineAPI)
 
-  return initHudSystem()
+  attempts = 0
+
+  while (!(AVATAR_OBSERVABLE in socialController.subscribedEvents)) {
+    if (attempts++ > 10) throw new Error(AVATAR_OBSERVABLE + ' not subscribed')
+    await sleep(300)
+  }
+
+  console.log(hudScene)
+
+  await untilNextFrame()
+
+  return hudScene
 }
 
 let hud = initHud()
@@ -560,15 +576,7 @@ let hud = initHud()
 export async function awaitHud() {
   it('await hud system to be ready', async function(this: any) {
     this.timeout(10000)
-    const hudScene = await hud
-    const system = await hudScene.worker!.system
-    const socialController = system.getAPIInstance(EngineAPI)
-    let attempts = 0
-
-    while (!(AVATAR_OBSERVABLE in socialController.subscribedEvents)) {
-      if (attempts++ > 10) throw new Error(AVATAR_OBSERVABLE + ' not subscribed')
-      await sleep(300)
-    }
+    await hud
   })
   return hud
 }
@@ -576,3 +584,5 @@ export async function awaitHud() {
 describe('Avatar hud initialization', () => {
   awaitHud()
 })
+
+start()
