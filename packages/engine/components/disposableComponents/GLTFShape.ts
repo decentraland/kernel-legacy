@@ -38,12 +38,19 @@ export class GLTFShape extends DisposableComponent {
   src: string | null = null
   assetContainerEntity = new Map<string, BABYLON.AssetContainer>()
   entityIsLoading = new Set<string>()
+  error = false
 
   private didFillContributions = false
 
   loadingDone(entity: BaseEntity): boolean {
+    if (this.error) {
+      return true
+    }
     if (this.entities.has(entity)) {
-      return this.assetContainerEntity.has(entity.uuid)
+      if (this.entityIsLoading.has(entity.uuid)) {
+        return false
+      }
+      return true
     }
     return false
   }
@@ -151,11 +158,9 @@ export class GLTFShape extends DisposableComponent {
 
           if (this.isStillValid(entity)) {
             // Fin the main mesh and add it as the BasicShape.nameInEntity component.
-            assetContainer.meshes
-              .filter($ => $.name === '__root__')
-              .forEach(mesh => {
-                entity.setObject3D(BasicShape.nameInEntity, mesh)
-              })
+            assetContainer.meshes.filter($ => $.name === '__root__').forEach(mesh => {
+              entity.setObject3D(BasicShape.nameInEntity, mesh)
+            })
 
             this.assetContainerEntity.set(entity.uuid, assetContainer)
 

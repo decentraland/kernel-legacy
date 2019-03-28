@@ -11,10 +11,14 @@ import { isSceneTexture, deleteUnusedTextures } from 'engine/renderer/monkeyLoad
 export class OBJShape extends DisposableComponent {
   assetContainerEntity = new Map<string, BABYLON.AssetContainer>()
   src: string | null = null
+  error = false
 
   private didFillContributions = false
 
   loadingDone(entity: BaseEntity): boolean {
+    if (this.error) {
+      return true
+    }
     if (this.entities.has(entity)) {
       return this.assetContainerEntity.has(entity.uuid)
     }
@@ -118,6 +122,7 @@ export class OBJShape extends DisposableComponent {
         },
         null,
         (_scene, message, exception) => {
+          this.error = true
           this.context.logger.error('Error loading OBJ', message, exception)
           this.onDetach(entity)
         },

@@ -3,6 +3,7 @@ import { avatarMessageObservable } from 'shared/comms/peers'
 import { AvatarMessageType, Pose } from 'shared/comms/types'
 import { gridToWorld } from 'atomicHelpers/parcelScenePositions'
 import { Quaternion } from 'babylonjs'
+import { sleep } from 'atomicHelpers/sleep'
 enableVisualTests('Avatar visual validation', function(root) {
   // const playerProfile = {
   //   displayName: 'Test Avatar',
@@ -46,21 +47,11 @@ enableVisualTests('Avatar visual validation', function(root) {
       data: { avatarType: 'avatar/main.gltf', pose: getPose(52, 0.3), publicKey: '3', displayName: 'Juancat' }
     })
 
-    wait(2000)
+    await sleep(500)
     await waitToBeLoaded((await hud).context.rootEntity)
   })
 
-  it('open profile ui for avatar1', async () => {
-    // Because I DON'T KNOW when it did load.
-    wait(1000)
-    await waitToBeLoaded((await hud).context.rootEntity)
-    wait(1000)
-    await waitToBeLoaded((await hud).context.rootEntity)
-    wait(1000)
-    await waitToBeLoaded((await hud).context.rootEntity)
-    wait(1000)
-    await waitToBeLoaded((await hud).context.rootEntity)
-  })
+  wait(2000)
 
   saveScreenshot(`avatar-round-robot.png`, { from: [51.0, 1.8, 0.6], lookAt: [51.0, 1.3, 0.3] })
 

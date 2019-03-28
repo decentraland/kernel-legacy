@@ -131,7 +131,7 @@ function getSceneNumbers() {
   }
 }
 
-async function initEngine() {
+async function initHud() {
   initKeyboard()
   const canvas = initDCL()
   const body = await bodyReadyFuture
@@ -141,7 +141,33 @@ async function initEngine() {
   // Test output will be 800x600
   setSize(800, 600)
   onWindowResize()
+
+  await untilNextFrame()
+
+  let attempts = 0
+
+  while (!scene) {
+    if (attempts++ > 10) throw new Error('!scene')
+    await sleep(300)
+  }
+
+  const hudScene = await initHudSystem()
+  const system = await hudScene.worker!.system
+  const socialController = system.getAPIInstance(EngineAPI)
+
+  attempts = 0
+
+  while (!(AVATAR_OBSERVABLE in socialController.subscribedEvents)) {
+    if (attempts++ > 10) throw new Error(AVATAR_OBSERVABLE + ' not subscribed')
+    await sleep(300)
+  }
+
+  await untilNextFrame()
+
+  return hudScene
 }
+
+let hud = initHud()
 
 /**
  * Enables visual tests
@@ -177,7 +203,7 @@ export function enableVisualTests(name: string, cb: (root: BABYLON.TransformNode
     })
 
     it('start the renderer', async () => {
-      await initEngine()
+      await hud
     })
 
     try {
@@ -540,38 +566,6 @@ export function testScene(
     })
   })
 }
-
-async function initHud() {
-  await initEngine()
-
-  await untilNextFrame()
-
-  let attempts = 0
-
-  while (!scene) {
-    if (attempts++ > 10) throw new Error('!scene')
-    await sleep(300)
-  }
-
-  const hudScene = await initHudSystem()
-  const system = await hudScene.worker!.system
-  const socialController = system.getAPIInstance(EngineAPI)
-
-  attempts = 0
-
-  while (!(AVATAR_OBSERVABLE in socialController.subscribedEvents)) {
-    if (attempts++ > 10) throw new Error(AVATAR_OBSERVABLE + ' not subscribed')
-    await sleep(300)
-  }
-
-  console.log(hudScene)
-
-  await untilNextFrame()
-
-  return hudScene
-}
-
-let hud = initHud()
 
 export async function awaitHud() {
   it('await hud system to be ready', async function(this: any) {
