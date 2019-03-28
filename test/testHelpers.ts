@@ -558,7 +558,7 @@ async function initHud() {
 let hud = initHud()
 
 export async function awaitHud() {
-  it('await hud system to be ready', async function() {
+  it('await hud system to be ready', async function(this: any) {
     this.timeout(10000)
     const hudScene = await hud
     const system = await hudScene.worker!.system
