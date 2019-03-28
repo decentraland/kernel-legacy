@@ -37,14 +37,12 @@ export class BaseComponent<T> implements BABYLON.Behavior<BaseEntity> {
   value: T
   entity: BaseEntity
 
-  constructor(entity: BaseEntity, value: T) {
+  constructor(entity: BaseEntity) {
     this.entity = entity
-    this.value = this.transformValue(value)
   }
 
   init(): void {
     // stub
-    this.update(null, this.value)
   }
 
   transformValue(value: T): T {

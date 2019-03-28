@@ -404,7 +404,8 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     } else if (name in this.components) {
       this.components[name].setValue(JSON.parse(payload.json))
     } else if (payload.classId in componentRegistry) {
-      const behavior: BaseComponent<any> = new componentRegistry[payload.classId](this, JSON.parse(payload.json))
+      const behavior: BaseComponent<any> = new componentRegistry[payload.classId](this)
+      behavior.setValue(JSON.parse(payload.json))
       this.components[name] = behavior
       this.addBehavior(behavior, true)
     }
