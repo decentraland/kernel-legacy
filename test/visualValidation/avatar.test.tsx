@@ -14,7 +14,8 @@ enableVisualTests('Avatar visual validation', function(root) {
 
   const hud = awaitHud()
 
-  it('creates a test scene with avatars', async () => {
+  it('creates a test scene with avatars', async function(this: any) {
+    this.timeout(10000)
     const tmpPosition = { x: 0, y: 0, z: 0 }
     const rotation = Quaternion.RotationYawPitchRoll(0, 0, 0)
 
