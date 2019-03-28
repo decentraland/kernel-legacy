@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Vector2, Color3 } from './math'
+import { Color3 } from './math'
 import { Color4 } from 'babylonjs';
 
 /**
@@ -22,26 +22,20 @@ export abstract class UIShape extends ObservableComponent {
   @ObservableComponent.field
   vAlign: string = 'center'
 
-  @ObservableComponent.field
-  width: number = 100
+  @ObservableComponent.uiValue
+  width: string | number = "100px"
 
-  @ObservableComponent.field
-  height: number = 50
+  @ObservableComponent.uiValue
+  height: string | number = "50px"
 
-  @ObservableComponent.field
-  position: Vector2 = new Vector2(0, 0)
+  @ObservableComponent.uiValue
+  positionX: string | number = "0px"
+
+  @ObservableComponent.uiValue
+  positionY: string | number = "0px"
 
   @ObservableComponent.field
   isPointerBlocker: boolean = false
-
-  @ObservableComponent.field
-  sizeInPixels: boolean = true
-
-  @ObservableComponent.field
-  positionInPixels: boolean = true
-
-
-
 
   private _parent?: UIShape
 
@@ -276,7 +270,7 @@ export class UITextShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: string = '#fff'
+  shadowColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   zIndex: number = 0
@@ -416,6 +410,10 @@ export class UIImageShape extends UIShape {
   constructor(parent: UIShape, source: string) {
     super(parent)
     this.source = source
+  }
+
+  toJSON() {
+
   }
 }
 

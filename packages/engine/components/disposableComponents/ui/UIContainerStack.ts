@@ -1,11 +1,11 @@
 import { DisposableComponent } from '../DisposableComponent'
 import { CLASS_ID } from 'decentraland-ecs/src'
+import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { UIControl } from './UIControl'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
 import { UIContainerStackShape } from 'decentraland-ecs/src/decentraland/UIShapes'
-import { Vector2 } from 'babylonjs';
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
@@ -13,7 +13,8 @@ const schemaValidator = createSchemaValidator({
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
   zIndex: { type: 'number', default: 0 },
-  position: { type: 'vector2', default: new Vector2(0, 0) },
+  positionX: { type: 'uiValue', default: new UIValue(0) },
+  positionY: { type: 'uiValue', default: new UIValue(0) },
   width: { type: 'number', default: 100 },
   height: { type: 'number', default: 20 },
   isPointerBlocker: { type: 'boolean', default: false },
@@ -55,8 +56,8 @@ export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.G
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.width = this.data.width
-    this.control.left = this.data.position.x
-    this.control.top = -this.data.position.y
+    this.control.left = this.data.positionX
+    this.control.top = -this.data.positionY
     this.control.color = this.data.color.toHexString()
     this.control.background = this.data.background.toHexString()
     this.control.isVisible = this.data.visible

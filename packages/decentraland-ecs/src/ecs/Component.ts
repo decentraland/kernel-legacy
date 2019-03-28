@@ -1,9 +1,11 @@
 import { newId } from './helpers'
 import { EventConstructor } from './EventManager'
+import { UIValue } from './UIValue'
 
 const componentSymbol = '__name__symbol_'
 const componentClassIdSymbol = '__classId__symbol_'
 const componentIdSymbol = '__component__id_'
+
 
 /**
  * @public
@@ -34,7 +36,7 @@ export interface ComponentConstructor<T extends ComponentLike> {
   [componentClassIdSymbol]?: number
   isComponent?: boolean
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -48,7 +50,7 @@ export interface DisposableComponentConstructor<T extends DisposableComponentLik
   isComponent?: boolean
   isDisposableComponent?: true
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -85,7 +87,7 @@ export class DisposableComponentUpdated {
  * @public
  */
 export function Component(componentName: string, classId?: number) {
-  return function<TFunction extends ComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends ComponentConstructor<any>>(target: TFunction): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -137,7 +139,7 @@ export function Component(componentName: string, classId?: number) {
  */
 
 export function DisposableComponent(componentName: string, classId: number) {
-  return function<TFunction extends DisposableComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends DisposableComponentConstructor<any>>(target: TFunction): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -270,10 +272,10 @@ export class ObservableComponent {
   static field(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function(this: ObservableComponent) {
+        get: function (this: ObservableComponent) {
           return this.data[propertyKey]
         },
-        set: function(this: ObservableComponent, value) {
+        set: function (this: ObservableComponent, value) {
           const oldValue = this.data[propertyKey]
           this.data[propertyKey] = value
 
@@ -290,20 +292,49 @@ export class ObservableComponent {
     }
   }
 
+
+  static uiValue(target: ObservableComponent, propertyKey: string) {
+    if (delete (target as any)[propertyKey]) {
+      Object.defineProperty(target, propertyKey.toString(), {
+        get: function (this: ObservableComponent): string | number {
+          return this.data[propertyKey].toString()
+        },
+        set: function (this: ObservableComponent, value: string | number) {
+          const oldValue = this.data[propertyKey]
+
+          const finalValue = new UIValue(value);
+
+          this.data[propertyKey] = finalValue
+
+          if (finalValue !== oldValue) {
+            this.dirty = true
+
+            for (let i = 0; i < this.subscriptions.length; i++) {
+              this.subscriptions[i](propertyKey, finalValue, oldValue)
+            }
+          }
+        },
+        enumerable: true
+      })
+    }
+  }
+
+
   static readonly(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function(this: ObservableComponent) {
+        get: function (this: ObservableComponent) {
           if (propertyKey in this.data === false) {
             throw new Error(`The field ${propertyKey} is uninitialized`)
           }
           return this.data[propertyKey]
         },
-        set: function(this: ObservableComponent, value) {
+        set: function (this: ObservableComponent, value) {
           if (propertyKey in this.data) {
             throw new Error(`The field ${propertyKey} is readonly`)
           }
           this.data[propertyKey] = value
+          this.dirty = true
         },
         enumerable: true,
         configurable: false

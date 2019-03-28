@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs'
 import { ReadOnlyVector2, ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { DEBUG } from 'config'
+import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 
 export type ISchema<Keys> = { [key: string]: { type: keyof Keys; default?: any } }
 export type Validator<T = any> = (x: any, defaultValue: T) => T
@@ -105,6 +106,24 @@ export const validators = {
     }
   },
 
+  uiValue(value: any, def: UIValue): {} {
+    if (value === null || value === undefined) return def
+
+    if (value instanceof UIValue) {
+      return value.toString()
+    }
+
+    if (typeof value === 'number') {
+      return new UIValue(value)
+    }
+
+    if (typeof value === 'string') {
+      return new UIValue(value)
+    }
+
+    return def
+  },
+
   quaternion(value: any, def: ReadOnlyQuaternion): ReadOnlyQuaternion {
     if (value === null || value === undefined) return def
 
@@ -201,7 +220,7 @@ export function createSchemaValidator(schema: ISchema<typeof validators>) {
   const schemaKeys = Object.keys(schema)
 
   return Object.assign(
-    function(input) {
+    function (input) {
       if (input != null && typeof input === 'object') {
         for (let k = 0; k < schemaKeys.length; k++) {
           const key = schemaKeys[k]

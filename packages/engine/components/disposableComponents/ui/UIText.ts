@@ -1,11 +1,11 @@
 import { DisposableComponent } from '../DisposableComponent'
 import { CLASS_ID, Color3 } from 'decentraland-ecs/src'
+import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
 import { UITextShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { UIControl } from './UIControl'
-import { Vector2 } from 'babylonjs';
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
@@ -13,7 +13,8 @@ const schemaValidator = createSchemaValidator({
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
   zIndex: { type: 'number', default: 0 },
-  position: { type: 'vector2', default: new Vector2(0, 0) },
+  positionX: { type: 'uiValue', default: new UIValue(0) },
+  positionY: { type: 'uiValue', default: new UIValue(0) },
   width: { type: 'number', default: 100 },
   height: { type: 'number', default: 20 },
   isPointerBlocker: { type: 'boolean', default: false },
@@ -75,7 +76,7 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.shadowBlur = this.data.shadowBlur
     this.control.shadowOffsetX = this.data.shadowOffsetX
     this.control.shadowOffsetY = this.data.shadowOffsetY
-    this.control.shadowColor = this.data.shadowColor
+    this.control.shadowColor = this.data.shadowColor.toHexString()
     this.control.lineSpacing = this.data.lineSpacing
     this.control.text = this.data.value
     this.control.textWrapping = this.data.textWrapping
@@ -93,8 +94,8 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.paddingLeft = this.data.paddingLeft
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.top = -this.data.position.y
-    this.control.left = this.data.position.x
+    this.control.top = -this.data.positionY
+    this.control.left = this.data.positionX
     this.control.isVisible = this.data.visible
 
     this.setParent(this.data.parentComponent)

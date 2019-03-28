@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Vector2, Color3 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask, Color3 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -44,7 +44,7 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
   component.sourceTop = 10
   component.sourceLeft = 130
   component.hAlign = 'right'
-  component.position = new Vector2(-10, 0)
+  component.positionX = '-10px'
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -66,7 +66,7 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
   component.sourceTop = 0
   component.sourceLeft = 48
   component.hAlign = 'right'
-  component.position = new Vector2(-10, 0)
+  component.positionX = '-10px'
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -88,7 +88,7 @@ function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
   component.sourceTop = 0
   component.sourceLeft = 0
   component.hAlign = 'right'
-  component.position = new Vector2(-10, 0)
+  component.positionX = '-10px'
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -110,7 +110,7 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
   component.sourceTop = 5
   component.sourceLeft = 96
   component.hAlign = 'right'
-  component.position = new Vector2(-10, 0)
+  component.positionX = '-10px'
   component.isPointerBlocker = true
   component.visible = false
 
@@ -133,7 +133,8 @@ function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']
   component.sourceTop = -5
   component.sourceLeft = 75
   component.hAlign = 'right'
-  component.position = new Vector2(-10, 5)
+  component.positionX = '-10px'
+  component.positionY = '5px'
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -155,11 +156,10 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   component.fontSize = 15
   component.width = 400
   component.height = 40
-  component.sizeInPixels = true
   component.thickness = 0
   component.vAlign = 'bottom'
   component.hAlign = 'left'
-  component.position = new Vector2(5, 0)
+  component.positionX = '5px'
   component.value = ''
   component.isPointerBlocker = true
 
@@ -189,12 +189,10 @@ function renderSender(parent: UIShape, props: { color: Color3; sender: string })
 function renderMessage(parent: UIShape, props: { color: Color3; message: string }) {
   const component = new UITextShape(parent)
   component.width = 320
-  component.sizeInPixels = true
-  component.positionInPixels = true
   component.color = props.color
   component.value = props.message
   component.fontSize = 14
-  component.position = new Vector2(10, 0)
+  component.positionX = '10px'
   component.height = 30
   component.vTextAlign = 'top'
   component.hTextAlign = 'left'
@@ -213,8 +211,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   stack.vAlign = 'bottom'
   stack.height = 30
   stack.width = 400
-  stack.sizeInPixels = true
-  stack.position = new Vector2(0, 50)
+  stack.positionY = '50px'
 
   renderSender(stack, { color, sender })
   renderMessage(stack, { color, message })
@@ -227,7 +224,7 @@ function createMessagesScrollbar(parent: UIShape, changed: (ev: IEvents['onChang
   component.id = 'slider'
   component.height = 170
   component.width = 20
-  component.position = new Vector2(185, 0)
+  component.positionX = '185px'
   component.minimum = -45
   component.isVertical = true
   component.maximum = -45
@@ -267,11 +264,10 @@ function createChatHeader(parent: UIShape) {
   headerTextComponent.vAlign = 'top'
   headerTextComponent.hTextAlign = 'left'
   headerTextComponent.vTextAlign = 'top'
-  headerTextComponent.position = new Vector2(15, 15)
+  headerTextComponent.positionX = '15px'
+  headerTextComponent.positionY = '15px'
   headerTextComponent.width = 100
   headerTextComponent.height = 40
-  headerTextComponent.sizeInPixels = true
-  headerTextComponent.positionInPixels = true
 
   return { container, headerTextComponent }
 }
@@ -285,9 +281,8 @@ function createCommandHelper(parent: UIShape, props: { name: string; description
   cmdNameComponent.value = `/${props.name}`
   cmdNameComponent.fontSize = 14
   cmdNameComponent.fontWeight = 'bold'
-  cmdNameComponent.width = 100//'100%'
-  cmdNameComponent.height = 25//'25px'
-  cmdNameComponent.sizeInPixels = true
+  cmdNameComponent.width = '100%'
+  cmdNameComponent.height = '25px'
 
   cmdNameComponent.hTextAlign = 'left'
 
@@ -296,9 +291,8 @@ function createCommandHelper(parent: UIShape, props: { name: string; description
   cmdDescriptionComponent.value = props.description
   cmdDescriptionComponent.fontSize = 13
   cmdDescriptionComponent.textWrapping = true
-  cmdDescriptionComponent.width = 100//'100%'
-  cmdDescriptionComponent.height = 30//'30px'
-  cmdDescriptionComponent.sizeInPixels = true
+  cmdDescriptionComponent.width = '100%'
+  cmdDescriptionComponent.height = '30px'
   cmdDescriptionComponent.vTextAlign = 'top'
   cmdDescriptionComponent.hTextAlign = 'left'
 }
@@ -358,14 +352,14 @@ function onSliderChanged(data: any) {
   sliderOpenedChat.component.value = value
 
   //messageContainer!.top = `${value}px`
-  messageContainer!.position.y = value
+  messageContainer!.positionY = value
 }
 
 function onHelpSliderChanged(data: any) {
   const value = Math.round(data.value)
   helpSliderComponent.value = value
   //commandsContainerStack.position.y = `${-value}px`
-  commandsContainerStack.position.y = -value
+  commandsContainerStack.positionY = -value
 
 }
 
@@ -428,8 +422,8 @@ container.vAlign = 'bottom'
 container.hAlign = 'left'
 container.width = 400
 container.height = 250
-container.position.x = 20
-container.position.y = 20
+container.positionX = 20
+container.positionY = 20
 container.color = Color3.White()
 container.thickness = 0
 container.background = Color3.Black()
@@ -438,11 +432,9 @@ container.visible = false
 const messageContainer = new UIContainerStackShape(container)
 messageContainer.vAlign = 'bottom'
 messageContainer.hAlign = 'left'
-//messageContainer.top = '-105px'
-//messageContainer.left = '15px'
-//messageContainer.height = '200px'
-messageContainer.height = 200
-messageContainer.position = new Vector2(15, -105)
+messageContainer.positionY = '-105px'
+messageContainer.positionX = '15px'
+messageContainer.height = '200px'
 
 const footerContainer = new UIContainerRectShape(container)
 footerContainer.adaptHeight = true
@@ -470,8 +462,8 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.adaptWidth = true
   containerMinimized.vAlign = 'bottom'
   containerMinimized.hAlign = 'left'
-  containerMinimized.position.x = 20
-  containerMinimized.position.y = 15
+  containerMinimized.positionX = 20
+  containerMinimized.positionY = 15
   containerMinimized.thickness = 0
   containerMinimized.background = Color3.Black()
 
@@ -494,7 +486,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   engine.addEntity(minimizedIconEntity)
 
   const helpIcon = createHelpButton(containerMinimized, openHelp)
-  helpIcon.component.position = new Vector2(0, 5)
+  helpIcon.component.positionY = 5
 
   return containerMinimized
 }
@@ -505,8 +497,8 @@ helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
 helpContainer.width = 400
 helpContainer.height = 250
-helpContainer.position.x = 20
-helpContainer.position.y = 20
+helpContainer.positionX = 20
+helpContainer.positionY = 20
 helpContainer.color = Color3.White()
 helpContainer.thickness = 0
 helpContainer.background = Color3.Black()
@@ -515,21 +507,17 @@ helpContainer.visible = false
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
 commandsContainerStack.vAlign = 'top'
 commandsContainerStack.hAlign = 'left'
-// commandsContainerStack.top = '50px'
-// commandsContainerStack.left = '15px'
-// commandsContainerStack.height = `55px`
-// commandsContainerStack.width = '320px'
-commandsContainerStack.position = new Vector2(15, 50)
-commandsContainerStack.height = 55
-commandsContainerStack.width = 320
+commandsContainerStack.positionY = '50px'
+commandsContainerStack.positionX = '15px'
+commandsContainerStack.height = `55px`
+commandsContainerStack.width = '320px'
 
 const helpSliderComponent = new UISliderShape(helpContainer)
 helpSliderComponent.id = 'help-slider'
-// helpSliderComponent.height = '170px'
-// helpSliderComponent.width = '20px'
-// helpSliderComponent.left = '185px'
-// helpSliderComponent.top = '10px'
-helpSliderComponent.position = new Vector2(185, 10)
+helpSliderComponent.height = '170px'
+helpSliderComponent.width = '20px'
+helpSliderComponent.positionX = '185px'
+helpSliderComponent.positionY = '10px'
 helpSliderComponent.minimum = 0
 helpSliderComponent.isVertical = true
 helpSliderComponent.value = 0
@@ -537,8 +525,6 @@ helpSliderComponent.paddingLeft = 0
 
 helpSliderComponent.height = 170
 helpSliderComponent.width = 20
-helpSliderComponent.sizeInPixels = true
-helpSliderComponent.positionInPixels = true
 
 helpSliderComponent.swapOrientation = true
 helpSliderComponent.isThumbCircle = true
@@ -578,12 +564,9 @@ headerTextComponent.hAlign = 'left'
 headerTextComponent.vAlign = 'top'
 headerTextComponent.hTextAlign = 'left'
 headerTextComponent.vTextAlign = 'top'
-// headerTextComponent.top = '15px'
-// headerTextComponent.left = '15px'
-headerTextComponent.position = new Vector2(15, 15)
+headerTextComponent.positionY = '15px'
+headerTextComponent.positionX = '15px'
 headerTextComponent.height = 40
-headerTextComponent.positionInPixels = true
-headerTextComponent.sizeInPixels = true
 
 async function execute(controller: string, method: string, args: Array<any>) {
   return executeTask(async () => {
