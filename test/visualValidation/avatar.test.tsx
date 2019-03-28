@@ -49,7 +49,17 @@ describe.only('avatars', () => {
 
       wait(2000)
       await waitToBeLoaded((await hud).context.rootEntity)
-      wait(2000)
+    })
+
+    it('open profile ui for avatar1', async () => {
+      // Because I DON'T KNOW when it did load.
+      wait(1000)
+      await waitToBeLoaded((await hud).context.rootEntity)
+      wait(1000)
+      await waitToBeLoaded((await hud).context.rootEntity)
+      wait(1000)
+      await waitToBeLoaded((await hud).context.rootEntity)
+      wait(1000)
       await waitToBeLoaded((await hud).context.rootEntity)
     })
 
@@ -69,7 +79,7 @@ describe.only('avatars', () => {
       })
     })
 
-    wait(2000)
+    wait(200)
 
     saveScreenshot(`avatar-profile-ui.png`, { from: [50.0, 1.8, 0.7], lookAt: [49.9, 1.3, 0.3] })
 
