@@ -75,7 +75,7 @@ if (qs.ws) {
 
 namespace DCL {
   export function EngineStarted() {
-    instancedJS = initializeEngine(gameInstance)
+    instancedJS = initializeEngine(gameInstance, qs.parse(location.search).position)
 
     instancedJS.catch(error => {
       document.body.classList.remove('dcl-loading')

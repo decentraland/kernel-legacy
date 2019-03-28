@@ -1,17 +1,23 @@
 type GameInstance = { SendMessage(object: string, method: string, ...args: (number | string)[]) }
 
+import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
+
 import { initShared } from '../shared'
+import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
-import { positionObservable, lastPlayerPosition } from '../shared/world/positionThings'
-import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
-import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
-import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
+import {
+  positionObservable,
+  lastPlayerPosition,
+  teleportObservable,
+  movePlayerToSpawnpoint
+} from '../shared/world/positionThings'
 import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
-
-import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
+import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
+
 import { DEBUG } from '../config'
 
 let gameInstance: GameInstance = null
@@ -131,7 +137,7 @@ class UnityParcelScene implements ParcelSceneAPI {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function initializeEngine(_gameInstance: GameInstance) {
+export async function initializeEngine(_gameInstance: GameInstance, initialPosition: string) {
   gameInstance = _gameInstance
   const { net } = await initShared()
 
@@ -141,6 +147,14 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     unityInterface.SetDebug()
   }
 
+  let spawnpointLand = initialPosition
+  let initialized = false
+
+  teleportObservable.add(position => {
+    initialized = false
+    spawnpointLand = `${position.x},${position.y}`
+  })
+
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
     shouldLoadParcelScene: land => {
@@ -149,14 +163,27 @@ export async function initializeEngine(_gameInstance: GameInstance) {
       // tslint:disable-next-line: no-commented-out-code
       // return preloadedScenes.has(land.scene.scene.base)
     },
-    onLoadParcelScenes: scenes => {
+    onLoadParcelScenes: lands => {
+      if (initialized) {
+        return
+      }
+
       unityInterface.LoadParcelScenes(
-        scenes.map($ => {
+        lands.map($ => {
           const x = Object.assign({}, ILandToLoadableParcelScene($).data)
           delete x.land
           return x
         })
       )
+
+      const land = lands.find(land => land.scene.scene.base === spawnpointLand)
+
+      if (!land) {
+        return
+      }
+
+      movePlayerToSpawnpoint(land)
+      initialized = true
     }
   })
 
