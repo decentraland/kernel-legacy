@@ -3955,8 +3955,8 @@ declare class UIImageShape extends UIShape {
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
+    sizeInPixels: boolean;
     constructor(parent: UIShape, source: string);
-    toJSON(): void;
 }
 
 /**

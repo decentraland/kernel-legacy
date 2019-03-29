@@ -228,7 +228,7 @@ export class UITextShape extends UIShape {
   outlineWidth: number = 0
 
   @ObservableComponent.field
-  outlineColor: string = '#fff'
+  outlineColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   color: Color3 = Color3.White()

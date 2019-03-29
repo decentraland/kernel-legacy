@@ -86,7 +86,7 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.textHorizontalAlignment = parseHorizontalAlignment(this.data.hTextAlign)
     this.control.textVerticalAlignment = parseVerticalAlignment(this.data.vTextAlign)
     this.control.outlineWidth = this.data.outlineWidth
-    this.control.outlineColor = this.data.outlineColor
+    this.control.outlineColor = this.data.outlineColor.toHexString()
     this.control.fontWeight = this.data.fontWeight
     this.control.paddingTop = this.data.paddingTop
     this.control.paddingRight = this.data.paddingRight
