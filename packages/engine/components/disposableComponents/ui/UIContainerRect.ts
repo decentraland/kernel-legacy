@@ -1,5 +1,6 @@
 import { DisposableComponent } from '../DisposableComponent'
 import { CLASS_ID } from 'decentraland-ecs/src'
+import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
@@ -7,18 +8,24 @@ import { UIControl } from './UIControl'
 import { UIContainerRectShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 const schemaValidator = createSchemaValidator({
+  id: { type: 'string', default: null },
+  visible: { type: 'boolean', default: true },
+  hAlign: { type: 'string', default: 'center' },
+  vAlign: { type: 'string', default: 'center' },
+  zIndex: { type: 'number', default: 0 },
+  positionX: { type: 'uiValue', default: new UIValue(0) },
+  positionY: { type: 'uiValue', default: new UIValue(0) },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 20 },
+  isPointerBlocker: { type: 'boolean', default: false },
+
   opacity: { type: 'number', default: 1 },
+  color: { type: 'color', default: BABYLON.Color3.White() },
+
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   thickness: { type: 'number', default: 0 },
-  width: { type: 'number', default: 1 },
-  height: { type: 'number', default: 1 },
-  position: { type: 'vector2', default: { x: 0, y: 0 } },
-  color: { type: 'color', default: BABYLON.Color3.White() },
-  background: { type: 'color', default: BABYLON.Color3.Black() },
-  hAlign: { type: 'string', default: 'center' },
-  vAlign: { type: 'string', default: 'center' },
-  visible: { type: 'boolean', default: true }
+  background: { type: 'color', default: BABYLON.Color3.Black() }
 })
 
 export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI.Rectangle> {
@@ -51,8 +58,8 @@ export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.top = -this.data.position.y
-    this.control.left = this.data.position.x
+    this.control.top = -this.data.positionY
+    this.control.left = this.data.positionX
     this.control.color = this.data.color.toHexString()
     this.control.background = this.data.background.toHexString()
     this.control.isVisible = this.data.visible

@@ -1,4 +1,4 @@
-import { Entity, engine, OnClick, executeTask, Vector2, Color3 } from 'decentraland-ecs/src'
+import { Entity, engine, OnClick, executeTask, Color3 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIContainerRectShape,
@@ -42,7 +42,7 @@ function createAvatar(parent: UIShape) {
   component.sourceTop = 0
   component.sourceWidth = 128
   component.sourceHeight = 128
-  component.position = new Vector2(0, 85)
+  component.positionY = 85
   component.visible = true
 
   return { component }
@@ -77,7 +77,8 @@ function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) 
   component.sourceTop = 132
   component.sourceWidth = 48
   component.sourceHeight = 48
-  component.position = new Vector2(55, 0)
+  component.positionX = 55
+  component.positionY = 0
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -116,7 +117,8 @@ function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) =
   component.sourceTop = 181
   component.sourceWidth = 52
   component.sourceHeight = 48
-  component.position = new Vector2(55, 0)
+  component.positionX = 55
+  component.positionY = 0
   component.isPointerBlocker = true
 
   const entity = new Entity()
@@ -136,7 +138,8 @@ function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) =
   component.sourceTop = 278
   component.sourceWidth = 48
   component.sourceHeight = 48
-  component.position = new Vector2(130, 170)
+  component.positionX = 130
+  component.positionY = 170
   component.isPointerBlocker = true
   component.visible = false
 
@@ -212,7 +215,7 @@ guiContainerComponent.height = 400
 guiContainerComponent.hAlign = 'right'
 // a guiContainerComponent.cornerRadius = 40
 guiContainerComponent.color = Color3.White()
-guiContainerComponent.position.x = -0.3
+guiContainerComponent.positionX = -0.3
 guiContainerComponent.visible = false
 
 // background
@@ -225,33 +228,34 @@ bgComponent.sourceLeft = 347
 bgComponent.sourceTop = 1
 bgComponent.sourceWidth = 96
 bgComponent.sourceHeight = 96
-bgComponent.position = new Vector2(0, 80)
+bgComponent.positionY = 80
 
 let avatarIcon = createAvatar(guiContainerComponent)
 
 // Display name
 const displayNameComponent = new UITextShape(guiContainerComponent)
-displayNameComponent.color = '#000'
+displayNameComponent.color = Color3.FromHexString('#000')
 displayNameComponent.fontSize = 24
 
 const publicKeyComponent = new UITextShape(guiContainerComponent)
-publicKeyComponent.color = '#999'
+publicKeyComponent.color = Color3.FromHexString('#999')
 publicKeyComponent.fontSize = 18
-publicKeyComponent.top = '30px'
+//publicKeyComponent.top = '30px'
+publicKeyComponent.positionY = 30
 
 // Friend, follow etc..
 const friendshipsContainer = new UIContainerRectShape(guiContainerComponent)
 // a friendshipsContainer.sizeInPixels = true
 friendshipsContainer.width = 450
-friendshipsContainer.position.y = -0.15
-friendshipsContainer.position.x = -0.1
+friendshipsContainer.positionY = -0.15
+friendshipsContainer.positionX = -0.1
 
 createWinkButton(friendshipsContainer, follow)
 createFriendButton(friendshipsContainer, addFriend)
 
 // Block, mute, etc...
 const blockAndMuteContainer = new UIContainerRectShape(friendshipsContainer)
-blockAndMuteContainer.position.x = 0.1
+blockAndMuteContainer.positionX = 0.1
 
 let muteButton = createMuteButton(blockAndMuteContainer, toggleMute)
 let blockButton = createBlockButton(blockAndMuteContainer, toggleBlock)

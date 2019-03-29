@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Vector2, Color3 } from './math'
+import { Color3, Color4 } from './math'
 
 /**
  * @alpha
@@ -11,6 +11,30 @@ export abstract class UIShape extends ObservableComponent {
    */
   @ObservableComponent.field
   visible: boolean = true
+
+  @ObservableComponent.field
+  zIndex: number = 0
+
+  @ObservableComponent.field
+  hAlign: string = 'center'
+
+  @ObservableComponent.field
+  vAlign: string = 'center'
+
+  @ObservableComponent.uiValue
+  width: string | number = '100px'
+
+  @ObservableComponent.uiValue
+  height: string | number = '50px'
+
+  @ObservableComponent.uiValue
+  positionX: string | number = '0px'
+
+  @ObservableComponent.uiValue
+  positionY: string | number = '0px'
+
+  @ObservableComponent.field
+  isPointerBlocker: boolean = false
 
   private _parent?: UIShape
 
@@ -54,12 +78,6 @@ export class UIWorldSpaceShape extends UIShape {
   id: string | null = null
 
   @ObservableComponent.field
-  width: string = '1'
-
-  @ObservableComponent.field
-  height: string = '1'
-
-  @ObservableComponent.field
   visible: boolean = true
 
   constructor() {
@@ -74,9 +92,6 @@ export class UIWorldSpaceShape extends UIShape {
 export class UIScreenSpaceShape extends UIShape {
   @ObservableComponent.field
   id: string | null = null
-
-  @ObservableComponent.field
-  visible: boolean = true
 
   constructor() {
     super(null)
@@ -104,40 +119,13 @@ export class UIContainerRectShape extends UIShape {
   thickness: number = 0
 
   @ObservableComponent.field
-  width: number = 1
-
-  @ObservableComponent.field
-  height: number = 1
-
-  @ObservableComponent.field
-  position: Vector2 = new Vector2(0, 0)
-
-  @ObservableComponent.field
   color: Color3 = Color3.White()
 
   @ObservableComponent.field
   background: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  hAlign: string = 'center'
-
-  @ObservableComponent.field
-  vAlign: string = 'center'
-
-  @ObservableComponent.field
   alignmentUsesSize: boolean = true
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
-
-  @ObservableComponent.field
-  sizeInPixels: boolean = true
-
-  @ObservableComponent.field
-  positionInPixels: boolean = true
 }
 
 /**
@@ -149,46 +137,22 @@ export class UIContainerStackShape extends UIShape {
   id: string | null = null
 
   @ObservableComponent.field
-  opacity: number = 1
-
-  @ObservableComponent.field
   adaptWidth: boolean = false
 
   @ObservableComponent.field
   adaptHeight: boolean = false
 
   @ObservableComponent.field
-  width: string = '100%'
+  opacity: number = 1
 
   @ObservableComponent.field
-  height: string = '100%'
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
-  top: string = '0px'
-
-  @ObservableComponent.field
-  left: string = '0px'
-
-  @ObservableComponent.field
-  color: string = 'white'
-
-  @ObservableComponent.field
-  background: string = 'transparent'
-
-  @ObservableComponent.field
-  hAlign: string = 'center'
-
-  @ObservableComponent.field
-  vAlign: string = 'center'
+  background: Color4 = new Color4(0, 0, 0, 0)
 
   @ObservableComponent.field
   vertical: boolean = true
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
 }
 
 /**
@@ -218,40 +182,22 @@ export class UIButtonShape extends UIShape {
   cornerRadius: number = 0
 
   @ObservableComponent.field
-  width: string = '100%'
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
-  height: string = '100%'
+  background: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  top: string = '0px'
+  paddingTop: number = 0
 
   @ObservableComponent.field
-  left: string = '0px'
+  paddingRight: number = 0
 
   @ObservableComponent.field
-  color: string = 'white'
+  paddingBottom: number = 0
 
   @ObservableComponent.field
-  background: string = 'black'
-
-  @ObservableComponent.field
-  hAlign: string = 'center'
-
-  @ObservableComponent.field
-  vAlign: string = 'center'
-
-  @ObservableComponent.field
-  paddingTop: string = '0px'
-
-  @ObservableComponent.field
-  paddingRight: string = '0px'
-
-  @ObservableComponent.field
-  paddingBottom: string = '0px'
-
-  @ObservableComponent.field
-  paddingLeft: string = '0px'
+  paddingLeft: number = 0
 
   @ObservableComponent.field
   shadowBlur: number = 0
@@ -263,16 +209,10 @@ export class UIButtonShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: string = '#fff'
+  shadowColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   text: string = 'button'
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
 }
 
 /**
@@ -290,7 +230,7 @@ export class UITextShape extends UIShape {
   outlineColor: string = '#fff'
 
   @ObservableComponent.field
-  color: string = '#fff'
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
   fontFamily: string = 'Arial'
@@ -308,7 +248,7 @@ export class UITextShape extends UIShape {
   value: string = ''
 
   @ObservableComponent.field
-  lineSpacing: string = '0px'
+  lineSpacing: number = 0
 
   @ObservableComponent.field
   lineCount: number = 0
@@ -329,7 +269,7 @@ export class UITextShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: string = '#fff'
+  shadowColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   hAlign: string = 'center'
@@ -344,34 +284,16 @@ export class UITextShape extends UIShape {
   vTextAlign: string = 'center'
 
   @ObservableComponent.field
-  width: string = '100%'
+  paddingTop: number = 0
 
   @ObservableComponent.field
-  height: string = '100px'
+  paddingRight: number = 0
 
   @ObservableComponent.field
-  top: string = '0px'
+  paddingBottom: number = 0
 
   @ObservableComponent.field
-  left: string = '0px'
-
-  @ObservableComponent.field
-  paddingTop: string = '0px'
-
-  @ObservableComponent.field
-  paddingRight: string = '0px'
-
-  @ObservableComponent.field
-  paddingBottom: string = '0px'
-
-  @ObservableComponent.field
-  paddingLeft: string = '0px'
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
+  paddingLeft: number = 0
 }
 
 /**
@@ -383,7 +305,7 @@ export class UIInputTextShape extends UIShape {
   id: string | null = null
 
   @ObservableComponent.field
-  color: string = '#fff'
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
   thickness: number = 1
@@ -404,25 +326,25 @@ export class UIInputTextShape extends UIShape {
   value: string = ''
 
   @ObservableComponent.field
-  placeholderColor: string = '#fff'
+  placeholderColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   placeholder: string = ''
 
   @ObservableComponent.field
-  margin: string = '10px'
+  margin: number = 10
 
   @ObservableComponent.field
-  maxWidth: string = '100%'
+  maxWidth: number = 100
 
   @ObservableComponent.field
   autoStretchWidth: boolean = true
 
   @ObservableComponent.field
-  background: string = 'black'
+  background: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  focusedBackground: string = 'black'
+  focusedBackground: Color3 = Color3.Black()
 
   @ObservableComponent.field
   shadowBlur: number = 0
@@ -434,46 +356,19 @@ export class UIInputTextShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: string = '#fff'
+  shadowColor: Color3 = Color3.White()
 
   @ObservableComponent.field
-  zIndex: number = 0
+  paddingTop: number = 0
 
   @ObservableComponent.field
-  hAlign: string = 'center'
+  paddingRight: number = 0
 
   @ObservableComponent.field
-  vAlign: string = 'center'
+  paddingBottom: number = 0
 
   @ObservableComponent.field
-  width: string = '100%'
-
-  @ObservableComponent.field
-  height: string = '50px'
-
-  @ObservableComponent.field
-  top: string = '0px'
-
-  @ObservableComponent.field
-  left: string = '0px'
-
-  @ObservableComponent.field
-  paddingTop: string = '0px'
-
-  @ObservableComponent.field
-  paddingRight: string = '0px'
-
-  @ObservableComponent.field
-  paddingBottom: string = '0px'
-
-  @ObservableComponent.field
-  paddingLeft: string = '0px'
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
+  paddingLeft: number = 0
 }
 
 /**
@@ -503,21 +398,6 @@ export class UIImageShape extends UIShape {
   source: string | null = null
 
   @ObservableComponent.field
-  width: number = 1
-
-  @ObservableComponent.field
-  height: number = 1
-
-  @ObservableComponent.field
-  position: Vector2 = new Vector2(0, 0)
-
-  @ObservableComponent.field
-  hAlign: string = 'center'
-
-  @ObservableComponent.field
-  vAlign: string = 'center'
-
-  @ObservableComponent.field
   paddingTop: number = 0
 
   @ObservableComponent.field
@@ -530,16 +410,7 @@ export class UIImageShape extends UIShape {
   paddingLeft: number = 0
 
   @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
-
-  @ObservableComponent.field
   sizeInPixels: boolean = true
-
-  @ObservableComponent.field
-  positionInPixels: boolean = true
 
   constructor(parent: UIShape, source: string) {
     super(parent)
@@ -562,7 +433,7 @@ export class UISliderShape extends UIShape {
   maximum: number = 1
 
   @ObservableComponent.field
-  color: string = '#fff'
+  color: Color3 = Color3.White()
 
   @ObservableComponent.field
   opacity: number = 1.0
@@ -571,16 +442,16 @@ export class UISliderShape extends UIShape {
   value: number = 0
 
   @ObservableComponent.field
-  borderColor: string = '#fff'
+  borderColor: Color3 = Color3.White()
 
   @ObservableComponent.field
-  background: string = 'black'
+  background: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  barOffset: string = '5px'
+  barOffset: number = 5
 
   @ObservableComponent.field
-  thumbWidth: string = '30px'
+  thumbWidth: number = 30
 
   @ObservableComponent.field
   isThumbCircle: boolean = false
@@ -598,41 +469,20 @@ export class UISliderShape extends UIShape {
   zIndex: number = 0
 
   @ObservableComponent.field
-  hAlign: string = 'center'
+  paddingTop: number = 0
 
   @ObservableComponent.field
-  vAlign: string = 'center'
+  paddingRight: number = 0
 
   @ObservableComponent.field
-  width: string = '100%'
+  paddingBottom: number = 0
 
   @ObservableComponent.field
-  height: string = '20px'
-
-  @ObservableComponent.field
-  top: string = '0px'
-
-  @ObservableComponent.field
-  left: string = '0px'
-
-  @ObservableComponent.field
-  paddingTop: string = '0px'
-
-  @ObservableComponent.field
-  paddingRight: string = '0px'
-
-  @ObservableComponent.field
-  paddingBottom: string = '0px'
-
-  @ObservableComponent.field
-  paddingLeft: string = '0px'
+  paddingLeft: number = 0
 
   @ObservableComponent.field
   onChanged: string = ''
 
   @ObservableComponent.field
   swapOrientation: boolean = false
-
-  @ObservableComponent.field
-  isPointerBlocker: boolean = false
 }

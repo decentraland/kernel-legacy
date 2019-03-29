@@ -1,5 +1,6 @@
 import { DisposableComponent } from '../DisposableComponent'
 import { CLASS_ID } from 'decentraland-ecs/src'
+import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { UIControl } from './UIControl'
@@ -7,19 +8,24 @@ import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entitie
 import { UIContainerStackShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 const schemaValidator = createSchemaValidator({
-  opacity: { type: 'number', default: 1 },
-  adaptWidth: { type: 'boolean', default: false },
-  adaptHeight: { type: 'boolean', default: false },
-  width: { type: 'string', default: '100%' },
-  height: { type: 'string', default: '100%' },
-  top: { type: 'string', default: '0px' },
-  left: { type: 'string', default: '0px' },
-  color: { type: 'string', default: 'white' },
-  background: { type: 'string', default: 'transparent' },
+  id: { type: 'string', default: null },
+  visible: { type: 'boolean', default: true },
   hAlign: { type: 'string', default: 'center' },
   vAlign: { type: 'string', default: 'center' },
-  vertical: { type: 'boolean', default: true },
-  visible: { type: 'boolean', default: true }
+  zIndex: { type: 'number', default: 0 },
+  positionX: { type: 'uiValue', default: new UIValue(0) },
+  positionY: { type: 'uiValue', default: new UIValue(0) },
+  width: { type: 'number', default: 100 },
+  height: { type: 'number', default: 20 },
+  isPointerBlocker: { type: 'boolean', default: false },
+
+  color: { type: 'string', default: 'white' },
+  opacity: { type: 'number', default: 1 },
+
+  adaptWidth: { type: 'boolean', default: false },
+  adaptHeight: { type: 'boolean', default: false },
+  background: { type: 'string', default: 'transparent' },
+  vertical: { type: 'boolean', default: true }
 })
 
 export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.GUI.StackPanel> {
@@ -50,10 +56,10 @@ export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.G
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.width = this.data.width
-    this.control.left = this.data.left
-    this.control.top = this.data.top
-    this.control.color = this.data.color
-    this.control.background = this.data.background
+    this.control.left = this.data.positionX
+    this.control.top = -this.data.positionY
+    this.control.color = this.data.color.toHexString()
+    this.control.background = this.data.background.toHexString()
     this.control.isVisible = this.data.visible
     this.control.isVertical = this.data.vertical
     // Only set height manually if the stack container is not in vertical mode

@@ -2682,6 +2682,7 @@ declare class ObservableComponent {
   data: any
   private subscriptions
   static field(target: ObservableComponent, propertyKey: string): void
+  static uiValue(target: ObservableComponent, propertyKey: string): void
   static readonly(target: ObservableComponent, propertyKey: string): void
   onChange(fn: ObservableComponentSubscription): void
   toJSON(): any
@@ -4000,25 +4001,17 @@ declare class UIButtonShape extends UIShape {
   fontWeight: string
   thickness: number
   cornerRadius: number
-  width: string
-  height: string
-  top: string
-  left: string
-  color: string
-  background: string
-  hAlign: string
-  vAlign: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
+  color: Color3
+  background: Color3
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
+  shadowColor: Color3
   text: string
-  visible: boolean
-  isPointerBlocker: boolean
 }
 
 /**
@@ -4030,18 +4023,9 @@ declare class UIContainerRectShape extends UIShape {
   adaptWidth: boolean
   adaptHeight: boolean
   thickness: number
-  width: number
-  height: number
-  position: Vector2
   color: Color3
   background: Color3
-  hAlign: string
-  vAlign: string
   alignmentUsesSize: boolean
-  visible: boolean
-  isPointerBlocker: boolean
-  sizeInPixels: boolean
-  positionInPixels: boolean
 }
 
 /**
@@ -4049,20 +4033,12 @@ declare class UIContainerRectShape extends UIShape {
  */
 declare class UIContainerStackShape extends UIShape {
   id: string | null
-  opacity: number
   adaptWidth: boolean
   adaptHeight: boolean
-  width: string
-  height: string
-  top: string
-  left: string
-  color: string
-  background: string
-  hAlign: string
-  vAlign: string
+  opacity: number
+  color: Color3
+  background: Color4
   vertical: boolean
-  visible: boolean
-  isPointerBlocker: boolean
 }
 
 /**
@@ -4076,20 +4052,12 @@ declare class UIImageShape extends UIShape {
   sourceWidth: number
   sourceHeight: number
   source: string | null
-  width: number
-  height: number
-  position: Vector2
-  hAlign: string
-  vAlign: string
   paddingTop: number
   paddingRight: number
   paddingBottom: number
   paddingLeft: number
-  visible: boolean
-  isPointerBlocker: boolean
-  sizeInPixels: boolean
-  positionInPixels: boolean
   constructor(parent: UIShape, source: string)
+  toJSON(): void
 }
 
 /**
@@ -4097,37 +4065,28 @@ declare class UIImageShape extends UIShape {
  */
 declare class UIInputTextShape extends UIShape {
   id: string | null
-  color: string
+  color: Color3
   thickness: number
   fontFamily: string
   fontSize: number
   fontWeight: string
   opacity: number
   value: string
-  placeholderColor: string
+  placeholderColor: Color3
   placeholder: string
-  margin: string
-  maxWidth: string
+  margin: number
+  maxWidth: number
   autoStretchWidth: boolean
-  background: string
-  focusedBackground: string
+  background: Color3
+  focusedBackground: Color3
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
-  zIndex: number
-  hAlign: string
-  vAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+  shadowColor: Color3
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
 }
 
 /**
@@ -4135,7 +4094,6 @@ declare class UIInputTextShape extends UIShape {
  */
 declare class UIScreenSpaceShape extends UIShape {
   id: string | null
-  visible: boolean
   constructor()
 }
 
@@ -4147,6 +4105,14 @@ declare abstract class UIShape extends ObservableComponent {
    * Defines if the entity and its children should be rendered
    */
   visible: boolean
+  zIndex: number
+  hAlign: string
+  vAlign: string
+  width: string | number
+  height: string | number
+  positionX: string | number
+  positionY: string | number
+  isPointerBlocker: boolean
   private _parent?
   constructor(parent: UIShape | null)
   readonly parent: UIShape | undefined
@@ -4159,31 +4125,24 @@ declare class UISliderShape extends UIShape {
   id: string | null
   minimum: number
   maximum: number
-  color: string
+  color: Color3
   opacity: number
   value: number
-  borderColor: string
-  background: string
-  barOffset: string
-  thumbWidth: string
+  borderColor: Color3
+  background: Color3
+  barOffset: number
+  thumbWidth: number
   isThumbCircle: boolean
   isThumbClamped: boolean
   isVertical: boolean
   visible: boolean
   zIndex: number
-  hAlign: string
-  vAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
   onChanged: string
   swapOrientation: boolean
-  isPointerBlocker: boolean
 }
 
 /**
@@ -4193,35 +4152,45 @@ declare class UITextShape extends UIShape {
   id: string | null
   outlineWidth: number
   outlineColor: string
-  color: string
+  color: Color3
   fontFamily: string
   fontSize: number
   fontWeight: string
   opacity: number
   value: string
-  lineSpacing: string
+  lineSpacing: number
   lineCount: number
   resizeToFit: boolean
   textWrapping: boolean
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
+  shadowColor: Color3
   zIndex: number
-  hAlign: string
-  vAlign: string
   hTextAlign: string
   vTextAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
+}
+
+/**
+ * @alpha
+ */
+declare class UIValue {
+  value: number
+  type: UIValueType
+  toString(): string
+  constructor(value: string | number)
+}
+
+/**
+ * @alpha
+ */
+declare enum UIValueType {
+  PERCENT = 0,
+  PIXELS = 1
 }
 
 /**
@@ -4229,8 +4198,6 @@ declare class UITextShape extends UIShape {
  */
 declare class UIWorldSpaceShape extends UIShape {
   id: string | null
-  width: string
-  height: string
   visible: boolean
   constructor()
 }
