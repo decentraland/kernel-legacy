@@ -332,9 +332,6 @@ export class UITextShape extends UIShape {
   shadowColor: string = '#fff'
 
   @ObservableComponent.field
-  zIndex: number = 0
-
-  @ObservableComponent.field
   hAlign: string = 'center'
 
   @ObservableComponent.field
