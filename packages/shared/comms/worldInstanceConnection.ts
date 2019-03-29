@@ -344,7 +344,6 @@ export class WorldInstanceConnection {
                 break
               }
             }
-
             break
           }
           case MessageType.PING: {

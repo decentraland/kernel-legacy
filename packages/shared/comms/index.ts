@@ -237,6 +237,7 @@ function collectInfo(context: Context) {
       if (context.stats) {
         context.stats.onPeerRemoved(peerAlias)
       }
+
       continue
     }
 

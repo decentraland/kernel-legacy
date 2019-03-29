@@ -423,7 +423,6 @@ describe('Communications', function() {
   describe('topic handlers', () => {
     it('chat handler', () => {
       const context = new Context({})
-
       const chatData = new ChatData()
       chatData.setText('text')
       chatData.setMessageId('chat1')

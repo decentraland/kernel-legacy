@@ -101,7 +101,6 @@ export class Stats {
   public profile = new PkgStats()
   public chat = new PkgStats()
   public webRtcSession = new PkgStats()
-
   public collectInfoDuration = new TrackAvgDuration()
   public dispatchTopicDuration = new TrackAvgDuration()
   public visiblePeersCount = 0
@@ -137,7 +136,6 @@ export class Stats {
       log('World instance: ')
 
       const connection = context.worldInstanceConnection!
-
       const url = connection.url
       if (connection.ws && connection.ws.readyState === SocketReadyState.OPEN) {
         const state =
