@@ -8,7 +8,6 @@ import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelS
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
-
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
@@ -109,7 +108,6 @@ class UnityParcelScene implements ParcelSceneAPI {
     this.worker.system
       .then(system => {
         system.getAPIInstance(DevTools).logger = this.logger
-
         const parcelIdentity = system.getAPIInstance(ParcelIdentity)
         parcelIdentity.land = this.data.data.land
       })

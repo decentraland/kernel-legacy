@@ -3,6 +3,7 @@ import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from './math'
 import { AnimationClip } from './AnimationClip'
 import { newId } from '../ecs/helpers'
 import { IEvents } from './Types'
+import { uuidEventSystem } from './Systems';
 
 export type TranformConstructorArgs = {
   position?: Vector3
@@ -158,13 +159,13 @@ export class Shape extends ObservableComponent {
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.BOX_SHAPE)
-export class BoxShape extends Shape {}
+export class BoxShape extends Shape { }
 
 /**
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.SPHERE_SHAPE)
-export class SphereShape extends Shape {}
+export class SphereShape extends Shape { }
 
 /**
  * @public
@@ -690,6 +691,48 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
   toJSON() {
     return { uuid: this.uuid, type: this.type }
   }
+
+  static uuidEvent(target: ObservableComponent, propertyKey: string) {
+    if (delete (target as any)[propertyKey]) {
+      const componentSymbol = propertyKey + '_' + Math.random()
+        ; (target as any)[componentSymbol] = undefined
+
+      Object.defineProperty(target, componentSymbol, {
+        ...Object.getOwnPropertyDescriptor(target, componentSymbol),
+        enumerable: false
+      })
+
+      Object.defineProperty(target, propertyKey.toString(), {
+        get: function () {
+          return this[componentSymbol]
+        },
+        set: function (value) {
+          const oldValue = this[componentSymbol]
+
+          if (value) {
+            if (value instanceof OnUUIDEvent) {
+              this.data[propertyKey] = value.uuid
+            } else {
+              throw new Error('value is not an OnUUIDEvent')
+            }
+          } else {
+            this.data[propertyKey] = null
+          }
+
+          this[componentSymbol] = value
+
+          if (value !== oldValue) {
+            this.dirty = true
+
+            for (let i = 0; i < this.subscriptions.length; i++) {
+              this.subscriptions[i](propertyKey, value, oldValue)
+            }
+          }
+        },
+        enumerable: true
+      })
+    }
+  }
 }
 
 /**
@@ -717,6 +760,20 @@ export class OnChanged extends OnUUIDEvent<'onChange'> {
 export class OnFocus extends OnUUIDEvent<'onFocus'> {
   @ObservableComponent.readonly
   readonly type: string = 'onFocus'
+}
+
+/**
+ * @public
+ */
+@Component('engine.onTextSubmit', CLASS_ID.UUID_CALLBACK)
+export class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
+  @ObservableComponent.readonly
+  readonly type: string = 'onTextSubmit'
+
+  constructor(cb: (event: { id: string; text: string; }) => void) {
+    super(cb)
+    uuidEventSystem.handlerMap[this.uuid] = this
+  }
 }
 
 /**

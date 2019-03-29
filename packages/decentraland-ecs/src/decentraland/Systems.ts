@@ -67,6 +67,7 @@ export class UUIDEventSystem implements ISystem {
   }
 
   private handleEvent(event: UUIDEvent): void {
+    console.log(arguments)
     if (event.uuid in this.handlerMap) {
       const handler = this.handlerMap[event.uuid]
       if (handler) {
@@ -77,3 +78,6 @@ export class UUIDEventSystem implements ISystem {
     }
   }
 }
+
+/** @internal */
+export const uuidEventSystem = new UUIDEventSystem()

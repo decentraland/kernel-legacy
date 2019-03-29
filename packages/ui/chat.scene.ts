@@ -34,7 +34,9 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
+
   const component = new UIImageShape(parent, UI_CHAT)
+
   component.id = 'minimize-icon'
   component.width = 20
   component.height = 20

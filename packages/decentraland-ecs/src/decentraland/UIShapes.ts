@@ -1,5 +1,5 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { CLASS_ID } from './Components'
+import { CLASS_ID, OnTextSubmit, OnUUIDEvent } from './Components'
 import { Color3 } from './math'
 import { Color4 } from './math'
 
@@ -367,6 +367,9 @@ export class UIInputTextShape extends UIShape {
 
   @ObservableComponent.field
   paddingLeft: number = 0
+
+  @OnUUIDEvent.uuidEvent
+  onTextSubmitEvent: OnTextSubmit | null = null
 }
 
 /**

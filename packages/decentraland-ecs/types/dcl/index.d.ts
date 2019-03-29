@@ -1447,6 +1447,13 @@ declare interface IEvents {
         isCommand: boolean;
     };
     /**
+     * `onTextSubmit` is triggered when the user sends a message through text input.
+     */
+    onTextSubmit: {
+        id: string;
+        text: string;
+    };
+    /**
      * `onChange` is triggered when an entity changes its own internal state.
      * Dispatched by the `ui-*` entities when their value is changed. It triggers a callback.
      * Notice: Only entities with ID will be listening for click events.
@@ -2588,6 +2595,7 @@ declare class ObservableComponent {
     dirty: boolean;
     data: any;
     private subscriptions;
+    static component(target: ObservableComponent, propertyKey: string): void;
     static field(target: ObservableComponent, propertyKey: string): void;
     static uiValue(target: ObservableComponent, propertyKey: string): void;
     static readonly(target: ObservableComponent, propertyKey: string): void;
@@ -2732,6 +2740,17 @@ declare class OnPointerDown extends PointerEventComponent {
  * @public
  */
 declare class OnPointerUp extends PointerEventComponent {
+}
+
+/**
+ * @public
+ */
+declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
+    readonly type: string;
+    constructor(cb: (event: {
+        id: string;
+        text: string;
+    }) => void);
 }
 
 /**
@@ -3986,6 +4005,7 @@ declare class UIInputTextShape extends UIShape {
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
+    onTextSubmitEvent: OnTextSubmit | null;
 }
 
 /**
@@ -4050,7 +4070,7 @@ declare class UISliderShape extends UIShape {
 declare class UITextShape extends UIShape {
     id: string | null;
     outlineWidth: number;
-    outlineColor: string;
+    outlineColor: Color3;
     color: Color3;
     fontFamily: string;
     fontSize: number;
