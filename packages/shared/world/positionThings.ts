@@ -9,7 +9,6 @@ import {
   ReadOnlyVector2
 } from 'decentraland-ecs/src/decentraland/math'
 import { Observable } from 'decentraland-ecs/src/ecs/Observable'
-import { scene } from 'engine/renderer'
 
 export const positionObservable = new Observable<
   Readonly<{
@@ -72,32 +71,20 @@ export function initializeUrlPositionObserver() {
   }
 }
 
-export function movePlayerToSpawnpoint(land: ILand) {
+export function getWorldSpawnpoint(land: ILand): Vector3 {
   const spawnpoint = getSpawnpoint(land)
 
   if (!spawnpoint) {
-    return
+    return lastPlayerPosition
   }
 
   const [x, y, z] = spawnpoint.split(',')
 
-  lastPlayerPosition.x += parseFloat(x)
-  lastPlayerPosition.y += parseFloat(y)
-  lastPlayerPosition.z += parseFloat(z)
-
-  const position: BABYLON.Vector3 = BABYLON.Vector3.Zero()
-  const rotation = BABYLON.Vector3.Zero()
-  const quaternion = BABYLON.Quaternion.Identity()
-
-  const result = new BABYLON.Vector3(
-    scene.activeCamera.position.x + parseFloat(x),
-    scene.activeCamera.position.y + parseFloat(y),
-    scene.activeCamera.position.z + parseFloat(z)
+  return new Vector3(
+    (lastPlayerPosition.x += parseFloat(x)),
+    (lastPlayerPosition.y += parseFloat(y)),
+    (lastPlayerPosition.z += parseFloat(z))
   )
-
-  scene.activeCamera.position.copyFrom(result)
-  position.copyFrom(result)
-  positionObservable.notifyObservers({ position, rotation, quaternion })
 }
 
 function getSpawnpoint(land: ILand) {

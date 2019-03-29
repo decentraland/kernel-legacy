@@ -6,12 +6,7 @@ import { initShared } from '../shared'
 import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
-import {
-  positionObservable,
-  lastPlayerPosition,
-  teleportObservable,
-  movePlayerToSpawnpoint
-} from '../shared/world/positionThings'
+import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
 import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
 import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
@@ -137,7 +132,7 @@ class UnityParcelScene implements ParcelSceneAPI {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function initializeEngine(_gameInstance: GameInstance, initialPosition: string) {
+export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
   const { net } = await initShared()
 
@@ -147,14 +142,6 @@ export async function initializeEngine(_gameInstance: GameInstance, initialPosit
     unityInterface.SetDebug()
   }
 
-  let spawnpointLand = initialPosition
-  let initialized = false
-
-  teleportObservable.add(position => {
-    initialized = false
-    spawnpointLand = `${position.x},${position.y}`
-  })
-
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
     shouldLoadParcelScene: land => {
@@ -163,11 +150,11 @@ export async function initializeEngine(_gameInstance: GameInstance, initialPosit
       // tslint:disable-next-line: no-commented-out-code
       // return preloadedScenes.has(land.scene.scene.base)
     },
+    onSpawnpoint: initialLand => {
+      const newPosition = getWorldSpawnpoint(initialLand)
+      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
+    },
     onLoadParcelScenes: lands => {
-      if (initialized) {
-        return
-      }
-
       unityInterface.LoadParcelScenes(
         lands.map($ => {
           const x = Object.assign({}, ILandToLoadableParcelScene($).data)
@@ -175,15 +162,6 @@ export async function initializeEngine(_gameInstance: GameInstance, initialPosit
           return x
         })
       )
-
-      const land = lands.find(land => land.scene.scene.base === spawnpointLand)
-
-      if (!land) {
-        return
-      }
-
-      movePlayerToSpawnpoint(land)
-      initialized = true
     }
   })
 
