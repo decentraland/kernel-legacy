@@ -333,13 +333,15 @@ export class Gizmos extends BaseComponent<GizmoConfiguration> {
   }
 
   configureGizmos() {
-    currentConfiguration = this.value
-    const isWorldCoordinates = !currentConfiguration.localReference
-    gizmoManager.gizmos.positionGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
-    gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = !isWorldCoordinates
-    gizmoManager.gizmos.scaleGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
-    gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = !isWorldCoordinates
-    gizmoManager.gizmos.rotationGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
+    if (this.value) {
+      currentConfiguration = this.value
+      const isWorldCoordinates = !currentConfiguration.localReference
+      gizmoManager.gizmos.positionGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
+      gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = !isWorldCoordinates
+      gizmoManager.gizmos.scaleGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
+      gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = !isWorldCoordinates
+      gizmoManager.gizmos.rotationGizmo!.updateGizmoPositionToMatchAttachedMesh = !isWorldCoordinates
+    }
   }
 
   update() {

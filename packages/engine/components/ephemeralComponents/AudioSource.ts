@@ -53,15 +53,15 @@ export class AudioSource extends BaseComponent<typeof defaultValue> {
       this.sound
         .then($ => {
           $.updateOptions({
-            loop: this.value.loop
+            loop: this.value!.loop
           })
           $.setPosition(this.entity.absolutePosition)
-          if (!this.value.loop && this.value.playing && $.isPlaying) {
+          if (!this.value!.loop && this.value!.playing && $.isPlaying) {
             $.stop()
           }
-          if (!$.isPlaying && this.value.playing) {
+          if (!$.isPlaying && this.value!.playing) {
             $.play()
-          } else if ($.isPlaying && !this.value.playing) {
+          } else if ($.isPlaying && !this.value!.playing) {
             $.stop()
           }
         })

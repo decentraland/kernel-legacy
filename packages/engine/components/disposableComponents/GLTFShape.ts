@@ -158,9 +158,11 @@ export class GLTFShape extends DisposableComponent {
 
           if (this.isStillValid(entity)) {
             // Fin the main mesh and add it as the BasicShape.nameInEntity component.
-            assetContainer.meshes.filter($ => $.name === '__root__').forEach(mesh => {
-              entity.setObject3D(BasicShape.nameInEntity, mesh)
-            })
+            assetContainer.meshes
+              .filter($ => $.name === '__root__')
+              .forEach(mesh => {
+                entity.setObject3D(BasicShape.nameInEntity, mesh)
+              })
 
             this.assetContainerEntity.set(entity.uuid, assetContainer)
 
@@ -190,8 +192,9 @@ export class GLTFShape extends DisposableComponent {
             }
 
             const animator: Animator = entity.getBehaviorByName('animator') as Animator
+
             if (animator) {
-              animator.transformValue(animator.value)
+              animator.transformValue(animator.value!)
             }
           } else {
             cleanupAssetContainer(assetContainer)
@@ -207,8 +210,9 @@ export class GLTFShape extends DisposableComponent {
           entity.assetContainer = void 0
 
           const animator: Animator = entity.getBehaviorByName('animator') as Animator
+
           if (animator) {
-            animator.transformValue(animator.value)
+            animator.transformValue(animator.value!)
           }
         }
       )

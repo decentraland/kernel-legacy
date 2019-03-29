@@ -58,6 +58,6 @@ export function removeEntityOutline(entity: BaseEntity) {
 export function addEntityOutline(entity: BaseEntity) {
   const b = entity.getBehaviorByName(OUTLINE_NAME)
   if (!b) {
-    entity.addBehavior(new Outline(entity, {}))
+    entity.addBehavior(new Outline(entity))
   }
 }

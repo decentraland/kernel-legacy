@@ -34,7 +34,7 @@ export interface BaseComponent<T> extends BABYLON.Behavior<BaseEntity> {
 }
 
 export class BaseComponent<T> implements BABYLON.Behavior<BaseEntity> {
-  value: T
+  value: T | null = null
   entity: BaseEntity
 
   constructor(entity: BaseEntity) {
