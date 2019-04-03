@@ -345,6 +345,11 @@ function toggleChat() {
   containerMinimized!.visible = visible
 }
 
+export function toggleChatAndFocus() {
+  toggleChat()
+  //TODO focus input text
+}
+
 function onSliderChanged(data: any) {
   const value = Math.round(data.value)
   sliderOpenedChat.component.value = value

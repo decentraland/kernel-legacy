@@ -50,8 +50,7 @@ export function initKeyboard() {
   vrCamera.keysRight = [Keys.KEY_D as number] // D
 
   document.body.addEventListener('keydown', e => {
-    if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
-      // CHAT
+    if (e.code === 'Enter') {
       return
     }
 

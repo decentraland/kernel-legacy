@@ -272,3 +272,6 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 
 // @internal
 export const AVATAR_OBSERVABLE = 'AVATAR_OBSERVABLE'
+
+// @internal
+export const CHAT_ACTIONS = 'CHAT_ACTIONS'
