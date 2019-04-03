@@ -14,19 +14,16 @@ const defaults = {
 }
 
 export class Texture extends DisposableComponent {
-  texture: BABYLON.Texture
-  meshObserver: Observer<{ type: string; object: BABYLON.TransformNode }>
+  texture?: BABYLON.Texture
+  meshObserver?: Observer<{ type: string; object: BABYLON.TransformNode }>
 
-  constructor(ctx, uuid) {
-    super(ctx, uuid)
-    this.loadingDone = false
-  }
+  private didLoad = false
 
-  static async getFromComponent(context: SharedSceneContext, id: string): Promise<BABYLON.Texture> {
+  static async getFromComponent(context: SharedSceneContext, id: string): Promise<BABYLON.Texture | null> {
     const component = context.getComponent(id)
 
     if (component && component instanceof Texture) {
-      return component.texture
+      return component.texture || null
     }
 
     return null
@@ -50,8 +47,7 @@ export class Texture extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
-
+    this.didLoad = false
     const validatedSamplingMode = validators.number(data.samplingMode, defaults.samplingMode)
     const validatedWrap = validators.number(data.wrap, defaults.wrap)
     const samplingMode = Math.max(Math.min(3, Math.floor(validators.int(validatedSamplingMode, 1))), 1)
@@ -80,7 +76,11 @@ export class Texture extends DisposableComponent {
       this.texture.hasAlpha = validators.boolean(data.hasAlpha, defaults.hasAlpha)
     }
 
-    this.loadingDone = true
+    this.didLoad = true
+  }
+
+  loadingDone() {
+    return this.didLoad
   }
 }
 

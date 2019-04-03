@@ -3,9 +3,10 @@ import { BaseEntity } from '../../entities/BaseEntity'
 import { validators } from '../helpers/schemaValidator'
 import { scene } from '../../renderer'
 import { probe } from '../../renderer/ambientLights'
-import { CLASS_ID, Observer } from 'decentraland-ecs/src'
+import { CLASS_ID } from 'decentraland-ecs/src'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 import { Texture } from './Texture'
+import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 
 const defaults = {
   alpha: 1,
@@ -33,13 +34,12 @@ const defaults = {
 
 export class PBRMaterial extends DisposableComponent {
   material: BABYLON.PBRMaterial
-  meshObserver: Observer<{ type: string; object: BABYLON.TransformNode }>
+  loadingDonePrivate: boolean = false
 
-  constructor(ctx, uuid) {
+  constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
     this.material = new BABYLON.PBRMaterial('#' + this.uuid, scene)
     this.contributions.materials.add(this.material)
-    this.loadingDone = false
   }
 
   updateMeshMaterial = (mesh: BABYLON.Mesh) => {
@@ -52,9 +52,9 @@ export class PBRMaterial extends DisposableComponent {
     mesh.material = null
   }
 
-  meshObserverCallback = ({ type, object }) => {
+  meshObserverCallback = ({ type, object }: { type: string; object: BABYLON.TransformNode | null }) => {
     if (type === BasicShape.nameInEntity) {
-      this.updateMeshMaterial(object)
+      this.updateMeshMaterial(object as any)
     }
   }
 
@@ -79,7 +79,7 @@ export class PBRMaterial extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
+    this.loadingDonePrivate = false
     const m = this.material
 
     m.albedoColor.copyFrom(validators.color(data.albedoColor, defaults.albedoColor))
@@ -179,9 +179,23 @@ export class PBRMaterial extends DisposableComponent {
       }
     }
 
-    this.loadingDone = true
+    this.contributions.textures.clear()
+
+    m.bumpTexture && this.contributions.textures.add(m.bumpTexture)
+    m.albedoTexture && this.contributions.textures.add(m.albedoTexture)
+    m.albedoTexture && this.contributions.textures.add(m.albedoTexture)
+    m.ambientTexture && this.contributions.textures.add(m.ambientTexture)
+    m.opacityTexture && this.contributions.textures.add(m.opacityTexture)
+    m.emissiveTexture && this.contributions.textures.add(m.emissiveTexture)
+    m.refractionTexture && this.contributions.textures.add(m.refractionTexture)
+
+    this.loadingDonePrivate = true
 
     deleteUnusedTextures()
+  }
+
+  loadingDone() {
+    return this.loadingDonePrivate
   }
 }
 

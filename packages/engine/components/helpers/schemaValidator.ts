@@ -127,7 +127,7 @@ export const validators = {
     }
   },
 
-  color(x, def: BABYLON.Color3) {
+  color(x: any, def: BABYLON.Color3) {
     if (x === null || x === undefined) return def
     const color = BABYLON.Color3.Black()
     if (typeof x === 'string') {
@@ -143,7 +143,7 @@ export const validators = {
     return color
   },
 
-  color4(x, def: BABYLON.Color3) {
+  color4(x: any, def: BABYLON.Color3) {
     if (x === null || x === undefined) return def
     const color = new BABYLON.Color4(0, 0, 0, 0)
     if (typeof x === 'string') {
@@ -159,7 +159,7 @@ export const validators = {
     return color
   },
 
-  side(val, def: number) {
+  side(val: any, def: number) {
     if (val === 0 || val === 1 || val === 2) {
       return val
     }
@@ -188,7 +188,7 @@ export function createSchemaValidator(schema: ISchema<typeof validators>) {
   const schemaKeys = Object.keys(schema)
 
   return Object.assign(
-    function(input) {
+    function(input: any) {
       if (input != null && typeof input === 'object') {
         for (let k = 0; k < schemaKeys.length; k++) {
           const key = schemaKeys[k]
