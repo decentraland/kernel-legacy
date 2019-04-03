@@ -11,13 +11,13 @@ container.height = '50%'
 
 const textInput = new UIInputTextShape(container)
 textInput.id = 'textInput'
-textInput.width = '100%'
+textInput.width = '80%'
 textInput.height = '25px'
 textInput.vAlign = 'bottom'
 textInput.hAlign = 'left'
 textInput.placeholder = 'Write yer shit here'
 textInput.placeholderColor = Color3.Gray()
-textInput.positionX = '10px'
+textInput.positionX = '10%'
 textInput.positionY = '10px'
 textInput.onTextSubmitEvent = new OnTextSubmit((x) => {
     container.color = Color3.Red()

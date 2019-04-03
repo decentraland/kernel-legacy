@@ -770,7 +770,7 @@ export class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
   @ObservableComponent.readonly
   readonly type: string = 'onTextSubmit'
 
-  constructor(cb: (event: { id: string; text: string; }) => void) {
+  constructor(cb: (event: { message: string; }) => void) {
     super(cb)
     uuidEventSystem.handlerMap[this.uuid] = this
   }

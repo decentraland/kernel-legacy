@@ -156,14 +156,6 @@ export interface IEvents {
   }
 
   /**
-   * `onTextSubmit` is triggered when the user sends a message through text input.
-   */
-  onTextSubmit: {
-    id: string
-    text: string
-  }
-
-  /**
    * `onChange` is triggered when an entity changes its own internal state.
    * Dispatched by the `ui-*` entities when their value is changed. It triggers a callback.
    * Notice: Only entities with ID will be listening for click events.
@@ -232,6 +224,10 @@ export interface IEvents {
   uuidEvent: {
     uuid: string
     payload: any
+  }
+
+  onTextSubmit: {
+    message: string
   }
 
   metricsUpdate: {
