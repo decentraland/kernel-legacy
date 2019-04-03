@@ -122,9 +122,6 @@ export class UIContainerRectShape extends UIShape {
   color: Color3 = Color3.White()
 
   @ObservableComponent.field
-  background: Color3 = Color3.Black()
-
-  @ObservableComponent.field
   alignmentUsesSize: boolean = true
 }
 

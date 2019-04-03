@@ -60,8 +60,7 @@ export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI
     this.control.height = this.data.height
     this.control.top = -this.data.positionY
     this.control.left = this.data.positionX
-    this.control.color = this.data.color.toHexString()
-    this.control.background = this.data.background.toHexString()
+    this.control.background = this.data.color.toHexString()
     this.control.isVisible = this.data.visible
 
     this.setParent(this.data.parentComponent)

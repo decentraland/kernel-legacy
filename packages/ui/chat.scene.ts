@@ -253,7 +253,7 @@ function createChatHeader(parent: UIShape) {
   container.width = 400
   container.height = 45
   container.thickness = 0
-  container.background = Color3.Black()
+  container.color = Color3.Black()
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -422,9 +422,8 @@ container.width = 400
 container.height = 250
 container.positionX = 20
 container.positionY = 20
-container.color = Color3.White()
 container.thickness = 0
-container.background = Color3.Black()
+container.color = Color3.Black()
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -463,7 +462,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.positionX = 20
   containerMinimized.positionY = 15
   containerMinimized.thickness = 0
-  containerMinimized.background = Color3.Black()
+  containerMinimized.color = Color3.Black()
 
   const minimizedIcon = new UIImageShape(containerMinimized, UI_CHAT)
   minimizedIcon.id = 'minimize-icon'
@@ -497,9 +496,8 @@ helpContainer.width = 400
 helpContainer.height = 250
 helpContainer.positionX = 20
 helpContainer.positionY = 20
-helpContainer.color = Color3.White()
 helpContainer.thickness = 0
-helpContainer.background = Color3.Black()
+helpContainer.color = Color3.Black()
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -552,7 +550,7 @@ headerContainer.hAlign = 'left'
 headerContainer.width = 400
 headerContainer.height = 45
 headerContainer.thickness = 0
-headerContainer.background = Color3.Black()
+headerContainer.color = Color3.Black()
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR
