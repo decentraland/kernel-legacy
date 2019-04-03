@@ -42,7 +42,7 @@ const schemaValidator = createSchemaValidator({
   shadowOffsetY: { type: 'number', default: 0 },
   shadowColor: { type: 'color', default: BABYLON.Color3.White() },
   hTextAlign: { type: 'string', default: 'center' },
-  vTextAlign: { type: 'string', default: 'center' },
+  vTextAlign: { type: 'string', default: 'center' }
 })
 
 class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
@@ -72,7 +72,6 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.color = this.data.color.toHexString()
     this.control.fontFamily = this.data.fontFamily
     this.control.fontSize = this.data.fontSize
-    this.control.zIndex = this.data.zIndex
     this.control.shadowBlur = this.data.shadowBlur
     this.control.shadowOffsetX = this.data.shadowOffsetX
     this.control.shadowOffsetY = this.data.shadowOffsetY

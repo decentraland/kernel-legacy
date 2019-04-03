@@ -3938,7 +3938,6 @@ declare class UIContainerRectShape extends UIShape {
     adaptHeight: boolean;
     thickness: number;
     color: Color3;
-    background: Color3;
     alignmentUsesSize: boolean;
 }
 
@@ -4081,7 +4080,8 @@ declare class UITextShape extends UIShape {
     shadowOffsetX: number;
     shadowOffsetY: number;
     shadowColor: Color3;
-    zIndex: number;
+    hAlign: string;
+    vAlign: string;
     hTextAlign: string;
     vTextAlign: string;
     paddingTop: number;
@@ -4096,8 +4096,8 @@ declare class UITextShape extends UIShape {
 declare class UIValue {
     value: number;
     type: UIValueType;
-    toString(): string;
     constructor(value: string | number);
+    toString(): string;
 }
 
 /**

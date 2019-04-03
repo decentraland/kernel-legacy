@@ -8,7 +8,7 @@ import { UIInputTextShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 import { UIControl } from './UIControl'
 import { IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Color3 } from 'babylonjs';
+import { Color3 } from 'babylonjs'
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
@@ -45,7 +45,7 @@ const schemaValidator = createSchemaValidator({
   shadowBlur: { type: 'number', default: 0 },
   shadowOffsetX: { type: 'number', default: 0 },
   shadowOffsetY: { type: 'number', default: 0 },
-  shadowColor: { type: 'color', default: Color3.White() },
+  shadowColor: { type: 'color', default: Color3.White() }
 })
 
 class UIInputText extends UIControl<UIInputTextShape, BABYLON.GUI.InputText> {

@@ -8,7 +8,7 @@ import { UISliderShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 import { UIControl } from './UIControl'
 import { IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Color3 } from 'babylonjs';
+import { Color3 } from 'babylonjs'
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },

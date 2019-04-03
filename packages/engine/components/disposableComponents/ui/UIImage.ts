@@ -32,8 +32,7 @@ const schemaValidator = createSchemaValidator({
   sourceWidth: { type: 'number', default: 1 },
   sourceHeight: { type: 'number', default: 1 },
   sizeInPixels: { type: 'boolean', default: true },
-  source: { type: 'string', default: null },
-
+  source: { type: 'string', default: null }
 })
 
 class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {

@@ -22,16 +22,16 @@ export abstract class UIShape extends ObservableComponent {
   vAlign: string = 'center'
 
   @ObservableComponent.uiValue
-  width: string | number = "100px"
+  width: string | number = '100px'
 
   @ObservableComponent.uiValue
-  height: string | number = "50px"
+  height: string | number = '50px'
 
   @ObservableComponent.uiValue
-  positionX: string | number = "0px"
+  positionX: string | number = '0px'
 
   @ObservableComponent.uiValue
-  positionY: string | number = "0px"
+  positionY: string | number = '0px'
 
   @ObservableComponent.field
   isPointerBlocker: boolean = false
@@ -120,9 +120,6 @@ export class UIContainerRectShape extends UIShape {
 
   @ObservableComponent.field
   color: Color3 = Color3.White()
-
-  @ObservableComponent.field
-  background: Color3 = Color3.Black()
 
   @ObservableComponent.field
   alignmentUsesSize: boolean = true
@@ -272,7 +269,10 @@ export class UITextShape extends UIShape {
   shadowColor: Color3 = Color3.White()
 
   @ObservableComponent.field
-  zIndex: number = 0
+  hAlign: string = 'center'
+
+  @ObservableComponent.field
+  vAlign: string = 'center'
 
   @ObservableComponent.field
   hTextAlign: string = 'center'

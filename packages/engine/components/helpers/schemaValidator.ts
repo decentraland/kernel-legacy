@@ -220,7 +220,7 @@ export function createSchemaValidator(schema: ISchema<typeof validators>) {
   const schemaKeys = Object.keys(schema)
 
   return Object.assign(
-    function (input) {
+    function(input) {
       if (input != null && typeof input === 'object') {
         for (let k = 0; k < schemaKeys.length; k++) {
           const key = schemaKeys[k]

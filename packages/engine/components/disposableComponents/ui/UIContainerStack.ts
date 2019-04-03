@@ -25,7 +25,7 @@ const schemaValidator = createSchemaValidator({
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   background: { type: 'string', default: 'transparent' },
-  vertical: { type: 'boolean', default: true },
+  vertical: { type: 'boolean', default: true }
 })
 
 export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.GUI.StackPanel> {
