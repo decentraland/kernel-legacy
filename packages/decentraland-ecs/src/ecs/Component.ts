@@ -6,7 +6,6 @@ const componentSymbol = '__name__symbol_'
 const componentClassIdSymbol = '__classId__symbol_'
 const componentIdSymbol = '__component__id_'
 
-
 /**
  * @public
  */
@@ -305,10 +304,7 @@ export class ObservableComponent {
         enumerable: true
       })
     }
-
-
   }
-
 
   static field(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
@@ -332,7 +328,6 @@ export class ObservableComponent {
       })
     }
   }
-
 
   static uiValue(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
@@ -359,7 +354,6 @@ export class ObservableComponent {
       })
     }
   }
-
 
   static readonly(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {

@@ -1,7 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID, OnUUIDEvent, OnTextSubmit } from './Components'
-import { Color3 } from './math'
-import { Color4 } from './math'
+import { Color3, Color4 } from './math'
 
 /**
  * @alpha
