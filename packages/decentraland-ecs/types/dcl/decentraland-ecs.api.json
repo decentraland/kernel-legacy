@@ -19008,8 +19008,8 @@
         },
         "uvs": {
           "kind": "property",
-          "signature": "uvs: number[];",
-          "isOptional": false,
+          "signature": "uvs?: number[];",
+          "isOptional": true,
           "isReadOnly": false,
           "isStatic": false,
           "type": "number[]",

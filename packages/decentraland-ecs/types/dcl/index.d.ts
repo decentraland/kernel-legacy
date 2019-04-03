@@ -3105,7 +3105,7 @@ declare class PlaneShape extends Shape {
    * Sets the UV coordinates for the plane.
    * Used to map specific pieces of a Material's texture into the plane's geometry.
    */
-  uvs: number[]
+  uvs?: number[]
 }
 
 /**

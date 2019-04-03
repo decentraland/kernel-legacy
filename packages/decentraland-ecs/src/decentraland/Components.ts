@@ -201,7 +201,7 @@ export class PlaneShape extends Shape {
    * Used to map specific pieces of a Material's texture into the plane's geometry.
    */
   @ObservableComponent.field
-  uvs: number[] = []
+  uvs?: number[]
 }
 
 /**
