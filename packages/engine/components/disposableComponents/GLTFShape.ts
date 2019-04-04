@@ -5,7 +5,7 @@ import { cleanupAssetContainer, processColliders } from 'engine/entities/utils/p
 import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { scene, engine } from 'engine/renderer'
 import { probe } from 'engine/renderer/ambientLights'
-import { DEBUG, EDITOR } from 'config'
+import { DEBUG } from 'config'
 import { log } from 'util'
 import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures, isSceneTexture } from 'engine/renderer/monkeyLoader'
@@ -66,25 +66,23 @@ export class GLTFShape extends DisposableComponent {
 
       const loadingEntity = new BABYLON.TransformNode('loading-padding')
 
-      if (EDITOR) {
-        entity.setObject3D(BasicShape.nameInEntity, loadingEntity)
+      entity.setObject3D(BasicShape.nameInEntity, loadingEntity)
 
-        {
-          const loadingInstance = loadingShape.createInstance('a')
-          loadingInstance.parent = loadingEntity
-          loadingInstance.position.y = 0.8
-          const animationDisposable = scene.onAfterRenderObservable.add(() => {
-            loadingInstance.rotation.set(0, 0, loadingInstance.rotation.z - engine.getDeltaTime() * 0.01)
-            loadingInstance.billboardMode = 7
-          })
+      {
+        const loadingInstance = loadingShape.createInstance('a')
+        loadingInstance.parent = loadingEntity
+        loadingInstance.position.y = 0.8
+        const animationDisposable = scene.onAfterRenderObservable.add(() => {
+          loadingInstance.rotation.set(0, 0, loadingInstance.rotation.z - engine.getDeltaTime() * 0.01)
+          loadingInstance.billboardMode = 7
+        })
 
-          loadingEntity.onDisposeObservable.add(() => {
-            loadingEntity.parent = null
-            loadingInstance.parent = null
-            loadingInstance.dispose()
-            scene.onAfterRenderObservable.remove(animationDisposable)
-          })
-        }
+        loadingEntity.onDisposeObservable.add(() => {
+          loadingEntity.parent = null
+          loadingInstance.parent = null
+          loadingInstance.dispose()
+          scene.onAfterRenderObservable.remove(animationDisposable)
+        })
       }
 
       BABYLON.SceneLoader.LoadAssetContainer(
@@ -158,6 +156,21 @@ export class GLTFShape extends DisposableComponent {
 
           loadingEntity.dispose(false, false)
 
+          if (!this.didFillContributions) {
+            this.didFillContributions = true
+            assetContainer.materials.forEach($ => {
+              this.contributions.materials.add($)
+            })
+            assetContainer.geometries.forEach($ => {
+              this.contributions.geometries.add($)
+            })
+            assetContainer.textures.forEach($ => {
+              this.contributions.textures.add($)
+            })
+          }
+
+          assetContainer.addAllToScene()
+
           if (this.isStillValid(entity)) {
             // Fin the main mesh and add it as the BasicShape.nameInEntity component.
             assetContainer.meshes
@@ -169,22 +182,6 @@ export class GLTFShape extends DisposableComponent {
             this.assetContainerEntity.set(entity.uuid, assetContainer)
 
             entity.assetContainer = assetContainer
-
-            assetContainer.addAllToScene()
-
-            // TODO: Remove this if after we instantiate GLTF
-            if (!this.didFillContributions) {
-              this.didFillContributions = true
-              assetContainer.materials.forEach($ => {
-                this.contributions.materials.add($)
-              })
-              assetContainer.geometries.forEach($ => {
-                this.contributions.geometries.add($)
-              })
-              assetContainer.textures.forEach($ => {
-                this.contributions.textures.add($)
-              })
-            }
 
             for (let ag of assetContainer.animationGroups) {
               ag.stop()

@@ -84,9 +84,13 @@ function markSceneTexture(texture: BABYLON.Texture, url: string) {
   // tslint:disable-next-line:semicolon
   ;(texture as any)[sceneTextureSymbol] = url
 
+  loadedTextures.set(url, texture)
+
   texture.onDisposeObservable.add(() => {
     const url = isSceneTexture(texture) || texture.url
-    if (url) loadedTextures.delete(url)
+    if (url) {
+      loadedTextures.delete(url)
+    }
   })
 }
 
@@ -99,6 +103,7 @@ export function getUsedTextures(): Set<string> {
     current.getCurrentUsages().textures.forEach($ => {
       const usedUrl = isSceneTexture($)
       if (usedUrl) {
+        loadedTextures.set(usedUrl, $)
         usedTextures.add(usedUrl)
       }
     })
@@ -185,16 +190,15 @@ export function loadTextureFromAB(
     samplerData ? samplerData.samplingMode : BABYLON.Texture.BILINEAR_SAMPLINGMODE,
     () => {
       texture.isPending = false
-      markSceneTexture(texture, url)
     },
     (message, exception) => {
       defaultLogger.error(message || exception || `Error loading texture (base64)`, exception)
-      loadedTextures.delete(url)
     },
     null,
     false
   )
 
+  markSceneTexture(texture, url)
   texture.isPending = true
 
   const dataUrl = `data:${url}`
@@ -261,16 +265,14 @@ export function loadTexture(
       samplerData ? samplerData.samplingMode : BABYLON.Texture.BILINEAR_SAMPLINGMODE,
       () => {
         texture.isPending = false
-        markSceneTexture(texture, url)
       },
       function(this: any, message, exception) {
-        loadedTextures.delete(url)
         if (!this._disposed) {
           defaultLogger.error(message || exception || `Error loading texture (${url})`, exception)
         }
       }
     )
-
+    markSceneTexture(texture, url)
     texture.isPending = true
 
     if (samplerData) {
