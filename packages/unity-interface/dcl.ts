@@ -225,7 +225,9 @@ async function initializeDecentralandUI() {
     mappings: []
   })
 
-  await ensureUiApis(scene.worker)
+  const worker = new SceneWorker(scene)
+
+  await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId })
 }
