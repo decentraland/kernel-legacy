@@ -15,6 +15,7 @@ textInput.width = '80%'
 textInput.height = '25px'
 textInput.vAlign = 'bottom'
 textInput.hAlign = 'left'
+textInput.fontSize = 10
 textInput.placeholder = 'Write yer shit here'
 textInput.placeholderColor = Color3.Gray()
 textInput.positionX = '10%'
