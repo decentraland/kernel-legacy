@@ -837,12 +837,20 @@ describe('ECS', () => {
             entity = $
           }
         })
+
+        const materials: PBRMaterial[] = []
+        for (let [, material] of parcelScene.context.disposableComponents) {
+          if (material instanceof PBRMaterial) {
+            materials.push(material)
+          }
+        }
+
         expect(!!entity!).to.eq(true)
         const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!mesh).to.eq(true)
 
-        const M1 = parcelScene.context.disposableComponents.get('C3') as PBRMaterial
-        const M2 = parcelScene.context.disposableComponents.get('C4') as PBRMaterial
+        const M1 = materials[0]
+        const M2 = materials[1]
 
         expect(M1).to.be.instanceOf(PBRMaterial, 'M1 is PBR')
         expect(M2).to.be.instanceOf(PBRMaterial, 'M2 is PBR')
@@ -854,7 +862,7 @@ describe('ECS', () => {
         await sleep(1000)
         const newLogs = logs.map($ => $[1])
 
-        expect(newLogs).to.include(`setting ${entity!.uuid} <- C4`)
+        expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
         const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!newMesh).to.eq(true)
@@ -1081,8 +1089,15 @@ describe('ECS', () => {
         const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!mesh).to.eq(true)
 
-        const M1 = parcelScene.context.disposableComponents.get('C3') as PBRMaterial
-        const M2 = parcelScene.context.disposableComponents.get('C4') as PBRMaterial
+        const materials: PBRMaterial[] = []
+        for (let [, material] of parcelScene.context.disposableComponents) {
+          if (material instanceof PBRMaterial) {
+            materials.push(material)
+          }
+        }
+
+        const M1 = materials[0]
+        const M2 = materials[1]
 
         expect(M1).to.be.instanceOf(PBRMaterial, 'M1 is PBR')
         expect(M2).to.be.instanceOf(PBRMaterial, 'M2 is PBR')
@@ -1094,7 +1109,7 @@ describe('ECS', () => {
         await sleep(1000)
         const newLogs = logs.map($ => $[1])
 
-        expect(newLogs).to.include(`setting ${entity!.uuid} <- C4`)
+        expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
         const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!newMesh).to.eq(true)
