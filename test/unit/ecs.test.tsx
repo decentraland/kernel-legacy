@@ -358,11 +358,7 @@ describe('ECS', () => {
           uuidEventFuture.resolve(event.uuid)
         })
 
-        const event = new UUIDEvent()
-
-        event.uuid = clicker.uuid
-        // event.type = 'OnClick'
-        event.payload = { data: { from: {}, direction: {}, pointerId: 1, length: 0 } }
+        const event = new UUIDEvent(clicker.uuid, { data: { from: {}, direction: {}, pointerId: 1, length: 0 } })
 
         engine.eventManager.fireEvent(event)
 
@@ -395,11 +391,7 @@ describe('ECS', () => {
           uuidEventFuture.resolve(event.uuid)
         })
 
-        const event = new UUIDEvent()
-
-        event.uuid = clicker.uuid
-        // event.type = 'OnClick'
-        event.payload = { data: { from: {}, direction: {}, pointerId: 1, length: 0 } }
+        const event = new UUIDEvent(clicker.uuid, { data: { from: {}, direction: {}, pointerId: 1, length: 0 } })
 
         engine.eventManager.fireEvent(event)
 
@@ -431,9 +423,7 @@ describe('ECS', () => {
           uuidEventFuture.resolve(event.uuid)
         })
 
-        const event = new UUIDEvent()
-
-        event.uuid = clicker.uuid
+        const event = new UUIDEvent(clicker.uuid, void 0)
 
         engine.eventManager.fireEvent(event)
 
