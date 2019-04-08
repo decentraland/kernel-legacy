@@ -42,6 +42,7 @@ import { PBRMaterial } from 'engine/components/disposableComponents/PBRMaterial'
 import { WebGLParcelScene } from 'engine/dcl/WebGLParcelScene'
 import { BoxShape } from 'engine/components/disposableComponents/BoxShape'
 import { UIScreenSpace } from 'engine/components/disposableComponents/ui/UIScreenSpace'
+import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 
 declare var describe: any, it: any
 
@@ -841,11 +842,11 @@ describe('ECS', () => {
         const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!mesh).to.eq(true)
 
-        const M1 = parcelScene.context.disposableComponents.get('C3') as PBRMaterial
-        const M2 = parcelScene.context.disposableComponents.get('C4') as PBRMaterial
+        const materials = getMaterials(parcelScene.context)
 
-        expect(M1).to.be.instanceOf(PBRMaterial, 'M1 is PBR')
-        expect(M2).to.be.instanceOf(PBRMaterial, 'M2 is PBR')
+        expect(materials.length).to.gte(2)
+
+        const [M1, M2] = materials
 
         expect(mesh.material === M1.material).to.eq(true, 'M1 must be set')
 
@@ -854,7 +855,7 @@ describe('ECS', () => {
         await sleep(1000)
         const newLogs = logs.map($ => $[1])
 
-        expect(newLogs).to.include(`setting ${entity!.uuid} <- C4`)
+        expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
         const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!newMesh).to.eq(true)
@@ -1061,6 +1062,18 @@ describe('ECS', () => {
       doTest()
     })
 
+    function getMaterials(context: SharedSceneContext) {
+      const materials: PBRMaterial[] = []
+
+      for (let [, x] of context.disposableComponents) {
+        if (x instanceof PBRMaterial) {
+          materials.push(x)
+        }
+      }
+
+      return materials
+    }
+
     testScene(-100, 104, ({ parcelScenePromise, sceneHost, logs }) => {
       it('locate camera', async () => {
         vrCamera!.position.set(-995, 1, 1040)
@@ -1081,11 +1094,11 @@ describe('ECS', () => {
         const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!mesh).to.eq(true)
 
-        const M1 = parcelScene.context.disposableComponents.get('C3') as PBRMaterial
-        const M2 = parcelScene.context.disposableComponents.get('C4') as PBRMaterial
+        const materials = getMaterials(parcelScene.context)
 
-        expect(M1).to.be.instanceOf(PBRMaterial, 'M1 is PBR')
-        expect(M2).to.be.instanceOf(PBRMaterial, 'M2 is PBR')
+        expect(materials.length).to.gte(2)
+
+        const [M1, M2] = materials
 
         expect(mesh.material === M1.material).to.eq(true, 'M1 must be set')
 
@@ -1094,7 +1107,7 @@ describe('ECS', () => {
         await sleep(1000)
         const newLogs = logs.map($ => $[1])
 
-        expect(newLogs).to.include(`setting ${entity!.uuid} <- C4`)
+        expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
         const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
         expect(!!newMesh).to.eq(true)
