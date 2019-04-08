@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color3 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, executeTask, Color3, Color4 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -166,7 +166,7 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
 
   const entity = new Entity()
   entity.addComponentOrReplace(component)
-  entity.addComponentOrReplace(new OnChanged(changed))
+  //entity.addComponentOrReplace(new OnChanged(changed))
   engine.addEntity(entity)
 
   return { component }
@@ -226,22 +226,16 @@ function createMessagesScrollbar(parent: UIShape, changed: (ev: IEvents['onChang
   component.height = 170
   component.width = 20
   component.positionX = '185px'
-  component.minimum = -45
-  component.isVertical = true
-  component.maximum = -45
-  component.value = -45
+  component.valueY = 0
   component.paddingLeft = 0
   component.visible = false
-  component.isThumbCircle = true
-  component.thumbWidth = 15
-  component.barOffset = 8
-  component.color = Color3.FromHexString('#333333')
-  component.background = Color3.FromHexString('#262626')
+  component.borderColor = Color4.FromHexString('#333333')
+  component.backgroundColor = Color4.FromHexString('#262626')
   component.isPointerBlocker = true
 
   const entity = new Entity()
   entity.addComponentOrReplace(component)
-  entity.addComponentOrReplace(new OnChanged(changed))
+  //entity.addComponentOrReplace(new OnChanged(changed))
   engine.addEntity(entity)
 
   return { entity, component }
@@ -350,7 +344,7 @@ function toggleChat() {
 
 function onSliderChanged(data: any) {
   const value = Math.round(data.value)
-  sliderOpenedChat.component.value = value
+  sliderOpenedChat.component.valueY = value
 
   //messageContainer!.top = `${value}px`
   messageContainer!.positionY = value
@@ -358,7 +352,7 @@ function onSliderChanged(data: any) {
 
 function onHelpSliderChanged(data: any) {
   const value = Math.round(data.value)
-  helpSliderComponent.value = value
+  helpSliderComponent.valueY = value
   //commandsContainerStack.position.y = `${-value}px`
   commandsContainerStack.positionY = -value
 }
@@ -403,8 +397,8 @@ function addMessage(messageEntry: MessageEntry): void {
     }
   } else {
     internalState.messages = [...internalState.messages, messageEntry]
-    sliderOpenedChat.component.maximum = getMessagesListHeight() - 160 // makes it always scroll to latest msg
-    sliderOpenedChat.component.value = -45
+    //sliderOpenedChat.component.maximum = getMessagesListHeight() - 160 // makes it always scroll to latest msg
+    //sliderOpenedChat.component.value = -45
     sliderOpenedChat.component.visible = true
     addEntryAndResize(messageEntry)
   }
@@ -516,20 +510,20 @@ helpSliderComponent.height = '170px'
 helpSliderComponent.width = '20px'
 helpSliderComponent.positionX = '185px'
 helpSliderComponent.positionY = '10px'
-helpSliderComponent.minimum = 0
-helpSliderComponent.isVertical = true
-helpSliderComponent.value = 0
+//helpSliderComponent.minimum = 0
+//helpSliderComponent.isVertical = true
+helpSliderComponent.valueY = 0
 helpSliderComponent.paddingLeft = 0
 
 helpSliderComponent.height = 170
 helpSliderComponent.width = 20
 
-helpSliderComponent.swapOrientation = true
-helpSliderComponent.isThumbCircle = true
-helpSliderComponent.thumbWidth = 15
-helpSliderComponent.barOffset = 8
-helpSliderComponent.color = Color3.FromHexString('#333333')
-helpSliderComponent.background = Color3.FromHexString('#262626')
+//helpSliderComponent.swapOrientation = true
+//helpSliderComponent.isThumbCircle = true
+//helpSliderComponent.thumbWidth = 15
+//helpSliderComponent.barOffset = 8
+helpSliderComponent.borderColor = Color4.FromHexString('#333333')
+helpSliderComponent.backgroundColor = Color4.FromHexString('#262626')
 helpSliderComponent.isPointerBlocker = true
 
 const sliderEntity = new Entity()
@@ -598,7 +592,7 @@ async function initializeCommandsHelp() {
   const commandsListHeight = commandsList.length * commandHeight
 
   commandsContainerStack.height = commandsListHeight
-  helpSliderComponent.maximum = commandsListHeight - commandHeight
+  //helpSliderComponent.maximum = commandsListHeight - commandHeight
 }
 
 executeTask(async () => {

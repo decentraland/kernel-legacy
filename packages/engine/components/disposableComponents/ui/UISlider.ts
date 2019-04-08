@@ -77,22 +77,22 @@ class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
   async updateData(data: UISliderShape): Promise<void> {
     this.data = schemaValidator(data)
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
-    this.control.minimum = this.data.minimum
-    this.control.maximum = this.data.maximum
-    this.control.color = this.data.color.toHexString()
+    this.control.minimum = 0
+    this.control.maximum = 1
+    //this.control.color = this.data.color.toHexString()
     this.control.zIndex = this.data.zIndex
-    this.control.background = this.data.background.toHexString()
+    this.control.background = this.data.backgroundColor.toHexString()
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.value = this.data.value
+    this.control.value = this.data.isHorizontal ? this.data.valueX : this.data.valueY;
     this.control.borderColor = this.data.borderColor.toHexString()
-    this.control.barOffset = this.data.barOffset
-    this.control.thumbWidth = this.data.thumbWidth
-    this.control.isThumbCircle = this.data.isThumbCircle
-    this.control.isThumbClamped = this.data.isThumbClamped
-    this.control.isVertical = this.data.isVertical
+    this.control.barOffset = 5
+    this.control.thumbWidth = 10
+    this.control.isThumbCircle = true
+    this.control.isThumbClamped = true
+    this.control.isVertical = true
     this.control.paddingTop = this.data.paddingTop
     this.control.paddingRight = this.data.paddingRight
     this.control.paddingBottom = this.data.paddingBottom
@@ -102,10 +102,6 @@ class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
     this.control.isVisible = this.data.visible
     this.control.rotation = 0
     this.control.isPointerBlocker = this.data.isPointerBlocker
-
-    if (this.data.swapOrientation) {
-      this.control.rotation = Math.PI
-    }
 
     this.setParent(this.data.parentComponent)
   }

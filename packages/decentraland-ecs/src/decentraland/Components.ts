@@ -751,6 +751,11 @@ export class OnClick extends OnUUIDEvent<'onClick'> {
 export class OnChanged extends OnUUIDEvent<'onChange'> {
   @ObservableComponent.readonly
   readonly type: string = 'onChange'
+
+  constructor(cb: (event: { value?: any, pointerId?: Number; }) => void) {
+    super(cb)
+    uuidEventSystem.handlerMap[this.uuid] = this
+  }
 }
 
 /**
