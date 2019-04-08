@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color3 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, Color3, Color4 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -10,14 +10,13 @@ import {
   UIFullScreenShape,
   UIShape
 } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { execute } from './rpc'
+import { screenSpaceUI } from './ui'
 
 declare var dcl: DecentralandInterface
 declare var require: any
 
-const UI_CHAT = require('../../static/images/ui-chat.png')
-
-// ScreenSpace UI
-const parent = new UIFullScreenShape()
+const UI_CHAT = require('../../../static/images/ui-chat.png')
 
 const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color3.White()
@@ -33,7 +32,9 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
+
   const component = new UIImageShape(parent, UI_CHAT)
+
   component.id = 'minimize-icon'
   component.width = 20
   component.height = 20
@@ -151,7 +152,7 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   component.color = PRIMARY_TEXT_COLOR
   component.background = Color3.Black()
   component.focusedBackground = Color3.Black()
-  component.placeholder = 'Type a message...'
+  component.placeholder = 'Say something to nearby people...'
   component.fontSize = 15
   component.width = 400
   component.height = 40
@@ -164,7 +165,7 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
 
   const entity = new Entity()
   entity.addComponentOrReplace(component)
-  entity.addComponentOrReplace(new OnChanged(changed))
+  //entity.addComponentOrReplace(new OnChanged(changed))
   engine.addEntity(entity)
 
   return { component }
@@ -224,22 +225,16 @@ function createMessagesScrollbar(parent: UIShape, changed: (ev: IEvents['onChang
   component.height = 170
   component.width = 20
   component.positionX = '185px'
-  component.minimum = -45
-  component.isVertical = true
-  component.maximum = -45
-  component.value = -45
+  component.valueY = 0
   component.paddingLeft = 0
   component.visible = false
-  component.isThumbCircle = true
-  component.thumbWidth = 15
-  component.barOffset = 8
-  component.color = Color3.FromHexString('#333333')
-  component.background = Color3.FromHexString('#262626')
+  component.borderColor = Color4.FromHexString('#333333')
+  component.backgroundColor = Color4.FromHexString('#262626')
   component.isPointerBlocker = true
 
   const entity = new Entity()
   entity.addComponentOrReplace(component)
-  entity.addComponentOrReplace(new OnChanged(changed))
+  //entity.addComponentOrReplace(new OnChanged(changed))
   engine.addEntity(entity)
 
   return { entity, component }
@@ -321,7 +316,7 @@ dcl.onEvent(event => {
   }
 })
 
-const containerMinimized = initializeMinimizedChat(parent)
+const containerMinimized = initializeMinimizedChat(screenSpaceUI)
 
 function openHelp() {
   internalState.isHelpVisible = true
@@ -348,7 +343,7 @@ function toggleChat() {
 
 function onSliderChanged(data: any) {
   const value = Math.round(data.value)
-  sliderOpenedChat.component.value = value
+  sliderOpenedChat.component.valueY = value
 
   //messageContainer!.top = `${value}px`
   messageContainer!.positionY = value
@@ -356,7 +351,7 @@ function onSliderChanged(data: any) {
 
 function onHelpSliderChanged(data: any) {
   const value = Math.round(data.value)
-  helpSliderComponent.value = value
+  helpSliderComponent.valueY = value
   //commandsContainerStack.position.y = `${-value}px`
   commandsContainerStack.positionY = -value
 }
@@ -401,8 +396,8 @@ function addMessage(messageEntry: MessageEntry): void {
     }
   } else {
     internalState.messages = [...internalState.messages, messageEntry]
-    sliderOpenedChat.component.maximum = getMessagesListHeight() - 160 // makes it always scroll to latest msg
-    sliderOpenedChat.component.value = -45
+    //sliderOpenedChat.component.maximum = getMessagesListHeight() - 160 // makes it always scroll to latest msg
+    //sliderOpenedChat.component.value = -45
     sliderOpenedChat.component.visible = true
     addEntryAndResize(messageEntry)
   }
@@ -414,7 +409,7 @@ function addEntryAndResize(messageEntry: MessageEntry) {
   createMessage(messageContainer, messageEntry)
 }
 
-const container = new UIContainerRectShape(parent)
+const container = new UIContainerRectShape(screenSpaceUI)
 container.id = 'gui-container'
 container.vAlign = 'bottom'
 container.hAlign = 'left'
@@ -488,7 +483,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   return containerMinimized
 }
 
-const helpContainer = new UIContainerRectShape(parent)
+const helpContainer = new UIContainerRectShape(screenSpaceUI)
 helpContainer.id = 'gui-container-commands'
 helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
@@ -514,20 +509,20 @@ helpSliderComponent.height = '170px'
 helpSliderComponent.width = '20px'
 helpSliderComponent.positionX = '185px'
 helpSliderComponent.positionY = '10px'
-helpSliderComponent.minimum = 0
-helpSliderComponent.isVertical = true
-helpSliderComponent.value = 0
+//helpSliderComponent.minimum = 0
+//helpSliderComponent.isVertical = true
+helpSliderComponent.valueY = 0
 helpSliderComponent.paddingLeft = 0
 
 helpSliderComponent.height = 170
 helpSliderComponent.width = 20
 
-helpSliderComponent.swapOrientation = true
-helpSliderComponent.isThumbCircle = true
-helpSliderComponent.thumbWidth = 15
-helpSliderComponent.barOffset = 8
-helpSliderComponent.color = Color3.FromHexString('#333333')
-helpSliderComponent.background = Color3.FromHexString('#262626')
+//helpSliderComponent.swapOrientation = true
+//helpSliderComponent.isThumbCircle = true
+//helpSliderComponent.thumbWidth = 15
+//helpSliderComponent.barOffset = 8
+helpSliderComponent.borderColor = Color4.FromHexString('#333333')
+helpSliderComponent.backgroundColor = Color4.FromHexString('#262626')
 helpSliderComponent.isPointerBlocker = true
 
 const sliderEntity = new Entity()
@@ -564,12 +559,6 @@ headerTextComponent.positionY = '15px'
 headerTextComponent.positionX = '15px'
 headerTextComponent.height = 40
 
-async function execute(controller: string, method: string, args: Array<any>) {
-  return executeTask(async () => {
-    return dcl.callRpc(controller, method, args)
-  })
-}
-
 function getMessagesListHeight() {
   return internalState.messages.length * messageHeight
 }
@@ -578,7 +567,7 @@ function getMessagesListHeight() {
 
 // Initialize chat scene
 
-async function initializeCommandsHelp() {
+export async function initializeChat() {
   const chatCmds = await execute('ChatController', 'getChatCommands', [null])
   const commandsList = []
 
@@ -596,10 +585,5 @@ async function initializeCommandsHelp() {
   const commandsListHeight = commandsList.length * commandHeight
 
   commandsContainerStack.height = commandsListHeight
-  helpSliderComponent.maximum = commandsListHeight - commandHeight
+  //helpSliderComponent.maximum = commandsListHeight - commandHeight
 }
-
-executeTask(async () => {
-  await Promise.all([dcl.loadModule('@decentraland/ChatController'), dcl.loadModule('@decentraland/Identity')])
-  await initializeCommandsHelp()
-})

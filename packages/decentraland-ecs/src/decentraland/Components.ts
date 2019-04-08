@@ -3,6 +3,7 @@ import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from './math'
 import { AnimationClip } from './AnimationClip'
 import { newId } from '../ecs/helpers'
 import { IEvents } from './Types'
+import { uuidEventSystem } from './Systems';
 
 export type TranformConstructorArgs = {
   position?: Vector3
@@ -49,6 +50,7 @@ export enum CLASS_ID {
 
   /** @deprecated */
   SOUND = 67,
+  TEXTURE = 68,
 
   AUDIO_CLIP = 200,
   AUDIO_SOURCE = 201,
@@ -158,13 +160,13 @@ export class Shape extends ObservableComponent {
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.BOX_SHAPE)
-export class BoxShape extends Shape {}
+export class BoxShape extends Shape { }
 
 /**
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.SPHERE_SHAPE)
-export class SphereShape extends Shape {}
+export class SphereShape extends Shape { }
 
 /**
  * @public
@@ -200,7 +202,7 @@ export class PlaneShape extends Shape {
    * Used to map specific pieces of a Material's texture into the plane's geometry.
    */
   @ObservableComponent.field
-  uvs: number[] = []
+  uvs?: number[]
 }
 
 /**
@@ -316,6 +318,54 @@ export class GLTFShape extends Shape {
   constructor(src: string) {
     super()
     this.src = src
+  }
+}
+
+/**
+ * @public
+ */
+@DisposableComponent('engine.texture', CLASS_ID.TEXTURE)
+export class Texture extends ObservableComponent {
+  @ObservableComponent.readonly
+  readonly src!: string
+
+  /**
+   * Enables crisper images based on the provided sampling mode.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | NEAREST   |
+   * |     2 | BILINEAR  |
+   * |     3 | TRILINEAR |
+   */
+  @ObservableComponent.readonly
+  readonly samplingMode!: number
+
+  /**
+   * Enables texture wrapping for this material.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | CLAMP     |
+   * |     2 | WRAP      |
+   * |     3 | MIRROR    |
+   */
+  @ObservableComponent.readonly
+  readonly wrap!: number
+
+  /**
+   * Defines if this texture has an alpha channel
+   */
+  @ObservableComponent.readonly
+  readonly hasAlpha!: boolean
+
+  constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>) {
+    super()
+    this.src = src
+
+    if (opts) {
+      for (let i in opts) {
+        this[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
+      }
+    }
   }
 }
 
@@ -569,32 +619,32 @@ export class Material extends ObservableComponent {
   /**
    * Texture applied as material.
    */
-  @ObservableComponent.field
-  albedoTexture?: string
+  @ObservableComponent.component
+  albedoTexture?: Texture
 
   /**
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
-  @ObservableComponent.field
-  alphaTexture?: string
+  @ObservableComponent.component
+  alphaTexture?: Texture
 
   /**
    * Emissive texture.
    */
-  @ObservableComponent.field
-  emissiveTexture?: string
+  @ObservableComponent.component
+  emissiveTexture?: Texture
 
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
-  @ObservableComponent.field
-  bumpTexture?: string
+  @ObservableComponent.component
+  bumpTexture?: Texture
 
   /**
    * Stores the refracted light information in a texture.
    */
-  @ObservableComponent.field
-  refractionTexture?: string
+  @ObservableComponent.component
+  refractionTexture?: Texture
 
   /**
    * If sets to true, disables all the lights affecting the material.
@@ -633,8 +683,8 @@ export class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  @ObservableComponent.field
-  texture: string = ''
+  @ObservableComponent.component
+  texture?: Texture
 
   /**
    * A number between 0 and 1.
@@ -642,28 +692,6 @@ export class BasicMaterial extends ObservableComponent {
    */
   @ObservableComponent.field
   alphaTest: number = 0.5
-
-  /**
-   * Enables crisper images based on the provided sampling mode.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | NEAREST   |
-   * |     2 | BILINEAR  |
-   * |     3 | TRILINEAR |
-   */
-  @ObservableComponent.field
-  samplingMode: number = 2
-
-  /**
-   * Enables texture wrapping for this material.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | CLAMP     |
-   * |     2 | WRAP      |
-   * |     3 | MIRROR    |
-   */
-  @ObservableComponent.field
-  wrap: number = 0
 }
 
 /**
@@ -690,6 +718,48 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
   toJSON() {
     return { uuid: this.uuid, type: this.type }
   }
+
+  static uuidEvent(target: ObservableComponent, propertyKey: string) {
+    if (delete (target as any)[propertyKey]) {
+      const componentSymbol = propertyKey + '_' + Math.random()
+        ; (target as any)[componentSymbol] = undefined
+
+      Object.defineProperty(target, componentSymbol, {
+        ...Object.getOwnPropertyDescriptor(target, componentSymbol),
+        enumerable: false
+      })
+
+      Object.defineProperty(target, propertyKey.toString(), {
+        get: function () {
+          return this[componentSymbol]
+        },
+        set: function (value) {
+          const oldValue = this[componentSymbol]
+
+          if (value) {
+            if (value instanceof OnUUIDEvent) {
+              this.data[propertyKey] = value.uuid
+            } else {
+              throw new Error('value is not an OnUUIDEvent')
+            }
+          } else {
+            this.data[propertyKey] = null
+          }
+
+          this[componentSymbol] = value
+
+          if (value !== oldValue) {
+            this.dirty = true
+
+            for (let i = 0; i < this.subscriptions.length; i++) {
+              this.subscriptions[i](propertyKey, value, oldValue)
+            }
+          }
+        },
+        enumerable: true
+      })
+    }
+  }
 }
 
 /**
@@ -708,6 +778,11 @@ export class OnClick extends OnUUIDEvent<'onClick'> {
 export class OnChanged extends OnUUIDEvent<'onChange'> {
   @ObservableComponent.readonly
   readonly type: string = 'onChange'
+
+  constructor(cb: (event: { value?: any, pointerId?: Number; }) => void) {
+    super(cb)
+    uuidEventSystem.handlerMap[this.uuid] = this
+  }
 }
 
 /**
@@ -717,6 +792,20 @@ export class OnChanged extends OnUUIDEvent<'onChange'> {
 export class OnFocus extends OnUUIDEvent<'onFocus'> {
   @ObservableComponent.readonly
   readonly type: string = 'onFocus'
+}
+
+/**
+ * @public
+ */
+@Component('engine.onTextSubmit', CLASS_ID.UUID_CALLBACK)
+export class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
+  @ObservableComponent.readonly
+  readonly type: string = 'onTextSubmit'
+
+  constructor(cb: (event: { message: string; }) => void) {
+    super(cb)
+    uuidEventSystem.handlerMap[this.uuid] = this
+  }
 }
 
 /**

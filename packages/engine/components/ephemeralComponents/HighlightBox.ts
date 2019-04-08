@@ -16,12 +16,12 @@ if (DEBUG && !isRunningTest) {
   }, 1000)
 }
 
-function filterMeshes($: BABYLON.TransformNode) {
+function filterMeshes($: BABYLON.Node) {
   return $ instanceof BABYLON.AbstractMesh
 }
 
 export class HighlightBox extends BaseComponent<{ highlight: boolean }> {
-  transformValue(x) {
+  transformValue(x: any) {
     return {
       nonce: Math.random(),
       highlight: validators.boolean(x, true)
@@ -30,6 +30,15 @@ export class HighlightBox extends BaseComponent<{ highlight: boolean }> {
 
   shouldSceneUpdate() {
     return true
+  }
+
+  didUpdateMesh = () => {
+    this.update()
+  }
+
+  attach() {
+    this.entity.onChangeObject3DObservable.add(this.didUpdateMesh)
+    this.update()
   }
 
   update() {
@@ -55,6 +64,7 @@ export class HighlightBox extends BaseComponent<{ highlight: boolean }> {
   }
 
   detach() {
+    this.entity.onChangeObject3DObservable.removeCallback(this.didUpdateMesh)
     const mesh: BABYLON.AbstractMesh = this.entity.getObject3D(BasicShape.nameInEntity) as any
     if (mesh) {
       mesh.renderOverlay = false

@@ -7,7 +7,7 @@ import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 
 export type EnableParcelSceneLoadingOptions = {
-  parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
+  parcelSceneClass: { new(x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
   shouldLoadParcelScene: (parcelToLoad: ILand) => boolean
   onLoadParcelScenes?(x: ILand[]): void
 }
@@ -18,9 +18,22 @@ export const loadedParcelSceneWorkers: Set<SceneWorker> = new Set()
  * This function receives the list of { type: string, data: ILand } from a remote worker.
  * It loads and unloads the ParcelScenes from the world
  */
-export function getParcelById(id: string) {
+export function getParcelByCID(id: string) {
   for (let parcelSceneWorker of loadedParcelSceneWorkers) {
     if (parcelSceneWorker.parcelScene.data.id === id) {
+      return parcelSceneWorker
+    }
+  }
+  return null
+}
+
+/**
+ * This function receives the list of { type: string, data: ILand } from a remote worker.
+ * It loads and unloads the ParcelScenes from the world
+ */
+export function getParcelById(id: string) {
+  for (let parcelSceneWorker of loadedParcelSceneWorkers) {
+    if (parcelSceneWorker.parcelScene.data.data.id === id) {
       return parcelSceneWorker
     }
   }
@@ -37,7 +50,7 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
     for (let i = 0; i < parcelScenes.length; i++) {
       const parcelSceneToLoad = parcelScenes[i]
 
-      if (!getParcelById(parcelSceneToLoad.mappingsResponse.root_cid)) {
+      if (!getParcelByCID(parcelSceneToLoad.mappingsResponse.root_cid)) {
         const parcelScene = new options.parcelSceneClass(ILandToLoadableParcelScene(parcelSceneToLoad))
 
         const parcelSceneWorker = new SceneWorker(parcelScene)

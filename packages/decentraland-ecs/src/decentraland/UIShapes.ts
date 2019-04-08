@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { CLASS_ID } from './Components'
-import { Color3 } from './math'
+import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged } from './Components'
+import { Color3, Color4 } from './math'
 
 /**
  * @alpha
@@ -10,7 +10,13 @@ export abstract class UIShape extends ObservableComponent {
    * Defines if the entity and its children should be rendered
    */
   @ObservableComponent.field
+  id: string | null = null
+
+  @ObservableComponent.field
   visible: boolean = true
+
+  @ObservableComponent.field
+  opacity: number = 0
 
   @ObservableComponent.field
   zIndex: number = 0
@@ -61,9 +67,6 @@ export abstract class UIShape extends ObservableComponent {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_FULLSCREEN_SHAPE)
 export class UIFullScreenShape extends UIShape {
-  @ObservableComponent.field
-  visible: boolean = true
-
   constructor() {
     super(null)
   }
@@ -74,12 +77,6 @@ export class UIFullScreenShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_WORLD_SPACE_SHAPE)
 export class UIWorldSpaceShape extends UIShape {
-  @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
-  visible: boolean = true
-
   constructor() {
     super(null)
   }
@@ -90,9 +87,6 @@ export class UIWorldSpaceShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_SCREEN_SPACE_SHAPE)
 export class UIScreenSpaceShape extends UIShape {
-  @ObservableComponent.field
-  id: string | null = null
-
   constructor() {
     super(null)
   }
@@ -103,12 +97,6 @@ export class UIScreenSpaceShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_RECT)
 export class UIContainerRectShape extends UIShape {
-  @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
-  opacity: number = 1
-
   @ObservableComponent.field
   adaptWidth: boolean = false
 
@@ -131,9 +119,6 @@ export class UIContainerRectShape extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_STACK)
 export class UIContainerStackShape extends UIShape {
   @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
   adaptWidth: boolean = false
 
   @ObservableComponent.field
@@ -154,12 +139,6 @@ export class UIContainerStackShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_BUTTON_SHAPE)
 export class UIButtonShape extends UIShape {
-  @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
-  opacity: number = 1
-
   @ObservableComponent.field
   fontFamily: string = 'Arial'
 
@@ -215,13 +194,10 @@ export class UIButtonShape extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_TEXT_SHAPE)
 export class UITextShape extends UIShape {
   @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
   outlineWidth: number = 0
 
   @ObservableComponent.field
-  outlineColor: string = '#fff'
+  outlineColor: Color3 = Color3.White()
 
   @ObservableComponent.field
   color: Color3 = Color3.White()
@@ -234,9 +210,6 @@ export class UITextShape extends UIShape {
 
   @ObservableComponent.field
   fontWeight: string = 'normal'
-
-  @ObservableComponent.field
-  opacity: number = 1.0
 
   @ObservableComponent.field
   value: string = ''
@@ -296,9 +269,6 @@ export class UITextShape extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_INPUT_TEXT_SHAPE)
 export class UIInputTextShape extends UIShape {
   @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
   color: Color3 = Color3.White()
 
   @ObservableComponent.field
@@ -312,9 +282,6 @@ export class UIInputTextShape extends UIShape {
 
   @ObservableComponent.field
   fontWeight: string = 'normal'
-
-  @ObservableComponent.field
-  opacity: number = 1.0
 
   @ObservableComponent.field
   value: string = ''
@@ -363,6 +330,9 @@ export class UIInputTextShape extends UIShape {
 
   @ObservableComponent.field
   paddingLeft: number = 0
+
+  @OnUUIDEvent.uuidEvent
+  onTextSubmitEvent: OnTextSubmit | null = null
 }
 
 /**
@@ -370,12 +340,6 @@ export class UIInputTextShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_IMAGE_SHAPE)
 export class UIImageShape extends UIShape {
-  @ObservableComponent.field
-  id: string | null = null
-
-  @ObservableComponent.field
-  opacity: number = 1
-
   @ObservableComponent.field
   sourceLeft: number = 0
 
@@ -418,49 +382,22 @@ export class UIImageShape extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_SLIDER_SHAPE)
 export class UISliderShape extends UIShape {
   @ObservableComponent.field
-  id: string | null = null
+  valueX: number = 0
 
   @ObservableComponent.field
-  minimum: number = 0
+  valueY: number = 0
 
   @ObservableComponent.field
-  maximum: number = 1
+  borderColor: Color4 = Color4.White()
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  backgroundColor: Color4 = Color4.Clear()
 
   @ObservableComponent.field
-  opacity: number = 1.0
-
-  @ObservableComponent.field
-  value: number = 0
-
-  @ObservableComponent.field
-  borderColor: Color3 = Color3.White()
-
-  @ObservableComponent.field
-  background: Color3 = Color3.Black()
-
-  @ObservableComponent.field
-  barOffset: number = 5
-
-  @ObservableComponent.field
-  thumbWidth: number = 30
-
-  @ObservableComponent.field
-  isThumbCircle: boolean = false
-
-  @ObservableComponent.field
-  isThumbClamped: boolean = false
+  isHorizontal: boolean = false
 
   @ObservableComponent.field
   isVertical: boolean = false
-
-  @ObservableComponent.field
-  visible: boolean = true
-
-  @ObservableComponent.field
-  zIndex: number = 0
 
   @ObservableComponent.field
   paddingTop: number = 0
@@ -474,9 +411,6 @@ export class UISliderShape extends UIShape {
   @ObservableComponent.field
   paddingLeft: number = 0
 
-  @ObservableComponent.field
-  onChanged: string = ''
-
-  @ObservableComponent.field
-  swapOrientation: boolean = false
+  @OnUUIDEvent.uuidEvent
+  onChanged: OnChanged | null = null
 }

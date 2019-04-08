@@ -65,34 +65,31 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
 
   async updateData(data: UIImageShape): Promise<void> {
     this.data = schemaValidator(data)
-
-    this.control.sourceLeft = this.data.sourceLeft
-    this.control.sourceTop = this.data.sourceTop
-    this.control.sourceWidth = this.data.sourceWidth
-    this.control.sourceHeight = this.data.sourceHeight
-
-    if (this.data.source) {
-      this.control.source = this.context.resolveUrl(this.data.source)
-    } else {
-      this.context.logger.warn(`Warning UIImage.source for ${this.data.id} is empty`)
-    }
-
-    this.control.width = `${this.data.width}px`
-    this.control.height = `${this.data.height}px`
-    this.control.top = `${-this.data.positionY}px`
-    this.control.left = `${this.data.positionX}px`
+    // @ts-ignore
+    this.control.sourceLeft = parseInt(this.data.sourceLeft, 10)
+    // @ts-ignore
+    this.control.sourceTop = parseInt(this.data.sourceTop, 10)
+    // @ts-ignore
+    this.control.sourceWidth = parseInt(this.data.sourceWidth, 10)
+    // @ts-ignore
+    this.control.sourceHeight = parseInt(this.data.sourceHeight, 10)
+    this.control.source = this.data.source
+    this.control.width = this.data.width
+    this.control.height = this.data.height
+    this.control.top = this.data.positionX
+    this.control.left = this.data.positionY
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     // missing this.uiEntity.fontWeight = this.data.fontWeight
-    this.control.paddingTop = `${this.data.paddingTop}px`
-    this.control.paddingLeft = `${this.data.paddingLeft}px`
-    this.control.paddingRight = `${this.data.paddingRight}px`
-    this.control.paddingBottom = `${this.data.paddingBottom}px`
+    this.control.paddingTop = this.data.paddingTop
+    this.control.paddingLeft = this.data.paddingLeft
+    this.control.paddingRight = this.data.paddingRight
+    this.control.paddingBottom = this.data.paddingBottom
     this.control.isVisible = this.data.visible
     this.control.isPointerBlocker = this.data.isPointerBlocker
 
-    this.setParent(this.data.parentComponent)
+    this.data.parentComponent && this.setParent(this.data.parentComponent)
   }
 
   dispatchOnClick = (pointerId: number) => {

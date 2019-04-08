@@ -77,3 +77,6 @@ export class UUIDEventSystem implements ISystem {
     }
   }
 }
+
+/** @internal */
+export const uuidEventSystem = new UUIDEventSystem()

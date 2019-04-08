@@ -30,18 +30,18 @@ function matrixWorldDidUpdate(entity: BaseEntity): void {
 }
 
 export class BaseEntity extends BABYLON.AbstractMesh {
-  get parentEntity(): BaseEntity {
+  get parentEntity(): BaseEntity | null {
     return findParentEntity(this)
   }
 
-  assetContainer: BABYLON.AssetContainer
+  assetContainer!: BABYLON.AssetContainer | void
   isDCLEntity = true
 
   attrs: Props = {}
 
   components: { [key: string]: BaseComponent<any> } = {}
 
-  onChangeObject3DObservable = new Observable<{ type: string; object: BABYLON.TransformNode }>()
+  onChangeObject3DObservable = new Observable<{ type: string; object: BABYLON.TransformNode | null }>()
 
   sendPositionsPending = false
   loadingDone = true
@@ -57,7 +57,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
   constructor(public uuid: string, public context: SharedSceneContext) {
     super(uuid)
     context.entities.set(uuid, this)
-    this.onAfterWorldMatrixUpdateObservable.add(matrixWorldDidUpdate)
+    this.onAfterWorldMatrixUpdateObservable.add(matrixWorldDidUpdate as any)
   }
 
   removeUUIDEvent(type: IEventNames): void {
@@ -67,6 +67,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
   addUUIDEvent(type: IEventNames, uuid: string): void {
     this.uuidEvents.set(type, uuid)
   }
+
   attachDisposableComponent(name: string, component: DisposableComponent) {
     const current = this.disposableComponents.get(name)
     if (current && current !== component) {
@@ -76,13 +77,13 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     this.disposableComponents.set(name, component)
   }
 
-  getLoadingEntity() {
+  getLoadingEntity(): BaseEntity | null {
     if (!this.loadingDone) {
       return this
     }
 
     for (let [, component] of this.disposableComponents) {
-      if (!component.loadingDone) {
+      if (!component.loadingDone(this)) {
         return this
       }
     }
@@ -103,7 +104,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     throw e
   }
 
-  setParentEntity(newParent: BaseEntity): void {
+  setParentEntity(newParent: BaseEntity | null): void {
     const currentParent = this.parentEntity
 
     if (currentParent === newParent) {
@@ -237,6 +238,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
 
     if (current) {
       current.removeFrom(this)
+      this.disposableComponents.delete(name)
     }
 
     this.removeUUIDEvent(name as any)
@@ -264,7 +266,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     return ret
   }
 
-  toJSON() {
+  toJSON(): any {
     return {
       id: this.id,
       components: this.attrs ? Object.keys(this.attrs) : [],
@@ -403,7 +405,8 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     } else if (name in this.components) {
       this.components[name].setValue(JSON.parse(payload.json))
     } else if (payload.classId in componentRegistry) {
-      const behavior: BaseComponent<any> = new componentRegistry[payload.classId](this, JSON.parse(payload.json))
+      const behavior: BaseComponent<any> = new componentRegistry[payload.classId](this)
+      behavior.setValue(JSON.parse(payload.json))
       this.components[name] = behavior
       this.addBehavior(behavior, true)
     }
@@ -453,7 +456,7 @@ export function findParentEntityOfType<T extends BaseEntity>(
   desiredClass: ConstructorOf<T>
 ): T | null {
   // Find the next entity parent to dispatch the event
-  let parent: T | BABYLON.Node = object.parent
+  let parent: T | BABYLON.Node | null = object.parent
 
   while (parent && !(parent instanceof desiredClass)) {
     parent = parent.parent

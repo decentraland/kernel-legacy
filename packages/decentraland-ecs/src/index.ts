@@ -24,16 +24,14 @@ DisposableComponent.engine = engine
 import { DecentralandInterface } from './decentraland/Types'
 
 /** @internal */
-declare let dcl: DecentralandInterface
+declare let dcl: DecentralandInterface | void
 if (typeof dcl !== 'undefined') {
   engine.addSystem(new DecentralandSynchronizationSystem(dcl), Infinity)
 }
 
-import { UUIDEventSystem } from './decentraland/Systems'
+import { uuidEventSystem } from './decentraland/Systems'
 
 // Initialize UUID Events system
-/** @internal */
-const uuidEventSystem = new UUIDEventSystem()
 engine.addSystem(uuidEventSystem)
 
 // DECENTRALAND DEPENDENCIES
@@ -48,5 +46,6 @@ export * from './decentraland/Input'
 export * from './decentraland/Audio'
 export * from './decentraland/Gizmos'
 export * from './decentraland/UIShapes'
+export * from './ecs/EventManager'
 
 export { engine }

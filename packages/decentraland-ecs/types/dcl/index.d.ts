@@ -215,30 +215,12 @@ declare class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  texture: string
+  texture?: Texture
   /**
    * A number between 0 and 1.
    * Any pixel with an alpha lower than this value will be shown as transparent.
    */
   alphaTest: number
-  /**
-   * Enables crisper images based on the provided sampling mode.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | NEAREST   |
-   * |     2 | BILINEAR  |
-   * |     3 | TRILINEAR |
-   */
-  samplingMode: number
-  /**
-   * Enables texture wrapping for this material.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | CLAMP     |
-   * |     2 | WRAP      |
-   * |     3 | MIRROR    |
-   */
-  wrap: number
 }
 
 /**
@@ -272,7 +254,7 @@ declare class Billboard extends ObservableComponent {
 /**
  * @public
  */
-declare class BoxShape extends Shape {}
+declare class BoxShape extends Shape { }
 
 /**
  * @public
@@ -878,7 +860,7 @@ declare class ComponentAdded {
 declare interface ComponentConstructor<T extends ComponentLike> {
   isComponent?: boolean
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -897,7 +879,7 @@ declare class ComponentGroup {
 /**
  * @public
  */
-declare interface ComponentLike {}
+declare interface ComponentLike { }
 
 /**
  * @public
@@ -1115,7 +1097,7 @@ declare interface DisposableComponentConstructor<T extends DisposableComponentLi
   isComponent?: boolean
   isDisposableComponent?: true
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -1166,14 +1148,14 @@ declare class Engine {
   readonly disposableComponents: Readonly<Record<string, DisposableComponentLike>>
   constructor()
   addEntity(entity: Entity): void
-  removeEntity(entity: Entity, removeChildren?: boolean, newParent?: Entity): void
+  removeEntity(entity: Entity): void
   addSystem(system: ISystem, priority?: number): void
   removeSystem(system: ISystem): void
   update(dt: number): void
   getEntitiesWithComponent(component: string): Record<string, any>
   getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, Entity>
   registerComponent(component: DisposableComponentLike): void
-  disposeComponent(component: DisposableComponentLike): void
+  disposeComponent(component: DisposableComponentLike): boolean
   updateComponent(component: DisposableComponentLike): void
   getComponentGroup(...requires: ComponentConstructor<any>[]): ComponentGroup
   removeComponentGroup(componentGroup: ComponentGroup): void
@@ -1231,7 +1213,7 @@ declare class Entity {
    */
   getComponentOrCreate<T>(
     component: ComponentConstructor<T> & {
-      new (): T
+      new(): T
     }
   ): T
   /**
@@ -1266,6 +1248,11 @@ declare class Entity {
 }
 
 declare const Epsilon = 0.000001
+
+/**
+ * @public
+ */
+declare function EventConstructor(eventName: string): ClassDecorator
 
 /**
  * @public
@@ -1404,7 +1391,7 @@ declare class Gizmos extends ObservableComponent {
  * @public
  */
 declare interface IEventConstructor<T> {
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 declare type IEventNames = keyof IEvents
@@ -1684,23 +1671,23 @@ declare class Material extends ObservableComponent {
   /**
    * Texture applied as material.
    */
-  albedoTexture?: string
+  albedoTexture?: Texture
   /**
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
-  alphaTexture?: string
+  alphaTexture?: Texture
   /**
    * Emissive texture.
    */
-  emissiveTexture?: string
+  emissiveTexture?: Texture
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
-  bumpTexture?: string
+  bumpTexture?: Texture
   /**
    * Stores the refracted light information in a texture.
    */
-  refractionTexture?: string
+  refractionTexture?: Texture
   /**
    * If sets to true, disables all the lights affecting the material.
    * Defaults to false.
@@ -2681,8 +2668,8 @@ declare class ObservableComponent {
   dirty: boolean
   data: any
   private subscriptions
+  static component(target: ObservableComponent, propertyKey: string): void
   static field(target: ObservableComponent, propertyKey: string): void
-  static uiValue(target: ObservableComponent, propertyKey: string): void
   static readonly(target: ObservableComponent, propertyKey: string): void
   onChange(fn: ObservableComponentSubscription): void
   toJSON(): any
@@ -2819,12 +2806,12 @@ declare class OnGizmoEvent extends OnUUIDEvent<'gizmoEvent'> {
 /**
  * @public
  */
-declare class OnPointerDown extends PointerEventComponent {}
+declare class OnPointerDown extends PointerEventComponent { }
 
 /**
  * @public
  */
-declare class OnPointerUp extends PointerEventComponent {}
+declare class OnPointerUp extends PointerEventComponent { }
 
 /**
  * @public
@@ -3118,7 +3105,7 @@ declare class PlaneShape extends Shape {
    * Sets the UV coordinates for the plane.
    * Used to map specific pieces of a Material's texture into the plane's geometry.
    */
-  uvs: number[]
+  uvs?: number[]
 }
 
 /**
@@ -3907,7 +3894,7 @@ declare enum Space {
 /**
  * @public
  */
-declare class SphereShape extends Shape {}
+declare class SphereShape extends Shape { }
 
 declare type TaskResult<T> = Promise<T> & {
   isComplete: boolean
@@ -3948,6 +3935,36 @@ declare class TextShape extends Shape {
   isPickable: boolean
   billboard: boolean
   constructor(value?: string)
+}
+
+/**
+ * @public
+ */
+declare class Texture extends ObservableComponent {
+  readonly src: string
+  /**
+   * Enables crisper images based on the provided sampling mode.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | NEAREST   |
+   * |     2 | BILINEAR  |
+   * |     3 | TRILINEAR |
+   */
+  readonly samplingMode: number
+  /**
+   * Enables texture wrapping for this material.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | CLAMP     |
+   * |     2 | WRAP      |
+   * |     3 | MIRROR    |
+   */
+  readonly wrap: number
+  /**
+   * Defines if this texture has an alpha channel
+   */
+  readonly hasAlpha: boolean
+  constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>)
 }
 
 declare const ToGammaSpace: number
@@ -4001,17 +4018,25 @@ declare class UIButtonShape extends UIShape {
   fontWeight: string
   thickness: number
   cornerRadius: number
-  color: Color3
-  background: Color3
-  paddingTop: number
-  paddingRight: number
-  paddingBottom: number
-  paddingLeft: number
+  width: string
+  height: string
+  top: string
+  left: string
+  color: string
+  background: string
+  hAlign: string
+  vAlign: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: Color3
+  shadowColor: string
   text: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4023,9 +4048,17 @@ declare class UIContainerRectShape extends UIShape {
   adaptWidth: boolean
   adaptHeight: boolean
   thickness: number
-  color: Color3
-  background: Color3
-  alignmentUsesSize: boolean
+  cornerRadius: number
+  width: string
+  height: string
+  top: string
+  left: string
+  color: string
+  background: string
+  hAlign: string
+  vAlign: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4033,12 +4066,20 @@ declare class UIContainerRectShape extends UIShape {
  */
 declare class UIContainerStackShape extends UIShape {
   id: string | null
+  opacity: number
   adaptWidth: boolean
   adaptHeight: boolean
-  opacity: number
-  color: Color3
-  background: Color4
+  width: string
+  height: string
+  top: string
+  left: string
+  color: string
+  background: string
+  hAlign: string
+  vAlign: string
   vertical: boolean
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4047,17 +4088,23 @@ declare class UIContainerStackShape extends UIShape {
 declare class UIImageShape extends UIShape {
   id: string | null
   opacity: number
-  sourceLeft: number
-  sourceTop: number
-  sourceWidth: number
-  sourceHeight: number
+  sourceLeft: string | null
+  sourceTop: string | null
+  sourceWidth: string | null
+  sourceHeight: string | null
   source: string | null
-  paddingTop: number
-  paddingRight: number
-  paddingBottom: number
-  paddingLeft: number
-  constructor(parent: UIShape, source: string)
-  toJSON(): void
+  width: string
+  height: string
+  top: string
+  left: string
+  hAlign: string
+  vAlign: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4065,28 +4112,37 @@ declare class UIImageShape extends UIShape {
  */
 declare class UIInputTextShape extends UIShape {
   id: string | null
-  color: Color3
+  color: string
   thickness: number
   fontFamily: string
   fontSize: number
   fontWeight: string
   opacity: number
   value: string
-  placeholderColor: Color3
+  placeholderColor: string
   placeholder: string
-  margin: number
-  maxWidth: number
+  margin: string
+  maxWidth: string
   autoStretchWidth: boolean
-  background: Color3
-  focusedBackground: Color3
+  background: string
+  focusedBackground: string
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: Color3
-  paddingTop: number
-  paddingRight: number
-  paddingBottom: number
-  paddingLeft: number
+  shadowColor: string
+  zIndex: number
+  hAlign: string
+  vAlign: string
+  width: string
+  height: string
+  top: string
+  left: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4094,6 +4150,7 @@ declare class UIInputTextShape extends UIShape {
  */
 declare class UIScreenSpaceShape extends UIShape {
   id: string | null
+  visible: boolean
   constructor()
 }
 
@@ -4105,14 +4162,6 @@ declare abstract class UIShape extends ObservableComponent {
    * Defines if the entity and its children should be rendered
    */
   visible: boolean
-  zIndex: number
-  hAlign: string
-  vAlign: string
-  width: string | number
-  height: string | number
-  positionX: string | number
-  positionY: string | number
-  isPointerBlocker: boolean
   private _parent?
   constructor(parent: UIShape | null)
   readonly parent: UIShape | undefined
@@ -4125,24 +4174,31 @@ declare class UISliderShape extends UIShape {
   id: string | null
   minimum: number
   maximum: number
-  color: Color3
+  color: string
   opacity: number
   value: number
-  borderColor: Color3
-  background: Color3
-  barOffset: number
-  thumbWidth: number
+  borderColor: string
+  background: string
+  barOffset: string
+  thumbWidth: string
   isThumbCircle: boolean
   isThumbClamped: boolean
   isVertical: boolean
   visible: boolean
   zIndex: number
-  paddingTop: number
-  paddingRight: number
-  paddingBottom: number
-  paddingLeft: number
+  hAlign: string
+  vAlign: string
+  width: string
+  height: string
+  top: string
+  left: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
   onChanged: string
   swapOrientation: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4152,45 +4208,35 @@ declare class UITextShape extends UIShape {
   id: string | null
   outlineWidth: number
   outlineColor: string
-  color: Color3
+  color: string
   fontFamily: string
   fontSize: number
   fontWeight: string
   opacity: number
   value: string
-  lineSpacing: number
+  lineSpacing: string
   lineCount: number
   resizeToFit: boolean
   textWrapping: boolean
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: Color3
+  shadowColor: string
   zIndex: number
+  hAlign: string
+  vAlign: string
   hTextAlign: string
   vTextAlign: string
-  paddingTop: number
-  paddingRight: number
-  paddingBottom: number
-  paddingLeft: number
-}
-
-/**
- * @alpha
- */
-declare class UIValue {
-  value: number
-  type: UIValueType
-  toString(): string
-  constructor(value: string | number)
-}
-
-/**
- * @alpha
- */
-declare enum UIValueType {
-  PERCENT = 0,
-  PIXELS = 1
+  width: string
+  height: string
+  top: string
+  left: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
@@ -4198,6 +4244,8 @@ declare enum UIValueType {
  */
 declare class UIWorldSpaceShape extends UIShape {
   id: string | null
+  width: string
+  height: string
   visible: boolean
   constructor()
 }
