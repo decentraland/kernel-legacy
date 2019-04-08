@@ -276,7 +276,7 @@ function createCommandHelper(parent: UIShape, props: { name: string; description
   container.height = 55
 
   const cmdNameComponent = new UITextShape(container)
-  cmdNameComponent.color = COMMAND_COLOR
+  // cmdNameComponent.color = COMMAND_COLOR
   cmdNameComponent.value = `/${props.name}`
   cmdNameComponent.fontSize = 14
   cmdNameComponent.fontWeight = 'bold'

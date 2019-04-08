@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color3, Color4 } from './math'
+import { Color3 } from './math'
 
 /**
  * @alpha
@@ -143,10 +143,7 @@ export class UIContainerStackShape extends UIShape {
   opacity: number = 1
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
-
-  @ObservableComponent.field
-  background: Color4 = new Color4(0, 0, 0, 0)
+  color: Color3 = Color3.Black()
 
   @ObservableComponent.field
   vertical: boolean = true
