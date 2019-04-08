@@ -273,3 +273,6 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
   type: T
   data: V
 }
+
+// @internal
+export const AVATAR_OBSERVABLE = 'AVATAR_OBSERVABLE'

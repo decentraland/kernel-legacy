@@ -97,7 +97,7 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.left = this.data.positionX
     this.control.isVisible = this.data.visible
 
-    this.setParent(this.data.parentComponent)
+    this.data.parentComponent && this.setParent(this.data.parentComponent)
   }
 }
 

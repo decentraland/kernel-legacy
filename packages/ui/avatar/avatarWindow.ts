@@ -1,18 +1,20 @@
-import { Entity, engine, OnClick, executeTask, Color3 } from 'decentraland-ecs/src'
 import {
+  UIShape,
   UIImageShape,
+  IEvents,
+  Entity,
+  OnClick,
+  engine,
   UIContainerRectShape,
   UITextShape,
-  UIFullScreenShape,
-  UIShape
-} from 'decentraland-ecs/src/decentraland/UIShapes'
-import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { ShowProfileMessage } from 'shared/comms/types'
+  Color3
+} from 'decentraland-ecs/src'
+import { execute } from './rpc'
+import { screenSpaceUI } from './ui'
 
-declare var dcl: DecentralandInterface
 declare var require: any
 
-const ATLAS_PATH = require('../../static/images/profile-ui.png')
+const ATLAS_PATH = require('../../../static/images/profile-ui.png')
 
 type IState = {
   publicKey: string
@@ -29,6 +31,8 @@ const internalState: IState = {
   isBlocked: false,
   avatarUrl: ''
 }
+
+export let currentAvatarId: string | null = null
 
 // -----------------------------
 
@@ -151,13 +155,6 @@ function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) =
   return { component, entity }
 }
 
-const hide = () => {
-  dcl.log('hiding avatar-profile')
-  internalState.visible = false
-  closeButton.component.visible = false
-  guiContainerComponent.visible = false
-}
-
 const toggleMute = async () => {
   const isMuted = !internalState.isMuted
   internalState.isMuted = isMuted
@@ -183,29 +180,6 @@ const toggleBlock = async () => {
 }
 
 // -----------------------------------------
-
-dcl.subscribe('SHOW_PROFILE')
-dcl.subscribe('HIDE_PROFILE')
-dcl.onEvent(event => {
-  const eventType: string = event.type
-  const eventData: any = event.data
-
-  switch (eventType) {
-    case 'SHOW_PROFILE':
-      show(eventData)
-      break
-
-    case 'HIDE_PROFILE':
-      hide()
-      break
-
-    default:
-      break
-  }
-})
-
-// ScreenSpace UI
-const screenSpaceUI = new UIFullScreenShape()
 
 // Main container
 const guiContainerComponent = new UIContainerRectShape(screenSpaceUI)
@@ -261,9 +235,20 @@ let muteButton = createMuteButton(blockAndMuteContainer, toggleMute)
 let blockButton = createBlockButton(blockAndMuteContainer, toggleBlock)
 
 // Close button
-let closeButton = createCloseButton(guiContainerComponent, hide)
+let closeButton = createCloseButton(guiContainerComponent, hideAvatarWindow)
 
-const show = (data: ShowProfileMessage) => {
+export type ShowProfileMessage = {
+  uuid: string
+  publicKey: string
+  displayName: string
+  isMuted: boolean
+  isBlocked: boolean
+  avatarUrl?: string
+}
+
+export function showAvatarWindow(data: ShowProfileMessage) {
+  currentAvatarId = data.uuid
+
   internalState.visible = true
   closeButton.component.visible = true
   guiContainerComponent.visible = true
@@ -285,6 +270,12 @@ const show = (data: ShowProfileMessage) => {
   blockButton.component.sourceTop = data.isBlocked ? 230 : 181
 }
 
+export function hideAvatarWindow() {
+  internalState.visible = false
+  closeButton.component.visible = false
+  guiContainerComponent.visible = false
+}
+
 function follow() {
   // stub
 }
@@ -293,20 +284,6 @@ function addFriend() {
   // stub
 }
 
-async function execute(controller: string, method: string, args: Array<any>) {
-  return executeTask(async () => {
-    return dcl.callRpc(controller, method, args)
-  })
-}
-
 const setAvatarIcon = (url: string) => {
   avatarIcon.component.source = url
 }
-
-// ------------------------------------
-
-// Initialize avatar profile scene
-
-executeTask(async () => {
-  await dcl.loadModule('@decentraland/SocialController')
-})

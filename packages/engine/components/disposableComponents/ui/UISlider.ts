@@ -103,7 +103,9 @@ class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
     this.control.rotation = 0
     this.control.isPointerBlocker = this.data.isPointerBlocker
 
-    this.setParent(this.data.parentComponent)
+    if (this.data.parentComponent) {
+      this.setParent(this.data.parentComponent)
+    }
   }
 
   dispatchOnChanged = (data: IEvents['onChange']) => {

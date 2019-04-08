@@ -67,7 +67,7 @@ export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.G
       this.control.height = this.data.height
     }
 
-    this.setParent(this.data.parentComponent)
+    this.data.parentComponent && this.setParent(this.data.parentComponent)
   }
 }
 

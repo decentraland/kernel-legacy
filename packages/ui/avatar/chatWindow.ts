@@ -1,5 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, executeTask, Color3, Color4 } from 'decentraland-ecs/src'
+import { Entity, engine, OnChanged, OnClick, Color3, Color4 } from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -10,14 +10,13 @@ import {
   UIFullScreenShape,
   UIShape
 } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { execute } from './rpc'
+import { screenSpaceUI } from './ui'
 
 declare var dcl: DecentralandInterface
 declare var require: any
 
-const UI_CHAT = require('../../static/images/ui-chat.png')
-
-// ScreenSpace UI
-const parent = new UIFullScreenShape()
+const UI_CHAT = require('../../../static/images/ui-chat.png')
 
 const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color3.White()
@@ -153,7 +152,7 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   component.color = PRIMARY_TEXT_COLOR
   component.background = Color3.Black()
   component.focusedBackground = Color3.Black()
-  component.placeholder = 'Type a message...'
+  component.placeholder = 'Say something to nearby people...'
   component.fontSize = 15
   component.width = 400
   component.height = 40
@@ -317,7 +316,7 @@ dcl.onEvent(event => {
   }
 })
 
-const containerMinimized = initializeMinimizedChat(parent)
+const containerMinimized = initializeMinimizedChat(screenSpaceUI)
 
 function openHelp() {
   internalState.isHelpVisible = true
@@ -410,7 +409,7 @@ function addEntryAndResize(messageEntry: MessageEntry) {
   createMessage(messageContainer, messageEntry)
 }
 
-const container = new UIContainerRectShape(parent)
+const container = new UIContainerRectShape(screenSpaceUI)
 container.id = 'gui-container'
 container.vAlign = 'bottom'
 container.hAlign = 'left'
@@ -484,7 +483,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   return containerMinimized
 }
 
-const helpContainer = new UIContainerRectShape(parent)
+const helpContainer = new UIContainerRectShape(screenSpaceUI)
 helpContainer.id = 'gui-container-commands'
 helpContainer.vAlign = 'bottom'
 helpContainer.hAlign = 'left'
@@ -560,12 +559,6 @@ headerTextComponent.positionY = '15px'
 headerTextComponent.positionX = '15px'
 headerTextComponent.height = 40
 
-async function execute(controller: string, method: string, args: Array<any>) {
-  return executeTask(async () => {
-    return dcl.callRpc(controller, method, args)
-  })
-}
-
 function getMessagesListHeight() {
   return internalState.messages.length * messageHeight
 }
@@ -574,7 +567,7 @@ function getMessagesListHeight() {
 
 // Initialize chat scene
 
-async function initializeCommandsHelp() {
+export async function initializeChat() {
   const chatCmds = await execute('ChatController', 'getChatCommands', [null])
   const commandsList = []
 
@@ -594,8 +587,3 @@ async function initializeCommandsHelp() {
   commandsContainerStack.height = commandsListHeight
   //helpSliderComponent.maximum = commandsListHeight - commandHeight
 }
-
-executeTask(async () => {
-  await Promise.all([dcl.loadModule('@decentraland/ChatController'), dcl.loadModule('@decentraland/Identity')])
-  await initializeCommandsHelp()
-})

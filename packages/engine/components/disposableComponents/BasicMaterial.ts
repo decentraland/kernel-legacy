@@ -2,9 +2,11 @@ import { DisposableComponent, BasicShape } from './DisposableComponent'
 import { BaseEntity } from '../../entities/BaseEntity'
 import { validators } from '../helpers/schemaValidator'
 import { scene } from '../../renderer'
-import { CLASS_ID, Observer } from 'decentraland-ecs/src'
+import { CLASS_ID } from 'decentraland-ecs/src'
 import { TextureSamplingMode, TextureWrapping } from 'shared/types'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
+import { Texture } from './Texture'
+import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 
 BABYLON.Effect.ShadersStore['dclShadelessVertexShader'] = `
   precision highp float;
@@ -56,12 +58,10 @@ const defaults = {
 
 export class BasicMaterial extends DisposableComponent {
   material: BABYLON.ShaderMaterial
-
-  meshObserver: Observer<{ type: string; object: BABYLON.TransformNode }>
-
-  constructor(ctx, uuid) {
+  loadingDonePrivate: boolean = false
+  constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
-    this.contributions.materials.add(this.material)
+
     this.material = new BABYLON.ShaderMaterial(
       '#' + this.uuid,
       scene,
@@ -75,10 +75,12 @@ export class BasicMaterial extends DisposableComponent {
         samplers: ['textureSampler']
       }
     )
-    this.loadingDone = false
+
+    this.contributions.materials.add(this.material)
+    this.loadingDonePrivate = false
   }
 
-  updateMeshMaterial = (mesh: BABYLON.Mesh) => {
+  updateMeshMaterial = (mesh: BABYLON.Mesh | null) => {
     if (!mesh) return
     mesh.material = this.material
   }
@@ -88,9 +90,9 @@ export class BasicMaterial extends DisposableComponent {
     mesh.material = null
   }
 
-  meshObserverCallback = ({ type, object }) => {
+  meshObserverCallback = ({ type, object }: { type: string; object: BABYLON.TransformNode | null }) => {
     if (type === BasicShape.nameInEntity) {
-      this.updateMeshMaterial(object)
+      this.updateMeshMaterial(object as any)
     }
   }
 
@@ -115,33 +117,24 @@ export class BasicMaterial extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
+    this.loadingDonePrivate = false
     if (data.texture) {
-      const src = validators.string(data.texture, defaults.texture)
-      if (src) {
-        const url = src.match(/^base64,/i) && !src.startsWith('data:') ? `data:image/png;${src}` : src
-        const texture = await this.context.getTexture(url)
-        const validatedSamplingMode = validators.number(data.samplingMode, defaults.samplingMode)
-        const validatedWrap = validators.number(data.wrap, defaults.wrap)
-        const samplingMode = Math.max(Math.min(3, Math.floor(validators.int(validatedSamplingMode, 1))), 1)
-        const wrap = Math.max(Math.min(2, Math.floor(validators.int(validatedWrap, 0))), 0)
+      const texture = await Texture.getFromComponent(this.context, data.texture)
 
-        texture.updateSamplingMode(samplingMode)
-        texture.wrapU = wrap
-        texture.wrapV = wrap
-
-        this.contributions.textures.clear()
-        this.contributions.textures.add(texture)
-
+      if (texture) {
         this.material.setTexture('textureSampler', texture)
       }
-
-      const alphaTest = validators.float(data.alphaTest, defaults.alphaTest)
-      this.material.setFloat('alphaTest', alphaTest)
-
-      deleteUnusedTextures()
     }
-    this.loadingDone = true
+
+    const alphaTest = validators.float(data.alphaTest, defaults.alphaTest)
+    this.material.setFloat('alphaTest', alphaTest)
+
+    deleteUnusedTextures()
+
+    this.loadingDonePrivate = true
+  }
+  loadingDone() {
+    return this.loadingDonePrivate
   }
 }
 

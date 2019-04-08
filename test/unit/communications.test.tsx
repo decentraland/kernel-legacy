@@ -4,32 +4,49 @@ import * as sinonChai from 'sinon-chai'
 
 import { parcelLimits } from 'config'
 import {
-  WebRtcMessage, ConnectMessage, WelcomeMessage, AuthMessage, TopicMessage, PingMessage,
-  PositionData, ProfileData, ChatData, TopicSubscriptionMessage,
-  MessageType, Role, Format
+  WebRtcMessage,
+  ConnectMessage,
+  WelcomeMessage,
+  AuthMessage,
+  TopicMessage,
+  DataMessage,
+  PingMessage,
+  PositionData,
+  ProfileData,
+  ChatData,
+  TopicSubscriptionMessage,
+  MessageType,
+  Role,
+  Format,
+  Category
 } from '../../packages/shared/comms/commproto_pb'
 import { Position, CommunicationArea, Parcel, position2parcel } from 'shared/comms/utils'
-import { WorldInstanceConnection, SocketReadyState, TopicHandler, positionHash } from 'shared/comms/worldInstanceConnection'
-import { Context, processChatMessage, processPositionMessage, processProfileMessage, PeerTrackingInfo, onPositionUpdate } from 'shared/comms'
-import { PkgStats } from 'shared/comms/debug'
+import { WorldInstanceConnection, SocketReadyState, positionHash } from 'shared/comms/worldInstanceConnection'
+import {
+  Context,
+  processChatMessage,
+  processPositionMessage,
+  processProfileMessage,
+  PeerTrackingInfo,
+  onPositionUpdate
+} from 'shared/comms'
 
 chai.use(sinonChai)
 
 const expect = chai.expect
 
-let webSocket = null
+let webSocket!: WebSocket
 
 class MockWebSocket {
   public readyState: SocketReadyState = SocketReadyState.CLOSED
 
   constructor(public url: string) {
-    webSocket = this
+    webSocket = this as any
   }
 }
 
 describe('Communications', function() {
   describe('CommunicationArea', () => {
-
     function makePosition(x: number, z: number): Position {
       return [x, 0, z, 0, 0, 0, 0]
     }
@@ -59,49 +76,51 @@ describe('Communications', function() {
   })
 
   describe('WorldInstanceConnection', () => {
-
-    const ORIGINAL_WEB_SOCKET = window['WebSocket']
+    const ORIGINAL_WEB_SOCKET = (window as any)['WebSocket']
 
     before(() => {
       // NOTE: little hack to be able to mock websocket requests
-      window['WebSocket'] = MockWebSocket
+      ;(window as any)['WebSocket'] = MockWebSocket
     })
 
-    let worldConn
+    let worldConn: WorldInstanceConnection
+    let mockWebRtc: any
     beforeEach(() => {
-      webSocket = null
+      webSocket = null as any
       worldConn = new WorldInstanceConnection('coordinator')
       worldConn.connect()
 
-      const mockWebRtc = {
+      mockWebRtc = {
         addIceCandidate: sinon.stub(),
         setRemoteDescription: sinon.stub(),
         setLocalDescription: sinon.stub(),
         createAnswer: sinon.stub(),
-        onicecandidate: worldConn.webRtcConn.onicecandidate,
-        ondatachannel: worldConn.webRtcConn.ondatachannel
+        onicecandidate: worldConn.webRtcConn!.onicecandidate,
+        ondatachannel: worldConn.webRtcConn!.ondatachannel
       }
       worldConn.webRtcConn = mockWebRtc
-      webSocket.readyState = SocketReadyState.OPEN
+      ;(webSocket as any).readyState = SocketReadyState.OPEN
+
       webSocket.send = sinon.stub()
     })
 
     after(() => {
-      window['WebSocket'] = ORIGINAL_WEB_SOCKET
+      ;(window as any)['WebSocket'] = ORIGINAL_WEB_SOCKET
     })
 
     describe('coordinator messages', () => {
       it('welcome', async () => {
         const msg = new WelcomeMessage()
         msg.setType(MessageType.WELCOME)
-        msg.setAlias('client1')
-        msg.setAvailableServersList(['server1'])
+        msg.setAlias(1)
+        msg.setAvailableServersList([1])
 
-        await webSocket.onmessage({ data: msg.serializeBinary() })
+        const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
+        await worldConn.ws!.onmessage!(event)
 
-        expect(worldConn.alias).to.equal('client1')
+        expect(worldConn.alias).to.equal('1')
 
-        expect(webSocket.send).to.have.been.calledWithMatch((bytes) => {
+        expect(webSocket.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
           const msgType = ConnectMessage.deserializeBinary(bytes).getType()
           expect(msgType).to.equal(MessageType.CONNECT)
           return true
@@ -111,115 +130,117 @@ describe('Communications', function() {
       it('webrtc ice candidate (from unknown peer)', async () => {
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
-        msg.setFromAlias('server2')
+        msg.setFromAlias(1)
 
-        await webSocket.onmessage({ data: msg.serializeBinary() })
+        const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
+        await worldConn.ws!.onmessage!(event)
 
-        expect(worldConn.webRtcConn.addIceCandidate).to.not.have.been.called
+        expect(worldConn.webRtcConn!.addIceCandidate).to.not.have.been.called
       })
 
       it('webrtc ice candidate', async () => {
-        worldConn.commServerAlias = 'server1'
+        worldConn.commServerAlias = 1
+        const sdp = 'candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8'
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
-        msg.setFromAlias('server1')
-        msg.setSdp('sdp')
+        msg.setFromAlias(1)
+        msg.setSdp(sdp)
 
-        await webSocket.onmessage({ data: msg.serializeBinary() })
+        const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
+        await worldConn.ws!.onmessage!(event)
 
-        expect(worldConn.webRtcConn.addIceCandidate).to.have.been.calledWith('sdp')
+        expect(worldConn.webRtcConn!.addIceCandidate).to.have.been.calledWith({ candidate: sdp })
       })
 
       it('webrtc offer', async () => {
-        worldConn.commServerAlias = 'server1'
+        worldConn.commServerAlias = 1
 
-        const answer = { sdp: "answer-sdp" }
-        worldConn.webRtcConn.createAnswer.resolves(answer)
+        const answer = { sdp: 'answer-sdp' }
+
+        mockWebRtc.createAnswer.resolves(answer)
 
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_OFFER)
-        msg.setFromAlias('server1')
+        msg.setFromAlias(1)
         msg.setSdp('sdp')
 
-        await webSocket.onmessage({ data: msg.serializeBinary() })
+        const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
+        await worldConn.ws!.onmessage!(event)
 
-        expect(worldConn.webRtcConn.setRemoteDescription).to.have.been.calledWithMatch((desc) => {
-          expect(desc.type).to.be.equal('offer')
-          expect(desc.sdp).to.be.equal('sdp')
-          return true
-        })
+        expect(worldConn.webRtcConn!.setRemoteDescription).to.have.been.calledWithMatch(
+          (desc: RTCSessionDescription) => {
+            expect(desc.type).to.be.equal('offer')
+            expect(desc.sdp).to.be.equal('sdp')
+            return true
+          }
+        )
 
-        expect(worldConn.webRtcConn.createAnswer).to.have.been.called
-        expect(worldConn.webRtcConn.setLocalDescription).to.have.been.calledWith(answer)
+        expect(worldConn.webRtcConn!.createAnswer).to.have.been.called
+        expect(worldConn.webRtcConn!.setLocalDescription).to.have.been.calledWith(answer)
 
-        expect(webSocket.send).to.have.been.calledWithMatch((bytes) => {
+        expect(webSocket.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ANSWER)
           expect(msg.getSdp()).to.equal(answer.sdp)
-          expect(msg.getToAlias()).to.equal('server1')
+          expect(msg.getToAlias()).to.equal(1)
           return true
         })
       })
 
       it('webrtc answer', async () => {
-        worldConn.commServerAlias = 'server1'
+        worldConn.commServerAlias = 1
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ANSWER)
-        msg.setFromAlias('server1')
+        msg.setFromAlias(1)
         msg.setSdp('sdp')
-
-        await webSocket.onmessage({ data: msg.serializeBinary() })
-
-        expect(worldConn.webRtcConn.setRemoteDescription).to.have.been.calledWithMatch((desc) => {
-          expect(desc.type).to.be.equal('answer')
-          expect(desc.sdp).to.be.equal('sdp')
-          return true
-        })
+        const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
+        await worldConn.ws!.onmessage!(event)
+        expect(worldConn.webRtcConn!.setRemoteDescription).to.have.been.calledWithMatch(
+          (desc: RTCSessionDescription) => {
+            expect(desc.type).to.be.equal('answer')
+            expect(desc.sdp).to.be.equal('sdp')
+            return true
+          }
+        )
       })
     })
 
     describe('webrtc', () => {
       it('onicecandidate', () => {
-        worldConn.commServerAlias = 'server1'
-        const event = {
-          candidate: {
-            candidate: 'candidate-sdp'
-          }
-        }
-        worldConn.webRtcConn.onicecandidate(event)
+        worldConn.commServerAlias = 1
 
-        expect(webSocket.send).to.have.been.calledWithMatch((bytes) => {
+        const sdp = 'candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8'
+        const candidate = new RTCIceCandidate({ candidate: sdp })
+        const event = new RTCPeerConnectionIceEvent('icecandidate', { candidate })
+        worldConn.webRtcConn!.onicecandidate!(event)
+        expect(webSocket.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ICE_CANDIDATE)
-          expect(msg.getToAlias()).to.equal('server1')
-          expect(msg.getSdp()).to.equal('candidate-sdp')
+          expect(msg.getToAlias()).to.equal(1)
+          expect(msg.getSdp()).to.equal(sdp)
           return true
         })
       })
 
       describe('reliable data channel', () => {
-        let channel
+        let channel: any
 
         beforeEach(() => {
-          worldConn.commServerAlias = 'server1'
-          channel = {
-            send: sinon.stub(),
-            label: 'reliable'
-          }
-
-          const event = { channel }
-
-          worldConn.webRtcConn.ondatachannel(event)
+          worldConn.commServerAlias = 1
+          channel = Object.defineProperties(new RTCPeerConnection().createDataChannel('reliable'), {
+            readyState: { value: 'open' },
+            send: { value: sinon.stub() }
+          })
+          const event = new RTCDataChannelEvent('datachannel', { channel })
+          worldConn.webRtcConn!.ondatachannel!(event)
 
           channel['onopen']()
-
         })
 
         it('register datachannel', () => {
           expect(worldConn.reliableDataChannel).to.equal(channel)
           expect(worldConn.authenticated).to.be.true
-
-          expect(channel.send).to.have.been.calledWithMatch((bytes) => {
+          expect(channel.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
             const msg = AuthMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.AUTH)
             expect(msg.getRole()).to.equal(Role.CLIENT)
@@ -228,27 +249,61 @@ describe('Communications', function() {
           })
         })
 
-        it('receive topic message, no handler registered', () => {
-          const msg = new TopicMessage()
-          msg.setType(MessageType.TOPIC)
-          msg.setFromAlias('client2')
-          msg.setTopic('topic1')
+        it('receive position data message', () => {
+          worldConn.positionHandler = sinon.stub()
+
+          const body = new PositionData()
+          body.setCategory(Category.POSITION)
+          body.setTime(Date.now())
+
+          const bodyEncoded = body.serializeBinary()
+
+          const msg = new DataMessage()
+          msg.setType(MessageType.DATA)
+          msg.setFromAlias(1)
+          msg.setBody(bodyEncoded)
 
           const e = { data: msg.serializeBinary() }
           channel.onmessage(e)
+          expect(worldConn.positionHandler).to.have.been.calledWith('1', body)
         })
 
-        it('receive topic message, handler registered', () => {
-          const handler = sinon.stub()
-          worldConn.subscriptions.set('topic1', handler)
-          const msg = new TopicMessage()
-          msg.setType(MessageType.TOPIC)
-          msg.setFromAlias('client2')
-          msg.setTopic('topic1')
+        it('receive profile data message', () => {
+          worldConn.profileHandler = sinon.stub()
+
+          const body = new ProfileData()
+          body.setCategory(Category.PROFILE)
+          body.setTime(Date.now())
+
+          const bodyEncoded = body.serializeBinary()
+
+          const msg = new DataMessage()
+          msg.setType(MessageType.DATA)
+          msg.setFromAlias(1)
+          msg.setBody(bodyEncoded)
 
           const e = { data: msg.serializeBinary() }
           channel.onmessage(e)
-          expect(handler).to.have.been.calledWith('client2')
+          expect(worldConn.profileHandler).to.have.been.calledWith('1', body)
+        })
+
+        it('receive chat data message', () => {
+          worldConn.chatHandler = sinon.stub()
+
+          const body = new ChatData()
+          body.setCategory(Category.CHAT)
+          body.setTime(Date.now())
+
+          const bodyEncoded = body.serializeBinary()
+
+          const msg = new DataMessage()
+          msg.setType(MessageType.DATA)
+          msg.setFromAlias(1)
+          msg.setBody(bodyEncoded)
+
+          const e = { data: msg.serializeBinary() }
+          channel.onmessage(e)
+          expect(worldConn.chatHandler).to.have.been.calledWith('1', body)
         })
 
         it('receive ping message', () => {
@@ -263,16 +318,15 @@ describe('Communications', function() {
       })
 
       it('register datachannel (unreliable)', () => {
-        worldConn.commServerAlias = 'server1'
-        const channel = {
-          send: sinon.stub(),
-          label: 'unreliable'
-        }
+        worldConn.commServerAlias = 1
 
-        const event = { channel }
+        const channel = Object.defineProperties(new RTCPeerConnection().createDataChannel('unreliable'), {
+          readyState: { value: 'open' },
+          send: { value: sinon.stub() }
+        })
 
-        worldConn.webRtcConn.ondatachannel(event)
-
+        const event = new RTCDataChannelEvent('datachannel', { channel })
+        worldConn.webRtcConn!.ondatachannel!(event)
         channel['onopen']()
 
         expect(worldConn.unreliableDataChannel).to.equal(channel)
@@ -282,24 +336,18 @@ describe('Communications', function() {
       describe('outbound messages', () => {
         beforeEach(() => {
           worldConn.reliableDataChannel = {
+            readyState: 'open',
             send: sinon.stub()
           }
           worldConn.unreliableDataChannel = {
+            readyState: 'open',
             send: sinon.stub()
           }
         })
 
         it('topic subscriptions', () => {
-          const handler = (fromAlias: string, data:Uint8Array): PkgStats | null => {
-            return null
-          }
-          const subscriptions = new Map<string, TopicHandler>()
-          subscriptions.set('topic1', handler)
-          subscriptions.set('topic2', handler)
-          worldConn.updateSubscriptions(subscriptions, 'topic1 topic2')
-
-          expect(worldConn.subscriptions).to.equal(subscriptions)
-          expect(worldConn.reliableDataChannel.send).to.have.been.calledWithMatch((bytes) => {
+          worldConn.updateSubscriptions('topic1 topic2')
+          expect(worldConn.reliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
             const msg = TopicSubscriptionMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.TOPIC_SUBSCRIPTION)
             expect(msg.getFormat()).to.equal(Format.PLAIN)
@@ -309,10 +357,11 @@ describe('Communications', function() {
         })
 
         it('position', () => {
-          const p = [ 20, 20, 20, 20, 20, 20, 20 ]
+          const p = [20, 20, 20, 20, 20, 20, 20] as Position
+
           worldConn.sendPositionMessage(p)
 
-          expect(worldConn.unreliableDataChannel.send).to.have.been.calledWithMatch((bytes) => {
+          expect(worldConn.unreliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
             const msg = TopicMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.TOPIC)
             expect(msg.getTopic()).to.equal('position:37:37')
@@ -330,7 +379,7 @@ describe('Communications', function() {
         })
 
         it('profile', () => {
-          const p = [ 20, 20, 20, 20, 20, 20, 20 ]
+          const p = [20, 20, 20, 20, 20, 20, 20] as Position
           const profile = {
             displayName: 'testname',
             publicKey: 'pubkey',
@@ -338,7 +387,7 @@ describe('Communications', function() {
           }
           worldConn.sendProfileMessage(p, profile)
 
-          expect(worldConn.reliableDataChannel.send).to.have.been.calledWithMatch((bytes) => {
+          expect(worldConn.reliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
             const msg = TopicMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.TOPIC)
             expect(msg.getTopic()).to.equal('profile:37:37')
@@ -352,12 +401,11 @@ describe('Communications', function() {
         })
 
         it('chat', () => {
-          const p = [ 20, 20, 20, 20, 20, 20, 20 ]
+          const p = [20, 20, 20, 20, 20, 20, 20] as Position
           const messageId = 'chat1'
           const text = 'hello'
           worldConn.sendChatMessage(p, messageId, text)
-
-          expect(worldConn.reliableDataChannel.send).to.have.been.calledWithMatch((bytes) => {
+          expect(worldConn.reliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
             const msg = TopicMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.TOPIC)
             expect(msg.getTopic()).to.equal('chat:37:37')
@@ -374,22 +422,19 @@ describe('Communications', function() {
 
   describe('topic handlers', () => {
     it('chat handler', () => {
-        const context = new Context({})
-        const worldConn = new WorldInstanceConnection('coordinator')
-        const chatData = new ChatData()
-        chatData.setText('text')
-        chatData.setMessageId('chat1')
-        const bytes = chatData.serializeBinary()
-        processChatMessage(context, worldConn, 'client2', bytes)
+      const context = new Context({})
+      const chatData = new ChatData()
+      chatData.setText('text')
+      chatData.setMessageId('chat1')
+      processChatMessage(context, 'client2', chatData)
 
-        expect(context.peerData).to.have.key('client2')
-        expect(context.peerData.get('client2').receivedPublicChatMessages).to.have.key('chat1')
+      expect(context.peerData).to.have.key('client2')
+      expect(context.peerData.get('client2')!.receivedPublicChatMessages).to.have.key('chat1')
     })
 
     describe('position handler', () => {
       it('new position', () => {
         const context = new Context({})
-        const worldConn = new WorldInstanceConnection('coordinator')
         const positionData = new PositionData()
 
         positionData.setTime(Date.now())
@@ -401,11 +446,10 @@ describe('Communications', function() {
         positionData.setRotationZ(20)
         positionData.setRotationW(20)
 
-        const bytes = positionData.serializeBinary()
-        processPositionMessage(context, worldConn, 'client2', bytes)
+        processPositionMessage(context, 'client2', positionData)
 
         expect(context.peerData).to.have.key('client2')
-        const trackingInfo = context.peerData.get('client2')
+        const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
         expect(trackingInfo.position).to.deep.equal([20, 20, 20, 20, 20, 20, 20])
       })
 
@@ -415,7 +459,6 @@ describe('Communications', function() {
         info.lastPositionUpdate = Date.now()
         info.position = [20, 20, 20, 20, 20, 20, 20]
         context.peerData.set('client2', info)
-        const worldConn = new WorldInstanceConnection('coordinator')
         const positionData = new PositionData()
 
         positionData.setTime(new Date(2008).getTime())
@@ -427,11 +470,10 @@ describe('Communications', function() {
         positionData.setRotationZ(30)
         positionData.setRotationW(30)
 
-        const bytes = positionData.serializeBinary()
-        processPositionMessage(context, worldConn, 'client2', bytes)
+        processPositionMessage(context, 'client2', positionData)
 
         expect(context.peerData).to.have.key('client2')
-        const trackingInfo = context.peerData.get('client2')
+        const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
         expect(trackingInfo.position).to.deep.equal([20, 20, 20, 20, 20, 20, 20])
       })
     })
@@ -439,7 +481,6 @@ describe('Communications', function() {
     describe('profile handler', () => {
       it('new profile message', () => {
         const context = new Context({})
-        const worldConn = new WorldInstanceConnection('coordinator')
 
         const profileData = new ProfileData()
         profileData.setTime(Date.now())
@@ -447,11 +488,10 @@ describe('Communications', function() {
         profileData.setPublicKey('pubkey')
         profileData.setAvatarType('fox')
 
-        const bytes = profileData.serializeBinary()
-        processProfileMessage(context, worldConn, 'client2', bytes)
+        processProfileMessage(context, 'client2', profileData)
 
         expect(context.peerData).to.have.key('client2')
-        const trackingInfo = context.peerData.get('client2')
+        const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
         expect(trackingInfo.profile).to.deep.equal({
           displayName: 'testname',
           publicKey: 'pubkey',
@@ -471,7 +511,6 @@ describe('Communications', function() {
         info.lastProfileUpdate = Date.now()
         info.profile = profile
         context.peerData.set('client2', info)
-        const worldConn = new WorldInstanceConnection('coordinator')
 
         const profileData = new ProfileData()
         profileData.setTime(new Date(2008).getTime())
@@ -479,11 +518,10 @@ describe('Communications', function() {
         profileData.setPublicKey('pubkey')
         profileData.setAvatarType('fox')
 
-        const bytes = profileData.serializeBinary()
-        processProfileMessage(context, worldConn, 'client2', bytes)
+        processProfileMessage(context, 'client2', profileData)
 
         expect(context.peerData).to.have.key('client2')
-        const trackingInfo = context.peerData.get('client2')
+        const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
         expect(trackingInfo.profile).to.equal(profile)
       })
     })
@@ -494,7 +532,7 @@ describe('Communications', function() {
       it(`hash ${p[0]}:${p[2]}`, () => {
         const parcel = position2parcel(p)
         const hash = positionHash(p)
-        const [ x, z ] = hash.split(':').map((n) => parseInt(n, 10))
+        const [x, z] = hash.split(':').map(n => parseInt(n, 10))
 
         const unhashX = (x << 2) - parcelLimits.maxParcelX
         const unhashZ = (z << 2) - parcelLimits.maxParcelZ
@@ -508,17 +546,9 @@ describe('Communications', function() {
 
     function testHashByParcel(parcel: Parcel) {
       it(`parcel ${parcel.x}:${parcel.z}`, () => {
-          const p = [
-              parcel.x * parcelLimits.parcelSize,
-              0,
-              parcel.z * parcelLimits.parcelSize,
-              0,
-              0,
-              0,
-              0
-          ] as Position
+        const p = [parcel.x * parcelLimits.parcelSize, 0, parcel.z * parcelLimits.parcelSize, 0, 0, 0, 0] as Position
         const hash = positionHash(p)
-        const [ x, z ] = hash.split(':').map((n) => parseInt(n, 10))
+        const [x, z] = hash.split(':').map(n => parseInt(n, 10))
 
         const unhashX = (x << 2) - 150
         const unhashZ = (z << 2) - 150
@@ -547,32 +577,33 @@ describe('Communications', function() {
     testHashByParcel(new Parcel(-1, -1))
     testHashByParcel(new Parcel(-1, 0))
     testHashByParcel(new Parcel(-1, 1))
-    testHashByParcel(new Parcel( 0, -1))
-    testHashByParcel(new Parcel( 0, 0))
-    testHashByParcel(new Parcel( 0, 1))
-    testHashByParcel(new Parcel( 1, -1))
-    testHashByParcel(new Parcel( 1, 0))
-    testHashByParcel(new Parcel( 1, 1))
+    testHashByParcel(new Parcel(0, -1))
+    testHashByParcel(new Parcel(0, 0))
+    testHashByParcel(new Parcel(0, 1))
+    testHashByParcel(new Parcel(1, -1))
+    testHashByParcel(new Parcel(1, 0))
+    testHashByParcel(new Parcel(1, 1))
   })
 
   describe('onPositionUpdate', () => {
     it('parcel has changed', () => {
       const context = new Context({})
       context.commRadius = 1
-      context.currentPosition = [ 20, 20, 20, 20, 20, 20, 20 ]
+      context.currentPosition = [20, 20, 20, 20, 20, 20, 20] as Position
       const worldConn = new WorldInstanceConnection('coordinator')
-      worldConn.reliableDataChannel = { send: sinon.stub() }
-      worldConn.unreliableDataChannel = { send: sinon.stub() }
+      worldConn.reliableDataChannel = { readyState: 'open', send: sinon.stub() }
+      worldConn.unreliableDataChannel = { readyState: 'open', send: sinon.stub() }
       worldConn.updateSubscriptions = sinon.stub()
       context.worldInstanceConnection = worldConn
 
-      onPositionUpdate(context, [ 0, 0, 0, 0, 0, 0, 0 ])
+      onPositionUpdate(context, [0, 0, 0, 0, 0, 0, 0])
 
-      expect(worldConn.updateSubscriptions).to.have.been.calledWithMatch((subscriptions) => {
-        expect(subscriptions).to.have.length(3)
+      expect(worldConn.updateSubscriptions).to.have.been.calledWithMatch((rawTopics: string) => {
+        expect(rawTopics.split(' ')).to.have.length(3)
         return true
-      }, (rawTopics) => {
-        expect(rawTopics.split(" ")).to.have.length(3)
+      })
+      expect(worldConn.updateSubscriptions).to.have.been.calledWithMatch((rawTopics: string) => {
+        expect(rawTopics.split(' ')).to.have.length(3)
         return true
       })
     })
@@ -580,10 +611,10 @@ describe('Communications', function() {
     it('parcel has not changed', () => {
       const context = new Context({})
       context.commRadius = 1
-      context.currentPosition = [ 20, 20, 20, 20, 20, 20, 20 ]
+      context.currentPosition = [20, 20, 20, 20, 20, 20, 20] as Position
       const worldConn = new WorldInstanceConnection('coordinator')
-      worldConn.reliableDataChannel = { send: sinon.stub() }
-      worldConn.unreliableDataChannel = { send: sinon.stub() }
+      worldConn.reliableDataChannel = { readyState: 'open', send: sinon.stub() }
+      worldConn.unreliableDataChannel = { readyState: 'open', send: sinon.stub() }
       worldConn.updateSubscriptions = sinon.stub()
       context.worldInstanceConnection = worldConn
 
