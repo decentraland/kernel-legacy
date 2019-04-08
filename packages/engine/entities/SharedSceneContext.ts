@@ -16,8 +16,7 @@ import {
   ComponentUpdatedPayload,
   CreateEntityPayload,
   RemoveEntityPayload,
-  SetEntityParentPayload,
-  SceneCreatedPayload
+  SetEntityParentPayload
 } from 'shared/types'
 
 import { ILogger, defaultLogger } from 'shared/logger'
@@ -27,7 +26,6 @@ import { measureObject3D } from './utils/checkParcelSceneLimits'
 import { IEventNames, IEvents, PointerEvent } from 'decentraland-ecs/src/decentraland/Types'
 import { Observable, ReadOnlyVector3 } from 'decentraland-ecs/src'
 import { colliderMaterial } from './utils/colliders'
-import future from 'fp-future'
 
 function validateHierarchy(entity: BaseEntity) {
   let parent: BaseEntity = entity
@@ -85,8 +83,6 @@ export class SharedSceneContext implements BABYLON.IDisposable {
 
   public readonly internalBaseUrl: string
   public onDisposeObservable = new Observable<SharedSceneContext>()
-
-  public readonly sceneCreated = future<SceneCreatedPayload>()
 
   private _disposed = false
   private eventSubscriber = new EventDispatcher()
@@ -173,11 +169,6 @@ export class SharedSceneContext implements BABYLON.IDisposable {
 
   emit<T extends IEventNames>(event: T, data: IEvents[T]) {
     this.eventSubscriber.emit(event, data)
-  }
-
-  /// #ECS.SceneCreated: The initial execution of the scene has ended.
-  SceneCreated(payload: SceneCreatedPayload) {
-    this.sceneCreated.resolve(payload)
   }
 
   /// #ECS.UpdateEntityComponent: Updates an ephemeral component C by Name in the entity E

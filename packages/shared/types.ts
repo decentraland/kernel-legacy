@@ -48,12 +48,10 @@ export type EntityActionType =
   | 'ComponentDisposed'
   | 'ComponentRemoved'
   | 'ComponentUpdated'
-  | 'SceneCreated'
 
 export type CreateEntityPayload = { id: string }
 
 export type RemoveEntityPayload = { id: string }
-export type SceneCreatedPayload = {}
 
 export type SetEntityParentPayload = {
   entityId: string

@@ -370,11 +370,6 @@ export default class GamekitScene extends Script {
       try {
         await customEval((source as any) as string, getES5Context({ dcl }))
 
-        this.events.push({
-          type: 'SceneCreated',
-          payload: '{}'
-        })
-
         if (!this.manualUpdate) {
           this.startLoop()
         }

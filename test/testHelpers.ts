@@ -154,9 +154,6 @@ async function initHud() {
 
   const hudScene = await initHudSystem()
   const system = await hudScene.worker!.system
-
-  await hudScene.context.sceneCreated
-
   const socialController = system.getAPIInstance(EngineAPI)
 
   attempts = 0
@@ -370,7 +367,6 @@ export function loadTestParcel(
       system.getAPIInstance(EngineAPI)
 
       await sleep(100)
-      await webGLParcelScene!.context.sceneCreated
 
       await waitToBeLoaded(webGLParcelScene!.context.rootEntity)
     })
@@ -537,8 +533,6 @@ export function testScene(
       while (!sceneHost.didStart) {
         await sleep(10)
       }
-
-      await parcelScene.context.sceneCreated
     })
 
     try {
