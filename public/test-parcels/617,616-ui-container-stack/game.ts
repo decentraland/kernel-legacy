@@ -1,3 +1,11 @@
+import {
+  UIScreenSpaceShape,
+  Color3,
+  UIContainerStackShape,
+  UIContainerRectShape,
+  UIImageShape
+} from 'decentraland-ecs/src'
+
 const ui = new UIScreenSpaceShape()
 
 const stackContainer = new UIContainerStackShape(ui)
