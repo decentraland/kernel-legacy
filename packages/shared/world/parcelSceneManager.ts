@@ -1,4 +1,4 @@
-import * as qs from 'query-string'
+const qs = require('query-string')
 
 import { initParcelSceneWorker } from '../../decentraland-loader/worker'
 import { ETHEREUM_NETWORK } from '../../config'

@@ -18,7 +18,9 @@ export async function loadClient(net: ETHEREUM_NETWORK) {
     onSpawnpoint: initialLand => {
       const newPosition = getWorldSpawnpoint(initialLand)
       const result = new BABYLON.Vector3(newPosition.x, newPosition.y, newPosition.z)
-      scene.activeCamera.position.copyFrom(result)
+      if (scene.activeCamera) {
+        scene.activeCamera.position.copyFrom(result)
+      }
     },
     shouldLoadParcelScene: () => true
   })
@@ -51,7 +53,7 @@ bodyReadyFuture
   })
   .catch(handleError)
 
-function handleError(e) {
+function handleError(e: Error) {
   document.body.classList.remove('dcl-loading')
   document.body.innerHTML = `<h3>${e.message}</h3>`
 }

@@ -95,7 +95,7 @@ function getSpawnpoint(land: ILand) {
     return
   }
 
-  return land.scene['policy'].teleportPosition
+  return (land.scene as any).policy.teleportPosition
 }
 
 export function getLandBase(land: ILand): { x: number; y: number } {
