@@ -9,7 +9,7 @@ import {
   UIContainerRectShape,
   UIFullScreenShape,
   UIShape,
-  UIStackType
+  UIStackOrientation
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -206,7 +206,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
 
   const stack = new UIContainerStackShape(parent)
-  stack.stackType = UIStackType.HORIZONTAL
+  stack.stackOrientation = UIStackOrientation.HORIZONTAL
   stack.hAlign = 'left'
   stack.vAlign = 'bottom'
   stack.height = 30

@@ -116,7 +116,7 @@ export class UIContainerRectShape extends UIShape {
 /**
  * @public
  */
-export enum UIStackType {
+export enum UIStackOrientation {
   VERTICAL,
   HORIZONTAL
 }
@@ -139,7 +139,7 @@ export class UIContainerStackShape extends UIShape {
   color: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  stackType: UIStackType = UIStackType.VERTICAL
+  stackOrientation: UIStackOrientation = UIStackOrientation.VERTICAL
 }
 
 /**

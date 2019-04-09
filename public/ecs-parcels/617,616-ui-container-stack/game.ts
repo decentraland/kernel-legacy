@@ -5,7 +5,6 @@ stackContainer.id = 'testContainerStack'
 stackContainer.color = Color3.Green()
 stackContainer.width = '50%'
 stackContainer.height = '50%'
-// stackContainer.stackType = UIStackType.HORIZONTAL
 
 const panel1 = new UIContainerRectShape(stackContainer)
 panel1.id = 'testContainerRect1'
