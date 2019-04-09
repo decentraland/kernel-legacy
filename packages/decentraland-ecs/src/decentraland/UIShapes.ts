@@ -16,7 +16,7 @@ export abstract class UIShape extends ObservableComponent {
   visible: boolean = true
 
   @ObservableComponent.field
-  opacity: number = 0
+  opacity: number = 1
 
   @ObservableComponent.field
   zIndex: number = 0

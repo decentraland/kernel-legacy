@@ -1,6 +1,5 @@
 import { UIScreenSpaceShape, UIContainerRectShape, Color3, UIInputTextShape, OnTextSubmit, log } from 'decentraland-ecs/src'
 
-
 const ui = new UIScreenSpaceShape()
 
 const container = new UIContainerRectShape(ui)
