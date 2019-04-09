@@ -8,7 +8,8 @@ import {
   UISliderShape,
   UIContainerRectShape,
   UIFullScreenShape,
-  UIShape
+  UIShape,
+  UIStackType
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -32,7 +33,6 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-
   const component = new UIImageShape(parent, UI_CHAT)
 
   component.id = 'minimize-icon'
@@ -206,7 +206,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
 
   const stack = new UIContainerStackShape(parent)
-  stack.vertical = false
+  stack.stackType = UIStackType.HORIZONTAL
   stack.hAlign = 'left'
   stack.vAlign = 'bottom'
   stack.height = 30

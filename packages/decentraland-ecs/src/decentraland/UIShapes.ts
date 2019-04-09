@@ -114,6 +114,14 @@ export class UIContainerRectShape extends UIShape {
 }
 
 /**
+ * @public
+ */
+export enum UIStackType {
+  VERTICAL,
+  HORIZONTAL
+}
+
+/**
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_STACK)
@@ -131,7 +139,7 @@ export class UIContainerStackShape extends UIShape {
   color: Color3 = Color3.Black()
 
   @ObservableComponent.field
-  vertical: boolean = true
+  stackType: UIStackType = UIStackType.VERTICAL
 }
 
 /**
