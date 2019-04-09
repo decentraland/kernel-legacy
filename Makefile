@@ -67,7 +67,7 @@ test-docker:
 		-v "$(PWD):/usr/src/app" \
 		-w /usr/src/app \
 		-e SINGLE_RUN=true \
-		circleci/node:8-browsers \
+		circleci/node:10-browsers \
 	 		node ./scripts/createMockJson.js
 	docker run \
 		-it \
@@ -76,7 +76,7 @@ test-docker:
 		-v "$(PWD):/usr/src/app" \
 		-w /usr/src/app \
 		-e SINGLE_RUN=true \
-		circleci/node:8-browsers \
+		circleci/node:10-browsers \
 	 		node ./scripts/test.js
 
 test-ci:
@@ -99,7 +99,7 @@ generate-images:
 		-e SINGLE_RUN=true \
 		-e GENERATE_NEW_IMAGES=true \
 		-p 8080:8080 \
-		circleci/node:8-browsers \
+		circleci/node:10-browsers \
 			make generate-images-local
 	$(MAKE) generate-mocks
 
@@ -107,7 +107,8 @@ generate-mocks:
 	$(NODE) ./scripts/createMockJson.js
 
 lint:
-	node_modules/.bin/madge packages/entryPoints/index.ts --circular
+	node_modules/.bin/madge packages/entryPoints/index.ts --circular --warning
+	node_modules/.bin/madge packages --orphans --extensions ts --exclude '.+\.d.ts|.+/dist\/.+'
 	node_modules/.bin/tslint --project tsconfig.json
 
 lint-fix:

@@ -1,4 +1,8 @@
-type GameInstance = { SendMessage(object: string, method: string, ...args: (number | string)[]) }
+declare var window: any
+
+type GameInstance = {
+  SendMessage(object: string, method: string, ...args: (number | string)[]): void
+}
 
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 
@@ -7,15 +11,17 @@ import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParc
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
-import { SceneWorker, ParcelSceneAPI } from '../shared/world/SceneWorker'
 import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
+import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
+import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 
 import { DEBUG } from '../config'
 
-let gameInstance: GameInstance = null
+let gameInstance!: GameInstance
 const preloadedScenes = new Set<string>()
 
 const positionEvent = {
@@ -55,6 +61,16 @@ const unityInterface = {
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
+  CreateUIScene(data: { id: string }) {
+    // TODO: Implement this function in unity
+    /**
+     * UI Scenes are scenes that does not check any limit or boundary. The
+     * position is fixed at 0,0 and they are universe-wide. An example of this
+     * kind of scenes is the Avatar scene. All the avatars are just GLTFs in
+     * a scene.
+     */
+    gameInstance.SendMessage('SceneController', 'CreateUIScene', JSON.stringify(data))
+  },
   /** Sends the camera position to the engine */
   SetPosition(x: number, y: number, z: number) {
     let theY = y <= 0 ? 2 : y
@@ -65,19 +81,18 @@ const unityInterface = {
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
     const parcelScenes = JSON.stringify({ parcelsToLoad })
     if (parcelScenes !== lastParcelScenesSent) {
-
       lastParcelScenesSent = parcelScenes
-      let finalJson: string = "";
+      let finalJson: string = ''
 
-      //NOTE(Brian): split json to be able to throttle the json parsing process in engine's side
+      // NOTE(Brian): split json to be able to throttle the json parsing process in engine's side
       for (let i = 0; i < parcelsToLoad.length; i++) {
         const parcel = parcelsToLoad[i]
         const json = JSON.stringify(parcel)
 
-        finalJson += json;
+        finalJson += json
 
         if (i < parcelsToLoad.length - 1) {
-          finalJson += "}{"
+          finalJson += '}{'
         }
       }
 
@@ -101,14 +116,14 @@ window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class UnityParcelScene implements ParcelSceneAPI {
+class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
-  worker: SceneWorker
+  worker!: SceneWorker
   unitySceneId: string
   logger: ILogger
 
-  constructor(public data: EnvironmentData<LoadableParcelScene>) {
-    this.unitySceneId = data.data.id
+  constructor(public id: string, public data: EnvironmentData<T>) {
+    this.unitySceneId = id
     this.logger = createLogger(this.unitySceneId + ': ')
   }
 
@@ -121,15 +136,6 @@ class UnityParcelScene implements ParcelSceneAPI {
 
   registerWorker(worker: SceneWorker): void {
     this.worker = worker
-
-    this.worker.system
-      .then(system => {
-        system.getAPIInstance(DevTools).logger = this.logger
-
-        const parcelIdentity = system.getAPIInstance(ParcelIdentity)
-        parcelIdentity.land = this.data.data.land
-      })
-      .catch(e => this.logger.error('Error initializing system', e))
   }
 
   dispose(): void {
@@ -145,6 +151,25 @@ class UnityParcelScene implements ParcelSceneAPI {
   }
 }
 
+class UnityParcelScene extends UnityScene<LoadableParcelScene> {
+  constructor(public data: EnvironmentData<LoadableParcelScene>) {
+    super(data.data.id, data)
+  }
+
+  registerWorker(worker: SceneWorker): void {
+    super.registerWorker(worker)
+
+    this.worker.system
+      .then(system => {
+        system.getAPIInstance(DevTools).logger = this.logger
+
+        const parcelIdentity = system.getAPIInstance(ParcelIdentity)
+        parcelIdentity.land = this.data.data.land
+      })
+      .catch(e => this.logger.error('Error initializing system', e))
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 export async function initializeEngine(_gameInstance: GameInstance) {
@@ -156,6 +181,8 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (DEBUG) {
     unityInterface.SetDebug()
   }
+
+  await initializeDecentralandUI()
 
   await enableParcelSceneLoading(net, {
     parcelSceneClass: UnityParcelScene,
@@ -183,11 +210,30 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   return {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
-        browserInterface[type](message)
+        // tslint:disable-next-line:semicolon
+        ;(browserInterface as any)[type](message)
       } else {
         // tslint:disable-next-line:no-console
         console.log('MessageFromEngine', type, message)
       }
     }
   }
+}
+
+async function initializeDecentralandUI() {
+  const id = 'dcl-ui-scene'
+
+  const scene = new UnityScene(id, {
+    baseUrl: location.origin,
+    main: hudWorkerUrl,
+    data: {},
+    id,
+    mappings: []
+  })
+
+  const worker = new SceneWorker(scene)
+
+  await ensureUiApis(worker)
+
+  unityInterface.CreateUIScene({ id: scene.unitySceneId })
 }

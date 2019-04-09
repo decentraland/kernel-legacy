@@ -3,8 +3,10 @@ import { BaseEntity } from '../../entities/BaseEntity'
 import { validators } from '../helpers/schemaValidator'
 import { scene } from '../../renderer'
 import { probe } from '../../renderer/ambientLights'
-import { CLASS_ID, Observer } from 'decentraland-ecs/src'
+import { CLASS_ID } from 'decentraland-ecs/src'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
+import { Texture } from './Texture'
+import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 
 const defaults = {
   alpha: 1,
@@ -32,13 +34,12 @@ const defaults = {
 
 export class PBRMaterial extends DisposableComponent {
   material: BABYLON.PBRMaterial
-  meshObserver: Observer<{ type: string; object: BABYLON.TransformNode }>
+  loadingDonePrivate: boolean = false
 
-  constructor(ctx, uuid) {
+  constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
     this.material = new BABYLON.PBRMaterial('#' + this.uuid, scene)
     this.contributions.materials.add(this.material)
-    this.loadingDone = false
   }
 
   updateMeshMaterial = (mesh: BABYLON.Mesh) => {
@@ -51,9 +52,9 @@ export class PBRMaterial extends DisposableComponent {
     mesh.material = null
   }
 
-  meshObserverCallback = ({ type, object }) => {
+  meshObserverCallback = ({ type, object }: { type: string; object: BABYLON.TransformNode | null }) => {
     if (type === BasicShape.nameInEntity) {
-      this.updateMeshMaterial(object)
+      this.updateMeshMaterial(object as any)
     }
   }
 
@@ -78,7 +79,7 @@ export class PBRMaterial extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    this.loadingDone = false
+    this.loadingDonePrivate = false
     const m = this.material
 
     m.albedoColor.copyFrom(validators.color(data.albedoColor, defaults.albedoColor))
@@ -133,67 +134,48 @@ export class PBRMaterial extends DisposableComponent {
     }
 
     if (data.albedoTexture) {
-      const src = validators.string(data.albedoTexture, defaults.albedoTexture)
-      if (src) {
-        const texture = await this.context.getTexture(src)
+      const texture = await Texture.getFromComponent(this.context, data.albedoTexture)
 
-        if (texture) {
-          m.albedoTexture = texture
-        }
+      if (texture) {
+        m.albedoTexture = texture
       }
     }
 
     if ('hasAlpha' in data) {
       m.useAlphaFromAlbedoTexture = validators.boolean(data.hasAlpha, defaults.hasAlpha)
-
-      if (m.albedoTexture) {
-        m.albedoTexture.hasAlpha = m.useAlphaFromAlbedoTexture
-      }
     }
 
     if (data.albedoTexture === data.alphaTexture) {
       m.opacityTexture = m.albedoTexture
     } else if (data.alphaTexture) {
-      const src = validators.string(data.alphaTexture, defaults.alphaTexture)
-      if (src) {
-        const texture = await this.context.getTexture(src)
+      const texture = await Texture.getFromComponent(this.context, data.alphaTexture)
 
-        if (texture) {
-          m.opacityTexture = texture
-        }
+      if (texture) {
+        m.opacityTexture = texture
       }
     }
 
     if (data.emissiveTexture) {
-      const src = validators.string(data.emissiveTexture, defaults.emissiveTexture)
-      if (src) {
-        const texture = await this.context.getTexture(src)
+      const texture = await Texture.getFromComponent(this.context, data.emissiveTexture)
 
-        if (texture) {
-          m.emissiveTexture = texture
-        }
+      if (texture) {
+        m.emissiveTexture = texture
       }
     }
 
     if (data.bumpTexture) {
-      const src = validators.string(data.bumpTexture, defaults.bumpTexture)
-      if (src) {
-        const texture = await this.context.getTexture(src)
+      const texture = await Texture.getFromComponent(this.context, data.bumpTexture)
 
-        if (texture) {
-          m.bumpTexture = texture
-        }
+      if (texture) {
+        m.bumpTexture = texture
       }
     }
 
     if (data.refractionTexture) {
-      const src = validators.string(data.refractionTexture, defaults.refractionTexture)
-      if (src) {
-        const texture = await this.context.getTexture(src)
+      const texture = await Texture.getFromComponent(this.context, data.refractionTexture)
 
-        if (texture) {
-          m.refractionTexture = texture
-        }
+      if (texture) {
+        m.refractionTexture = texture
       }
     }
 
@@ -207,9 +189,13 @@ export class PBRMaterial extends DisposableComponent {
     m.emissiveTexture && this.contributions.textures.add(m.emissiveTexture)
     m.refractionTexture && this.contributions.textures.add(m.refractionTexture)
 
-    this.loadingDone = true
+    this.loadingDonePrivate = true
 
     deleteUnusedTextures()
+  }
+
+  loadingDone() {
+    return this.loadingDonePrivate
   }
 }
 

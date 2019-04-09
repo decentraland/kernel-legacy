@@ -215,30 +215,12 @@ declare class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  texture: string
+  texture?: Texture
   /**
    * A number between 0 and 1.
    * Any pixel with an alpha lower than this value will be shown as transparent.
    */
   alphaTest: number
-  /**
-   * Enables crisper images based on the provided sampling mode.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | NEAREST   |
-   * |     2 | BILINEAR  |
-   * |     3 | TRILINEAR |
-   */
-  samplingMode: number
-  /**
-   * Enables texture wrapping for this material.
-   * | Value | Type      |
-   * |-------|-----------|
-   * |     1 | CLAMP     |
-   * |     2 | WRAP      |
-   * |     3 | MIRROR    |
-   */
-  wrap: number
 }
 
 /**
@@ -597,7 +579,11 @@ declare class Color3 {
   /**
    * Serializes Color3
    */
-  toJSON(): string
+  toJSON(): {
+    r: number
+    g: number
+    b: number
+  }
 }
 
 /**
@@ -1162,14 +1148,14 @@ declare class Engine {
   readonly disposableComponents: Readonly<Record<string, DisposableComponentLike>>
   constructor()
   addEntity(entity: Entity): void
-  removeEntity(entity: Entity, removeChildren?: boolean, newParent?: Entity): void
+  removeEntity(entity: Entity): void
   addSystem(system: ISystem, priority?: number): void
   removeSystem(system: ISystem): void
   update(dt: number): void
   getEntitiesWithComponent(component: string): Record<string, any>
   getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, Entity>
   registerComponent(component: DisposableComponentLike): void
-  disposeComponent(component: DisposableComponentLike): void
+  disposeComponent(component: DisposableComponentLike): boolean
   updateComponent(component: DisposableComponentLike): void
   getComponentGroup(...requires: ComponentConstructor<any>[]): ComponentGroup
   removeComponentGroup(componentGroup: ComponentGroup): void
@@ -1262,6 +1248,11 @@ declare class Entity {
 }
 
 declare const Epsilon = 0.000001
+
+/**
+ * @public
+ */
+declare function EventConstructor(eventName: string): ClassDecorator
 
 /**
  * @public
@@ -1680,23 +1671,23 @@ declare class Material extends ObservableComponent {
   /**
    * Texture applied as material.
    */
-  albedoTexture?: string
+  albedoTexture?: Texture
   /**
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
-  alphaTexture?: string
+  alphaTexture?: Texture
   /**
    * Emissive texture.
    */
-  emissiveTexture?: string
+  emissiveTexture?: Texture
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
-  bumpTexture?: string
+  bumpTexture?: Texture
   /**
    * Stores the refracted light information in a texture.
    */
-  refractionTexture?: string
+  refractionTexture?: Texture
   /**
    * If sets to true, disables all the lights affecting the material.
    * Defaults to false.
@@ -2677,6 +2668,7 @@ declare class ObservableComponent {
   dirty: boolean
   data: any
   private subscriptions
+  static component(target: ObservableComponent, propertyKey: string): void
   static field(target: ObservableComponent, propertyKey: string): void
   static readonly(target: ObservableComponent, propertyKey: string): void
   onChange(fn: ObservableComponentSubscription): void
@@ -3113,7 +3105,7 @@ declare class PlaneShape extends Shape {
    * Sets the UV coordinates for the plane.
    * Used to map specific pieces of a Material's texture into the plane's geometry.
    */
-  uvs: number[]
+  uvs?: number[]
 }
 
 /**
@@ -3943,6 +3935,36 @@ declare class TextShape extends Shape {
   isPickable: boolean
   billboard: boolean
   constructor(value?: string)
+}
+
+/**
+ * @public
+ */
+declare class Texture extends ObservableComponent {
+  readonly src: string
+  /**
+   * Enables crisper images based on the provided sampling mode.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | NEAREST   |
+   * |     2 | BILINEAR  |
+   * |     3 | TRILINEAR |
+   */
+  readonly samplingMode: number
+  /**
+   * Enables texture wrapping for this material.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     1 | CLAMP     |
+   * |     2 | WRAP      |
+   * |     3 | MIRROR    |
+   */
+  readonly wrap: number
+  /**
+   * Defines if this texture has an alpha channel
+   */
+  readonly hasAlpha: boolean
+  constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>)
 }
 
 declare const ToGammaSpace: number

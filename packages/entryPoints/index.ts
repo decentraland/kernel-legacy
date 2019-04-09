@@ -1,13 +1,13 @@
 import 'engine'
 
 import { ETHEREUM_NETWORK, DEBUG } from '../config'
-import { initBabylonClient } from '../dcl'
+import { initBabylonClient } from '../engine/dcl'
 import { domReadyFuture, bodyReadyFuture, scene } from '../engine/renderer/init'
 import { initShared } from '../shared'
 import { enableParcelSceneLoading } from '../shared/world/parcelSceneManager'
+import { WebGLParcelScene } from '../engine/dcl/WebGLParcelScene'
+import { enableMiniMap } from '../engine/dcl/widgets/minimap'
 import { getWorldSpawnpoint } from '../shared/world/positionThings'
-import { WebGLParcelScene } from '../dcl/WebGLParcelScene'
-import { enableMiniMap } from '../dcl/widgets/minimap'
 
 export async function loadClient(net: ETHEREUM_NETWORK) {
   await initBabylonClient()
