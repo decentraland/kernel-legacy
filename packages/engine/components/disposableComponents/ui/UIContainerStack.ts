@@ -58,8 +58,7 @@ export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.G
     this.control.width = this.data.width
     this.control.left = this.data.positionX
     this.control.top = -this.data.positionY
-    this.control.color = this.data.color.toHexString()
-    this.control.background = this.data.background.toHexString()
+    this.control.background = this.data.color.toHexString()
     this.control.isVisible = this.data.visible
     this.control.isVertical = this.data.vertical
     // Only set height manually if the stack container is not in vertical mode

@@ -125,10 +125,10 @@ export class UIContainerStackShape extends UIShape {
   adaptHeight: boolean = false
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  opacity: number = 1
 
   @ObservableComponent.field
-  background: Color4 = new Color4(0, 0, 0, 0)
+  color: Color3 = Color3.Black()
 
   @ObservableComponent.field
   vertical: boolean = true
