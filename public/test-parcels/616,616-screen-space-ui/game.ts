@@ -1,4 +1,6 @@
-const SEND_ICON = './images/send-icon.png'
+import { UIScreenSpaceShape, UIContainerRectShape, Color3 } from 'decentraland-ecs/src'
+
+//const SEND_ICON = './images/send-icon.png'
 
 const ui = new UIScreenSpaceShape()
 

@@ -1,3 +1,5 @@
+import { UIScreenSpaceShape, UITextShape, Color3 } from 'decentraland-ecs/src'
+
 const ui = new UIScreenSpaceShape()
 
 const text = new UITextShape(ui)
@@ -29,5 +31,6 @@ text.hTextAlign = 'center'
 text.vTextAlign = 'center'
 text.width = 300
 text.height = 200
-text.position = new Vector2(0, 0)
+text.positionX = 0
+text.positionY = 0
 text.visible = true
