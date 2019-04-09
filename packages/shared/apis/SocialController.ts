@@ -12,7 +12,7 @@ import {
   getMutedUsers
 } from 'shared/comms/peers'
 import { AvatarMessage } from 'shared/comms/types'
-import { AVATAR_OBSERVABLE, CHAT_ACTIONS } from 'decentraland-ecs/src/decentraland/Types'
+import { AVATAR_OBSERVABLE } from 'decentraland-ecs/src/decentraland/Types'
 
 export interface IProfileData {
   displayName: string
@@ -34,15 +34,6 @@ export class SocialController extends ExposableAPI {
 
     avatarMessageObservable.add((event: any) => {
       engineAPI.sendSubscriptionEvent(AVATAR_OBSERVABLE as any, event)
-    })
-
-    // Toggle chat
-    document.body.addEventListener('keydown', e => {
-      if (e.code !== 'Enter') {
-        return
-      }
-
-      engineAPI.sendSubscriptionEvent(CHAT_ACTIONS as any, {})
     })
   }
 

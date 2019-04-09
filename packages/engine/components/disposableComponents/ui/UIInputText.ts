@@ -42,17 +42,11 @@ const schemaValidator = createSchemaValidator({
   isPointerBlocker: { type: 'boolean', default: false }
 })
 
-export let chatDisposableComponent: UIInputText
-
 class UIInputText extends UIControl<UIInputTextShape, BABYLON.GUI.InputText> {
   control = new BABYLON.GUI.InputText('input')
 
   constructor(ctx: SharedSceneContext, uuid: string) {
     super(ctx, uuid)
-
-    if (this.uuid === 'Cz') {
-      chatDisposableComponent = this
-    }
 
     this.control.onTextChangedObservable.add($ => {
       this.dispatchOnChanged({ pointerId: -1, value: $.text })
