@@ -73,9 +73,9 @@ class UIImage extends UIControl<UIImageShape, BABYLON.GUI.Image> {
       const texture = await Texture.getFromComponent(this.context, data.source as any)
 
       this.contributions.textures.clear()
-      this.contributions.textures.add(texture)
 
       if (texture) {
+        this.contributions.textures.add(texture)
         this.control.source = texture.url
       }
     }
