@@ -352,6 +352,11 @@ function closeChat() {
   transparentContainer!.visible = true
 }
 
+function closeChat() {
+  container!.visible = false
+  containerMinimized!.visible = true
+}
+
 function onSliderChanged(data: any) {
   const value = Math.round(data.value)
   sliderOpenedChat.component.value = value
