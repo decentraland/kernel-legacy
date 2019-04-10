@@ -190,30 +190,10 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     unityInterface.SetDebug()
   }
 
-  if (!PREVIEW) {
-    await initializeDecentralandUI()
-  }
+  await initializeDecentralandUI()
 
   if (PREVIEW) {
-    global['handleServerMessage'] = function(message: any) {
-      if (message.type === 'update') {
-        // tslint:disable-next-line: no-floating-promises
-        loadPreviewScene()
-      }
-    }
-
     await loadPreviewScene()
-
-    // Warn in case wallet is set in mainnet
-    if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
-      const style = document.createElement('style')
-      style.appendChild(
-        document.createTextNode(
-          `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
-        )
-      )
-      document.head.appendChild(style)
-    }
   } else {
     await enableParcelSceneLoading(net, {
       parcelSceneClass: UnityParcelScene,
@@ -240,6 +220,8 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 
   return {
+    net,
+    loadPreviewScene,
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon

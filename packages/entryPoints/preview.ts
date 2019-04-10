@@ -7,6 +7,7 @@ global['preview'] = window['preview'] = true
 global['avoidWeb3'] = window['avoidWeb3']
 
 import { initializeEngine } from '../unity-interface/dcl'
+import { ETHEREUM_NETWORK, DEBUG, AVOID_WEB3 } from '../config'
 const queryString = require('query-string')
 const qs = queryString.parse(document.location.search)
 
@@ -80,10 +81,31 @@ namespace DCL {
   export function EngineStarted() {
     instancedJS = initializeEngine(gameInstance!)
 
-    instancedJS.catch(error => {
-      document.body.classList.remove('dcl-loading')
-      document.body.innerHTML = `<h3>${error.message}</h3>`
-    })
+    instancedJS
+      .then(({ net, loadPreviewScene }) => {
+        global['handleServerMessage'] = function(message: any) {
+          if (message.type === 'update') {
+            loadPreviewScene()
+              .then()
+              .catch(console.error)
+          }
+        }
+
+        // Warn in case wallet is set in mainnet
+        if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
+          const style = document.createElement('style')
+          style.appendChild(
+            document.createTextNode(
+              `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
+            )
+          )
+          document.head.appendChild(style)
+        }
+      })
+      .catch(error => {
+        document.body.classList.remove('dcl-loading')
+        document.body.innerHTML = `<h3>${error.message}</h3>`
+      })
   }
 
   export function MessageFromEngine(type: string, jsonEncodedMessage: string) {
