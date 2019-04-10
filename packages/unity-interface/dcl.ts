@@ -66,7 +66,7 @@ const browserInterface = {
 let lastParcelScenesSent = ''
 
 const unityInterface = {
-  debug: DEBUG,
+  debug: false,
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
