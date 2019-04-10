@@ -6,6 +6,7 @@ export * from './ecs/Task'
 export * from './ecs/helpers'
 export * from './ecs/Observable'
 export * from './ecs/UIValue'
+export * from './ecs/EventManager'
 
 import { DecentralandSynchronizationSystem } from './decentraland/Implementation'
 
@@ -46,6 +47,5 @@ export * from './decentraland/Input'
 export * from './decentraland/Audio'
 export * from './decentraland/Gizmos'
 export * from './decentraland/UIShapes'
-export * from './ecs/EventManager'
 
 export { engine }

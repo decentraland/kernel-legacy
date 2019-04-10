@@ -167,6 +167,20 @@ export interface IEvents {
   }
 
   /**
+   * @internal
+   * `onEnter` is triggered when the user hits the "Enter" key from the keyboard
+   * Used principally by the Chat internal scene
+   */
+  onEnter: {}
+
+  /**
+   * @internal
+   * `onPointerLock` is triggered when the user clicks the world canvas and the
+   * pointer locks to it so the pointer moves the camera
+   */
+  onPointerLock: {}
+
+  /**
    * `onFocus` is triggered when an entity focus is active.
    * Dispatched by the `ui-input` and `ui-password` entities when the value is changed.
    * It triggers a callback.

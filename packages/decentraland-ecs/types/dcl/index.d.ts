@@ -1299,7 +1299,7 @@ declare const Epsilon = 0.000001;
 /**
  * @public
  */
-declare function EventConstructor(eventName: string): ClassDecorator;
+declare function EventConstructor(): ClassDecorator;
 
 /**
  * @public
@@ -4019,9 +4019,9 @@ declare class UIContainerRectShape extends UIShape {
 declare class UIContainerStackShape extends UIShape {
     adaptWidth: boolean;
     adaptHeight: boolean;
+    opacity: number;
     color: Color3;
-    background: Color4;
-    vertical: boolean;
+    stackOrientation: UIStackOrientation;
 }
 
 /**
@@ -4032,13 +4032,13 @@ declare class UIImageShape extends UIShape {
     sourceTop: number;
     sourceWidth: number;
     sourceHeight: number;
-    source: string | null;
+    source?: Texture;
     paddingTop: number;
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
     sizeInPixels: boolean;
-    constructor(parent: UIShape, source: string);
+    constructor(parent: UIShape, source: Texture);
 }
 
 /**
@@ -4117,6 +4117,14 @@ declare class UISliderShape extends UIShape {
 }
 
 /**
+ * @public
+ */
+declare enum UIStackOrientation {
+    VERTICAL = 0,
+    HORIZONTAL = 1
+}
+
+/**
  * @alpha
  */
 declare class UITextShape extends UIShape {
@@ -4174,8 +4182,9 @@ declare class UIWorldSpaceShape extends UIShape {
  * @public
  */
 declare class UUIDEvent<T = any> {
-    uuid: string;
-    payload: T;
+    readonly uuid: string;
+    readonly payload: T;
+    constructor(uuid: string, payload: T);
 }
 
 /**

@@ -3,7 +3,8 @@ import {
   Color3,
   UIContainerStackShape,
   UIContainerRectShape,
-  UIImageShape
+  UIImageShape,
+  Texture
 } from 'decentraland-ecs/src'
 
 const ui = new UIScreenSpaceShape()
@@ -20,7 +21,7 @@ panel1.color = Color3.Blue()
 panel1.width = '200px'
 panel1.height = '200px'
 
-const image = new UIImageShape(stackContainer, 'img.png')
+const image = new UIImageShape(stackContainer, new Texture('img.png'))
 image.id = 'testUIImage'
 image.width = '100px'
 image.height = '100px'

@@ -1,5 +1,5 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged } from './Components'
+import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged, Texture } from './Components'
 import { Color3, Color4 } from './math'
 
 /**
@@ -360,8 +360,8 @@ export class UIImageShape extends UIShape {
   @ObservableComponent.field
   sourceHeight: number = 1
 
-  @ObservableComponent.field
-  source: string | null = null
+  @ObservableComponent.component
+  source?: Texture
 
   @ObservableComponent.field
   paddingTop: number = 0
@@ -378,7 +378,7 @@ export class UIImageShape extends UIShape {
   @ObservableComponent.field
   sizeInPixels: boolean = true
 
-  constructor(parent: UIShape, source: string) {
+  constructor(parent: UIShape, source: Texture) {
     super(parent)
     this.source = source
   }
