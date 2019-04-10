@@ -1,4 +1,5 @@
 declare var window: any
+declare var global: any
 
 type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
@@ -19,7 +20,7 @@ import {
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
-import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
+import { enableParcelSceneLoading, getParcelById, loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
@@ -27,7 +28,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 
-import { DEBUG, PREVIEW } from '../config'
+import { DEBUG, PREVIEW, ETHEREUM_NETWORK, AVOID_WEB3 } from '../config'
 
 let gameInstance!: GameInstance
 const preloadedScenes = new Set<string>()
@@ -65,7 +66,7 @@ const browserInterface = {
 let lastParcelScenesSent = ''
 
 const unityInterface = {
-  debug: false,
+  debug: DEBUG,
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
@@ -183,10 +184,9 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
   const { net } = await initShared()
-
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
-  if (DEBUG || PREVIEW) {
+  if (DEBUG) {
     unityInterface.SetDebug()
   }
 
@@ -195,7 +195,25 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 
   if (PREVIEW) {
+    global['handleServerMessage'] = function(message: any) {
+      if (message.type === 'update') {
+        // tslint:disable-next-line: no-floating-promises
+        loadPreviewScene()
+      }
+    }
+
     await loadPreviewScene()
+
+    // Warn in case wallet is set in mainnet
+    if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
+      const style = document.createElement('style')
+      style.appendChild(
+        document.createTextNode(
+          `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
+        )
+      )
+      document.head.appendChild(style)
+    }
   } else {
     await enableParcelSceneLoading(net, {
       parcelSceneClass: UnityParcelScene,
@@ -255,12 +273,16 @@ async function initializeDecentralandUI() {
 async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
 
+  loadedParcelSceneWorkers.forEach($ => {
+    $.dispose()
+    loadedParcelSceneWorkers.delete($)
+  })
+
   if (result.ok) {
     // we load the scene to get the metadata
     // about rhe bounds and position of the scene
     // TODO(fmiras): Validate scene according to https://github.com/decentraland/proposals/blob/master/dsp/0020.mediawiki
     const scene = (await result.json()) as IScene
-
     const mappingsFetch = await fetch('/mappings')
     const mappingsResponse = (await mappingsFetch.json()) as MappingsResponse
 
@@ -268,6 +290,15 @@ async function loadPreviewScene() {
       baseUrl: location.toString().replace(/\?[^\n]+/g, ''),
       scene,
       mappingsResponse: mappingsResponse
+    }
+
+    // tslint:disable-next-line: no-console
+    console.log('Starting Preview...')
+    const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
+    const parcelSceneWorker = new SceneWorker(parcelScene)
+
+    if (parcelSceneWorker) {
+      loadedParcelSceneWorkers.add(parcelSceneWorker)
     }
 
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
