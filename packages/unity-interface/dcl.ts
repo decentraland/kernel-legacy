@@ -60,7 +60,6 @@ const unityInterface = {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
   CreateUIScene(data: { id: string }) {
-    // TODO: Implement this function in unity
     /**
      * UI Scenes are scenes that does not check any limit or boundary. The
      * position is fixed at 0,0 and they are universe-wide. An example of this
@@ -205,7 +204,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
-        ; (browserInterface as any)[type](message)
+        ;(browserInterface as any)[type](message)
       } else {
         // tslint:disable-next-line:no-console
         console.log('MessageFromEngine', type, message)
