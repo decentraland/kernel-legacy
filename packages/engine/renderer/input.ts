@@ -53,7 +53,7 @@ export function initKeyboard() {
 
   document.body.addEventListener('keydown', e => {
     if (e.code === 'Enter' && hud) {
-      hud.context.entities.forEach(e => e.dispatchUUIDEvent('onEnter', {}))
+      hud.context.entities.forEach((e: any) => e.dispatchUUIDEvent('onEnter', {}))
     }
 
     keyState[Keys.KEY_SHIFT] = e.shiftKey
@@ -287,6 +287,10 @@ export function enableMouseLock(canvas: HTMLCanvasElement) {
         } else {
           canvas.requestPointerLock()
           canvas.focus()
+
+          if (hud) {
+            hud.context.entities.forEach((e: any) => e.dispatchUUIDEvent('onPointerLock', {}))
+          }
         }
       }
     } else if (e.type === BABYLON.PointerEventTypes.POINTERUP) {
