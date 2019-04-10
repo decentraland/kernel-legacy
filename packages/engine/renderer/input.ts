@@ -277,6 +277,10 @@ export function enableMouseLock(canvas: HTMLCanvasElement) {
     if (e.type === BABYLON.PointerEventTypes.POINTERDOWN) {
       const evt = e.event as PointerEvent
 
+      if (hud) {
+        hud.context.entities.forEach((e: any) => e.dispatchUUIDEvent('onPointerLock', {}))
+      }
+
       if (isThirdPersonCamera()) {
         canvas.focus()
         interactWithScene('pointerDown', evt.offsetX, evt.offsetY, evt.pointerId)
@@ -287,10 +291,6 @@ export function enableMouseLock(canvas: HTMLCanvasElement) {
         } else {
           canvas.requestPointerLock()
           canvas.focus()
-
-          if (hud) {
-            hud.context.entities.forEach((e: any) => e.dispatchUUIDEvent('onPointerLock', {}))
-          }
         }
       }
     } else if (e.type === BABYLON.PointerEventTypes.POINTERUP) {
