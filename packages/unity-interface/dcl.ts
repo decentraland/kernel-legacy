@@ -7,7 +7,15 @@ type GameInstance = {
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 
 import { initShared } from '../shared'
-import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
+import {
+  LoadableParcelScene,
+  EntityAction,
+  EnvironmentData,
+  ILandToLoadableParcelScene,
+  IScene,
+  MappingsResponse,
+  ILand
+} from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
@@ -19,7 +27,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 
-import { DEBUG } from '../config'
+import { DEBUG, PREVIEW } from '../config'
 
 let gameInstance!: GameInstance
 const preloadedScenes = new Set<string>()
@@ -178,34 +186,40 @@ export async function initializeEngine(_gameInstance: GameInstance) {
 
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
-  if (DEBUG) {
+  if (DEBUG || PREVIEW) {
     unityInterface.SetDebug()
   }
 
-  await initializeDecentralandUI()
+  if (!PREVIEW) {
+    await initializeDecentralandUI()
+  }
 
-  await enableParcelSceneLoading(net, {
-    parcelSceneClass: UnityParcelScene,
-    shouldLoadParcelScene: land => {
-      return true
-      // TODO integrate with unity the preloading feature
-      // tslint:disable-next-line: no-commented-out-code
-      // return preloadedScenes.has(land.scene.scene.base)
-    },
-    onSpawnpoint: initialLand => {
-      const newPosition = getWorldSpawnpoint(initialLand)
-      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
-    },
-    onLoadParcelScenes: lands => {
-      unityInterface.LoadParcelScenes(
-        lands.map($ => {
-          const x = Object.assign({}, ILandToLoadableParcelScene($).data)
-          delete x.land
-          return x
-        })
-      )
-    }
-  })
+  if (PREVIEW) {
+    await loadPreviewScene()
+  } else {
+    await enableParcelSceneLoading(net, {
+      parcelSceneClass: UnityParcelScene,
+      shouldLoadParcelScene: () => {
+        return true
+        // TODO integrate with unity the preloading feature
+        // tslint:disable-next-line: no-commented-out-code
+        // return preloadedScenes.has(land.scene.scene.base)
+      },
+      onSpawnpoint: initialLand => {
+        const newPosition = getWorldSpawnpoint(initialLand)
+        unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
+      },
+      onLoadParcelScenes: lands => {
+        unityInterface.LoadParcelScenes(
+          lands.map($ => {
+            const x = Object.assign({}, ILandToLoadableParcelScene($).data)
+            delete x.land
+            return x
+          })
+        )
+      }
+    })
+  }
 
   return {
     onMessage(type: string, message: any) {
@@ -236,4 +250,31 @@ async function initializeDecentralandUI() {
   await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId })
+}
+
+async function loadPreviewScene() {
+  const result = await fetch('/scene.json?nocache=' + Math.random())
+
+  if (result.ok) {
+    // we load the scene to get the metadata
+    // about rhe bounds and position of the scene
+    // TODO(fmiras): Validate scene according to https://github.com/decentraland/proposals/blob/master/dsp/0020.mediawiki
+    const scene = (await result.json()) as IScene
+
+    const mappingsFetch = await fetch('/mappings')
+    const mappingsResponse = (await mappingsFetch.json()) as MappingsResponse
+
+    let defaultScene: ILand = {
+      baseUrl: location.toString().replace(/\?[^\n]+/g, ''),
+      scene,
+      mappingsResponse: mappingsResponse
+    }
+
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
+    delete target.land
+
+    unityInterface.LoadParcelScenes([target])
+  } else {
+    throw new Error('Could not load scene.json')
+  }
 }
