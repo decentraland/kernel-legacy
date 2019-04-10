@@ -17,7 +17,7 @@ declare var require: any
 
 const ATLAS_PATH = require('../../../static/images/profile-ui.png')
 
-const AtlasTexture = new Texture(ATLAS_PATH)
+const atlasTexture = new Texture(ATLAS_PATH)
 
 type IState = {
   publicKey: string
@@ -40,11 +40,10 @@ export let currentAvatarId: string | null = null
 // -----------------------------
 
 function createAvatar(parent: UIShape) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'avatar'
   component.width = '128px'
   component.height = '128px'
-  component.source = AtlasTexture
   component.sourceLeft = 0
   component.sourceTop = 0
   component.sourceWidth = 128
@@ -56,11 +55,10 @@ function createAvatar(parent: UIShape) {
 }
 
 function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'wink'
   component.width = '48px'
   component.height = '48px'
-  component.source = AtlasTexture
   component.sourceLeft = 347
   component.sourceTop = 132
   component.sourceWidth = 48
@@ -75,11 +73,10 @@ function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'friend'
   component.width = '48px'
   component.height = '48px'
-  component.source = AtlasTexture
   component.sourceLeft = 396
   component.sourceTop = 132
   component.sourceWidth = 48
@@ -96,11 +93,10 @@ function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) 
 }
 
 function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'mute'
   component.width = '52px'
   component.height = '48px'
-  component.source = AtlasTexture
   component.sourceLeft = 347
   component.sourceTop = 181
   component.sourceWidth = 52
@@ -115,11 +111,10 @@ function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'block'
   component.width = '52px'
   component.height = '48px'
-  component.source = AtlasTexture
   component.sourceLeft = 400
   component.sourceTop = 181
   component.sourceWidth = 52
@@ -136,11 +131,10 @@ function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) =
 }
 
 function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'close'
   component.width = '48px'
   component.height = '48px'
-  component.source = AtlasTexture
   component.sourceLeft = 350
   component.sourceTop = 278
   component.sourceWidth = 48
@@ -196,11 +190,10 @@ guiContainerComponent.positionX = -0.3
 guiContainerComponent.visible = false
 
 // background
-const bgComponent = new UIImageShape(guiContainerComponent, ATLAS_PATH)
+const bgComponent = new UIImageShape(guiContainerComponent, atlasTexture)
 bgComponent.id = 'avatar_bg'
 bgComponent.width = '96px'
 bgComponent.height = '96px'
-bgComponent.source = AtlasTexture
 bgComponent.sourceLeft = 347
 bgComponent.sourceTop = 1
 bgComponent.sourceWidth = 96

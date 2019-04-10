@@ -44,12 +44,11 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
 
   component.id = 'minimize-icon'
   component.width = '20px'
   component.height = '20px'
-  component.source = uiChatTexture
   component.sourceWidth = 40
   component.sourceHeight = 40
   component.sourceTop = 10
@@ -67,11 +66,10 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
 }
 
 function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'send-icon'
   component.width = '23px'
   component.height = '23px'
-  component.source = uiChatTexture
   component.sourceWidth = 48
   component.sourceHeight = 48
   component.sourceTop = 0
@@ -89,11 +87,10 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'help-icon'
   component.width = '23px'
   component.height = '23px'
-  component.source = uiChatTexture
   component.sourceWidth = 48
   component.sourceHeight = 48
   component.sourceTop = 0
@@ -111,11 +108,10 @@ function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'close-icon'
   component.width = '20px'
   component.height = '20px'
-  component.source = uiChatTexture
   component.sourceWidth = 35
   component.sourceHeight = 35
   component.sourceTop = 5
@@ -134,11 +130,10 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
 }
 
 function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'help-close-icon'
   component.width = '25px'
   component.height = '25px'
-  component.source = uiChatTexture
   component.sourceWidth = 59
   component.sourceHeight = 60
   component.sourceTop = -5
@@ -497,11 +492,10 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.thickness = 0
   containerMinimized.color = Color3.Black()
 
-  const minimizedIcon = new UIImageShape(containerMinimized, UI_CHAT)
+  const minimizedIcon = new UIImageShape(containerMinimized, uiChatTexture)
   minimizedIcon.id = 'minimize-icon'
   minimizedIcon.width = '230px'
   minimizedIcon.height = '55px'
-  minimizedIcon.source = uiChatTexture
   minimizedIcon.sourceWidth = 210
   minimizedIcon.sourceHeight = 50
   minimizedIcon.sourceTop = 50
