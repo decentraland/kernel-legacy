@@ -203,7 +203,7 @@ bgComponent.sourceWidth = '96px'
 bgComponent.sourceHeight = '96px'
 bgComponent.top = '-80px'
 
-let avatarIcon = createAvatar(guiContainerComponent)
+createAvatar(guiContainerComponent)
 
 // Display name
 const displayNameComponent = new UITextShape(guiContainerComponent)
@@ -250,8 +250,6 @@ export function showAvatarWindow(data: ShowProfileMessage) {
   closeButton.component.visible = true
   guiContainerComponent.visible = true
 
-  data.avatarUrl && setAvatarIcon(data.avatarUrl)
-
   internalState.publicKey = data.publicKey
 
   const pubKeyShortened =
@@ -279,8 +277,4 @@ function follow() {
 
 function addFriend() {
   // stub
-}
-
-const setAvatarIcon = (url: string) => {
-  avatarIcon.component.source = url
 }
