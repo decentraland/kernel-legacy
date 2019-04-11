@@ -1,5 +1,4 @@
 declare var window: any
-declare var global: any
 
 type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
@@ -28,7 +27,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 
-import { DEBUG, PREVIEW, ETHEREUM_NETWORK, AVOID_WEB3 } from '../config'
+import { DEBUG, PREVIEW } from '../config'
 
 let gameInstance!: GameInstance
 const preloadedScenes = new Set<string>()
