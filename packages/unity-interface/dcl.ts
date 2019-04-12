@@ -4,19 +4,21 @@ type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
 }
 
+import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
+
 import { initShared } from '../shared'
+import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
-import { positionObservable, lastPlayerPosition } from '../shared/world/positionThings'
+import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
 import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
-import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
-import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
-
-import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+
+import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
+
 import { DEBUG } from '../config'
 
 let gameInstance!: GameInstance
@@ -60,7 +62,6 @@ const unityInterface = {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
   CreateUIScene(data: { id: string }) {
-    // TODO: Implement this function in unity
     /**
      * UI Scenes are scenes that does not check any limit or boundary. The
      * position is fixed at 0,0 and they are universe-wide. An example of this
@@ -190,9 +191,13 @@ export async function initializeEngine(_gameInstance: GameInstance) {
       // tslint:disable-next-line: no-commented-out-code
       // return preloadedScenes.has(land.scene.scene.base)
     },
-    onLoadParcelScenes: scenes => {
+    onSpawnpoint: initialLand => {
+      const newPosition = getWorldSpawnpoint(initialLand)
+      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
+    },
+    onLoadParcelScenes: lands => {
       unityInterface.LoadParcelScenes(
-        scenes.map($ => {
+        lands.map($ => {
           const x = Object.assign({}, ILandToLoadableParcelScene($).data)
           delete x.land
           return x
@@ -205,7 +210,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
-        ; (browserInterface as any)[type](message)
+        ;(browserInterface as any)[type](message)
       } else {
         // tslint:disable-next-line:no-console
         console.log('MessageFromEngine', type, message)

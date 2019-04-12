@@ -1,4 +1,4 @@
-import { UIScreenSpaceShape, UIContainerRectShape, UIImageShape, Color3 } from 'decentraland-ecs/src'
+import { UIScreenSpaceShape, UIContainerRectShape, UIImageShape, Color3, Texture } from 'decentraland-ecs/src'
 
 const ui = new UIScreenSpaceShape()
 
@@ -14,7 +14,7 @@ imageBack.color = Color3.Red()
 imageBack.width = '128px'
 imageBack.height = '128px'
 
-const image = new UIImageShape(container, 'img.png')
+const image = new UIImageShape(container, new Texture('img.png'))
 image.id = 'testUIImage'
 image.width = '128px'
 image.height = '128px'

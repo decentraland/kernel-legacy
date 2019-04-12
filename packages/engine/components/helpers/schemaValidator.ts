@@ -2,6 +2,7 @@ import * as BABYLON from 'babylonjs'
 import { ReadOnlyVector2, ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { DEBUG } from 'config'
 import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
+import { UIStackOrientation } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 export type ISchema<Keys> = { [key: string]: { type: keyof Keys; default?: any } }
 export type Validator<T = any> = (x: any, defaultValue: T) => T
@@ -104,6 +105,13 @@ export const validators = {
     } else {
       return def
     }
+  },
+
+  UIStackOrientation(value: any, def: UIStackOrientation.VERTICAL) {
+    if (value === null || value === undefined || (value.type !== Number && value.type !== UIStackOrientation))
+      return def
+
+    return value
   },
 
   uiValue(value: any, def: UIValue): {} {
@@ -220,7 +228,7 @@ export function createSchemaValidator(schema: ISchema<typeof validators>) {
   const schemaKeys = Object.keys(schema)
 
   return Object.assign(
-    function (input: any) {
+    function(input: any) {
       if (input != null && typeof input === 'object') {
         for (let k = 0; k < schemaKeys.length; k++) {
           const key = schemaKeys[k]

@@ -1,5 +1,15 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { Entity, engine, OnChanged, OnClick, Color3, Color4 } from 'decentraland-ecs/src'
+import {
+  Entity,
+  engine,
+  OnChanged,
+  OnClick,
+  Color3,
+  Color4,
+  OnEnter,
+  OnPointerLock,
+  Texture
+} from 'decentraland-ecs/src'
 import {
   UIImageShape,
   UIInputTextShape,
@@ -8,7 +18,8 @@ import {
   UISliderShape,
   UIContainerRectShape,
   UIFullScreenShape,
-  UIShape
+  UIShape,
+  UIStackOrientation
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -17,6 +28,7 @@ declare var dcl: DecentralandInterface
 declare var require: any
 
 const UI_CHAT = require('../../../static/images/ui-chat.png')
+const uiChatTexture = new Texture(UI_CHAT)
 
 const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color3.White()
@@ -32,13 +44,11 @@ type MessageEntry = {
 // UI creators -------------------
 
 function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
 
   component.id = 'minimize-icon'
-  component.width = 20
-  component.height = 20
-  component.source = UI_CHAT
+  component.width = '20px'
+  component.height = '20px'
   component.sourceWidth = 40
   component.sourceHeight = 40
   component.sourceTop = 10
@@ -56,11 +66,10 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
 }
 
 function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'send-icon'
-  component.width = 23
-  component.height = 23
-  component.source = UI_CHAT
+  component.width = '23px'
+  component.height = '23px'
   component.sourceWidth = 48
   component.sourceHeight = 48
   component.sourceTop = 0
@@ -78,11 +87,10 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'help-icon'
-  component.width = 23
-  component.height = 23
-  component.source = UI_CHAT
+  component.width = '23px'
+  component.height = '23px'
   component.sourceWidth = 48
   component.sourceHeight = 48
   component.sourceTop = 0
@@ -100,11 +108,10 @@ function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
 }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'close-icon'
-  component.width = 20
-  component.height = 20
-  component.source = UI_CHAT
+  component.width = '20px'
+  component.height = '20px'
   component.sourceWidth = 35
   component.sourceHeight = 35
   component.sourceTop = 5
@@ -123,11 +130,10 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
 }
 
 function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, UI_CHAT)
+  const component = new UIImageShape(parent, uiChatTexture)
   component.id = 'help-close-icon'
-  component.width = 25
-  component.height = 25
-  component.source = UI_CHAT
+  component.width = '25px'
+  component.height = '25px'
   component.sourceWidth = 59
   component.sourceHeight = 60
   component.sourceTop = -5
@@ -206,7 +212,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
 
   const stack = new UIContainerStackShape(parent)
-  stack.vertical = false
+  stack.stackOrientation = UIStackOrientation.HORIZONTAL
   stack.hAlign = 'left'
   stack.vAlign = 'bottom'
   stack.height = 30
@@ -339,6 +345,13 @@ function toggleChat() {
 
   container!.visible = !visible
   containerMinimized!.visible = visible
+  transparentContainer!.visible = visible
+}
+
+function closeChat() {
+  container!.visible = false
+  containerMinimized!.visible = true
+  transparentContainer!.visible = true
 }
 
 function onSliderChanged(data: any) {
@@ -407,6 +420,8 @@ function addEntryAndResize(messageEntry: MessageEntry) {
   //messageContainer!.height = `${getMessagesListHeight()}px`
   messageContainer!.height = getMessagesListHeight()
   createMessage(messageContainer, messageEntry)
+  transparentMessageContainer!.height = `${getMessagesListHeight()}px`
+  createMessage(transparentMessageContainer, messageEntry)
 }
 
 const container = new UIContainerRectShape(screenSpaceUI)
@@ -427,6 +442,24 @@ messageContainer.hAlign = 'left'
 messageContainer.positionY = '-105px'
 messageContainer.positionX = '15px'
 messageContainer.height = '200px'
+
+const transparentContainer = new UIContainerRectShape(screenSpaceUI)
+transparentContainer.id = 'gui-transparent-container'
+transparentContainer.vAlign = 'bottom'
+transparentContainer.hAlign = 'left'
+transparentContainer.width = '400px'
+transparentContainer.height = '250px'
+transparentContainer.positionX = '20px'
+transparentContainer.positionY = '60px'
+transparentContainer.thickness = 0
+transparentContainer.visible = true
+
+const transparentMessageContainer = new UIContainerStackShape(transparentContainer)
+transparentMessageContainer.vAlign = 'bottom'
+transparentMessageContainer.hAlign = 'left'
+transparentMessageContainer.positionY = '105px'
+transparentMessageContainer.positionY = '15px'
+transparentMessageContainer.height = '200px'
 
 const footerContainer = new UIContainerRectShape(container)
 footerContainer.adaptHeight = true
@@ -459,11 +492,10 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.thickness = 0
   containerMinimized.color = Color3.Black()
 
-  const minimizedIcon = new UIImageShape(containerMinimized, UI_CHAT)
+  const minimizedIcon = new UIImageShape(containerMinimized, uiChatTexture)
   minimizedIcon.id = 'minimize-icon'
-  minimizedIcon.width = 230
-  minimizedIcon.height = 55
-  minimizedIcon.source = UI_CHAT
+  minimizedIcon.width = '230px'
+  minimizedIcon.height = '55px'
   minimizedIcon.sourceWidth = 210
   minimizedIcon.sourceHeight = 50
   minimizedIcon.sourceTop = 50
@@ -475,6 +507,8 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   const minimizedIconEntity = new Entity()
   minimizedIconEntity.addComponentOrReplace(minimizedIcon)
   minimizedIconEntity.addComponentOrReplace(new OnClick(toggleChat))
+  minimizedIconEntity.addComponentOrReplace(new OnEnter(toggleChat))
+  minimizedIconEntity.addComponentOrReplace(new OnPointerLock(closeChat))
   engine.addEntity(minimizedIconEntity)
 
   const helpIcon = createHelpButton(containerMinimized, openHelp)

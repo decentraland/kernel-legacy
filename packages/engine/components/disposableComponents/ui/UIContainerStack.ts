@@ -5,7 +5,7 @@ import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { UIControl } from './UIControl'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
-import { UIContainerStackShape } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { UIContainerStackShape, UIStackOrientation } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },
@@ -25,7 +25,7 @@ const schemaValidator = createSchemaValidator({
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   background: { type: 'string', default: 'transparent' },
-  vertical: { type: 'boolean', default: true }
+  stackOrientation: { type: 'UIStackOrientation', default: UIStackOrientation.VERTICAL }
 })
 
 export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.GUI.StackPanel> {
@@ -60,9 +60,10 @@ export class UIContainerStack extends UIControl<UIContainerStackShape, BABYLON.G
     this.control.top = -this.data.positionY
     this.control.background = this.data.color.toHexString()
     this.control.isVisible = this.data.visible
-    this.control.isVertical = this.data.vertical
+    this.control.isVertical = this.data.stackOrientation == UIStackOrientation.VERTICAL
+
     // Only set height manually if the stack container is not in vertical mode
-    if (!this.data.vertical) {
+    if (this.data.stackOrientation != UIStackOrientation.VERTICAL) {
       this.control.height = this.data.height
     }
 

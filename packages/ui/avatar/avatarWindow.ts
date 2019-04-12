@@ -7,7 +7,8 @@ import {
   engine,
   UIContainerRectShape,
   UITextShape,
-  Color3
+  Color3,
+  Texture
 } from 'decentraland-ecs/src'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -15,6 +16,8 @@ import { screenSpaceUI } from './ui'
 declare var require: any
 
 const ATLAS_PATH = require('../../../static/images/profile-ui.png')
+
+const atlasTexture = new Texture(ATLAS_PATH)
 
 type IState = {
   publicKey: string
@@ -37,11 +40,10 @@ export let currentAvatarId: string | null = null
 // -----------------------------
 
 function createAvatar(parent: UIShape) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'avatar'
-  component.width = 128
-  component.height = 128
-  component.source = ATLAS_PATH
+  component.width = '128px'
+  component.height = '128px'
   component.sourceLeft = 0
   component.sourceTop = 0
   component.sourceWidth = 128
@@ -53,11 +55,10 @@ function createAvatar(parent: UIShape) {
 }
 
 function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'wink'
-  component.width = 48
-  component.height = 48
-  component.source = ATLAS_PATH
+  component.width = '48px'
+  component.height = '48px'
   component.sourceLeft = 347
   component.sourceTop = 132
   component.sourceWidth = 48
@@ -72,11 +73,10 @@ function createWinkButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'friend'
-  component.width = 48
-  component.height = 48
-  component.source = ATLAS_PATH
+  component.width = '48px'
+  component.height = '48px'
   component.sourceLeft = 396
   component.sourceTop = 132
   component.sourceWidth = 48
@@ -93,11 +93,10 @@ function createFriendButton(parent: UIShape, click: (event: IEvents['onClick']) 
 }
 
 function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'mute'
-  component.width = 52
-  component.height = 48
-  component.source = ATLAS_PATH
+  component.width = '52px'
+  component.height = '48px'
   component.sourceLeft = 347
   component.sourceTop = 181
   component.sourceWidth = 52
@@ -112,11 +111,10 @@ function createMuteButton(parent: UIShape, click: (event: IEvents['onClick']) =>
 }
 
 function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'block'
-  component.width = 52
-  component.height = 48
-  component.source = ATLAS_PATH
+  component.width = '52px'
+  component.height = '48px'
   component.sourceLeft = 400
   component.sourceTop = 181
   component.sourceWidth = 52
@@ -133,11 +131,10 @@ function createBlockButton(parent: UIShape, click: (event: IEvents['onClick']) =
 }
 
 function createCloseButton(parent: UIShape, click: (event: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, ATLAS_PATH)
+  const component = new UIImageShape(parent, atlasTexture)
   component.id = 'close'
-  component.width = 48
-  component.height = 48
-  component.source = ATLAS_PATH
+  component.width = '48px'
+  component.height = '48px'
   component.sourceLeft = 350
   component.sourceTop = 278
   component.sourceWidth = 48
@@ -193,18 +190,17 @@ guiContainerComponent.positionX = -0.3
 guiContainerComponent.visible = false
 
 // background
-const bgComponent = new UIImageShape(guiContainerComponent, ATLAS_PATH)
+const bgComponent = new UIImageShape(guiContainerComponent, atlasTexture)
 bgComponent.id = 'avatar_bg'
-bgComponent.width = 96
-bgComponent.height = 96
-bgComponent.source = ATLAS_PATH
+bgComponent.width = '96px'
+bgComponent.height = '96px'
 bgComponent.sourceLeft = 347
 bgComponent.sourceTop = 1
 bgComponent.sourceWidth = 96
 bgComponent.sourceHeight = 96
 bgComponent.positionY = 80
 
-let avatarIcon = createAvatar(guiContainerComponent)
+createAvatar(guiContainerComponent)
 
 // Display name
 const displayNameComponent = new UITextShape(guiContainerComponent)
@@ -253,8 +249,6 @@ export function showAvatarWindow(data: ShowProfileMessage) {
   closeButton.component.visible = true
   guiContainerComponent.visible = true
 
-  data.avatarUrl && setAvatarIcon(data.avatarUrl)
-
   internalState.publicKey = data.publicKey
 
   const pubKeyShortened =
@@ -282,8 +276,4 @@ function follow() {
 
 function addFriend() {
   // stub
-}
-
-const setAvatarIcon = (url: string) => {
-  avatarIcon.component.source = url
 }

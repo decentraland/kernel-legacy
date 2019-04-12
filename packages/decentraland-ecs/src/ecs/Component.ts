@@ -55,7 +55,7 @@ export interface DisposableComponentConstructor<T extends DisposableComponentLik
 /**
  * @public
  */
-@EventConstructor('dcl-disposable-component-created')
+@EventConstructor()
 export class DisposableComponentCreated {
   constructor(public componentId: string, public componentName: string, public classId: number) {
     // stub
@@ -65,7 +65,7 @@ export class DisposableComponentCreated {
 /**
  * @public
  */
-@EventConstructor('dcl-disposable-component-removed')
+@EventConstructor()
 export class DisposableComponentRemoved {
   constructor(public componentId: string) {
     // stub
@@ -75,7 +75,7 @@ export class DisposableComponentRemoved {
 /**
  * @public
  */
-@EventConstructor('dcl-disposable-component-updated')
+@EventConstructor()
 export class DisposableComponentUpdated {
   constructor(public componentId: string, public component: DisposableComponentLike) {
     // stub
