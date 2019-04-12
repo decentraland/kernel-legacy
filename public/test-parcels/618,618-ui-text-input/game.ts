@@ -1,4 +1,11 @@
-import { UIScreenSpaceShape, UIContainerRectShape, Color4, UIInputTextShape, OnTextSubmit, log } from 'decentraland-ecs/src'
+import {
+  UIScreenSpaceShape,
+  UIContainerRectShape,
+  Color4,
+  UIInputTextShape,
+  OnTextSubmit,
+  log
+} from 'decentraland-ecs/src'
 
 const ui = new UIScreenSpaceShape()
 
@@ -15,14 +22,14 @@ textInput.height = '25px'
 textInput.vAlign = 'bottom'
 textInput.hAlign = 'left'
 textInput.fontSize = 10
-textInput.placeholder = 'Write yer shit here'
+textInput.placeholder = 'Write message here'
 textInput.placeholderColor = Color4.Gray()
 textInput.positionX = '10%'
 textInput.positionY = '10px'
-textInput.onTextSubmitEvent = new OnTextSubmit((x) => {
-    container.color = Color4.Red()
-    log("submitted text! " + x.text)
-});
+textInput.onTextSubmitEvent = new OnTextSubmit(x => {
+  container.color = Color4.Red()
+  log('submitted text! ' + x.text)
+})
 
 // const entity = new Entity()
 // entity.addComponentOrReplace(textInput)

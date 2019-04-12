@@ -1,6 +1,7 @@
 import {
   UIScreenSpaceShape,
   Color3,
+  Color4,
   UIContainerStackShape,
   UIContainerRectShape,
   UIImageShape,
@@ -17,7 +18,7 @@ stackContainer.height = '50%'
 
 const panel1 = new UIContainerRectShape(stackContainer)
 panel1.id = 'testContainerRect1'
-panel1.color = Color3.Blue()
+panel1.color = Color4.Blue()
 panel1.width = '200px'
 panel1.height = '200px'
 
@@ -30,6 +31,6 @@ image.sourceHeight = 100
 
 const panel2 = new UIContainerRectShape(stackContainer)
 panel2.id = 'testContainerRect2'
-panel2.color = Color3.Red()
+panel2.color = Color4.Red()
 panel2.width = '200px'
 panel2.height = '200px'
