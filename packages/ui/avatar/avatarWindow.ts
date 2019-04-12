@@ -8,6 +8,7 @@ import {
   UIContainerRectShape,
   UITextShape,
   Color3,
+  Color4,
   Texture
 } from 'decentraland-ecs/src'
 import { execute } from './rpc'
@@ -185,7 +186,7 @@ guiContainerComponent.width = 300
 guiContainerComponent.height = 400
 guiContainerComponent.hAlign = 'right'
 // a guiContainerComponent.cornerRadius = 40
-guiContainerComponent.color = Color3.White()
+guiContainerComponent.color = Color4.White()
 guiContainerComponent.positionX = -0.3
 guiContainerComponent.visible = false
 

@@ -156,8 +156,8 @@ function createTextInput(parent: UIShape, changed: (ev: IEvents['onChange']) => 
   component.id = 'input'
   component.autoStretchWidth = false
   component.color = PRIMARY_TEXT_COLOR
-  component.background = Color3.Black()
-  component.focusedBackground = Color3.Black()
+  component.background = Color4.Black()
+  component.focusedBackground = Color4.Black()
   component.placeholder = 'Say something to nearby people...'
   component.fontSize = 15
   component.width = 400
@@ -254,7 +254,7 @@ function createChatHeader(parent: UIShape) {
   container.width = 400
   container.height = 45
   container.thickness = 0
-  container.color = Color3.Black()
+  container.color = Color4.Black()
 
   const headerTextComponent = new UITextShape(parent)
   headerTextComponent.color = PRIMARY_TEXT_COLOR
@@ -433,7 +433,7 @@ container.height = 250
 container.positionX = 20
 container.positionY = 20
 container.thickness = 0
-container.color = Color3.Black()
+container.color = Color4.Black()
 container.visible = false
 
 const messageContainer = new UIContainerStackShape(container)
@@ -490,7 +490,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.positionX = 20
   containerMinimized.positionY = 15
   containerMinimized.thickness = 0
-  containerMinimized.color = Color3.Black()
+  containerMinimized.color = Color4.Black()
 
   const minimizedIcon = new UIImageShape(containerMinimized, uiChatTexture)
   minimizedIcon.id = 'minimize-icon'
@@ -526,7 +526,7 @@ helpContainer.height = 250
 helpContainer.positionX = 20
 helpContainer.positionY = 20
 helpContainer.thickness = 0
-helpContainer.color = Color3.Black()
+helpContainer.color = Color4.Black()
 helpContainer.visible = false
 
 const commandsContainerStack = new UIContainerStackShape(helpContainer)
@@ -579,7 +579,7 @@ headerContainer.hAlign = 'left'
 headerContainer.width = 400
 headerContainer.height = 45
 headerContainer.thickness = 0
-headerContainer.color = Color3.Black()
+headerContainer.color = Color4.Black()
 
 const headerTextComponent = new UITextShape(helpContainer)
 headerTextComponent.color = PRIMARY_TEXT_COLOR
