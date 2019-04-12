@@ -227,7 +227,7 @@ export interface IEvents {
   }
 
   onTextSubmit: {
-    message: string
+    text: string
   }
 
   metricsUpdate: {

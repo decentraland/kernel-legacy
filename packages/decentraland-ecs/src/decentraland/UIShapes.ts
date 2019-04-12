@@ -40,7 +40,7 @@ export abstract class UIShape extends ObservableComponent {
   positionY: string | number = '0px'
 
   @ObservableComponent.field
-  isPointerBlocker: boolean = false
+  isPointerBlocker: boolean = true
 
   private _parent?: UIShape
 
@@ -107,7 +107,7 @@ export class UIContainerRectShape extends UIShape {
   thickness: number = 0
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  color: Color4 = Color4.White()
 
   @ObservableComponent.field
   alignmentUsesSize: boolean = true
@@ -206,7 +206,7 @@ export class UITextShape extends UIShape {
   fontFamily: string = 'Arial'
 
   @ObservableComponent.field
-  fontSize: number = 100
+  fontSize: number = 10
 
   @ObservableComponent.field
   fontWeight: string = 'normal'
@@ -278,7 +278,7 @@ export class UIInputTextShape extends UIShape {
   fontFamily: string = 'Arial'
 
   @ObservableComponent.field
-  fontSize: number = 100
+  fontSize: number = 10
 
   @ObservableComponent.field
   fontWeight: string = 'normal'
@@ -287,7 +287,7 @@ export class UIInputTextShape extends UIShape {
   value: string = ''
 
   @ObservableComponent.field
-  placeholderColor: Color3 = Color3.White()
+  placeholderColor: Color4 = Color4.White()
 
   @ObservableComponent.field
   placeholder: string = ''
@@ -302,10 +302,10 @@ export class UIInputTextShape extends UIShape {
   autoStretchWidth: boolean = true
 
   @ObservableComponent.field
-  background: Color3 = Color3.Black()
+  background: Color4 = Color4.Black()
 
   @ObservableComponent.field
-  focusedBackground: Color3 = Color3.Black()
+  focusedBackground: Color4 = Color4.Black()
 
   @ObservableComponent.field
   shadowBlur: number = 0
@@ -317,7 +317,7 @@ export class UIInputTextShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: Color3 = Color3.White()
+  shadowColor: Color4 = Color4.White()
 
   @ObservableComponent.field
   paddingTop: number = 0

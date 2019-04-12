@@ -1552,7 +1552,7 @@ declare interface IEvents {
         payload: any;
     };
     onTextSubmit: {
-        message: string;
+        text: string;
     };
     metricsUpdate: {
         given: Record<string, number>;
@@ -2790,7 +2790,7 @@ declare class OnPointerUp extends PointerEventComponent {
 declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
     readonly type: string;
     constructor(cb: (event: {
-        message: string;
+        text: string;
     }) => void);
 }
 
@@ -4019,8 +4019,8 @@ declare class UIContainerRectShape extends UIShape {
 declare class UIContainerStackShape extends UIShape {
     adaptWidth: boolean;
     adaptHeight: boolean;
+    opacity: number;
     color: Color3;
-    background: Color4;
     vertical: boolean;
 }
 

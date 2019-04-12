@@ -1,51 +1,42 @@
-import { UIScreenSpaceShape, UIContainerRectShape, Color3, UIInputTextShape, OnTextSubmit, log } from 'decentraland-ecs/src'
-
+import { UIScreenSpaceShape, Color3, UIInputTextShape, OnTextSubmit, UISliderShape, Color4, UITextShape, UIContainerRectShape } from 'decentraland-ecs/src'
 
 const ui = new UIScreenSpaceShape()
 
-const container = new UIContainerRectShape(ui)
-container.id = 'testRectContainer'
-container.color = Color3.Green()
+const container = new UISliderShape(ui)
 container.width = '50%'
 container.height = '50%'
+container.backgroundColor = Color4.Gray()
+container.isVertical = true
 
-const textInput = new UIInputTextShape(container)
-textInput.id = 'textInput'
+const rt = new UIContainerRectShape(ui)
+rt.width = '50%'
+rt.height = '50%'
+rt.color = Color4.Clear()
+rt.isPointerBlocker = false
+
+let curOffset = 0
+
+
+const textInput = new UIInputTextShape(rt)
 textInput.width = '80%'
 textInput.height = '25px'
 textInput.vAlign = 'bottom'
-textInput.hAlign = 'left'
+textInput.hAlign = 'center'
 textInput.fontSize = 10
-textInput.placeholder = 'Write yer shit here'
-textInput.placeholderColor = Color3.Gray()
-textInput.positionX = '10%'
-textInput.positionY = '10px'
+textInput.placeholder = 'You have something to say?'
+textInput.placeholderColor = Color4.Gray()
+textInput.positionX = '25px'
+textInput.positionY = '25px'
+textInput.isPointerBlocker = true
+
 textInput.onTextSubmitEvent = new OnTextSubmit((x) => {
-    container.color = Color3.Red()
-    log("submitted text! " + x)
-});
-
-// const entity = new Entity()
-// entity.addComponentOrReplace(textInput)
-// entity.addComponentOrReplace(event)
-// engine.addEntity(entity)
-
-// const imageBack = new UIContainerRectShape(container)
-// imageBack.id = 'imageBack'
-// imageBack.color = Color3.Red()
-// imageBack.width = '128px'
-// imageBack.height = '128px'
-
-// const image = new UIImageShape(container, 'img.png')
-// image.id = 'testUIImage'
-// image.width = '128px'
-// image.height = '128px'
-// image.sourceWidth = 128
-// image.sourceHeight = 128
-// image.sourceTop = 0
-// image.sourceLeft = 0
-// image.paddingLeft = 10
-// image.paddingRight = 10
-// image.paddingTop = 10
-// image.paddingBottom = 10
-// image.isPointerBlocker = true
+    const text = new UITextShape(container)
+    text.value = "<xXx-EL-CAPO-BRAYAN-xXx> " + x.text
+    text.width = '100%'
+    text.height = '20px'
+    text.vAlign = 'top'
+    text.hAlign = 'left'
+    text.positionY = curOffset
+    container.valueY = 1
+    curOffset -= 25
+})
