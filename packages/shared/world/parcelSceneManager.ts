@@ -9,7 +9,7 @@ import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 
 export type EnableParcelSceneLoadingOptions = {
-  parcelSceneClass: { new(x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
+  parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
   shouldLoadParcelScene: (parcelToLoad: ILand) => boolean
   onSpawnpoint?: (initialLand: ILand) => void
   onLoadParcelScenes?(x: ILand[]): void
@@ -65,7 +65,7 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
     }
 
     loadedParcelSceneWorkers.forEach($ => {
-      if (!completeListOfParcelsThatShouldBeLoaded.includes($.parcelScene.data.id)) {
+      if (!$.persistent && !completeListOfParcelsThatShouldBeLoaded.includes($.parcelScene.data.id)) {
         $.dispose()
         loadedParcelSceneWorkers.delete($)
       }
