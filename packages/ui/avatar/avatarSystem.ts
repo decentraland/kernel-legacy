@@ -9,8 +9,8 @@ import {
   Vector3,
   Quaternion,
   Component,
-  Scalar,
-  OnPointerDown
+  Scalar//,
+  //OnPointerDown
 } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
@@ -26,7 +26,7 @@ import {
 } from 'shared/comms/types'
 import { execute } from './rpc'
 import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
-import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
+//import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -143,7 +143,7 @@ export class AvatarEntity extends Entity {
   constructor(public name: string) {
     super(name)
 
-    const clicked = new OnPointerDown(this.clicked)
+    // const clicked = new OnPointerDown(this.clicked)
 
     {
       this.labelEntity.setParent(this)
@@ -151,11 +151,11 @@ export class AvatarEntity extends Entity {
       this.label.billboard = true
       this.label.isPickable = true
       this.labelEntity.addComponent(this.label)
-      this.labelEntity.addComponent(clicked)
+      //this.labelEntity.addComponent(clicked)
     }
 
     this.body.setParent(this)
-    this.body.addComponent(clicked)
+    //this.body.addComponent(clicked)
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
@@ -163,15 +163,15 @@ export class AvatarEntity extends Entity {
     this.setVisible(true)
   }
 
-  clicked = () => {
-    showAvatarWindow({
-      displayName: this.displayName,
-      isBlocked: this.blocked,
-      isMuted: this.muted,
-      publicKey: this.publicKey,
-      uuid: this.name
-    })
-  }
+  // clicked = () => {
+  //   showAvatarWindow({
+  //     displayName: this.displayName,
+  //     isBlocked: this.blocked,
+  //     isMuted: this.muted,
+  //     publicKey: this.publicKey,
+  //     uuid: this.name
+  //   })
+  // }
 
   setBlocked(blocked: boolean, muted: boolean): void {
     this.blocked = blocked
@@ -315,18 +315,18 @@ function handleUserRemoved({ uuid }: UserRemovedMessage): void {
     avatarMap.delete(uuid)
     engine.removeEntity(avatar)
   }
-  if (uuid === currentAvatarId) {
-    hideAvatarWindow()
-  }
+  // if (uuid === currentAvatarId) {
+  //   hideAvatarWindow()
+  // }
   cleanupUnusedModels()
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
-  const avatar = avatarMap.get(uuid)
+  //const avatar = avatarMap.get(uuid)
 
-  if (avatar) {
-    avatar.clicked()
-  }
+  // if (avatar) {
+  //   avatar.clicked()
+  // }
 }
 
 function handleMutedBlockedMessages({ uuid }: UserMessage): void {

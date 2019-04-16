@@ -3,19 +3,19 @@ import { UIScreenSpaceShape, UIContainerRectShape, UIImageShape, Color4, Texture
 const ui = new UIScreenSpaceShape()
 
 const container = new UIContainerRectShape(ui)
-container.id = 'testRectContainer'
+container.name = 'testRectContainer'
 container.color = Color4.Green()
 container.width = '50%'
 container.height = '50%'
 
 const imageBack = new UIContainerRectShape(container)
-imageBack.id = 'imageBack'
+imageBack.name = 'imageBack'
 imageBack.color = Color4.Red()
 imageBack.width = '128px'
 imageBack.height = '128px'
 
 const image = new UIImageShape(container, new Texture('img.png'))
-image.id = 'testUIImage'
+image.name = 'testUIImage'
 image.width = '128px'
 image.height = '128px'
 image.sourceWidth = 128

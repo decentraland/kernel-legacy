@@ -1,6 +1,6 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged, Texture } from './Components'
-import { Color3, Color4 } from './math'
+import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged, Texture, OnClick, OnFocus, OnBlur } from './Components'
+import { Color4 } from './math'
 
 /**
  * @alpha
@@ -10,7 +10,7 @@ export abstract class UIShape extends ObservableComponent {
    * Defines if the entity and its children should be rendered
    */
   @ObservableComponent.field
-  id: string | null = null
+  name: string | null = null
 
   @ObservableComponent.field
   visible: boolean = true
@@ -107,7 +107,7 @@ export class UIContainerRectShape extends UIShape {
   thickness: number = 0
 
   @ObservableComponent.field
-  color: Color4 = Color4.White()
+  color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
   alignmentUsesSize: boolean = true
@@ -133,10 +133,7 @@ export class UIContainerStackShape extends UIShape {
   adaptHeight: boolean = false
 
   @ObservableComponent.field
-  opacity: number = 1
-
-  @ObservableComponent.field
-  color: Color3 = Color3.Black()
+  color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
   stackOrientation: UIStackOrientation = UIStackOrientation.VERTICAL
@@ -163,10 +160,10 @@ export class UIButtonShape extends UIShape {
   cornerRadius: number = 0
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  color: Color4 = Color4.White()
 
   @ObservableComponent.field
-  background: Color3 = Color3.Black()
+  background: Color4 = Color4.White()
 
   @ObservableComponent.field
   paddingTop: number = 0
@@ -190,7 +187,7 @@ export class UIButtonShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: Color3 = Color3.White()
+  shadowColor: Color4 = Color4.Black()
 
   @ObservableComponent.field
   text: string = 'button'
@@ -205,10 +202,10 @@ export class UITextShape extends UIShape {
   outlineWidth: number = 0
 
   @ObservableComponent.field
-  outlineColor: Color3 = Color3.White()
+  outlineColor: Color4 = Color4.White()
 
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  color: Color4 = Color4.White()
 
   @ObservableComponent.field
   fontFamily: string = 'Arial'
@@ -244,7 +241,7 @@ export class UITextShape extends UIShape {
   shadowOffsetY: number = 0
 
   @ObservableComponent.field
-  shadowColor: Color3 = Color3.White()
+  shadowColor: Color4 = Color4.Black()
 
   @ObservableComponent.field
   hAlign: string = 'center'
@@ -277,7 +274,7 @@ export class UITextShape extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_INPUT_TEXT_SHAPE)
 export class UIInputTextShape extends UIShape {
   @ObservableComponent.field
-  color: Color3 = Color3.White()
+  color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
   thickness: number = 1
@@ -340,7 +337,17 @@ export class UIInputTextShape extends UIShape {
   paddingLeft: number = 0
 
   @OnUUIDEvent.uuidEvent
-  onTextSubmitEvent: OnTextSubmit | null = null
+  onTextSubmit: OnTextSubmit | null = null
+
+  @OnUUIDEvent.uuidEvent
+  onChanged: OnChanged | null = null
+
+  @OnUUIDEvent.uuidEvent
+  onFocus: OnFocus | null = null
+
+  @OnUUIDEvent.uuidEvent
+  onBlur: OnBlur | null = null
+
 }
 
 /**
@@ -377,6 +384,9 @@ export class UIImageShape extends UIShape {
 
   @ObservableComponent.field
   sizeInPixels: boolean = true
+
+  @OnUUIDEvent.uuidEvent
+  onClick: OnClick | null = null
 
   constructor(parent: UIShape, source: Texture) {
     super(parent)

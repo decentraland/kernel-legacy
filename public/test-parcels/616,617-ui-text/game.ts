@@ -1,17 +1,17 @@
-import { UIScreenSpaceShape, UITextShape, Color3 } from 'decentraland-ecs/src'
+import { UIScreenSpaceShape, UITextShape, Color4 } from 'decentraland-ecs/src'
 
 const ui = new UIScreenSpaceShape()
 
 const text = new UITextShape(ui)
-text.id = 'testUIText'
+text.name = 'testUIText'
 text.paddingLeft = 10
 text.paddingRight = 10
 text.paddingTop = 10
 text.paddingBottom = 10
 text.isPointerBlocker = true
 text.outlineWidth = 0.1
-text.outlineColor = Color3.Green()
-text.color = Color3.Red()
+text.outlineColor = Color4.Green()
+text.color = Color4.Red()
 text.fontFamily = 'Arial'
 text.fontSize = 100
 text.fontWeight = 'normal'
@@ -24,7 +24,7 @@ text.textWrapping = false
 text.shadowBlur = 0
 text.shadowOffsetX = 0
 text.shadowOffsetY = 0
-text.shadowColor = Color3.Black()
+text.shadowColor = Color4.Black()
 text.hAlign = 'center'
 text.vAlign = 'center'
 text.hTextAlign = 'center'

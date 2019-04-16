@@ -10,13 +10,13 @@ import {
 const ui = new UIScreenSpaceShape()
 
 const container = new UIContainerRectShape(ui)
-container.id = 'testRectContainer'
+container.name = 'testRectContainer'
 container.color = Color4.Green()
 container.width = '50%'
 container.height = '50%'
 
 const textInput = new UIInputTextShape(container)
-textInput.id = 'textInput'
+textInput.name = 'textInput'
 textInput.width = '80%'
 textInput.height = '25px'
 textInput.vAlign = 'bottom'
