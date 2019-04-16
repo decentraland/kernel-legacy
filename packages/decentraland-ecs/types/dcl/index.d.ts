@@ -215,7 +215,7 @@ declare class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  texture: string | null
+  texture?: Texture
   /**
    * A number between 0 and 1.
    * Any pixel with an alpha lower than this value will be shown as transparent.
@@ -4092,7 +4092,7 @@ declare class UIImageShape extends UIShape {
   sourceTop: string | null
   sourceWidth: string | null
   sourceHeight: string | null
-  source?: Texture
+  source: string | null
   width: string
   height: string
   top: string
