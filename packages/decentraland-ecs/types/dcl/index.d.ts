@@ -215,7 +215,7 @@ declare class BasicMaterial extends ObservableComponent {
   /**
    * The source of the texture image.
    */
-  texture?: Texture
+  texture: string | null
   /**
    * A number between 0 and 1.
    * Any pixel with an alpha lower than this value will be shown as transparent.
