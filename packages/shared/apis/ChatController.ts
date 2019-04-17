@@ -72,7 +72,7 @@ export class ChatController extends ExposableAPI implements IChatController {
         sender: currentUser.displayName || currentUser.publicKey || 'unknown',
         message
       })
-      sendPublicChatMessage(newEntry.id, newEntry.message)
+      sendPublicChatMessage(newEntry.id, `${newEntry.sender}: ${newEntry.message}`)
     }
 
     return entry
