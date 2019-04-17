@@ -45,6 +45,12 @@ export class AnimationClip extends ObservableComponent {
   public playing: boolean = false
 
   /**
+   * Does any anyone asked to reset the animation? default: false
+   */
+  @ObservableComponent.field
+  public shouldReset: boolean = false
+
+  /**
    * The animation speed
    */
   @ObservableComponent.field
@@ -80,5 +86,20 @@ export class AnimationClip extends ObservableComponent {
    */
   pause() {
     this.playing = false
+  }
+
+  /**
+   * Resets the animation state to the frame 0
+   */
+  reset() {
+    this.shouldReset = true
+  }
+
+  /**
+   * Resets and pauses the animation
+   */
+  stop() {
+    this.reset()
+    this.pause()
   }
 }
