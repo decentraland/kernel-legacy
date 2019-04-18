@@ -48,9 +48,13 @@ function getModel(src: string) {
 }
 
 function getAvatarModel(avatarName: string) {
+  // Remove possible 'zero width spaces' (unicode 8203) existence in name
+  avatarName = avatarName.replace(/(^[\s\u200b]*|[\s\u200b]*$)/g, '')
+
   if (avatarName.endsWith('.gltf') || avatarName.endsWith('.glb')) {
     return getModel(`models/avatar/${avatarName}`)
   }
+
   return getModel(`models/avatar/${avatarName}/head.glb`)
 }
 

@@ -69,7 +69,7 @@ const unityInterface = {
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
-  CreateUIScene(data: { id: string }) {
+  CreateUIScene(data: { id: string; baseUrl: string }) {
     /**
      * UI Scenes are scenes that does not check any limit or boundary. The
      * position is fixed at 0,0 and they are universe-wide. An example of this
@@ -250,7 +250,7 @@ async function initializeDecentralandUI() {
 
   loadedParcelSceneWorkers.add(worker)
 
-  unityInterface.CreateUIScene({ id: scene.unitySceneId })
+  unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
 }
 
 async function loadPreviewScene() {
