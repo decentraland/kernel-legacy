@@ -62,6 +62,7 @@ export class Animator extends BaseComponent<SkeletalAnimationComponent> {
 
         if (animationAttributes.shouldReset) {
           clip.reset()
+          animationAttributes.shouldReset = false
         }
 
         if (animationAttributes.playing && !(clip as any).isPlaying) {
