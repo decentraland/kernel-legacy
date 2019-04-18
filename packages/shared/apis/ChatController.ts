@@ -53,10 +53,12 @@ export class ChatController extends ExposableAPI implements IChatController {
 
   @exposeMethod
   async send(message: string): Promise<MessageEntry> {
-    let entry = this.handleChatCommand(message)
+    let entry
 
     // Check if message is a command
     if (message[0] === '/') {
+      entry = this.handleChatCommand(message)
+
       // If no such command was found, provide some feedback
       if (!entry) {
         entry = {
