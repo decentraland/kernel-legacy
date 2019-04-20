@@ -1,0 +1,40 @@
+{
+    "name": "DCL Debug",
+    "version": "0.1.0",
+    "description": "Extends the Developer Tools, adding information about the Decentraland Explorer",
+    "devtools_page": "main.html",
+    "manifest_version": 2,
+    "permissions": [
+        "tabs",
+        "<all_urls>"
+    ],
+    "icons": {
+        "16": "img/16.png",
+        "48": "img/48.png",
+        "128": "img/128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "inject.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "background": {
+        "scripts": [
+            "broker.js"
+        ]
+    },
+    "page_action": {
+        "default_icon": {
+            "19": "img/19.png",
+            "38": "img/38.png"
+        },
+        "default_title": "DCL Debug"
+    },
+    "minimum_chrome_version": "21.0.1180.57"
+}

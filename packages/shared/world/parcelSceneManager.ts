@@ -8,6 +8,11 @@ import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 
+declare var window: Window & {
+  __DCL_DEV_TOOLS__?: boolean
+  dclDevToolSend: (name: string, data: string | Object) => any
+}
+
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
   shouldLoadParcelScene: (parcelToLoad: ILand) => boolean
@@ -78,6 +83,9 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
   enablePositionReporting()
 
   ret.server.on('ParcelScenes.notify', (data: { parcelScenes: ILand[] }) => {
+    if (window.__DCL_DEV_TOOLS__) {
+      window.dclDevToolSend('sceneConciliation', data.parcelScenes)
+    }
     setParcelScenes(data.parcelScenes.filter(land => options.shouldLoadParcelScene(land)))
     if (!initialized && options.onSpawnpoint) {
       const initialLand = data.parcelScenes.find(land => land.scene.scene.base === spawnpointLand)

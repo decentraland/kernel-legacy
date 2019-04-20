@@ -29,6 +29,11 @@ import { Observable, ReadOnlyVector3 } from 'decentraland-ecs/src'
 import { colliderMaterial } from './utils/colliders'
 import future from 'fp-future'
 
+declare var window: Window & {
+  __DCL_DEV_TOOLS__?: boolean
+  dclDevToolSend: (name: string, data: string | Object) => any
+}
+
 function validateHierarchy(entity: BaseEntity) {
   let parent: BaseEntity = entity
 
@@ -167,6 +172,10 @@ export class SharedSceneContext implements BABYLON.IDisposable {
   }
 
   on<T extends IEventNames>(event: T, cb: (data: IEvents[T]) => void) {
+    if (window.__DCL_DEV_TOOLS__) {
+      window.dclDevToolSend('evs-events', event)
+    }
+
     return this.eventSubscriber.on(event, cb)
   }
 

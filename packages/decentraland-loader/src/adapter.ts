@@ -1,6 +1,11 @@
 import { Client } from 'decentraland-rpc/lib/common/json-rpc/Client'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 
+declare var window: Window & {
+  __DCL_DEV_TOOLS__?: boolean
+  dclDevToolSend: (name: string, data: string | Object) => any
+}
+
 export class Adapter extends Client {
   constructor(public transport: ScriptingTransport) {
     super({})
@@ -31,6 +36,9 @@ export class Adapter extends Client {
   }
 
   sendMessage(message: string) {
+    if (window.__DCL_DEV_TOOLS__) {
+      window.dclDevToolSend('net', message)
+    }
     this.transport.sendMessage(message)
   }
 }

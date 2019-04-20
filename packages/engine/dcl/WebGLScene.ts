@@ -5,6 +5,11 @@ import { defaultLogger, ILogger } from 'shared/logger'
 import { DevTools } from 'shared/apis/DevTools'
 import { IEvents, IEventNames } from 'decentraland-ecs/src/decentraland/Types'
 
+declare var window: Window & {
+  __DCL_DEV_TOOLS__?: boolean
+  dclDevToolSend: (name: string, data: string | Object) => any
+}
+
 /**
  * The WebGLScene has the responsibility of communicating the SceneWorker with the SharedSceneContext
  * That involves:
@@ -24,6 +29,9 @@ export class WebGLScene<T> implements ParcelSceneAPI {
 
   // TODO: ECS, figure out how to send metrics and who should handle it
   sendBatch(actions: EntityAction[]): void {
+    if (window.__DCL_DEV_TOOLS__) {
+      window.dclDevToolSend('ecs-actions', actions)
+    }
     if (!this.disposed) {
       for (let i = 0; i < actions.length; i++) {
         try {
