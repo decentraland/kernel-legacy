@@ -102,10 +102,10 @@ export async function initShared() {
   const isWhitelisted = await grantAccess(address, net)
 
   if (isWhitelisted) {
-    connect(
+    await connect(
       address,
       net
-    ).catch()
+    )
   } else {
     throw new Error(`The address ${address} is not whitelisted`)
   }
