@@ -210,7 +210,7 @@ export class Entity {
   removeComponent(component: string, triggerRemovedEvent?: boolean): void
   removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void
   removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void
-  removeComponent(component: (object & ComponentLike) | string | Function, triggerRemovedEvent = true): void {
+  removeComponent(component: object | string | Function, triggerRemovedEvent = true): void {
     const typeOfComponent = typeof component
 
     if (typeOfComponent !== 'string' && typeOfComponent !== 'function' && typeOfComponent !== 'object') {
