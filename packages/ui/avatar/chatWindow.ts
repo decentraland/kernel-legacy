@@ -5,11 +5,13 @@ import {
   OnChanged,
   OnClick,
   Color4,
+  log,
   // OnEnter,
   // OnPointerLock,
   Texture,
   OnBlur,
   OnFocus,
+  OnTextSubmit,
   //OnTextSubmit
 } from 'decentraland-ecs/src'
 import {
@@ -17,11 +19,12 @@ import {
   UIInputTextShape,
   UITextShape,
   UIContainerStackShape,
-  UISliderShape,
+  //  UISliderShape,
   UIContainerRectShape,
   UIFullScreenShape,
   UIShape,
-  UIStackOrientation
+  UIStackOrientation,
+  UISliderShape
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -60,11 +63,6 @@ function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) =
   component.isPointerBlocker = true
   component.onClick = new OnClick(click)
 
-  // const entity = new Entity()
-  // entity.addComponentOrReplace(component)
-  // entity.addComponentOrReplace(new OnClick(click))
-  // engine.addEntity(entity)
-
   return { component }
 }
 
@@ -78,14 +76,11 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
   component.sourceTop = 0
   component.sourceLeft = 48
   component.hAlign = 'right'
+  component.vAlign = 'bottom'
   component.positionX = '-10px'
+  component.positionY = '15px'
   component.isPointerBlocker = true
   component.onClick = new OnClick(click)
-
-  // const entity = new Entity()
-  // entity.addComponentOrReplace(component)
-  // entity.addComponentOrReplace(new OnClick(click))
-  // engine.addEntity(entity)
 
   return { component }
 }
@@ -126,10 +121,6 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
   component.isPointerBlocker = true
   component.visible = false
   component.onClick = new OnClick(click)
-  // const entity = new Entity()
-  // entity.addComponentOrReplace(component)
-  // entity.addComponentOrReplace(new OnClick(click))
-  // engine.addEntity(entity)
 
   return { component }
 }
@@ -181,6 +172,7 @@ function createTextInput(
   component.onChanged = new OnChanged(onChanged)
   component.onFocus = new OnFocus(onFocus)
   component.onBlur = new OnBlur(onBlur)
+  component.onTextSubmit = new OnTextSubmit(sendMsg)
 
   return { component }
 }
@@ -191,28 +183,32 @@ function renderSender(parent: UIShape, props: { color: Color4; sender: string })
   const component = new UITextShape(parent)
   component.color = props.color
   component.value = `${props.sender}: `
-  component.fontSize = 14
+  component.fontSize = 10
   component.fontWeight = 'bold'
-  component.hTextAlign = 'left'
   component.vTextAlign = 'top'
+  component.hTextAlign = 'left'
   component.hAlign = 'left'
   component.vAlign = 'top'
   component.resizeToFit = true
+  component.width = '100%'
 
   return { component }
 }
 
 function renderMessage(parent: UIShape, props: { color: Color4; message: string }) {
   const component = new UITextShape(parent)
-  component.width = 320
   component.color = props.color
   component.value = props.message
-  component.fontSize = 14
+  component.fontSize = 10
   component.positionX = '10px'
-  component.height = 30
+  component.width = '100%'
+  //component.height = 30
   component.vTextAlign = 'top'
   component.hTextAlign = 'left'
+  component.hAlign = 'left'
+  component.vAlign = 'top'
   component.textWrapping = true
+  component.resizeToFit = true
 
   return { component }
 }
@@ -227,28 +223,13 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   stack.vAlign = 'bottom'
   stack.height = 20
   stack.width = 400
-  stack.positionY = '50px'
+  stack.adaptHeight = true
+  stack.adaptWidth = true
 
   renderSender(stack, { color, sender })
   renderMessage(stack, { color, message })
 
   return { component: stack }
-}
-
-function createMessagesScrollbar(parent: UIShape) {
-  const component = new UISliderShape(parent)
-  component.name = 'slider'
-  component.height = 170
-  component.width = 20
-  component.positionX = '185px'
-  component.valueY = 0
-  component.paddingLeft = 0
-  component.visible = false
-  component.borderColor = Color4.FromHexString('#333333')
-  component.backgroundColor = Color4.FromHexString('#262626')
-  component.isPointerBlocker = true
-
-  return { component }
 }
 
 function createChatHeader(parent: UIShape) {
@@ -303,7 +284,7 @@ function createChatHeader(parent: UIShape) {
 // }
 
 // -------------------------------
-const messageHeight: number = 30
+// const messageHeight: number = 30
 const internalState = {
   commandsList: [] as Array<any>,
   messages: [] as Array<any>,
@@ -333,6 +314,7 @@ const containerMinimized = initializeMinimizedChat(screenSpaceUI)
 
 const container = new UIContainerRectShape(screenSpaceUI)
 container.name = 'gui-container'
+container.color = Color4.Black()
 container.vAlign = 'bottom'
 container.hAlign = 'left'
 container.width = 400
@@ -349,7 +331,7 @@ messageContainer.positionY = '-105px'
 messageContainer.positionX = '15px'
 messageContainer.height = '200px'
 
-const transparentContainer = new UIContainerRectShape(screenSpaceUI)
+const transparentContainer = new UISliderShape(screenSpaceUI)
 transparentContainer.name = 'gui-transparent-container'
 transparentContainer.vAlign = 'bottom'
 transparentContainer.hAlign = 'left'
@@ -357,15 +339,14 @@ transparentContainer.width = '400px'
 transparentContainer.height = '250px'
 transparentContainer.positionX = '20px'
 transparentContainer.positionY = '60px'
-transparentContainer.thickness = 0
 transparentContainer.visible = true
 
 const transparentMessageContainer = new UIContainerStackShape(transparentContainer)
 transparentMessageContainer.vAlign = 'bottom'
 transparentMessageContainer.hAlign = 'left'
-transparentMessageContainer.positionY = '105px'
 transparentMessageContainer.positionY = '15px'
-transparentMessageContainer.height = '200px'
+transparentMessageContainer.width = '100%'
+transparentMessageContainer.height = '100%'
 
 const footerContainer = new UIContainerRectShape(screenSpaceUI)
 footerContainer.adaptHeight = true
@@ -376,21 +357,27 @@ footerContainer.width = 400
 footerContainer.height = 250
 footerContainer.positionX = 20
 footerContainer.positionY = 20
+footerContainer.isPointerBlocker = false
 
 const textInput = createTextInput(footerContainer, onInputChanged, onInputFocus, onInputBlur)
 
 //createHelpButton(footerContainer, openHelp)
 createSendButton(container, sendMsg)
 createCloseButton(container, toggleChat)
-
 setMaximized(isMaximized)
-
-// Slider for opened chat
-const sliderOpenedChat = createMessagesScrollbar(container)
 
 // Chat header text
 const chatHeader = createChatHeader(container)
 createMinimizeButton(chatHeader.container, toggleChat)
+
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
+addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
 
 // const helpContainer = new UIContainerRectShape(screenSpaceUI)
 // helpContainer.name = 'gui-container-commands'
@@ -458,9 +445,9 @@ createMinimizeButton(chatHeader.container, toggleChat)
 // headerTextComponent.positionX = '15px'
 // headerTextComponent.height = 40
 
-function getMessagesListHeight() {
-  return internalState.messages.length * messageHeight
-}
+// function getMessagesListHeight() {
+//   return internalState.messages.length * messageHeight
+// }
 
 // ------------------------------------
 
@@ -523,10 +510,8 @@ function onInputBlur() {
 }
 
 function onInputChanged(message: string) {
-  const { value } = textInput.component
-
   // set proper color
-  if (value.charAt(0) === '/') {
+  if (message.charAt(0) === '/') {
     textInput.component.color = COMMAND_COLOR
   } else {
     textInput.component.color = PRIMARY_TEXT_COLOR
@@ -555,25 +540,21 @@ async function sendMsg() {
 }
 
 function addMessage(messageEntry: MessageEntry): void {
-  if (internalState.messages.length <= 6) {
-    internalState.messages.push(messageEntry)
-    if (internalState.messages.length > 0) {
-      addEntryAndResize(messageEntry)
-    }
-  } else {
-    internalState.messages = [...internalState.messages, messageEntry]
-    //sliderOpenedChat.component.maximum = getMessagesListHeight() - 160 // makes it always scroll to latest msg
-    //sliderOpenedChat.component.value = -45
-    sliderOpenedChat.component.visible = true
-    addEntryAndResize(messageEntry)
-  }
+  internalState.messages.push(messageEntry)
+  // if (internalState.messages.length == 0) {
+  // }
+  // else {
+  //   internalState.messages = [...internalState.messages, messageEntry]
+  // }
+
+  addEntryAndResize(messageEntry)
 }
 
 function addEntryAndResize(messageEntry: MessageEntry) {
   //messageContainer!.height = `${getMessagesListHeight()}px`
-  messageContainer!.height = getMessagesListHeight()
+  //messageContainer!.height = getMessagesListHeight()
   createMessage(messageContainer, messageEntry)
-  transparentMessageContainer!.height = `${getMessagesListHeight()}px`
+  //transparentMessageContainer!.height = `${getMessagesListHeight()}px`
   createMessage(transparentMessageContainer, messageEntry)
 }
 

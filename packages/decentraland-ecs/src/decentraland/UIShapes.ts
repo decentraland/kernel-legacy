@@ -127,10 +127,10 @@ export enum UIStackOrientation {
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_STACK)
 export class UIContainerStackShape extends UIShape {
   @ObservableComponent.field
-  adaptWidth: boolean = false
+  adaptWidth: boolean = true
 
   @ObservableComponent.field
-  adaptHeight: boolean = false
+  adaptHeight: boolean = true
 
   @ObservableComponent.field
   color: Color4 = Color4.Clear()
@@ -212,6 +212,9 @@ export class UITextShape extends UIShape {
 
   @ObservableComponent.field
   fontSize: number = 10
+
+  @ObservableComponent.field
+  fontAutoSize: boolean = false
 
   @ObservableComponent.field
   fontWeight: string = 'normal'

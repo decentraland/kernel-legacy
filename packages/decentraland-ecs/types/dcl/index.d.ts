@@ -2744,10 +2744,6 @@ declare class OnBlur extends OnUUIDEvent<'onBlur'> {
  */
 declare class OnChanged extends OnUUIDEvent<'onChange'> {
     readonly type: string;
-    constructor(cb: (event: {
-        value?: any;
-        pointerId?: Number;
-    }) => void);
 }
 
 /**
@@ -2789,9 +2785,6 @@ declare class OnPointerUp extends PointerEventComponent {
  */
 declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
     readonly type: string;
-    constructor(cb: (event: {
-        text: string;
-    }) => void);
 }
 
 /**
@@ -4066,8 +4059,10 @@ declare class UIInputTextShape extends UIShape {
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
-    onTextSubmitEvent: OnTextSubmit | null;
+    onTextSubmit: OnTextSubmit | null;
     onChanged: OnChanged | null;
+    onFocus: OnFocus | null;
+    onBlur: OnBlur | null;
 }
 
 /**
@@ -4134,6 +4129,7 @@ declare class UITextShape extends UIShape {
     color: Color4;
     fontFamily: string;
     fontSize: number;
+    fontAutoSize: boolean;
     fontWeight: string;
     value: string;
     lineSpacing: number;

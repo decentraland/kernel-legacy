@@ -36,7 +36,7 @@ textInput.positionX = '25px'
 textInput.positionY = '25px'
 textInput.isPointerBlocker = true
 
-textInput.onTextSubmitEvent = new OnTextSubmit(x => {
+textInput.onTextSubmit = new OnTextSubmit(x => {
   const text = new UITextShape(container)
   text.value = '<USER-ID> ' + x.text
   text.width = '100%'

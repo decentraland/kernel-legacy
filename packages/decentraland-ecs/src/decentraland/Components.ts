@@ -713,6 +713,7 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
     }
 
     this.callback = callback
+    uuidEventSystem.handlerMap[this.uuid] = this
   }
 
   toJSON() {
@@ -778,11 +779,6 @@ export class OnClick extends OnUUIDEvent<'onClick'> {
 export class OnChanged extends OnUUIDEvent<'onChange'> {
   @ObservableComponent.readonly
   readonly type: string = 'onChange'
-
-  constructor(cb: (event: { value?: any, pointerId?: Number; }) => void) {
-    super(cb)
-    uuidEventSystem.handlerMap[this.uuid] = this
-  }
 }
 
 /**
@@ -819,11 +815,6 @@ export class OnFocus extends OnUUIDEvent<'onFocus'> {
 export class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
   @ObservableComponent.readonly
   readonly type: string = 'onTextSubmit'
-
-  constructor(cb: (event: { text: string; }) => void) {
-    super(cb)
-    uuidEventSystem.handlerMap[this.uuid] = this
-  }
 }
 
 /**

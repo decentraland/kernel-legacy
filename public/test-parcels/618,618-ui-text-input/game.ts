@@ -26,7 +26,7 @@ textInput.placeholder = 'Write message here'
 textInput.placeholderColor = Color4.Gray()
 textInput.positionX = '10%'
 textInput.positionY = '10px'
-textInput.onTextSubmitEvent = new OnTextSubmit(x => {
+textInput.onTextSubmit = new OnTextSubmit(x => {
   container.color = Color4.Red()
   log('submitted text! ' + x.text)
 })
