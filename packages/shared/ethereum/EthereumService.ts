@@ -271,7 +271,7 @@ export async function getEphemeralKeys(network: ETHEREUM_NETWORK, regenerate: bo
   }
 
   if (!keys) {
-    const { invite: inviteAddress } = decentralandConfigurations
+    const inviteAddress = decentralandConfigurations.invite
     keys = await generateEphemeralKeys(requestManager.provider, inviteAddress)
     saveToLocalStorage(storageKey, keys)
   }
