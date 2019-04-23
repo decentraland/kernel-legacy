@@ -48,9 +48,13 @@ function getModel(src: string) {
 }
 
 function getAvatarModel(avatarName: string) {
+  // Remove possible 'zero width spaces' (unicode 8203) existence in name
+  avatarName = avatarName.replace(/(^[\s\u200b]*|[\s\u200b]*$)/g, '')
+
   if (avatarName.endsWith('.gltf') || avatarName.endsWith('.glb')) {
     return getModel(`models/avatar/${avatarName}`)
   }
+
   return getModel(`models/avatar/${avatarName}/head.glb`)
 }
 
@@ -150,11 +154,19 @@ export class AvatarEntity extends Entity {
 
     {
       this.labelEntity.setParent(this)
-      this.labelEntity.getComponentOrCreate(Transform).position.y = 2
+
+      let labelTransform = this.labelEntity.getComponentOrCreate(Transform)
+      labelTransform.position.y = 2
+      labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
+
       this.label.isPickable = true
       this.labelEntity.addComponent(this.label)
       //this.labelEntity.addComponent(clicked)
+
+      const model = getAvatarModel(GENERIC_AVATAR)
+      this.currentAvatarType = GENERIC_AVATAR
+      this.body.addComponentOrReplace(model)
     }
 
     this.body.setParent(this)
@@ -201,12 +213,11 @@ export class AvatarEntity extends Entity {
   setUserData(userData: Partial<UserInformation>): void {
     if (userData.avatarType) {
       this.setAvatarType(userData.avatarType)
+    } else {
+      this.setAvatarType(GENERIC_AVATAR)
     }
 
     if (userData.pose) {
-      if (!this.currentAvatarType) {
-        this.setAvatarType(GENERIC_AVATAR)
-      }
       this.setPose(userData.pose)
     }
 
@@ -259,8 +270,6 @@ function ensureAvatar(uuid: UUID): AvatarEntity | null {
 
   avatar = new AvatarEntity(uuid)
 
-  avatar.setUserData({ avatarType: 'square-robot' })
-
   avatarMap.set(uuid, avatar)
 
   executeTask(hideBlockedUsers)
@@ -295,6 +304,11 @@ function handleUserData(message: ReceiveUserDataMessage): void {
 
   if (avatar) {
     const userData = message.data
+
+    // We force the GENERIC_AVATAR for now until the Avatar system and creation/integration pipeline has been defined
+    // TODO: Remove this override once the Avatar system design has been defined.
+    userData.avatarType = GENERIC_AVATAR
+
     avatar.setUserData(userData)
   }
 }
