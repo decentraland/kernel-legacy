@@ -74,6 +74,14 @@ export class AnimationClip extends ObservableComponent {
     this.speed = params.speed || this.speed
   }
 
+  toJSON() {
+    const ret = JSON.parse(JSON.stringify(super.toJSON()))
+    if (this.shouldReset) {
+      this.shouldReset = false
+    }
+    return ret
+  }
+
   /**
    * Starts the animation
    */
