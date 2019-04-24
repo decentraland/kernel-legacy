@@ -24,7 +24,6 @@ const schemaValidator = createSchemaValidator({
   opacity: { type: 'number', default: 1 },
 
   cornerRadius: { type: 'number', default: 0 },
-  fontFamily: { type: 'string', default: 'Arial' },
   fontSize: { type: 'number', default: 50 },
   fontWeight: { type: 'string', default: 'normal' },
   background: { type: 'string', default: 'black' },
@@ -106,7 +105,7 @@ class UIButton extends UIControl<UIButtonShape, BABYLON.GUI.Button> {
     this.control.isVisible = this.data.visible
     this.control.isPointerBlocker = this.data.isPointerBlocker
     this.textBlock.isPointerBlocker = this.data.isPointerBlocker
-    this.textBlock.fontFamily = this.data.fontFamily
+    this.textBlock.fontFamily = 'Arial'
     this.textBlock.fontSize = this.data.fontSize
     this.textBlock.fontWeight = this.data.fontWeight
     this.textBlock.text = this.data.text

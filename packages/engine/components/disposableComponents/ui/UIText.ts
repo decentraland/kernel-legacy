@@ -35,7 +35,8 @@ const schemaValidator = createSchemaValidator({
   value: { type: 'string', default: '' },
   lineSpacing: { type: 'string', default: '0px' },
   lineCount: { type: 'number', default: 0 },
-  resizeToFit: { type: 'boolean', default: false },
+  adaptWidth: { type: 'boolean', default: false },
+  adaptHeight: { type: 'boolean', default: false },
   textWrapping: { type: 'boolean', default: false },
   shadowBlur: { type: 'number', default: 0 },
   shadowOffsetX: { type: 'number', default: 0 },
@@ -70,7 +71,7 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
 
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.color = this.data.color.toHexString()
-    this.control.fontFamily = this.data.fontFamily
+    this.control.fontFamily = 'Arial'
     this.control.fontSize = this.data.fontSize
     this.control.shadowBlur = this.data.shadowBlur
     this.control.shadowOffsetX = this.data.shadowOffsetX
@@ -79,7 +80,7 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.lineSpacing = this.data.lineSpacing
     this.control.text = this.data.value
     this.control.textWrapping = this.data.textWrapping
-    this.control.resizeToFit = this.data.resizeToFit
+    //this.control.resizeToFit = this.data.resizeToFit
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.textHorizontalAlignment = parseHorizontalAlignment(this.data.hTextAlign)

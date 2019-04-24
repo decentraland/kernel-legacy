@@ -52,7 +52,8 @@ function generateInventoryItem(index: number) {
   text.value = `Item ${index}`
   text.vAlign = 'center'
   text.hAlign = 'center'
-  text.resizeToFit = true
+  text.adaptWidth = true
+  text.adaptHeight = true
   text.fontSize = 10
   text.color = new Color3(1, 0, 0)
 }
@@ -145,16 +146,7 @@ valueFromSlider2.color = Color3.Black()
 
 const slider1 = new Entity()
 const sliderShape1 = new UISliderShape(container)
-sliderShape1.minimum = 0
-sliderShape1.maximum = 10
-sliderShape1.color = Color3.White()
 sliderShape1.opacity = 1.0
-sliderShape1.value = 0
-sliderShape1.borderColor = Color3.White()
-sliderShape1.background = Color3.Black()
-sliderShape1.barOffset = '5px'
-sliderShape1.thumbWidth = '30px'
-sliderShape1.isThumbClamped = false
 sliderShape1.isVertical = true
 sliderShape1.hAlign = 'right'
 sliderShape1.vAlign = 'top'
@@ -173,25 +165,16 @@ engine.addEntity(slider1)
 
 const slider2 = new Entity()
 const sliderShape2 = new UISliderShape(container)
-sliderShape2.minimum = 0
-sliderShape2.maximum = 10
-sliderShape2.color = Color3.Purple()
 sliderShape2.opacity = 1.0
-sliderShape2.value = 0
 sliderShape2.borderColor = new Color4(1, 0, 0, 1)
-sliderShape2.background = Color3.Blue()
-sliderShape2.barOffset = '5px'
-sliderShape2.thumbWidth = '30px'
-sliderShape2.isThumbCircle = true
-sliderShape2.isThumbClamped = false
 sliderShape2.isVertical = false
+sliderShape2.isHorizontal = true
 sliderShape2.hAlign = 'right'
 sliderShape2.vAlign = 'top'
 sliderShape2.width = '150px'
 sliderShape2.height = '20px'
 sliderShape2.positionY = '-130px'
 sliderShape2.positionX = '-40px'
-sliderShape2.swapOrientation = true
 slider2.addComponentOrReplace(
   new OnChanged((data: { value: number }) => {
     const value = Math.round(data.value)

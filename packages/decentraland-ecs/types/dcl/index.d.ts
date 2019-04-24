@@ -3977,7 +3977,6 @@ declare class Transform extends ObservableComponent {
  * @alpha
  */
 declare class UIButtonShape extends UIShape {
-    fontFamily: string;
     fontSize: number;
     fontWeight: string;
     thickness: number;
@@ -4014,6 +4013,7 @@ declare class UIContainerStackShape extends UIShape {
     adaptHeight: boolean;
     color: Color4;
     stackOrientation: UIStackOrientation;
+    spacing: Number;
 }
 
 /**
@@ -4040,7 +4040,6 @@ declare class UIImageShape extends UIShape {
 declare class UIInputTextShape extends UIShape {
     color: Color4;
     thickness: number;
-    fontFamily: string;
     fontSize: number;
     fontWeight: string;
     value: string;
@@ -4082,7 +4081,6 @@ declare abstract class UIShape extends ObservableComponent {
     name: string | null;
     visible: boolean;
     opacity: number;
-    zIndex: number;
     hAlign: string;
     vAlign: string;
     width: string | number;
@@ -4127,14 +4125,14 @@ declare class UITextShape extends UIShape {
     outlineWidth: number;
     outlineColor: Color4;
     color: Color4;
-    fontFamily: string;
     fontSize: number;
     fontAutoSize: boolean;
     fontWeight: string;
     value: string;
     lineSpacing: number;
     lineCount: number;
-    resizeToFit: boolean;
+    adaptWidth: boolean;
+    adaptHeight: boolean;
     textWrapping: boolean;
     shadowBlur: number;
     shadowOffsetX: number;

@@ -19,9 +19,6 @@ export abstract class UIShape extends ObservableComponent {
   opacity: number = 1
 
   @ObservableComponent.field
-  zIndex: number = 0
-
-  @ObservableComponent.field
   hAlign: string = 'center'
 
   @ObservableComponent.field
@@ -137,6 +134,9 @@ export class UIContainerStackShape extends UIShape {
 
   @ObservableComponent.field
   stackOrientation: UIStackOrientation = UIStackOrientation.VERTICAL
+
+  @ObservableComponent.field
+  spacing: Number = 0
 }
 
 /**
@@ -144,9 +144,6 @@ export class UIContainerStackShape extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_BUTTON_SHAPE)
 export class UIButtonShape extends UIShape {
-  @ObservableComponent.field
-  fontFamily: string = 'Arial'
-
   @ObservableComponent.field
   fontSize: number = 30
 
@@ -208,9 +205,6 @@ export class UITextShape extends UIShape {
   color: Color4 = Color4.White()
 
   @ObservableComponent.field
-  fontFamily: string = 'Arial'
-
-  @ObservableComponent.field
   fontSize: number = 10
 
   @ObservableComponent.field
@@ -229,7 +223,10 @@ export class UITextShape extends UIShape {
   lineCount: number = 0
 
   @ObservableComponent.field
-  resizeToFit: boolean = false
+  adaptWidth: boolean = false
+
+  @ObservableComponent.field
+  adaptHeight: boolean = false
 
   @ObservableComponent.field
   textWrapping: boolean = false
@@ -281,9 +278,6 @@ export class UIInputTextShape extends UIShape {
 
   @ObservableComponent.field
   thickness: number = 1
-
-  @ObservableComponent.field
-  fontFamily: string = 'Arial'
 
   @ObservableComponent.field
   fontSize: number = 10

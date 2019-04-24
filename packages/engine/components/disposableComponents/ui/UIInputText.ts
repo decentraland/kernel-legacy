@@ -96,9 +96,9 @@ class UIInputText extends UIControl<UIInputTextShape, BABYLON.GUI.InputText> {
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.color = this.data.color.toHexString()
     this.control.thickness = this.data.thickness
-    this.control.fontFamily = this.data.fontFamily
+    this.control.fontFamily = 'Arial'
     this.control.fontSize = this.data.fontSize
-    this.control.zIndex = this.data.zIndex
+    this.control.zIndex = 0
     this.control.margin = `${this.data.margin}px`
     this.control.maxWidth = this.data.maxWidth
     this.control.autoStretchWidth = this.data.autoStretchWidth

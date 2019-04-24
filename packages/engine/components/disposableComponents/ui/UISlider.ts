@@ -80,7 +80,7 @@ class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
     this.control.minimum = 0
     this.control.maximum = 1
     //this.control.color = this.data.color.toHexString()
-    this.control.zIndex = this.data.zIndex
+    this.control.zIndex = 0
     this.control.background = this.data.backgroundColor.toHexString()
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)

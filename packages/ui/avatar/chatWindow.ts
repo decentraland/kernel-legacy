@@ -14,6 +14,7 @@ import {
   OnTextSubmit,
   //OnTextSubmit
 } from 'decentraland-ecs/src'
+
 import {
   UIImageShape,
   UIInputTextShape,
@@ -23,11 +24,12 @@ import {
   UIContainerRectShape,
   UIFullScreenShape,
   UIShape,
-  UIStackOrientation,
   UISliderShape
 } from 'decentraland-ecs/src/decentraland/UIShapes'
+
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
+import { MessageEntry } from 'shared/types'
 
 declare var dcl: DecentralandInterface
 declare var require: any
@@ -38,13 +40,6 @@ const uiChatTexture = new Texture(UI_CHAT)
 const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color4.White()
 const COMMAND_COLOR = Color4.FromHexString('#d7a9ff')
-
-type MessageEntry = {
-  id?: string
-  sender: string
-  message: string
-  isCommand?: boolean
-}
 
 // UI creators -------------------
 
@@ -85,27 +80,6 @@ function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => vo
   return { component }
 }
 
-// function createHelpButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-//   const component = new UIImageShape(parent, uiChatTexture)
-//   component.name = 'help-icon'
-//   component.width = '23px'
-//   component.height = '23px'
-//   component.sourceWidth = 48
-//   component.sourceHeight = 48
-//   component.sourceTop = 0
-//   component.sourceLeft = 0
-//   component.hAlign = 'right'
-//   component.positionX = '-10px'
-//   component.isPointerBlocker = true
-//   component.onClick = new OnClick(click)
-//   // const entity = new Entity()
-//   // entity.addComponentOrReplace(component)
-//   // entity.addComponentOrReplace(new OnClick(click))
-//   // engine.addEntity(entity)
-
-//   return { component }
-// }
-
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent, uiChatTexture)
   component.name = 'close-icon'
@@ -124,28 +98,6 @@ function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => v
 
   return { component }
 }
-
-// function createHelpCloseButton(parent: UIShape, click: (data: IEvents['onClick']) => void) {
-//   const component = new UIImageShape(parent, uiChatTexture)
-//   component.name = 'help-close-icon'
-//   component.width = '25px'
-//   component.height = '25px'
-//   component.sourceWidth = 59
-//   component.sourceHeight = 60
-//   component.sourceTop = -5
-//   component.sourceLeft = 75
-//   component.hAlign = 'right'
-//   component.positionX = '-10px'
-//   component.positionY = '5px'
-//   component.isPointerBlocker = true
-//   component.onClick = new OnClick(click)
-//   // const entity = new Entity()
-//   // entity.addComponentOrReplace(component)
-//   // entity.addComponentOrReplace(new OnClick(click))
-//   // engine.addEntity(entity)
-
-//   return { component }
-// }
 
 function createTextInput(
   parent: UIShape,
@@ -172,43 +124,7 @@ function createTextInput(
   component.onChanged = new OnChanged(onChanged)
   component.onFocus = new OnFocus(onFocus)
   component.onBlur = new OnBlur(onBlur)
-  component.onTextSubmit = new OnTextSubmit(sendMsg)
-
-  return { component }
-}
-
-
-
-function renderSender(parent: UIShape, props: { color: Color4; sender: string }) {
-  const component = new UITextShape(parent)
-  component.color = props.color
-  component.value = `${props.sender}: `
-  component.fontSize = 10
-  component.fontWeight = 'bold'
-  component.vTextAlign = 'top'
-  component.hTextAlign = 'left'
-  component.hAlign = 'left'
-  component.vAlign = 'top'
-  component.resizeToFit = true
-  component.width = '100%'
-
-  return { component }
-}
-
-function renderMessage(parent: UIShape, props: { color: Color4; message: string }) {
-  const component = new UITextShape(parent)
-  component.color = props.color
-  component.value = props.message
-  component.fontSize = 10
-  component.positionX = '10px'
-  component.width = '100%'
-  //component.height = 30
-  component.vTextAlign = 'top'
-  component.hTextAlign = 'left'
-  component.hAlign = 'left'
-  component.vAlign = 'top'
-  component.textWrapping = true
-  component.resizeToFit = true
+  component.onTextSubmit = new OnTextSubmit(onInputSubmit)
 
   return { component }
 }
@@ -217,19 +133,20 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   const { sender, message, isCommand } = props
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
 
-  const stack = new UIContainerStackShape(parent)
-  stack.stackOrientation = UIStackOrientation.HORIZONTAL
-  stack.hAlign = 'left'
-  stack.vAlign = 'bottom'
-  stack.height = 20
-  stack.width = 400
-  stack.adaptHeight = true
-  stack.adaptWidth = true
+  const component = new UITextShape(parent)
+  component.color = color
+  component.value = `<b>${sender}:</b> ${message}`
+  component.fontSize = 12
+  component.vTextAlign = 'top'
+  component.hTextAlign = 'left'
+  component.hAlign = 'left'
+  component.vAlign = 'top'
+  component.adaptWidth = false
+  component.adaptHeight = true
+  component.width = '300px'
+  component.textWrapping = true
 
-  renderSender(stack, { color, sender })
-  renderMessage(stack, { color, message })
-
-  return { component: stack }
+  return { component: component }
 }
 
 function createChatHeader(parent: UIShape) {
@@ -257,34 +174,7 @@ function createChatHeader(parent: UIShape) {
   return { container, headerTextComponent }
 }
 
-// function createCommandHelper(parent: UIShape, props: { name: string; description: string }) {
-//   const container = new UIContainerStackShape(parent)
-//   container.height = 55
-//   container.width = 200
-
-//   const cmdNameComponent = new UITextShape(container)
-//   // cmdNameComponent.color = COMMAND_COLOR
-//   cmdNameComponent.value = `/${props.name}`
-//   cmdNameComponent.fontSize = 14
-//   cmdNameComponent.fontWeight = 'bold'
-//   cmdNameComponent.width = '100%'
-//   cmdNameComponent.height = '15px'
-
-//   cmdNameComponent.hTextAlign = 'left'
-
-//   const cmdDescriptionComponent = new UITextShape(container)
-//   //  cmdDescriptionComponent.color = Color4.FromHexString('#7d8499')
-//   cmdDescriptionComponent.value = props.description
-//   cmdDescriptionComponent.fontSize = 13
-//   //cmdDescriptionComponent.textWrapping = true
-//   cmdDescriptionComponent.width = '100%'
-//   cmdDescriptionComponent.height = '30px'
-//   cmdDescriptionComponent.vTextAlign = 'top'
-//   cmdDescriptionComponent.hTextAlign = 'left'
-// }
-
 // -------------------------------
-// const messageHeight: number = 30
 const internalState = {
   commandsList: [] as Array<any>,
   messages: [] as Array<any>,
@@ -314,22 +204,15 @@ const containerMinimized = initializeMinimizedChat(screenSpaceUI)
 
 const container = new UIContainerRectShape(screenSpaceUI)
 container.name = 'gui-container'
-container.color = Color4.Black()
+container.color = new Color4(0, 0, 0, 0.2)
 container.vAlign = 'bottom'
 container.hAlign = 'left'
-container.width = 400
+container.width = 470
 container.height = 250
 container.positionX = 20
-container.positionY = 20
+container.positionY = 0
 container.thickness = 0
 container.visible = false
-
-const messageContainer = new UIContainerStackShape(container)
-messageContainer.vAlign = 'bottom'
-messageContainer.hAlign = 'left'
-messageContainer.positionY = '-105px'
-messageContainer.positionX = '15px'
-messageContainer.height = '200px'
 
 const transparentContainer = new UISliderShape(screenSpaceUI)
 transparentContainer.name = 'gui-transparent-container'
@@ -338,15 +221,19 @@ transparentContainer.hAlign = 'left'
 transparentContainer.width = '400px'
 transparentContainer.height = '250px'
 transparentContainer.positionX = '20px'
-transparentContainer.positionY = '60px'
+transparentContainer.positionY = '70px'
+transparentContainer.valueY = 1
+transparentContainer.isVertical = false
+transparentContainer.isHorizontal = false
 transparentContainer.visible = true
 
 const transparentMessageContainer = new UIContainerStackShape(transparentContainer)
 transparentMessageContainer.vAlign = 'bottom'
 transparentMessageContainer.hAlign = 'left'
-transparentMessageContainer.positionY = '15px'
 transparentMessageContainer.width = '100%'
 transparentMessageContainer.height = '100%'
+transparentMessageContainer.spacing = 6
+
 
 const footerContainer = new UIContainerRectShape(screenSpaceUI)
 footerContainer.adaptHeight = true
@@ -354,101 +241,20 @@ footerContainer.adaptWidth = true
 footerContainer.vAlign = 'bottom'
 footerContainer.hAlign = 'left'
 footerContainer.width = 400
-footerContainer.height = 250
+footerContainer.height = 25
 footerContainer.positionX = 20
 footerContainer.positionY = 20
-footerContainer.isPointerBlocker = false
+footerContainer.isPointerBlocker = true
 
 const textInput = createTextInput(footerContainer, onInputChanged, onInputFocus, onInputBlur)
 
-//createHelpButton(footerContainer, openHelp)
-createSendButton(container, sendMsg)
+createSendButton(footerContainer, sendMsg)
 createCloseButton(container, toggleChat)
 setMaximized(isMaximized)
 
 // Chat header text
 const chatHeader = createChatHeader(container)
 createMinimizeButton(chatHeader.container, toggleChat)
-
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-addMessage({ message: "me gusta comer caca, blahblahblahblahblahblah, yadayadayadayadaydayadaydadadaydaydadyaydaydyadayday", sender: "capo" })
-
-// const helpContainer = new UIContainerRectShape(screenSpaceUI)
-// helpContainer.name = 'gui-container-commands'
-// helpContainer.vAlign = 'bottom'
-// helpContainer.hAlign = 'left'
-// helpContainer.width = 400
-// helpContainer.height = 250
-// helpContainer.positionX = 20
-// helpContainer.positionY = 20
-// helpContainer.thickness = 0
-// helpContainer.visible = false
-
-// const commandsContainerStack = new UIContainerStackShape(helpContainer)
-// commandsContainerStack.vAlign = 'top'
-// commandsContainerStack.hAlign = 'left'
-// commandsContainerStack.positionY = '50px'
-// commandsContainerStack.positionX = '15px'
-// commandsContainerStack.height = '55px'
-// commandsContainerStack.width = '320px'
-
-// const helpSliderComponent = new UISliderShape(helpContainer)
-// helpSliderComponent.name = 'help-slider'
-// helpSliderComponent.height = '170px'
-// helpSliderComponent.width = '20px'
-// helpSliderComponent.positionX = '185px'
-// helpSliderComponent.positionY = '10px'
-// //helpSliderComponent.minimum = 0
-// //helpSliderComponent.isVertical = true
-// helpSliderComponent.valueY = 0
-// helpSliderComponent.paddingLeft = 0
-
-// helpSliderComponent.height = 170
-// helpSliderComponent.width = 20
-
-// helpSliderComponent.borderColor = Color4.FromHexString('#333333')
-// helpSliderComponent.backgroundColor = Color4.FromHexString('#262626')
-// helpSliderComponent.isPointerBlocker = true
-
-
-// const closeButtonContainer = new UIContainerRectShape(helpContainer)
-// closeButtonContainer.adaptHeight = true
-// closeButtonContainer.adaptWidth = true
-// closeButtonContainer.vAlign = 'bottom'
-// closeButtonContainer.hAlign = 'right'
-
-// createHelpCloseButton(closeButtonContainer, closeHelp)
-
-// const headerContainer = new UIContainerRectShape(helpContainer)
-// headerContainer.name = 'gui-container-header'
-// headerContainer.vAlign = 'top'
-// headerContainer.hAlign = 'left'
-// headerContainer.width = 400
-// headerContainer.height = 45
-// headerContainer.thickness = 0
-
-// const headerTextComponent = new UITextShape(helpContainer)
-// headerTextComponent.color = PRIMARY_TEXT_COLOR
-// headerTextComponent.value = 'Commands'
-// headerTextComponent.fontSize = 17
-// headerTextComponent.hAlign = 'left'
-// headerTextComponent.vAlign = 'top'
-// headerTextComponent.hTextAlign = 'left'
-// headerTextComponent.vTextAlign = 'top'
-// headerTextComponent.positionY = '15px'
-// headerTextComponent.positionX = '15px'
-// headerTextComponent.height = 40
-
-// function getMessagesListHeight() {
-//   return internalState.messages.length * messageHeight
-// }
-
 // ------------------------------------
 
 // Initialize chat scene
@@ -460,35 +266,7 @@ export async function initializeChat() {
   for (let i in chatCmds) {
     commandsList.push(chatCmds[i])
   }
-
-  // if (commandsList.length > 0) {
-  //   commandsList.map(cmd => {
-  //     createCommandHelper(commandsContainerStack, cmd)
-  //   })
-  // }
-
-  // const commandHeight = 55
-  // const commandsListHeight = commandsList.length * commandHeight
-
-  // commandsContainerStack.height = commandsListHeight
-  //helpSliderComponent.maximum = commandsListHeight - commandHeight
 }
-
-// function openHelp() {
-//   internalState.isHelpVisible = true
-
-//   container!.visible = false
-//   containerMinimized!.visible = false
-//   // helpContainer!.visible = true
-// }
-
-// function closeHelp() {
-//   internalState.isHelpVisible = false
-
-//   container!.visible = true
-//   containerMinimized!.visible = false
-//   // helpContainer!.visible = false
-// }
 
 function toggleChat() {
   setMaximized(!isMaximized)
@@ -497,7 +275,6 @@ function toggleChat() {
 function setMaximized(maximized: boolean) {
   container.visible = maximized
   containerMinimized.visible = !maximized
-  transparentContainer.visible = !maximized
   isMaximized = maximized
 }
 
@@ -524,37 +301,27 @@ function onInputChanged(message: string) {
   }
 }
 
+function onInputSubmit(e: { text: string }) {
+  log("submit: " + e.text)
+  sendMsg()
+  // Clear input
+  textInput.component.value = ''
+}
+
 async function sendMsg() {
   const currentMessage = textInput.component.value
 
   if (currentMessage) {
-    const cmd = await execute('ChatController', 'send', [currentMessage])
+    const messageSent = await execute('ChatController', 'send', [currentMessage])
     // If the command was recognized, add the confirming message to the list
-    if (cmd) {
-      addMessage(cmd as MessageEntry)
+    if (messageSent) {
+      addMessage(messageSent as MessageEntry)
     }
-
-    // Clear input
-    textInput.component.value = ''
   }
 }
 
 function addMessage(messageEntry: MessageEntry): void {
   internalState.messages.push(messageEntry)
-  // if (internalState.messages.length == 0) {
-  // }
-  // else {
-  //   internalState.messages = [...internalState.messages, messageEntry]
-  // }
-
-  addEntryAndResize(messageEntry)
-}
-
-function addEntryAndResize(messageEntry: MessageEntry) {
-  //messageContainer!.height = `${getMessagesListHeight()}px`
-  //messageContainer!.height = getMessagesListHeight()
-  createMessage(messageContainer, messageEntry)
-  //transparentMessageContainer!.height = `${getMessagesListHeight()}px`
   createMessage(transparentMessageContainer, messageEntry)
 }
 
@@ -581,16 +348,6 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   minimizedIcon.vAlign = 'top'
   minimizedIcon.isPointerBlocker = true
   minimizedIcon.onClick = new OnClick(toggleChat)
-
-  // const minimizedIconEntity = new Entity()
-  // minimizedIconEntity.addComponentOrReplace(minimizedIcon)
-  // minimizedIconEntity.addComponentOrReplace(new OnClick(toggleChat))
-  // minimizedIconEntity.addComponentOrReplace(new OnEnter(toggleChat))
-  // minimizedIconEntity.addComponentOrReplace(new OnPointerLock(closeChat))
-  // engine.addEntity(minimizedIconEntity)
-
-  // const helpIcon = createHelpButton(containerMinimized, openHelp)
-  // helpIcon.component.positionY = 5
 
   return containerMinimized
 }
