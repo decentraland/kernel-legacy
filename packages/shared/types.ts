@@ -260,11 +260,6 @@ export type SkeletalAnimationValue = {
   speed?: number
 
   /**
-   * `onEnd` callback function to be executed when the animation is finished
-   */
-  onEndFn?: (() => void) | null
-
-  /**
    * Is the animation playing? default: true
    */
   playing?: boolean
