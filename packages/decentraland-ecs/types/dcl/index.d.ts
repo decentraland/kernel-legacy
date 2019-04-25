@@ -42,7 +42,7 @@ declare class Angle {
 /**
  * @public
  */
-declare class AnimationClip extends ObservableComponent {
+declare class AnimationState extends ObservableComponent {
   /**
    * Name of the animation in the model
    */
@@ -90,14 +90,14 @@ declare type AnimationParams = {
 declare class Animator extends Shape {
   private states
   /**
-   * Adds an AnimationClip to the animation lists.
+   * Adds an AnimationState to the animation lists.
    */
-  addClip(clip: AnimationClip): void
+  addClip(clip: AnimationState): void
   /**
    * Gets the animation clip instance for the specified clip name.
    * If the clip doesn't exist a new one will be created.
    */
-  getClip(clipName: string): AnimationClip
+  getClip(clipName: string): AnimationState
 }
 
 /**
