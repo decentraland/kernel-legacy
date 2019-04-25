@@ -39,6 +39,12 @@ declare class Angle {
   radians(): number
 }
 
+declare type AnimationParams = {
+  looping?: boolean
+  speed?: number
+  weight?: number
+}
+
 /**
  * @public
  */
@@ -60,6 +66,10 @@ declare class AnimationState extends ObservableComponent {
    */
   playing: boolean
   /**
+   * Does any anyone asked to reset the animation? default: false
+   */
+  shouldReset: boolean
+  /**
    * The animation speed
    */
   speed: number
@@ -68,6 +78,7 @@ declare class AnimationState extends ObservableComponent {
    * Sets the clip parameters
    */
   setParams(params: AnimationParams): void
+  toJSON(): any
   /**
    * Starts the animation
    */
@@ -76,12 +87,14 @@ declare class AnimationState extends ObservableComponent {
    * Pauses the animation
    */
   pause(): void
-}
-
-declare type AnimationParams = {
-  looping?: boolean
-  speed?: number
-  weight?: number
+  /**
+   * Resets the animation state to the frame 0
+   */
+  reset(): void
+  /**
+   * Resets and pauses the animation
+   */
+  stop(): void
 }
 
 /**
@@ -4092,7 +4105,7 @@ declare class UIImageShape extends UIShape {
   sourceTop: string | null
   sourceWidth: string | null
   sourceHeight: string | null
-  source: string | null
+  source?: Texture
   width: string
   height: string
   top: string
