@@ -37,48 +37,57 @@ declare var require: any
 const UI_CHAT = require('../../../static/images/ui-chat.png')
 const uiChatTexture = new Texture(UI_CHAT)
 
-const MAX_CHARS = 94
+//const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color4.White()
 const COMMAND_COLOR = Color4.FromHexString('#d7a9ff')
 
 // UI creators -------------------
+dcl.subscribe('MESSAGE_RECEIVED')
+dcl.onEvent(event => {
+  const eventType: string = event.type
+  const eventData: any = event.data
+  if (eventType === 'MESSAGE_RECEIVED') {
+    addMessage(eventData.messageEntry as MessageEntry)
+  }
+})
 
-function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, uiChatTexture)
 
-  component.name = 'minimize-icon'
-  component.width = '20px'
-  component.height = '20px'
-  component.sourceWidth = 40
-  component.sourceHeight = 40
-  component.sourceTop = 10
-  component.sourceLeft = 130
-  component.hAlign = 'right'
-  component.positionX = '-10px'
-  component.isPointerBlocker = true
-  component.onClick = new OnClick(click)
+// function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
+//   const component = new UIImageShape(parent, uiChatTexture)
 
-  return { component }
-}
+//   component.name = 'minimize-icon'
+//   component.width = '20px'
+//   component.height = '20px'
+//   component.sourceWidth = 40
+//   component.sourceHeight = 40
+//   component.sourceTop = 10
+//   component.sourceLeft = 130
+//   component.hAlign = 'right'
+//   component.positionX = '-10px'
+//   component.isPointerBlocker = true
+//   component.onClick = new OnClick(click)
 
-function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, uiChatTexture)
-  component.name = 'send-icon'
-  component.width = '23px'
-  component.height = '23px'
-  component.sourceWidth = 48
-  component.sourceHeight = 48
-  component.sourceTop = 0
-  component.sourceLeft = 48
-  component.hAlign = 'right'
-  component.vAlign = 'bottom'
-  component.positionX = '-10px'
-  component.positionY = '15px'
-  component.isPointerBlocker = true
-  component.onClick = new OnClick(click)
+//   return { component }
+// }
 
-  return { component }
-}
+// function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
+//   const component = new UIImageShape(parent, uiChatTexture)
+//   component.name = 'send-icon'
+//   component.width = '23px'
+//   component.height = '23px'
+//   component.sourceWidth = 48
+//   component.sourceHeight = 48
+//   component.sourceTop = 0
+//   component.sourceLeft = 48
+//   component.hAlign = 'right'
+//   component.vAlign = 'bottom'
+//   component.positionX = '-10px'
+//   component.positionY = '15px'
+//   component.isPointerBlocker = true
+//   component.onClick = new OnClick(click)
+
+//   return { component }
+// }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImageShape(parent, uiChatTexture)
@@ -111,7 +120,7 @@ function createTextInput(
   component.background = Color4.Clear()
   component.focusedBackground = Color4.Clear()
   component.placeholder = 'Say something to nearby people...'
-  component.fontSize = 10
+  component.fontSize = 12
   component.width = 380
   component.height = 20
   component.thickness = 0
@@ -149,30 +158,30 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   return { component: component }
 }
 
-function createChatHeader(parent: UIShape) {
-  const container = new UIContainerRectShape(parent)
-  container.name = 'gui-container-header'
-  container.vAlign = 'top'
-  container.hAlign = 'left'
-  container.width = 400
-  container.height = 45
-  container.thickness = 0
+// function createChatHeader(parent: UIShape) {
+//   const container = new UIContainerRectShape(parent)
+//   container.name = 'gui-container-header'
+//   container.vAlign = 'top'
+//   container.hAlign = 'left'
+//   container.width = 400
+//   container.height = 45
+//   container.thickness = 0
 
-  const headerTextComponent = new UITextShape(parent)
-  headerTextComponent.color = PRIMARY_TEXT_COLOR
-  headerTextComponent.value = 'Chat'
-  headerTextComponent.fontSize = 17
-  headerTextComponent.hAlign = 'left'
-  headerTextComponent.vAlign = 'top'
-  headerTextComponent.hTextAlign = 'left'
-  headerTextComponent.vTextAlign = 'top'
-  headerTextComponent.positionX = '15px'
-  headerTextComponent.positionY = '15px'
-  headerTextComponent.width = 100
-  headerTextComponent.height = 40
+//   const headerTextComponent = new UITextShape(parent)
+//   headerTextComponent.color = PRIMARY_TEXT_COLOR
+//   headerTextComponent.value = 'Chat'
+//   headerTextComponent.fontSize = 17
+//   headerTextComponent.hAlign = 'left'
+//   headerTextComponent.vAlign = 'top'
+//   headerTextComponent.hTextAlign = 'left'
+//   headerTextComponent.vTextAlign = 'top'
+//   headerTextComponent.positionX = '15px'
+//   headerTextComponent.positionY = '15px'
+//   headerTextComponent.width = 100
+//   headerTextComponent.height = 40
 
-  return { container, headerTextComponent }
-}
+//   return { container, headerTextComponent }
+// }
 
 // -------------------------------
 const internalState = {
@@ -188,16 +197,6 @@ const internalState = {
   rotate: false
 }
 
-dcl.subscribe('MESSAGE_RECEIVED')
-dcl.subscribe('MESSAGE_SENT')
-dcl.onEvent(event => {
-  const eventType: string = event.type
-  const eventData: any = event.data
-  if (eventType === 'MESSAGE_RECEIVED' || eventType === 'MESSAGE_SENT') {
-    addMessage(eventData.messageEntry)
-  }
-})
-
 let isMaximized: boolean = false
 
 const containerMinimized = initializeMinimizedChat(screenSpaceUI)
@@ -207,8 +206,8 @@ container.name = 'gui-container'
 container.color = new Color4(0, 0, 0, 0.2)
 container.vAlign = 'bottom'
 container.hAlign = 'left'
-container.width = 470
-container.height = 250
+container.width = 400
+container.height = 320
 container.positionX = 20
 container.positionY = 0
 container.thickness = 0
@@ -232,6 +231,7 @@ transparentMessageContainer.vAlign = 'bottom'
 transparentMessageContainer.hAlign = 'left'
 transparentMessageContainer.width = '100%'
 transparentMessageContainer.height = '100%'
+transparentMessageContainer.positionX = '10px'
 transparentMessageContainer.spacing = 6
 
 
@@ -248,13 +248,13 @@ footerContainer.isPointerBlocker = true
 
 const textInput = createTextInput(footerContainer, onInputChanged, onInputFocus, onInputBlur)
 
-createSendButton(footerContainer, sendMsg)
+//createSendButton(footerContainer, onSendButtonClick)
 createCloseButton(container, toggleChat)
 setMaximized(isMaximized)
 
 // Chat header text
-const chatHeader = createChatHeader(container)
-createMinimizeButton(chatHeader.container, toggleChat)
+//const chatHeader = createChatHeader(container)
+//createMinimizeButton(chatHeader.container, toggleChat)
 // ------------------------------------
 
 // Initialize chat scene
@@ -275,7 +275,12 @@ function toggleChat() {
 function setMaximized(maximized: boolean) {
   container.visible = maximized
   containerMinimized.visible = !maximized
+  transparentContainer.isVertical = maximized
   isMaximized = maximized
+
+  if (!maximized) {
+    textInput.component.value = ''
+  }
 }
 
 function onInputFocus() {
@@ -288,37 +293,38 @@ function onInputBlur() {
 
 function onInputChanged(message: string) {
   // set proper color
-  if (message.charAt(0) === '/') {
-    textInput.component.color = COMMAND_COLOR
-  } else {
-    textInput.component.color = PRIMARY_TEXT_COLOR
-  }
+  // if (message.charAt(0) == '/') {
+  //   textInput.component.color = COMMAND_COLOR
+  // } else {
+  //   textInput.component.color = PRIMARY_TEXT_COLOR
+  // }
 
-  if (message.length < MAX_CHARS) {
-    textInput.component.value = message
-  } else {
-    textInput.component.value = message.slice(0, MAX_CHARS)
-  }
+  // if (message.length < MAX_CHARS) {
+  //   textInput.component.value = message
+  // } else {
+  //   textInput.component.value = message.slice(0, MAX_CHARS)
+  // }
+  textInput.component.value = message
 }
 
-function onInputSubmit(e: { text: string }) {
-  log("submit: " + e.text)
-  sendMsg()
-  // Clear input
-  textInput.component.value = ''
+async function onInputSubmit(e: { text: string }) {
+  await sendMsg(e.text)
 }
 
-async function sendMsg() {
-  const currentMessage = textInput.component.value
+function onSendButtonClick() {
+  sendMsg(textInput.component.value)
+}
 
-  if (currentMessage) {
-    const messageSent = await execute('ChatController', 'send', [currentMessage])
-    // If the command was recognized, add the confirming message to the list
-    if (messageSent) {
-      addMessage(messageSent as MessageEntry)
+async function sendMsg(messageToSend: string) {
+  if (messageToSend) {
+    const message = await execute('ChatController', 'send', [messageToSend])
+
+    if (message) {
+      addMessage(message)
     }
   }
 }
+
 
 function addMessage(messageEntry: MessageEntry): void {
   internalState.messages.push(messageEntry)
