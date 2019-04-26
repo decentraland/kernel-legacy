@@ -1,8 +1,8 @@
-import { UIScreenSpaceShape, UITextShape, Color4 } from 'decentraland-ecs/src'
+import { UICanvas, UIText, Color4 } from 'decentraland-ecs/src'
 
-const ui = new UIScreenSpaceShape()
+const ui = new UICanvas()
 
-const text = new UITextShape(ui)
+const text = new UIText(ui)
 text.name = 'testUIText'
 text.paddingLeft = 10
 text.paddingRight = 10

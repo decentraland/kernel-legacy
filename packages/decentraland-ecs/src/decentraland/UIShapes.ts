@@ -61,19 +61,21 @@ export abstract class UIShape extends ObservableComponent {
 
 /**
  * @internal
+ * NOTE(Brian): this should be deprecated
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_FULLSCREEN_SHAPE)
-export class UIFullScreenShape extends UIShape {
+export class UIFullScreen extends UIShape {
   constructor() {
     super(null)
   }
 }
 
 /**
- * @alpha
+ * @internal
+ * NOTE(Brian): this should be deprecated
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_WORLD_SPACE_SHAPE)
-export class UIWorldSpaceShape extends UIShape {
+export class UIWorldSpace extends UIShape {
   constructor() {
     super(null)
   }
@@ -83,7 +85,7 @@ export class UIWorldSpaceShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_SCREEN_SPACE_SHAPE)
-export class UIScreenSpaceShape extends UIShape {
+export class UICanvas extends UIShape {
   constructor() {
     super(null)
   }
@@ -93,7 +95,7 @@ export class UIScreenSpaceShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_RECT)
-export class UIContainerRectShape extends UIShape {
+export class UIContainerRect extends UIShape {
   @ObservableComponent.field
   adaptWidth: boolean = false
 
@@ -122,7 +124,7 @@ export enum UIStackOrientation {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_STACK)
-export class UIContainerStackShape extends UIShape {
+export class UIContainerStack extends UIShape {
   @ObservableComponent.field
   adaptWidth: boolean = true
 
@@ -143,7 +145,7 @@ export class UIContainerStackShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_BUTTON_SHAPE)
-export class UIButtonShape extends UIShape {
+export class UIButton extends UIShape {
   @ObservableComponent.field
   fontSize: number = 30
 
@@ -194,7 +196,7 @@ export class UIButtonShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_TEXT_SHAPE)
-export class UITextShape extends UIShape {
+export class UIText extends UIShape {
   @ObservableComponent.field
   outlineWidth: number = 0
 
@@ -272,7 +274,7 @@ export class UITextShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_INPUT_TEXT_SHAPE)
-export class UIInputTextShape extends UIShape {
+export class UIInputText extends UIShape {
   @ObservableComponent.field
   color: Color4 = Color4.Clear()
 
@@ -351,7 +353,7 @@ export class UIInputTextShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_IMAGE_SHAPE)
-export class UIImageShape extends UIShape {
+export class UIImage extends UIShape {
   @ObservableComponent.field
   sourceLeft: number = 0
 
@@ -395,7 +397,7 @@ export class UIImageShape extends UIShape {
  * @alpha
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_SLIDER_SHAPE)
-export class UISliderShape extends UIShape {
+export class UIScrollRect extends UIShape {
   @ObservableComponent.field
   valueX: number = 0
 

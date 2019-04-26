@@ -5,7 +5,6 @@ import {
   OnChanged,
   OnClick,
   Color4,
-  log,
   // OnEnter,
   // OnPointerLock,
   Texture,
@@ -16,15 +15,15 @@ import {
 } from 'decentraland-ecs/src'
 
 import {
-  UIImageShape,
-  UIInputTextShape,
-  UITextShape,
-  UIContainerStackShape,
-  //  UISliderShape,
-  UIContainerRectShape,
-  UIFullScreenShape,
+  UIImage,
+  UIInputText,
+  UIText,
+  UIContainerStack,
+  //  UIScrollRect,
+  UIContainerRect,
+  UIFullScreen,
   UIShape,
-  UISliderShape
+  UIScrollRect
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 import { execute } from './rpc'
@@ -53,7 +52,7 @@ dcl.onEvent(event => {
 
 
 // function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-//   const component = new UIImageShape(parent, uiChatTexture)
+//   const component = new UIImage(parent, uiChatTexture)
 
 //   component.name = 'minimize-icon'
 //   component.width = '20px'
@@ -71,7 +70,7 @@ dcl.onEvent(event => {
 // }
 
 // function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-//   const component = new UIImageShape(parent, uiChatTexture)
+//   const component = new UIImage(parent, uiChatTexture)
 //   component.name = 'send-icon'
 //   component.width = '23px'
 //   component.height = '23px'
@@ -90,7 +89,7 @@ dcl.onEvent(event => {
 // }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-  const component = new UIImageShape(parent, uiChatTexture)
+  const component = new UIImage(parent, uiChatTexture)
   component.name = 'close-icon'
   component.width = '20px'
   component.height = '20px'
@@ -113,7 +112,7 @@ function createTextInput(
   onChanged: (value?: any, pointerId?: Number) => void,
   onFocus: () => void,
   onBlur: () => void) {
-  const component = new UIInputTextShape(parent)
+  const component = new UIInputText(parent)
   component.name = 'input'
   component.autoStretchWidth = false
   component.color = PRIMARY_TEXT_COLOR
@@ -142,7 +141,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   const { sender, message, isCommand } = props
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
 
-  const component = new UITextShape(parent)
+  const component = new UIText(parent)
   component.color = color
   component.value = `<b>${sender}:</b> ${message}`
   component.fontSize = 12
@@ -159,7 +158,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
 }
 
 // function createChatHeader(parent: UIShape) {
-//   const container = new UIContainerRectShape(parent)
+//   const container = new UIContainerRect(parent)
 //   container.name = 'gui-container-header'
 //   container.vAlign = 'top'
 //   container.hAlign = 'left'
@@ -167,7 +166,7 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
 //   container.height = 45
 //   container.thickness = 0
 
-//   const headerTextComponent = new UITextShape(parent)
+//   const headerTextComponent = new UIText(parent)
 //   headerTextComponent.color = PRIMARY_TEXT_COLOR
 //   headerTextComponent.value = 'Chat'
 //   headerTextComponent.fontSize = 17
@@ -201,7 +200,7 @@ let isMaximized: boolean = false
 
 const containerMinimized = initializeMinimizedChat(screenSpaceUI)
 
-const container = new UIContainerRectShape(screenSpaceUI)
+const container = new UIContainerRect(screenSpaceUI)
 container.name = 'gui-container'
 container.color = new Color4(0, 0, 0, 0.2)
 container.vAlign = 'bottom'
@@ -213,7 +212,7 @@ container.positionY = 0
 container.thickness = 0
 container.visible = false
 
-const transparentContainer = new UISliderShape(screenSpaceUI)
+const transparentContainer = new UIScrollRect(screenSpaceUI)
 transparentContainer.name = 'gui-transparent-container'
 transparentContainer.vAlign = 'bottom'
 transparentContainer.hAlign = 'left'
@@ -226,7 +225,7 @@ transparentContainer.isVertical = false
 transparentContainer.isHorizontal = false
 transparentContainer.visible = true
 
-const transparentMessageContainer = new UIContainerStackShape(transparentContainer)
+const transparentMessageContainer = new UIContainerStack(transparentContainer)
 transparentMessageContainer.vAlign = 'bottom'
 transparentMessageContainer.hAlign = 'left'
 transparentMessageContainer.width = '100%'
@@ -235,7 +234,7 @@ transparentMessageContainer.positionX = '10px'
 transparentMessageContainer.spacing = 6
 
 
-const footerContainer = new UIContainerRectShape(screenSpaceUI)
+const footerContainer = new UIContainerRect(screenSpaceUI)
 footerContainer.adaptHeight = true
 footerContainer.adaptWidth = true
 footerContainer.vAlign = 'bottom'
@@ -311,9 +310,9 @@ async function onInputSubmit(e: { text: string }) {
   await sendMsg(e.text)
 }
 
-function onSendButtonClick() {
-  sendMsg(textInput.component.value)
-}
+// function onSendButtonClick() {
+//   sendMsg(textInput.component.value)
+// }
 
 async function sendMsg(messageToSend: string) {
   if (messageToSend) {
@@ -331,8 +330,8 @@ function addMessage(messageEntry: MessageEntry): void {
   createMessage(transparentMessageContainer, messageEntry)
 }
 
-function initializeMinimizedChat(parent: UIFullScreenShape) {
-  const containerMinimized = new UIContainerRectShape(parent)
+function initializeMinimizedChat(parent: UIFullScreen) {
+  const containerMinimized = new UIContainerRect(parent)
   containerMinimized.name = 'gui-container-minimized'
   containerMinimized.adaptHeight = true
   containerMinimized.adaptWidth = true
@@ -342,7 +341,7 @@ function initializeMinimizedChat(parent: UIFullScreenShape) {
   containerMinimized.positionY = 15
   containerMinimized.thickness = 0
 
-  const minimizedIcon = new UIImageShape(containerMinimized, uiChatTexture)
+  const minimizedIcon = new UIImage(containerMinimized, uiChatTexture)
   minimizedIcon.name = 'minimize-icon'
   minimizedIcon.width = '230px'
   minimizedIcon.height = '55px'

@@ -1,21 +1,21 @@
 import {
-  UIScreenSpaceShape,
-  UIContainerRectShape,
+  UICanvas,
+  UIContainerRect,
   Color4,
-  UIInputTextShape,
+  UIInputText,
   OnTextSubmit,
   log
 } from 'decentraland-ecs/src'
 
-const ui = new UIScreenSpaceShape()
+const ui = new UICanvas()
 
-const container = new UIContainerRectShape(ui)
+const container = new UIContainerRect(ui)
 container.name = 'testRectContainer'
 container.color = Color4.Green()
 container.width = '50%'
 container.height = '50%'
 
-const textInput = new UIInputTextShape(container)
+const textInput = new UIInputText(container)
 textInput.name = 'textInput'
 textInput.width = '80%'
 textInput.height = '25px'
@@ -36,13 +36,13 @@ textInput.onTextSubmit = new OnTextSubmit(x => {
 // entity.addComponentOrReplace(event)
 // engine.addEntity(entity)
 
-// const imageBack = new UIContainerRectShape(container)
+// const imageBack = new UIContainerRect(container)
 // imageBack.id = 'imageBack'
 // imageBack.color = Color3.Red()
 // imageBack.width = '128px'
 // imageBack.height = '128px'
 
-// const image = new UIImageShape(container, 'img.png')
+// const image = new UIImage(container, 'img.png')
 // image.id = 'testUIImage'
 // image.width = '128px'
 // image.height = '128px'

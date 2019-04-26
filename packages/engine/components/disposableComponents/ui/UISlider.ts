@@ -4,7 +4,7 @@ import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
-import { UISliderShape } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { UIScrollRect } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
 import { UIControl } from './UIControl'
 import { IEvents } from 'decentraland-ecs/src/decentraland/Types'
@@ -43,7 +43,7 @@ const schemaValidator = createSchemaValidator({
   swapOrientation: { type: 'boolean', default: false }
 })
 
-class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
+class UISlider extends UIControl<UIScrollRect, BABYLON.GUI.Slider> {
   control = new BABYLON.GUI.Slider('slider')
 
   constructor(ctx: SharedSceneContext, uuid: string) {
@@ -74,7 +74,7 @@ class UISlider extends UIControl<UISliderShape, BABYLON.GUI.Slider> {
     super.dispose()
   }
 
-  async updateData(data: UISliderShape): Promise<void> {
+  async updateData(data: UIScrollRect): Promise<void> {
     this.data = schemaValidator(data)
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.minimum = 0

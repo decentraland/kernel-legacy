@@ -5,7 +5,7 @@ import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { UIControl } from './UIControl'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
-import { UIContainerStackShape, UIStackOrientation } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { UIContainerStack as UIContainerStackShape, UIStackOrientation } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 const schemaValidator = createSchemaValidator({
   id: { type: 'string', default: null },

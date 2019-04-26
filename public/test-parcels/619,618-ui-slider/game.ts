@@ -1,22 +1,22 @@
 import {
-  UIScreenSpaceShape,
-  UIInputTextShape,
+  UICanvas,
+  UIInputText,
   OnTextSubmit,
-  UISliderShape,
+  UIScrollRect,
   Color4,
-  UITextShape,
-  UIContainerRectShape
+  UIText,
+  UIContainerRect
 } from 'decentraland-ecs/src'
 
-const ui = new UIScreenSpaceShape()
+const ui = new UICanvas()
 
-const container = new UISliderShape(ui)
+const container = new UIScrollRect(ui)
 container.width = '50%'
 container.height = '50%'
 container.backgroundColor = Color4.Gray()
 container.isVertical = true
 
-const rt = new UIContainerRectShape(ui)
+const rt = new UIContainerRect(ui)
 rt.width = '50%'
 rt.height = '50%'
 rt.color = Color4.Clear()
@@ -24,7 +24,7 @@ rt.isPointerBlocker = false
 
 let curOffset = 0
 
-const textInput = new UIInputTextShape(rt)
+const textInput = new UIInputText(rt)
 textInput.width = '80%'
 textInput.height = '25px'
 textInput.vAlign = 'bottom'
@@ -37,7 +37,7 @@ textInput.positionY = '25px'
 textInput.isPointerBlocker = true
 
 textInput.onTextSubmit = new OnTextSubmit(x => {
-  const text = new UITextShape(container)
+  const text = new UIText(container)
   text.value = '<USER-ID> ' + x.text
   text.width = '100%'
   text.height = '20px'

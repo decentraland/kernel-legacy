@@ -3976,7 +3976,7 @@ declare class Transform extends ObservableComponent {
 /**
  * @alpha
  */
-declare class UIButtonShape extends UIShape {
+declare class UIButton extends UIShape {
     fontSize: number;
     fontWeight: string;
     thickness: number;
@@ -3997,7 +3997,14 @@ declare class UIButtonShape extends UIShape {
 /**
  * @alpha
  */
-declare class UIContainerRectShape extends UIShape {
+declare class UICanvas extends UIShape {
+    constructor();
+}
+
+/**
+ * @alpha
+ */
+declare class UIContainerRect extends UIShape {
     adaptWidth: boolean;
     adaptHeight: boolean;
     thickness: number;
@@ -4008,7 +4015,7 @@ declare class UIContainerRectShape extends UIShape {
 /**
  * @alpha
  */
-declare class UIContainerStackShape extends UIShape {
+declare class UIContainerStack extends UIShape {
     adaptWidth: boolean;
     adaptHeight: boolean;
     color: Color4;
@@ -4019,7 +4026,7 @@ declare class UIContainerStackShape extends UIShape {
 /**
  * @alpha
  */
-declare class UIImageShape extends UIShape {
+declare class UIImage extends UIShape {
     sourceLeft: number;
     sourceTop: number;
     sourceWidth: number;
@@ -4037,7 +4044,7 @@ declare class UIImageShape extends UIShape {
 /**
  * @alpha
  */
-declare class UIInputTextShape extends UIShape {
+declare class UIInputText extends UIShape {
     color: Color4;
     thickness: number;
     fontSize: number;
@@ -4067,8 +4074,18 @@ declare class UIInputTextShape extends UIShape {
 /**
  * @alpha
  */
-declare class UIScreenSpaceShape extends UIShape {
-    constructor();
+declare class UIScrollRect extends UIShape {
+    valueX: number;
+    valueY: number;
+    borderColor: Color4;
+    backgroundColor: Color4;
+    isHorizontal: boolean;
+    isVertical: boolean;
+    paddingTop: number;
+    paddingRight: number;
+    paddingBottom: number;
+    paddingLeft: number;
+    onChanged: OnChanged | null;
 }
 
 /**
@@ -4094,23 +4111,6 @@ declare abstract class UIShape extends ObservableComponent {
 }
 
 /**
- * @alpha
- */
-declare class UISliderShape extends UIShape {
-    valueX: number;
-    valueY: number;
-    borderColor: Color4;
-    backgroundColor: Color4;
-    isHorizontal: boolean;
-    isVertical: boolean;
-    paddingTop: number;
-    paddingRight: number;
-    paddingBottom: number;
-    paddingLeft: number;
-    onChanged: OnChanged | null;
-}
-
-/**
  * @public
  */
 declare enum UIStackOrientation {
@@ -4121,7 +4121,7 @@ declare enum UIStackOrientation {
 /**
  * @alpha
  */
-declare class UITextShape extends UIShape {
+declare class UIText extends UIShape {
     outlineWidth: number;
     outlineColor: Color4;
     color: Color4;
@@ -4164,13 +4164,6 @@ declare class UIValue {
 declare enum UIValueType {
     PERCENT = 0,
     PIXELS = 1
-}
-
-/**
- * @alpha
- */
-declare class UIWorldSpaceShape extends UIShape {
-    constructor();
 }
 
 /**

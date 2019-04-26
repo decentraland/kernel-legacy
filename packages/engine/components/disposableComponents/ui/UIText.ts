@@ -4,7 +4,7 @@ import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
 import { parseVerticalAlignment, parseHorizontalAlignment } from 'engine/entities/utils/parseAttrs'
-import { UITextShape } from 'decentraland-ecs/src/decentraland/UIShapes'
+import { UIText as UITextShape } from 'decentraland-ecs/src/decentraland/UIShapes'
 import { UIControl } from './UIControl'
 
 const schemaValidator = createSchemaValidator({

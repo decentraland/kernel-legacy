@@ -1,44 +1,44 @@
 const SEND_ICON = './images/send-icon.png'
 
-const ui = new UIScreenSpaceShape()
+const ui = new UICanvas()
 const uiEntity = new Entity()
 uiEntity.addComponentOrReplace(ui)
 engine.addEntity(uiEntity)
 
-const container = new UIContainerRectShape(ui)
+const container = new UIContainerRect(ui)
 container.width = 1
 container.height = 1
-container.color = Color3.White() // we set global text color here
+container.color = Color4.White() // we set global text color here
 container.hAlign = 'center'
 container.vAlign = 'center'
 
 // We add separate rect container to act as a background with opacity
-const bg = new UIContainerRectShape(container)
+const bg = new UIContainerRect(container)
 bg.opacity = 0.2
 bg.thickness = 1
 // TODO: UI-Migration
 // a bg.cornerRadius = 10
-bg.color = Color3.Black()
+bg.color = Color4.Black()
 
 // --- INVENTORY
 
-const inventoryContainer = new UIContainerStackShape(container)
+const inventoryContainer = new UIContainerStack(container)
 inventoryContainer.adaptWidth = true
 // inventoryContainer.adaptHeight = true --- you can only set adaptWidth (X)OR adaptHeight for it to work correctly
 inventoryContainer.width = '40%'
 inventoryContainer.positionY = '-100px'
 inventoryContainer.positionX = '10px'
 // inventoryContainer.color = 'white' // previously set child text color
-inventoryContainer.color = Color3.Blue()
+inventoryContainer.color = Color4.Blue()
 inventoryContainer.hAlign = 'left'
 inventoryContainer.vAlign = 'top'
-inventoryContainer.vertical = true // when adapting height, set this to false
+inventoryContainer.stackOrientation = UIStackOrientation.VERTICAL // when adapting height, set this to false
 
 function generateInventoryItem(index: number) {
-  const bg = new UIContainerRectShape(inventoryContainer)
-  bg.id = `hmmm-${index}`
+  const bg = new UIContainerRect(inventoryContainer)
+  bg.name = `hmmm-${index}`
   bg.thickness = 1
-  bg.color = Color3.Blue()
+  bg.color = Color4.Blue()
   // If `inventoryContainer.adaptWidth` OR `inventoryContainer.adaptHeight`
   // are set to true, you have to set width OR height of its children in pixels!
   bg.width = 1
@@ -47,15 +47,15 @@ function generateInventoryItem(index: number) {
   bg.hAlign = 'center'
   bg.vAlign = 'top'
 
-  const text = new UITextShape(bg)
-  text.id = `hehe-${index}`
+  const text = new UIText(bg)
+  text.name = `hehe-${index}`
   text.value = `Item ${index}`
   text.vAlign = 'center'
   text.hAlign = 'center'
   text.adaptWidth = true
   text.adaptHeight = true
   text.fontSize = 10
-  text.color = new Color3(1, 0, 0)
+  text.color = new Color4(1, 0, 0, 1)
 }
 
 generateInventoryItem(1)
@@ -67,23 +67,22 @@ generateInventoryItem(4)
 
 let inputTextState = ''
 
-const input = new UIInputTextShape(container)
-input.color = Color3.White()
+const input = new UIInputText(container)
+input.color = Color4.White()
 input.thickness = 1
-input.fontFamily = 'Open Sans'
 input.fontSize = 20
 input.fontWeight = 'normal'
 input.opacity = 1.0
-input.placeholderColor = Color3.White()
+input.placeholderColor = Color4.White()
 input.value = inputTextState
 input.placeholder = 'write something...'
 input.margin = 10
-input.color = Color3.Black()
-input.focusedBackground = Color3.FromHexString('#00a4a4')
+input.color = Color4.Black()
+input.focusedBackground = Color4.FromHexString('#00a4a4')
 input.shadowBlur = 10
 input.shadowOffsetX = 5
 input.shadowOffsetY = 5
-input.shadowColor = Color3.FromHexString('#c7c7c7')
+input.shadowColor = Color4.FromHexString('#c7c7c7')
 input.hAlign = 'right'
 input.vAlign = 'top'
 input.width = '40%'
@@ -102,16 +101,16 @@ inputEntity.addComponentOrReplace(
 engine.addEntity(inputEntity)
 
 const sendButton = new Entity()
-const sendButtonShape = new UIImageShape(container, new Texture(SEND_ICON))
-sendButtonShape.sourceWidth = '64px'
-sendButtonShape.sourceHeight = '64px'
-sendButtonShape.sourceTop = '0px'
-sendButtonShape.sourceLeft = '0px'
+const sendButtonShape = new UIImage(container, new Texture(SEND_ICON))
+sendButtonShape.sourceWidth = 64
+sendButtonShape.sourceHeight = 64
+sendButtonShape.sourceTop = 0
+sendButtonShape.sourceLeft = 0
 sendButtonShape.width = '30px'
 sendButtonShape.height = '30px'
 sendButtonShape.hAlign = 'right'
-sendButtonShape.position.y = -40
-sendButtonShape.position.x = -20
+sendButtonShape.positionY = -40
+sendButtonShape.positionX = -20
 sendButton.addComponentOrReplace(
   new OnClick(() => {
     if (inputTextState) {
@@ -127,25 +126,25 @@ engine.addEntity(sendButton)
 
 // --- SLIDERS
 
-const valueFromSlider1 = new UITextShape(container)
+const valueFromSlider1 = new UIText(container)
 valueFromSlider1.value = '0'
 valueFromSlider1.vAlign = 'top'
 valueFromSlider1.hAlign = 'right'
 valueFromSlider1.width = '30px'
 valueFromSlider1.fontSize = 30
-valueFromSlider1.color = new Color3(1, 0, 0)
+valueFromSlider1.color = new Color4(1, 0, 0)
 
-const valueFromSlider2 = new UITextShape(container)
+const valueFromSlider2 = new UIText(container)
 valueFromSlider2.positionY = '-100px'
 valueFromSlider2.value = '0'
 valueFromSlider2.vAlign = 'top'
 valueFromSlider2.hAlign = 'right'
 valueFromSlider2.width = '30px'
 valueFromSlider2.fontSize = 30
-valueFromSlider2.color = Color3.Black()
+valueFromSlider2.color = Color4.Black()
 
 const slider1 = new Entity()
-const sliderShape1 = new UISliderShape(container)
+const sliderShape1 = new UIScrollRect(container)
 sliderShape1.opacity = 1.0
 sliderShape1.isVertical = true
 sliderShape1.hAlign = 'right'
@@ -164,7 +163,7 @@ slider1.addComponentOrReplace(sliderShape1)
 engine.addEntity(slider1)
 
 const slider2 = new Entity()
-const sliderShape2 = new UISliderShape(container)
+const sliderShape2 = new UIScrollRect(container)
 sliderShape2.opacity = 1.0
 sliderShape2.borderColor = new Color4(1, 0, 0, 1)
 sliderShape2.isVertical = false
@@ -184,7 +183,7 @@ slider2.addComponentOrReplace(
 slider2.addComponentOrReplace(sliderShape2)
 engine.addEntity(slider2)
 
-const topText = new UITextShape(container)
+const topText = new UIText(container)
 topText.value = 'Some text'
 topText.vAlign = 'top'
 topText.fontSize = 20
@@ -192,25 +191,26 @@ topText.width = '200px'
 topText.height = '25px'
 topText.paddingTop = 10
 topText.outlineWidth = 1
-topText.outlineColor = Color3.FromHexString('#add8e6')
+topText.outlineColor = Color4.FromHexString('#add8e6')
 
-const textFromInput = new UITextShape(container)
+const textFromInput = new UIText(container)
 textFromInput.value = 'Type text to input and press send button'
 textFromInput.hAlign = 'right'
 textFromInput.vAlign = 'top'
 textFromInput.positionY = '-200px'
 textFromInput.fontSize = 15
-textFromInput.resizeToFit = true
+textFromInput.adaptHeight = true
+textFromInput.adaptWidth = true
 textFromInput.paddingRight = 10
 
 // --- CLOSE BUTTON
 
 const closeButton = new Entity()
-const closeShape = new UIButtonShape(container)
+const closeShape = new UIButton(container)
 closeShape.text = 'Close UI'
 closeShape.fontSize = 15
-closeShape.color = Color3.Black()
-closeShape.background = Color3.Yellow()
+closeShape.color = Color4.Black()
+closeShape.background = Color4.Yellow()
 closeShape.cornerRadius = 10
 closeShape.thickness = 1
 closeShape.width = '120px'
