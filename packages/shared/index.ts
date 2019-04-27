@@ -2,16 +2,7 @@ import './apis/index'
 import './events'
 
 import { initializeUrlPositionObserver } from './world/positionThings'
-import {
-  ETHEREUM_NETWORK,
-  MOBILE_DEBUG,
-  PREVIEW,
-  EDITOR,
-  AVOID_WEB3,
-  setNetwork,
-  decentralandConfigurations,
-  getTLD
-} from '../config'
+import { ETHEREUM_NETWORK, MOBILE_DEBUG, networkConfigurations, PREVIEW, EDITOR, AVOID_WEB3 } from '../config'
 import { getERC721 } from './ethereum/ERC721'
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { connect } from './comms'
@@ -26,7 +17,7 @@ async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
   let isWhitelisted = location.hostname === 'localhost' || navigator.userAgent.includes('Oculus')
 
   if (!isWhitelisted && address) {
-    const contract = await getERC721(requestManager, decentralandConfigurations.invite)
+    const contract = await getERC721(requestManager, networkConfigurations[net].invite)
 
     const balance = await contract.balanceOf(address)
 
@@ -40,16 +31,16 @@ async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
   return isWhitelisted
 }
 
-function getNetworkFromTLD(): ETHEREUM_NETWORK | null {
-  if (getTLD() === 'localhost') {
+function getNetworkFromDomain(): ETHEREUM_NETWORK | null {
+  const domain = window.location.host
+
+  if (domain.endsWith('.decentraland.org') || domain.endsWith('.decentraland.today')) {
+    return ETHEREUM_NETWORK.MAINNET
+  } else if (domain.endsWith('.decentraland.zone')) {
+    return ETHEREUM_NETWORK.ROPSTEN
+  } else {
     return null
   }
-
-  if (getTLD() === 'zone') {
-    return ETHEREUM_NETWORK.ROPSTEN
-  }
-
-  return ETHEREUM_NETWORK.MAINNET
 }
 
 async function getAddressAndNetwork() {
@@ -57,7 +48,7 @@ async function getAddressAndNetwork() {
     error('Could not get Ethereum address, communications will be disabled.')
 
     return {
-      net: getNetworkFromTLD() || ETHEREUM_NETWORK.MAINNET,
+      net: getNetworkFromDomain() || ETHEREUM_NETWORK.MAINNET,
       address: '0x0000000000000000000000000000000000000000'
     }
   }
@@ -67,7 +58,8 @@ async function getAddressAndNetwork() {
     const address = await getUserAccount()
     const web3Network = await getNetwork()
     const web3net = web3Network === '1' ? ETHEREUM_NETWORK.MAINNET : ETHEREUM_NETWORK.ROPSTEN
-    const net = getNetworkFromTLD() || web3net
+
+    const net = getNetworkFromDomain() || web3net
 
     if (web3net && net !== web3net) {
       // TODO @fmiras show an HTML error if web3 networks differs from domain network and do not load client at all
@@ -86,7 +78,7 @@ async function getAddressAndNetwork() {
       info(e)
 
       return {
-        net: getNetworkFromTLD() || ETHEREUM_NETWORK.MAINNET,
+        net: getNetworkFromDomain() || ETHEREUM_NETWORK.MAINNET,
         address: '0x0000000000000000000000000000000000000000'
       }
     } else {
@@ -97,12 +89,11 @@ async function getAddressAndNetwork() {
 
 export async function initShared() {
   const { address, net } = await getAddressAndNetwork()
-  // Load contracts from https://contracts.decentraland.org
-  await setNetwork(net)
+
   const isWhitelisted = await grantAccess(address, net)
 
   if (isWhitelisted) {
-    await connect(
+    connect(
       address,
       net
     )

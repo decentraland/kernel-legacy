@@ -1,13 +1,6 @@
 import 'webrtc-adapter'
 
-import {
-  parcelLimits,
-  ETHEREUM_NETWORK,
-  commConfigurations,
-  playerConfigurations,
-  getServerConfigurations
-} from 'config'
-
+import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, networkConfigurations, playerConfigurations } from 'config'
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
 import { positionObservable } from 'shared/world/positionThings'
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
@@ -115,12 +108,11 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
     peerTrackingInfo.receivedPublicChatMessages.add(msgId)
 
     const user = getUser(fromAlias)
-
     if (user) {
       const { displayName } = user
       const entry = {
         id: msgId,
-        sender: displayName,
+        sender: displayName || user.publicKey || 'unknown',
         message: text,
         isCommand: false
       }
@@ -311,7 +303,7 @@ export async function connect(ethAddress: string, network: ETHEREUM_NETWORK) {
       avatarType: user.avatarType
     }
 
-    const connection = new WorldInstanceConnection(getServerConfigurations().worldInstanceUrl)
+    const connection = new WorldInstanceConnection(networkConfigurations[network].worldInstanceUrl)
     connection.positionHandler = (alias, data) => processPositionMessage(context!, alias, data)
     connection.profileHandler = (alias, data) => processProfileMessage(context!, alias, data)
     connection.chatHandler = (alias, data) => processChatMessage(context!, alias, data)

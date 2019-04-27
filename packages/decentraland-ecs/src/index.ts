@@ -5,6 +5,7 @@ export * from './ecs/Entity'
 export * from './ecs/Task'
 export * from './ecs/helpers'
 export * from './ecs/Observable'
+export * from './ecs/UIValue'
 export * from './ecs/EventManager'
 
 import { DecentralandSynchronizationSystem } from './decentraland/Implementation'
@@ -29,11 +30,9 @@ if (typeof dcl !== 'undefined') {
   engine.addSystem(new DecentralandSynchronizationSystem(dcl), Infinity)
 }
 
-import { UUIDEventSystem } from './decentraland/Systems'
+import { uuidEventSystem } from './decentraland/Systems'
 
 // Initialize UUID Events system
-/** @internal */
-const uuidEventSystem = new UUIDEventSystem()
 engine.addSystem(uuidEventSystem)
 
 // DECENTRALAND DEPENDENCIES
@@ -43,7 +42,7 @@ export * from './decentraland/Systems'
 export * from './decentraland/Events'
 export * from './decentraland/Camera'
 export * from './decentraland/math'
-export * from './decentraland/AnimationState'
+export * from './decentraland/AnimationClip'
 export * from './decentraland/Input'
 export * from './decentraland/Audio'
 export * from './decentraland/Gizmos'

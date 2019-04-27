@@ -33,7 +33,7 @@ export class Color4 {
      * Defines the alpha component (between 0 and 1, default is 1)
      */
     public a: number = 1
-  ) {}
+  ) { }
 
   // Statics
 
@@ -80,6 +80,84 @@ export class Color4 {
     result.g = left.g + (right.g - left.g) * amount
     result.b = left.b + (right.b - left.b) * amount
     result.a = left.a + (right.a - left.a) * amount
+  }
+
+  /**
+ * Returns a Color4 value containing a red color
+ * @returns a new Color3 object
+ */
+  public static Red(): Color4 {
+    return new Color4(1.0, 0, 0, 1.0)
+  }
+  /**
+   * Returns a Color4 value containing a green color
+   * @returns a new Color4 object
+   */
+  public static Green(): Color4 {
+    return new Color4(0, 1.0, 0, 1.0)
+  }
+  /**
+   * Returns a Color4 value containing a blue color
+   * @returns a new Color4 object
+   */
+  public static Blue(): Color4 {
+    return new Color4(0, 0, 1.0, 1.0)
+  }
+  /**
+   * Returns a Color4 value containing a black color
+   * @returns a new Color4 object
+   */
+  public static Black(): Color4 {
+    return new Color4(0, 0, 0, 1)
+  }
+  /**
+   * Returns a Color4 value containing a white color
+   * @returns a new Color4 object
+   */
+  public static White(): Color4 {
+    return new Color4(1, 1, 1, 1)
+  }
+  /**
+   * Returns a Color4 value containing a purple color
+   * @returns a new Color4 object
+   */
+  public static Purple(): Color4 {
+    return new Color4(0.5, 0, 0.5, 1)
+  }
+  /**
+   * Returns a Color4 value containing a magenta color
+   * @returns a new Color4 object
+   */
+  public static Magenta(): Color4 {
+    return new Color4(1, 0, 1, 1)
+  }
+  /**
+   * Returns a Color4 value containing a yellow color
+   * @returns a new Color4 object
+   */
+  public static Yellow(): Color4 {
+    return new Color4(1, 1, 0, 1)
+  }
+  /**
+   * Returns a Color4 value containing a gray color
+   * @returns a new Color4 object
+   */
+  public static Gray(): Color4 {
+    return new Color4(0.5, 0.5, 0.5, 1.0)
+  }
+  /**
+   * Returns a Color4 value containing a teal color
+   * @returns a new Color4 object
+   */
+  public static Teal(): Color4 {
+    return new Color4(0, 1.0, 1.0, 1.0)
+  }
+  /**
+   * Returns a Color4 value containing a transparent color
+   * @returns a new Color4 object
+   */
+  public static Clear(): Color4 {
+    return new Color4(0, 0, 0, 0)
   }
 
   /**

@@ -194,12 +194,6 @@ export class Entity {
     if (this.eventManager) {
       this.eventManager.fireEvent(new ComponentAdded(this, componentName, classId))
     }
-
-    const storedComponent = component as ComponentLike
-
-    if (typeof storedComponent.addedToEntity === 'function') {
-      storedComponent.addedToEntity(this)
-    }
   }
 
   /**
@@ -219,7 +213,7 @@ export class Entity {
 
     const componentName = typeOfComponent === 'string' ? (component as string) : getComponentName(component as any)
 
-    const storedComponent = this.components[componentName] as ComponentLike | void
+    const storedComponent = this.components[componentName]
 
     if (!storedComponent) {
       log(`Entity Warning: Trying to remove inexisting component "${componentName}" from entity "${this.identifier}"`)
@@ -230,14 +224,8 @@ export class Entity {
       if (storedComponent instanceof (component as ComponentConstructor<any>)) {
         delete this.components[componentName]
 
-        if (storedComponent) {
-          if (triggerRemovedEvent && this.eventManager) {
-            this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
-          }
-
-          if (typeof storedComponent.removedFromEntity === 'function') {
-            storedComponent.removedFromEntity(this)
-          }
+        if (triggerRemovedEvent && this.eventManager && storedComponent) {
+          this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
         }
         return
       } else {
@@ -251,17 +239,9 @@ export class Entity {
     }
 
     delete this.components[componentName]
-
-    if (storedComponent) {
-      if (triggerRemovedEvent && this.eventManager) {
-        this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
-      }
-
-      if (typeof storedComponent.removedFromEntity === 'function') {
-        storedComponent.removedFromEntity(this)
-      }
+    if (triggerRemovedEvent && this.eventManager && storedComponent) {
+      this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
     }
-
     return
   }
 

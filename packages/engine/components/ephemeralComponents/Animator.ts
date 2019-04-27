@@ -7,7 +7,7 @@ import { disposeAnimationGroups } from 'engine/entities/utils/processModels'
 function validateClip(clipDef: SkeletalAnimationValue): SkeletalAnimationValue | null {
   if ((clipDef as any) != null && typeof (clipDef as any) === 'object') {
     clipDef.weight = Math.max(Math.min(1, validators.float(clipDef.weight, 1)), 0)
-    clipDef.looping = validators.boolean(clipDef.looping, true)
+    clipDef.loop = validators.boolean(clipDef.loop, true)
     clipDef.playing = validators.boolean(clipDef.playing, true)
     clipDef.speed = Math.max(0, validators.float(clipDef.speed, 1))
 
@@ -60,18 +60,8 @@ export class Animator extends BaseComponent<SkeletalAnimationComponent> {
           clip.speedRatio = animationAttributes.speed
         }
 
-        if (animationAttributes.shouldReset) {
-          clip.reset()
-        }
-
-        if (!clip.onAnimationEndObservable.hasObservers()) {
-          clip.onAnimationEndObservable.addOnce(() => {
-            this.entity.dispatchUUIDEvent('onAnimationEnd', { clipName: animationAttributes.clip })
-          })
-        }
-
         if (animationAttributes.playing && !(clip as any).isPlaying) {
-          clip.play(animationAttributes.looping)
+          clip.play(animationAttributes.loop)
         } else if (!animationAttributes.playing && (clip as any).isPlaying) {
           clip.pause()
         }

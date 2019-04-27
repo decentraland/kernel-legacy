@@ -1,8 +1,9 @@
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
 import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from './math'
-import { AnimationState } from './AnimationState'
+import { AnimationClip } from './AnimationClip'
 import { newId } from '../ecs/helpers'
 import { IEvents } from './Types'
+import { uuidEventSystem } from './Systems';
 
 export type TranformConstructorArgs = {
   position?: Vector3
@@ -159,13 +160,13 @@ export class Shape extends ObservableComponent {
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.BOX_SHAPE)
-export class BoxShape extends Shape {}
+export class BoxShape extends Shape { }
 
 /**
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.SPHERE_SHAPE)
-export class SphereShape extends Shape {}
+export class SphereShape extends Shape { }
 
 /**
  * @public
@@ -374,12 +375,12 @@ export class Texture extends ObservableComponent {
 @Component('engine.animator', CLASS_ID.ANIMATION)
 export class Animator extends Shape {
   @ObservableComponent.readonly
-  private states: AnimationState[] = []
+  private states: AnimationClip[] = []
 
   /**
-   * Adds an AnimationState to the animation lists.
+   * Adds an AnimationClip to the animation lists.
    */
-  addClip(clip: AnimationState) {
+  addClip(clip: AnimationClip) {
     this.states.push(clip)
     clip.onChange(() => {
       this.dirty = true
@@ -390,7 +391,7 @@ export class Animator extends Shape {
    * Gets the animation clip instance for the specified clip name.
    * If the clip doesn't exist a new one will be created.
    */
-  getClip(clipName: string): AnimationState {
+  getClip(clipName: string): AnimationClip {
     for (let i = 0; i < this.states.length; i++) {
       const clip = this.states[i]
       if (clip.clip === clipName) {
@@ -398,7 +399,7 @@ export class Animator extends Shape {
       }
     }
 
-    const newClip = new AnimationState(clipName)
+    const newClip = new AnimationClip(clipName)
     this.addClip(newClip)
     return newClip
   }
@@ -712,10 +713,53 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
     }
 
     this.callback = callback
+    uuidEventSystem.handlerMap[this.uuid] = this
   }
 
   toJSON() {
     return { uuid: this.uuid, type: this.type }
+  }
+
+  static uuidEvent(target: ObservableComponent, propertyKey: string) {
+    if (delete (target as any)[propertyKey]) {
+      const componentSymbol = propertyKey + '_' + Math.random()
+        ; (target as any)[componentSymbol] = undefined
+
+      Object.defineProperty(target, componentSymbol, {
+        ...Object.getOwnPropertyDescriptor(target, componentSymbol),
+        enumerable: false
+      })
+
+      Object.defineProperty(target, propertyKey.toString(), {
+        get: function () {
+          return this[componentSymbol]
+        },
+        set: function (value) {
+          const oldValue = this[componentSymbol]
+
+          if (value) {
+            if (value instanceof OnUUIDEvent) {
+              this.data[propertyKey] = value.uuid
+            } else {
+              throw new Error('value is not an OnUUIDEvent')
+            }
+          } else {
+            this.data[propertyKey] = null
+          }
+
+          this[componentSymbol] = value
+
+          if (value !== oldValue) {
+            this.dirty = true
+
+            for (let i = 0; i < this.subscriptions.length; i++) {
+              this.subscriptions[i](propertyKey, value, oldValue)
+            }
+          }
+        },
+        enumerable: true
+      })
+    }
   }
 }
 
@@ -758,19 +802,19 @@ export class OnPointerLock extends OnUUIDEvent<'onPointerLock'> {
 /**
  * @public
  */
-@Component('engine.onAnimationEnd', CLASS_ID.UUID_CALLBACK)
-export class OnAnimationEnd extends OnUUIDEvent<'onAnimationEnd'> {
+@Component('engine.onFocus', CLASS_ID.UUID_CALLBACK)
+export class OnFocus extends OnUUIDEvent<'onFocus'> {
   @ObservableComponent.readonly
-  readonly type: string = 'onAnimationEnd'
+  readonly type: string = 'onFocus'
 }
 
 /**
  * @public
  */
-@Component('engine.onFocus', CLASS_ID.UUID_CALLBACK)
-export class OnFocus extends OnUUIDEvent<'onFocus'> {
+@Component('engine.onTextSubmit', CLASS_ID.UUID_CALLBACK)
+export class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
   @ObservableComponent.readonly
-  readonly type: string = 'onFocus'
+  readonly type: string = 'onTextSubmit'
 }
 
 /**

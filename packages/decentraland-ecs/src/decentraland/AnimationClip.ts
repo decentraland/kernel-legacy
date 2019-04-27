@@ -16,7 +16,7 @@ const defaultParams: Required<Pick<AnimationParams, 'looping' | 'speed' | 'weigh
 /**
  * @public
  */
-export class AnimationState extends ObservableComponent {
+export class AnimationClip extends ObservableComponent {
   // @internal
   public isAnimationClip: boolean = true
 
@@ -45,12 +45,6 @@ export class AnimationState extends ObservableComponent {
   public playing: boolean = false
 
   /**
-   * Does any anyone asked to reset the animation? default: false
-   */
-  @ObservableComponent.field
-  public shouldReset: boolean = false
-
-  /**
    * The animation speed
    */
   @ObservableComponent.field
@@ -74,14 +68,6 @@ export class AnimationState extends ObservableComponent {
     this.speed = params.speed || this.speed
   }
 
-  toJSON() {
-    const ret = JSON.parse(JSON.stringify(super.toJSON()))
-    if (this.shouldReset) {
-      this.shouldReset = false
-    }
-    return ret
-  }
-
   /**
    * Starts the animation
    */
@@ -94,20 +80,5 @@ export class AnimationState extends ObservableComponent {
    */
   pause() {
     this.playing = false
-  }
-
-  /**
-   * Resets the animation state to the frame 0
-   */
-  reset() {
-    this.shouldReset = true
-  }
-
-  /**
-   * Resets and pauses the animation
-   */
-  stop() {
-    this.reset()
-    this.pause()
   }
 }

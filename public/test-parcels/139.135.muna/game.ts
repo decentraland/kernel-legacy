@@ -4,7 +4,7 @@ import {
   engine,
   Vector3,
   Transform,
-  AnimationState,
+  AnimationClip,
   Animator,
   Quaternion
 } from 'decentraland-ecs/src'
@@ -29,7 +29,7 @@ function AddGLTF(path: string, position: Vector3, rotation: Vector3, scale?: Vec
 
   if (clip) {
     const animator = new Animator()
-    let animation = new AnimationState(clip)
+    let animation = new AnimationClip(clip)
     animator.addClip(animation)
     entity.addComponent(animator)
     animation.play()

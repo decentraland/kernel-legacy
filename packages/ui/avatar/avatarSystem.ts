@@ -9,8 +9,8 @@ import {
   Vector3,
   Quaternion,
   Component,
-  Scalar,
-  OnPointerDown
+  Scalar//,
+  //OnPointerDown
 } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
@@ -26,7 +26,7 @@ import {
 } from 'shared/comms/types'
 import { execute } from './rpc'
 import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
-import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
+//import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -48,9 +48,13 @@ function getModel(src: string) {
 }
 
 function getAvatarModel(avatarName: string) {
+  // Remove possible 'zero width spaces' (unicode 8203) existence in name
+  avatarName = avatarName.replace(/(^[\s\u200b]*|[\s\u200b]*$)/g, '')
+
   if (avatarName.endsWith('.gltf') || avatarName.endsWith('.glb')) {
     return getModel(`models/avatar/${avatarName}`)
   }
+
   return getModel(`models/avatar/${avatarName}/head.glb`)
 }
 
@@ -146,19 +150,27 @@ export class AvatarEntity extends Entity {
   constructor(public name: string) {
     super(name)
 
-    const clicked = new OnPointerDown(this.clicked)
+    // const clicked = new OnPointerDown(this.clicked)
 
     {
       this.labelEntity.setParent(this)
-      this.labelEntity.getComponentOrCreate(Transform).position.y = 2
+
+      let labelTransform = this.labelEntity.getComponentOrCreate(Transform)
+      labelTransform.position.y = 2
+      labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
+
       this.label.isPickable = true
       this.labelEntity.addComponent(this.label)
-      this.labelEntity.addComponent(clicked)
+      //this.labelEntity.addComponent(clicked)
+
+      const model = getAvatarModel(GENERIC_AVATAR)
+      this.currentAvatarType = GENERIC_AVATAR
+      this.body.addComponentOrReplace(model)
     }
 
     this.body.setParent(this)
-    this.body.addComponent(clicked)
+    //this.body.addComponent(clicked)
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
@@ -166,15 +178,15 @@ export class AvatarEntity extends Entity {
     this.setVisible(true)
   }
 
-  clicked = () => {
-    showAvatarWindow({
-      displayName: this.displayName,
-      isBlocked: this.blocked,
-      isMuted: this.muted,
-      publicKey: this.publicKey,
-      uuid: this.name
-    })
-  }
+  // clicked = () => {
+  //   showAvatarWindow({
+  //     displayName: this.displayName,
+  //     isBlocked: this.blocked,
+  //     isMuted: this.muted,
+  //     publicKey: this.publicKey,
+  //     uuid: this.name
+  //   })
+  // }
 
   setBlocked(blocked: boolean, muted: boolean): void {
     this.blocked = blocked
@@ -201,12 +213,11 @@ export class AvatarEntity extends Entity {
   setUserData(userData: Partial<UserInformation>): void {
     if (userData.avatarType) {
       this.setAvatarType(userData.avatarType)
+    } else {
+      this.setAvatarType(GENERIC_AVATAR)
     }
 
     if (userData.pose) {
-      if (!this.currentAvatarType) {
-        this.setAvatarType(GENERIC_AVATAR)
-      }
       this.setPose(userData.pose)
     }
 
@@ -259,8 +270,6 @@ function ensureAvatar(uuid: UUID): AvatarEntity | null {
 
   avatar = new AvatarEntity(uuid)
 
-  avatar.setUserData({ avatarType: 'square-robot' })
-
   avatarMap.set(uuid, avatar)
 
   executeTask(hideBlockedUsers)
@@ -295,6 +304,11 @@ function handleUserData(message: ReceiveUserDataMessage): void {
 
   if (avatar) {
     const userData = message.data
+
+    // We force the GENERIC_AVATAR for now until the Avatar system and creation/integration pipeline has been defined
+    // TODO: Remove this override once the Avatar system design has been defined.
+    userData.avatarType = GENERIC_AVATAR
+
     avatar.setUserData(userData)
   }
 }
@@ -329,18 +343,18 @@ function handleUserRemoved({ uuid }: UserRemovedMessage): void {
     avatarMap.delete(uuid)
     engine.removeEntity(avatar)
   }
-  if (uuid === currentAvatarId) {
-    hideAvatarWindow()
-  }
+  // if (uuid === currentAvatarId) {
+  //   hideAvatarWindow()
+  // }
   cleanupUnusedModels()
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
-  const avatar = avatarMap.get(uuid)
+  //const avatar = avatarMap.get(uuid)
 
-  if (avatar) {
-    avatar.clicked()
-  }
+  // if (avatar) {
+  //   avatar.clicked()
+  // }
 }
 
 function handleMutedBlockedMessages({ uuid }: UserMessage): void {

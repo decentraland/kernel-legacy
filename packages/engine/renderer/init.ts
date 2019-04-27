@@ -9,7 +9,15 @@ import { initMonkeyLoader } from './monkeyLoader'
 import { Database } from '../database'
 
 import { future } from 'fp-future'
-import { isRunningTest, playerConfigurations, interactionLimits, DEBUG, PREVIEW, EDITOR } from 'config'
+import {
+  isRunningTest,
+  playerConfigurations,
+  interactionLimits,
+  isStandaloneHeadset,
+  DEBUG,
+  PREVIEW,
+  EDITOR
+} from 'config'
 
 export const canvas = document.createElement('canvas')
 canvas.setAttribute('id', 'main-canvas')
@@ -158,7 +166,7 @@ const database: BABYLON.Database = new Database() as any
 
   scene.getBoundingBoxRenderer().showBackLines = false
 
-  if (isRunningTest) {
+  if (!isStandaloneHeadset || isRunningTest) {
     scene.onReadyObservable.add(() => {
       effectLayers.forEach($ => scene.effectLayers.includes($) || scene.addEffectLayer($))
 

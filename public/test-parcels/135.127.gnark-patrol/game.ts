@@ -4,7 +4,7 @@ import {
   engine,
   Vector3,
   Transform,
-  AnimationState,
+  AnimationClip,
   Animator,
   Component,
   Camera
@@ -70,9 +70,9 @@ engine.addEntity(gnark)
 
 // Add walk animation
 const animator = new Animator()
-const walkClip = new AnimationState('walk')
-const turnRClip = new AnimationState('turnRight', { looping: true })
-const raiseDeadClip = new AnimationState('raiseDead')
+const walkClip = new AnimationClip('walk')
+const turnRClip = new AnimationClip('turnRight', { looping: true })
+const raiseDeadClip = new AnimationClip('raiseDead')
 animator.addClip(walkClip)
 animator.addClip(turnRClip)
 animator.addClip(raiseDeadClip)
