@@ -72,6 +72,7 @@ export class AnimationState extends ObservableComponent {
   setParams(params: AnimationParams) {
     this.looping = params.looping !== undefined ? params.looping : this.looping
     this.speed = params.speed || this.speed
+    return this
   }
 
   toJSON() {
@@ -87,6 +88,7 @@ export class AnimationState extends ObservableComponent {
    */
   play() {
     this.playing = true
+    return this
   }
 
   /**
@@ -94,6 +96,7 @@ export class AnimationState extends ObservableComponent {
    */
   pause() {
     this.playing = false
+    return this
   }
 
   /**
@@ -101,6 +104,7 @@ export class AnimationState extends ObservableComponent {
    */
   reset() {
     this.shouldReset = true
+    return this
   }
 
   /**
@@ -109,5 +113,6 @@ export class AnimationState extends ObservableComponent {
   stop() {
     this.reset()
     this.pause()
+    return this
   }
 }

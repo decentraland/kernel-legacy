@@ -79,12 +79,12 @@ export class Engine {
     this.eventManager.addListener(ComponentRemoved, this, this.componentRemovedHandler)
   }
 
-  addEntity(entity: Entity) {
+  addEntity(entity: Entity): Engine {
     const parent = entity.getParent()
 
     if (entity.isAddedToEngine()) {
       log('The entity is already in the engine. Please fix this')
-      return
+      return this
     }
 
     entity.eventManager = this.eventManager
@@ -112,6 +112,8 @@ export class Engine {
         }
       }
     }
+
+    return this
   }
 
   removeEntity(entity: Entity) {
@@ -161,12 +163,14 @@ export class Engine {
         log(componentName)
       }
     }
+
+    return this
   }
 
   addSystem(system: ISystem, priority: number = 0) {
     if (this.addedSystems.indexOf(system) !== -1) {
       log('Engine: Trying to add a system that is already added. Aborting')
-      return
+      return this
     }
 
     if (this.systems.length > 0) {
@@ -190,6 +194,8 @@ export class Engine {
     }
 
     this.registerSystem(system)
+
+    return this
   }
 
   removeSystem(system: ISystem) {
@@ -211,6 +217,7 @@ export class Engine {
         }
       }
     }
+    return this
   }
 
   update(dt: number) {
@@ -224,6 +231,7 @@ export class Engine {
         }
       }
     }
+    return this
   }
 
   getEntitiesWithComponent(component: string): Record<string, any>
@@ -247,6 +255,8 @@ export class Engine {
       this.eventManager.fireEvent(new DisposableComponentCreated(id, name, classId))
       this.eventManager.fireEvent(new DisposableComponentUpdated(id, component))
     }
+
+    return this
   }
 
   disposeComponent(component: DisposableComponentLike) {
@@ -265,6 +275,8 @@ export class Engine {
 
   updateComponent(component: DisposableComponentLike) {
     this.eventManager.fireEvent(new DisposableComponentUpdated(getComponentId(component), component))
+
+    return this
   }
 
   getComponentGroup(...requires: ComponentConstructor<any>[]) {
@@ -313,6 +325,8 @@ export class Engine {
         }
       }
     }
+
+    return this
   }
 
   private registerSystem(system: ISystem) {
@@ -323,10 +337,12 @@ export class Engine {
     }
 
     this.simpleSystems.push(system)
+
+    return this
   }
 
   private checkRequirementsAndAdd(entity: Entity) {
-    if (!entity.isAddedToEngine()) return
+    if (!entity.isAddedToEngine()) return this
 
     for (let componentName in entity.components) {
       if (!(componentName in this.entityLists)) {
@@ -351,6 +367,8 @@ export class Engine {
         system.onAddEntity(entity)
       }
     }
+
+    return this
   }
 
   private checkRequirements(entity: Entity, system: ComponentGroup) {
@@ -363,12 +381,14 @@ export class Engine {
         system.removeEntity(entity)
       }
     }
+
+    return this
   }
 
   private componentAddedHandler(event: ComponentAdded) {
     const { entity, componentName } = event
 
-    if (!entity.isAddedToEngine()) return
+    if (!entity.isAddedToEngine()) return this
 
     if (!this.entityLists[componentName]) {
       this.entityLists[componentName] = { [entity.uuid]: entity }
@@ -383,6 +403,8 @@ export class Engine {
         this.checkRequirements(entity, componentGroups[i])
       }
     }
+
+    return this
   }
 
   private componentRemovedHandler(event: ComponentRemoved) {
@@ -390,7 +412,7 @@ export class Engine {
     // all systems that this entity lost this specific component.
     const { entity, componentName } = event
 
-    if (!entity.isAddedToEngine()) return
+    if (!entity.isAddedToEngine()) return this
 
     delete this.entityLists[componentName][entity.uuid]
 
@@ -401,5 +423,7 @@ export class Engine {
         this.checkRequirements(entity, componentGroups[i])
       }
     }
+
+    return this
   }
 }

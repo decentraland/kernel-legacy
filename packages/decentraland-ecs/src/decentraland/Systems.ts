@@ -20,12 +20,14 @@ export class UUIDEventSystem implements ISystem {
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('uuidEvent')
     }
+    return this
   }
 
   deactivate() {
     if (typeof dcl !== 'undefined') {
       dcl.unsubscribe('uuidEvent')
     }
+    return this
   }
 
   onAddEntity(entity: Entity) {
@@ -36,6 +38,7 @@ export class UUIDEventSystem implements ISystem {
         this.handlerMap[component.uuid] = component
       }
     }
+    return this
   }
 
   onRemoveEntity(entity: Entity) {
@@ -46,6 +49,7 @@ export class UUIDEventSystem implements ISystem {
         delete this.handlerMap[component.uuid]
       }
     }
+    return this
   }
 
   private componentAdded(event: ComponentAdded) {

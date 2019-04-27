@@ -74,6 +74,7 @@ export class ComponentGroup {
       // tslint:disable-next-line:semicolon
       ;(this.entities as Entity[]).push(entity)
     }
+    return this
   }
 
   // @internal
@@ -84,6 +85,7 @@ export class ComponentGroup {
       // tslint:disable-next-line:semicolon
       ;(this.entities as Entity[]).splice(id, 1)
     }
+    return this
   }
 
   // @internal
@@ -91,6 +93,7 @@ export class ComponentGroup {
     if (this._requiresNames.indexOf(component) !== -1) {
       this.removeEntity(entity)
     }
+    return this
   }
 
   // @internal

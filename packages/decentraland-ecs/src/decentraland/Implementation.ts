@@ -47,6 +47,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
           break
       }
     })
+    return this
   }
 
   /**
@@ -93,6 +94,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
         }
       }
     }
+    return this
   }
 
   /**
@@ -109,6 +111,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
       // Remove the caches from local memory
       delete this.cachedComponents[entityId]
     }
+    return this
   }
 
   /**

@@ -30,7 +30,7 @@ export class Entity {
    * Adds or replaces a component in the entity.
    * @param component - component instance.
    */
-  addComponentOrReplace<T extends object>(component: T): void {
+  addComponentOrReplace<T extends object>(component: T): Entity {
     if (typeof component === 'function') {
       throw new Error('You passed a function or class as a component, an instance of component is expected')
     }
@@ -43,12 +43,12 @@ export class Entity {
 
     if (this.components[componentName]) {
       if (this.components[componentName] === component) {
-        return
+        return this
       }
       this.removeComponent(this.components[componentName], false)
     }
 
-    this.addComponent(component)
+    return this.addComponent(component)
   }
 
   /**
@@ -200,6 +200,7 @@ export class Entity {
     if (typeof storedComponent.addedToEntity === 'function') {
       storedComponent.addedToEntity(this)
     }
+    return this
   }
 
   /**
@@ -280,7 +281,7 @@ export class Entity {
   /**
    * Sets the parent entity
    */
-  setParent(newParent: Entity) {
+  setParent(newParent: Entity): Entity {
     let parent = !newParent && this.engine ? this.engine.rootEntity : newParent
     let currentParent = this.getParent()
 
@@ -291,7 +292,7 @@ export class Entity {
     }
 
     if (newParent === currentParent) {
-      return
+      return this
     }
 
     const circularAncestor = this.getCircularAncestor(newParent)
@@ -325,6 +326,8 @@ export class Entity {
     if (this.eventManager && this.engine) {
       this.eventManager.fireEvent(new ParentChanged(this, parent))
     }
+
+    return this
   }
 
   /**
@@ -359,6 +362,8 @@ export class Entity {
     if (this.uuid && parent) {
       parent.children[this.uuid] = this
     }
+
+    return this
   }
 }
 
