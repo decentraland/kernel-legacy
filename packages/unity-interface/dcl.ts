@@ -7,11 +7,19 @@ type GameInstance = {
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 
 import { initShared } from '../shared'
-import { LoadableParcelScene, EntityAction, EnvironmentData, ILandToLoadableParcelScene } from '../shared/types'
+import {
+  LoadableParcelScene,
+  EntityAction,
+  EnvironmentData,
+  ILandToLoadableParcelScene,
+  IScene,
+  MappingsResponse,
+  ILand
+} from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { ILogger, createLogger } from '../shared/logger'
 import { positionObservable, lastPlayerPosition, getWorldSpawnpoint } from '../shared/world/positionThings'
-import { enableParcelSceneLoading, getParcelById } from '../shared/world/parcelSceneManager'
+import { enableParcelSceneLoading, getParcelById, loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
@@ -174,7 +182,6 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
   const { net } = await initShared()
-
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
   if (DEBUG) {
@@ -183,30 +190,36 @@ export async function initializeEngine(_gameInstance: GameInstance) {
 
   await initializeDecentralandUI()
 
-  await enableParcelSceneLoading(net, {
-    parcelSceneClass: UnityParcelScene,
-    shouldLoadParcelScene: land => {
-      return true
-      // TODO integrate with unity the preloading feature
-      // tslint:disable-next-line: no-commented-out-code
-      // return preloadedScenes.has(land.scene.scene.base)
-    },
-    onSpawnpoint: initialLand => {
-      const newPosition = getWorldSpawnpoint(initialLand)
-      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
-    },
-    onLoadParcelScenes: lands => {
-      unityInterface.LoadParcelScenes(
-        lands.map($ => {
-          const x = Object.assign({}, ILandToLoadableParcelScene($).data)
-          delete x.land
-          return x
-        })
-      )
-    }
-  })
+  if (PREVIEW) {
+    await loadPreviewScene()
+  } else {
+    await enableParcelSceneLoading(net, {
+      parcelSceneClass: UnityParcelScene,
+      shouldLoadParcelScene: () => {
+        return true
+        // TODO integrate with unity the preloading feature
+        // tslint:disable-next-line: no-commented-out-code
+        // return preloadedScenes.has(land.scene.scene.base)
+      },
+      onSpawnpoint: initialLand => {
+        const newPosition = getWorldSpawnpoint(initialLand)
+        unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
+      },
+      onLoadParcelScenes: lands => {
+        unityInterface.LoadParcelScenes(
+          lands.map($ => {
+            const x = Object.assign({}, ILandToLoadableParcelScene($).data)
+            delete x.land
+            return x
+          })
+        )
+      }
+    })
+  }
 
   return {
+    net,
+    loadPreviewScene,
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon

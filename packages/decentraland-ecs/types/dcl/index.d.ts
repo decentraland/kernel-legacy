@@ -41,77 +41,77 @@ declare class Angle {
 }
 
 declare type AnimationParams = {
-  looping?: boolean
-  speed?: number
-  weight?: number
-}
+    looping?: boolean;
+    speed?: number;
+    weight?: number;
+};
 
 /**
  * @public
  */
 declare class AnimationState extends ObservableComponent {
-  /**
-   * Name of the animation in the model
-   */
-  readonly clip: string
-  /**
-   * Does the animation loop?, default: true
-   */
-  looping: boolean
-  /**
-   * Weight of the animation, values from 0 to 1, used to blend several animations. default: 1
-   */
-  weight: number
-  /**
-   * Is the animation playing? default: true
-   */
-  playing: boolean
-  /**
-   * Does any anyone asked to reset the animation? default: false
-   */
-  shouldReset: boolean
-  /**
-   * The animation speed
-   */
-  speed: number
-  constructor(clip: string, params?: AnimationParams)
-  /**
-   * Sets the clip parameters
-   */
-  setParams(params: AnimationParams): void
-  toJSON(): any
-  /**
-   * Starts the animation
-   */
-  play(): void
-  /**
-   * Pauses the animation
-   */
-  pause(): void
-  /**
-   * Resets the animation state to the frame 0
-   */
-  reset(): void
-  /**
-   * Resets and pauses the animation
-   */
-  stop(): void
+    /**
+     * Name of the animation in the model
+     */
+    readonly clip: string;
+    /**
+     * Does the animation loop?, default: true
+     */
+    looping: boolean;
+    /**
+     * Weight of the animation, values from 0 to 1, used to blend several animations. default: 1
+     */
+    weight: number;
+    /**
+     * Is the animation playing? default: true
+     */
+    playing: boolean;
+    /**
+     * Does any anyone asked to reset the animation? default: false
+     */
+    shouldReset: boolean;
+    /**
+     * The animation speed
+     */
+    speed: number;
+    constructor(clip: string, params?: AnimationParams);
+    /**
+     * Sets the clip parameters
+     */
+    setParams(params: AnimationParams): void;
+    toJSON(): any;
+    /**
+     * Starts the animation
+     */
+    play(): void;
+    /**
+     * Pauses the animation
+     */
+    pause(): void;
+    /**
+     * Resets the animation state to the frame 0
+     */
+    reset(): void;
+    /**
+     * Resets and pauses the animation
+     */
+    stop(): void;
 }
 
 /**
  * @public
  */
 declare class Animator extends Shape {
-  private states
-  /**
-   * Adds an AnimationState to the animation lists.
-   */
-  addClip(clip: AnimationState): void
-  /**
-   * Gets the animation clip instance for the specified clip name.
-   * If the clip doesn't exist a new one will be created.
-   */
-  getClip(clipName: string): AnimationState
+    private states;
+    /**
+     * Adds an AnimationState to the animation lists.
+     */
+    addClip(clip: AnimationState): void;
+    /**
+     * Gets the animation clip instance for the specified clip name.
+     * If the clip doesn't exist a new one will be created.
+     */
+    getClip(clipName: string): AnimationState;
 }
 
 /**
@@ -1512,6 +1512,12 @@ declare interface IEvents {
         pointerId?: number;
     };
     /**
+     * `onAnimationEnd` is triggered when an animation clip gets finish
+     */
+    onAnimationEnd: {
+        clipName: string;
+    };
+    /**
      * `onFocus` is triggered when an entity focus is active.
      * Dispatched by the `ui-input` and `ui-password` entities when the value is changed.
      * It triggers a callback.
@@ -2743,6 +2749,13 @@ declare class ObserverEventState {
      * @returns the current event state
      */
     initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
+}
+
+/**
+ * @public
+ */
+declare class OnAnimationEnd extends OnUUIDEvent<'onAnimationEnd'> {
+    readonly type: string;
 }
 
 /**
@@ -4039,26 +4052,19 @@ declare class UIContainerStack extends UIShape {
 /**
  * @alpha
  */
-declare class UIImageShape extends UIShape {
-  id: string | null
-  opacity: number
-  sourceLeft: string | null
-  sourceTop: string | null
-  sourceWidth: string | null
-  sourceHeight: string | null
-  source?: Texture
-  width: string
-  height: string
-  top: string
-  left: string
-  hAlign: string
-  vAlign: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+declare class UIImage extends UIShape {
+    sourceLeft: number;
+    sourceTop: number;
+    sourceWidth: number;
+    sourceHeight: number;
+    source?: Texture;
+    paddingTop: number;
+    paddingRight: number;
+    paddingBottom: number;
+    paddingLeft: number;
+    sizeInPixels: boolean;
+    onClick: OnClick | null;
+    constructor(parent: UIShape, source: Texture);
 }
 
 /**
