@@ -40,65 +40,78 @@ declare class Angle {
     radians(): number;
 }
 
+declare type AnimationParams = {
+  looping?: boolean
+  speed?: number
+  weight?: number
+}
+
 /**
  * @public
  */
-declare class AnimationClip extends ObservableComponent {
-    /**
-     * Name of the animation in the model
-     */
-    readonly clip: string;
-    /**
-     * Does the animation loop?, default: true
-     */
-    looping: boolean;
-    /**
-     * Weight of the animation, values from 0 to 1, used to blend several animations. default: 1
-     */
-    weight: number;
-    /**
-     * Is the animation playing? default: true
-     */
-    playing: boolean;
-    /**
-     * The animation speed
-     */
-    speed: number;
-    constructor(clip: string, params?: AnimationParams);
-    /**
-     * Sets the clip parameters
-     */
-    setParams(params: AnimationParams): void;
-    /**
-     * Starts the animation
-     */
-    play(): void;
-    /**
-     * Pauses the animation
-     */
-    pause(): void;
+declare class AnimationState extends ObservableComponent {
+  /**
+   * Name of the animation in the model
+   */
+  readonly clip: string
+  /**
+   * Does the animation loop?, default: true
+   */
+  looping: boolean
+  /**
+   * Weight of the animation, values from 0 to 1, used to blend several animations. default: 1
+   */
+  weight: number
+  /**
+   * Is the animation playing? default: true
+   */
+  playing: boolean
+  /**
+   * Does any anyone asked to reset the animation? default: false
+   */
+  shouldReset: boolean
+  /**
+   * The animation speed
+   */
+  speed: number
+  constructor(clip: string, params?: AnimationParams)
+  /**
+   * Sets the clip parameters
+   */
+  setParams(params: AnimationParams): void
+  toJSON(): any
+  /**
+   * Starts the animation
+   */
+  play(): void
+  /**
+   * Pauses the animation
+   */
+  pause(): void
+  /**
+   * Resets the animation state to the frame 0
+   */
+  reset(): void
+  /**
+   * Resets and pauses the animation
+   */
+  stop(): void
 }
-
-declare type AnimationParams = {
-    looping?: boolean;
-    speed?: number;
-    weight?: number;
-};
 
 /**
  * @public
  */
 declare class Animator extends Shape {
-    private states;
-    /**
-     * Adds an AnimationClip to the animation lists.
-     */
-    addClip(clip: AnimationClip): void;
-    /**
-     * Gets the animation clip instance for the specified clip name.
-     * If the clip doesn't exist a new one will be created.
-     */
-    getClip(clipName: string): AnimationClip;
+  private states
+  /**
+   * Adds an AnimationState to the animation lists.
+   */
+  addClip(clip: AnimationState): void
+  /**
+   * Gets the animation clip instance for the specified clip name.
+   * If the clip doesn't exist a new one will be created.
+   */
+  getClip(clipName: string): AnimationState
 }
 
 /**
@@ -4026,19 +4039,26 @@ declare class UIContainerStack extends UIShape {
 /**
  * @alpha
  */
-declare class UIImage extends UIShape {
-    sourceLeft: number;
-    sourceTop: number;
-    sourceWidth: number;
-    sourceHeight: number;
-    source?: Texture;
-    paddingTop: number;
-    paddingRight: number;
-    paddingBottom: number;
-    paddingLeft: number;
-    sizeInPixels: boolean;
-    onClick: OnClick | null;
-    constructor(parent: UIShape, source: Texture);
+declare class UIImageShape extends UIShape {
+  id: string | null
+  opacity: number
+  sourceLeft: string | null
+  sourceTop: string | null
+  sourceWidth: string | null
+  sourceHeight: string | null
+  source?: Texture
+  width: string
+  height: string
+  top: string
+  left: string
+  hAlign: string
+  vAlign: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
+  visible: boolean
+  isPointerBlocker: boolean
 }
 
 /**
