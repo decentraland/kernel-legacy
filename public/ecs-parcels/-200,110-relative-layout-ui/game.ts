@@ -16,34 +16,27 @@ container.vAlign = 'center'
 const bg = new UIContainerRect(container)
 bg.opacity = 0.2
 bg.thickness = 1
-// TODO: UI-Migration
-// a bg.cornerRadius = 10
 bg.color = Color4.Black()
 
 // --- INVENTORY
 
 const inventoryContainer = new UIContainerStack(container)
 inventoryContainer.adaptWidth = true
-// inventoryContainer.adaptHeight = true --- you can only set adaptWidth (X)OR adaptHeight for it to work correctly
 inventoryContainer.width = '40%'
 inventoryContainer.positionY = '-100px'
 inventoryContainer.positionX = '10px'
-// inventoryContainer.color = 'white' // previously set child text color
 inventoryContainer.color = Color4.Blue()
 inventoryContainer.hAlign = 'left'
 inventoryContainer.vAlign = 'top'
-inventoryContainer.stackOrientation = UIStackOrientation.VERTICAL // when adapting height, set this to false
+inventoryContainer.stackOrientation = UIStackOrientation.VERTICAL
 
 function generateInventoryItem(index: number) {
   const bg = new UIContainerRect(inventoryContainer)
   bg.name = `hmmm-${index}`
   bg.thickness = 1
   bg.color = Color4.Blue()
-  // If `inventoryContainer.adaptWidth` OR `inventoryContainer.adaptHeight`
-  // are set to true, you have to set width OR height of its children in pixels!
   bg.width = 1
-  // TODO: UI-Migration
-  bg.height = 1 // 60px
+  bg.height = 1
   bg.hAlign = 'center'
   bg.vAlign = 'top'
 
