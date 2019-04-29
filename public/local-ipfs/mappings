@@ -15181,37 +15181,6 @@
   },
   {
     "publisher": "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
-    "parcel_id": "620,620",
-    "root_cid": "Qm5qmb2iYvNT3X2ENVvHa1Xty5zoFqo4ZvdYHb7mtyBrmWECj5pPrx8Vaoou3RwUAivA8fDvgLSrtc3NcdTDPKUXhV",
-    "contents": [
-      {
-        "file": "game.js",
-        "hash": "Qm9g5g5ChQEYaBhJqdYLam4k4CjXV9CLaLE3i5KzigxAEPAahyx9iY1N9ZedoPy3pV3HV7479HrwfWjc2MduXLoYu"
-      },
-      {
-        "file": "game.ts",
-        "hash": "Qm2RJrR52bd3o12jpxMhhNGkwW6Qwb8f18CwDEWWZh6s6xvKaxQz76CP4UD9PzUHX47kXhew554K5B1UcQTWT21KnU"
-      },
-      {
-        "file": "pickaxe.jpeg",
-        "hash": "Qm5nyBw5C88RkqSXxRHCCYU4UT3ZJc6aKfXyDGNbXB1SxfuEFataDxKgG3sVZFfoUYY6EmvXgsay2VCJahH8MX4c3F"
-      },
-      {
-        "file": "rock1.jpg",
-        "hash": "Qm5nQxuDKbXA21hs3s3GwN4HmKrU5Emtfu15FgJPgd2yuRtQxxUr46Eyk1jbCrHyzCTWTerdTvssRvFFX1h6YsBazh"
-      },
-      {
-        "file": "scene.json",
-        "hash": "Qm2MuFV7dajBSAKAd7MeQt1babLAnZJCfmUvMgFbUTv8XJaG6opJcSQMz6Z29wgtGLe6KE5v1SxN8v6wvX2nXMiQpT"
-      },
-      {
-        "file": "tsconfig.json",
-        "hash": "Qm2fY1PyzdJTjEA9fcby9oxMXRnujVHXtzzADBRkKnJXjR42CBP3uLHK7ubxJgLuRAkQTiUDsBJrDS3QLwALB61oTQ"
-      }
-    ]
-  },
-  {
-    "publisher": "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
     "parcel_id": "800,10",
     "root_cid": "Qmz8mjxps9TqRy7nCxJjxUdHYiY9PnZFJiRw9vC65GZUvvBzheGEJFgPApTM3KHgyanuJXN7wxkeFc8xDGYa4SW12",
     "contents": [
