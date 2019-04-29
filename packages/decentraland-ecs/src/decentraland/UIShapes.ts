@@ -1,7 +1,7 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID, OnUUIDEvent, Texture } from './Components'
 import { Color4 } from './math'
-
+import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'
 /**
  * @alpha
  */

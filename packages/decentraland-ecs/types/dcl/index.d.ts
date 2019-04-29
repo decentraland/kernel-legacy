@@ -667,9 +667,9 @@ declare class Color4 {
      */
     static LerpToRef(left: Color4, right: Color4, amount: number, result: Color4): void;
     /**
-   * Returns a Color4 value containing a red color
-   * @returns a new Color3 object
-   */
+     * Returns a Color4 value containing a red color
+     * @returns a new Color3 object
+     */
     static Red(): Color4;
     /**
      * Returns a Color4 value containing a green color
@@ -1642,14 +1642,11 @@ declare class Input {
     private handlePointerDown;
 }
 
-declare type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
+declare type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP';
 
-declare type InputState = Record<
-  Pointer,
-  {
-    BUTTON_DOWN: boolean
-  }
->
+declare type InputState = Record<Pointer, {
+    BUTTON_DOWN: boolean;
+}>;
 
 declare type LocalPointerEvent = PointerEvent & {
     origin: Vector3;
@@ -2829,11 +2826,11 @@ declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
     readonly uuid: string;
     callback: (event: any) => void;
     constructor(callback: (event: IEvents[T]) => void);
+    static uuidEvent(target: ObservableComponent, propertyKey: string): void;
     toJSON(): {
         uuid: string;
         type: string | undefined;
     };
-    static uuidEvent(target: ObservableComponent, propertyKey: string): void;
 }
 
 /**

@@ -1,5 +1,6 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import { OnChanged, OnClick, Color4, Texture, OnBlur, OnFocus, OnTextSubmit } from 'decentraland-ecs/src'
+import { Color4, Texture } from 'decentraland-ecs/src'
+import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from 'decentraland-ecs/src/decentraland/UIEvents'
 
 import {
   UIImage,

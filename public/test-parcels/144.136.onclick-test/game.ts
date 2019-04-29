@@ -4,13 +4,14 @@ import {
   engine,
   Vector3,
   Transform,
-  OnClick,
   Material,
   BoxShape,
   PlaneShape,
   Color3,
   Camera
 } from 'decentraland-ecs/src'
+
+import { OnClick } from 'decentraland-ecs/src/decentraland/UIEvents'
 
 class FaceCameraSystem implements ISystem {
   update() {

@@ -1,11 +1,6 @@
-import {
-  UICanvas,
-  UIContainerRect,
-  Color4,
-  UIInputText,
-  OnTextSubmit,
-  log
-} from 'decentraland-ecs/src'
+import { UICanvas, UIContainerRect, Color4, UIInputText, log } from 'decentraland-ecs/src'
+
+import { OnTextSubmit } from 'decentraland-ecs/src/decentraland/UIEvents'
 
 const ui = new UICanvas()
 
@@ -30,28 +25,3 @@ textInput.onTextSubmit = new OnTextSubmit(x => {
   container.color = Color4.Red()
   log('submitted text! ' + x.text)
 })
-
-// const entity = new Entity()
-// entity.addComponentOrReplace(textInput)
-// entity.addComponentOrReplace(event)
-// engine.addEntity(entity)
-
-// const imageBack = new UIContainerRect(container)
-// imageBack.id = 'imageBack'
-// imageBack.color = Color3.Red()
-// imageBack.width = '128px'
-// imageBack.height = '128px'
-
-// const image = new UIImage(container, 'img.png')
-// image.id = 'testUIImage'
-// image.width = '128px'
-// image.height = '128px'
-// image.sourceWidth = 128
-// image.sourceHeight = 128
-// image.sourceTop = 0
-// image.sourceLeft = 0
-// image.paddingLeft = 10
-// image.paddingRight = 10
-// image.paddingTop = 10
-// image.paddingBottom = 10
-// image.isPointerBlocker = true
