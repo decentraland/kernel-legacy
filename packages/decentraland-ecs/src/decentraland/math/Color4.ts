@@ -33,7 +33,7 @@ export class Color4 {
      * Defines the alpha component (between 0 and 1, default is 1)
      */
     public a: number = 1
-  ) { }
+  ) {}
 
   // Statics
 
@@ -83,9 +83,9 @@ export class Color4 {
   }
 
   /**
- * Returns a Color4 value containing a red color
- * @returns a new Color3 object
- */
+   * Returns a Color4 value containing a red color
+   * @returns a new Color3 object
+   */
   public static Red(): Color4 {
     return new Color4(1.0, 0, 0, 1.0)
   }

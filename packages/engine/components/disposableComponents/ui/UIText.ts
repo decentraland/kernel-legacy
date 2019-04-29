@@ -80,7 +80,6 @@ class UIText extends UIControl<UITextShape, BABYLON.GUI.TextBlock> {
     this.control.lineSpacing = this.data.lineSpacing
     this.control.text = this.data.value
     this.control.textWrapping = this.data.textWrapping
-    //this.control.resizeToFit = this.data.resizeToFit
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.textHorizontalAlignment = parseHorizontalAlignment(this.data.hTextAlign)

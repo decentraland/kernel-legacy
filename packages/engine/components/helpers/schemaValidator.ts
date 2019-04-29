@@ -108,8 +108,9 @@ export const validators = {
   },
 
   UIStackOrientation(value: any, def: UIStackOrientation.VERTICAL) {
-    if (value === null || value === undefined || (value.type !== Number && value.type !== UIStackOrientation))
+    if (value === null || value === undefined || (value.type !== Number && value.type !== UIStackOrientation)) {
       return def
+    }
 
     return value
   },

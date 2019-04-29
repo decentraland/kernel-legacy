@@ -79,14 +79,13 @@ class UISlider extends UIControl<UIScrollRect, BABYLON.GUI.Slider> {
     this.control.alpha = Math.max(0, Math.min(1, this.data.opacity))
     this.control.minimum = 0
     this.control.maximum = 1
-    //this.control.color = this.data.color.toHexString()
     this.control.zIndex = 0
     this.control.background = this.data.backgroundColor.toHexString()
     this.control.horizontalAlignment = parseHorizontalAlignment(this.data.hAlign)
     this.control.verticalAlignment = parseVerticalAlignment(this.data.vAlign)
     this.control.width = this.data.width
     this.control.height = this.data.height
-    this.control.value = this.data.isHorizontal ? this.data.valueX : this.data.valueY;
+    this.control.value = this.data.isHorizontal ? this.data.valueX : this.data.valueY
     this.control.borderColor = this.data.borderColor.toHexString()
     this.control.barOffset = 5
     this.control.thumbWidth = 10
