@@ -15,9 +15,9 @@ export class UIValue {
 
   constructor(value: string | number) {
     this.type = UIValueType.PIXELS
-    let valueAsString: string = value as string
 
-    if (typeof valueAsString) {
+    if (typeof value === 'string') {
+      let valueAsString: string = value
       if (valueAsString.indexOf('px') > -1) {
         this.type = UIValueType.PIXELS
       } else if (valueAsString.indexOf('%') > -1) {
@@ -26,7 +26,7 @@ export class UIValue {
 
       this.value = parseFloat(valueAsString)
     } else {
-      this.value = value as number
+      this.value = value
     }
   }
 
