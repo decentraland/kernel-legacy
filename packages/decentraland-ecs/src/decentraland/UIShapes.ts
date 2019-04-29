@@ -246,16 +246,10 @@ export class UIText extends UIShape {
   shadowColor: Color4 = Color4.Black()
 
   @ObservableComponent.field
-  hAlign: string = 'center'
+  hTextAlign: string = 'left'
 
   @ObservableComponent.field
-  vAlign: string = 'center'
-
-  @ObservableComponent.field
-  hTextAlign: string = 'center'
-
-  @ObservableComponent.field
-  vTextAlign: string = 'center'
+  vTextAlign: string = 'bottom'
 
   @ObservableComponent.field
   paddingTop: number = 0
@@ -303,6 +297,12 @@ export class UIInputText extends UIShape {
   maxWidth: number = 100
 
   @ObservableComponent.field
+  hTextAlign: string = 'left'
+
+  @ObservableComponent.field
+  vTextAlign: string = 'bottom'
+
+  @ObservableComponent.field
   autoStretchWidth: boolean = true
 
   @ObservableComponent.field
@@ -346,7 +346,6 @@ export class UIInputText extends UIShape {
 
   @OnUUIDEvent.uuidEvent
   onBlur: OnBlur | null = null
-
 }
 
 /**

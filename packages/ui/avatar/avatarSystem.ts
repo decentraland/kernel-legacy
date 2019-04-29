@@ -9,8 +9,7 @@ import {
   Vector3,
   Quaternion,
   Component,
-  Scalar//,
-  //OnPointerDown
+  Scalar
 } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
@@ -26,7 +25,6 @@ import {
 } from 'shared/comms/types'
 import { execute } from './rpc'
 import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
-//import { showAvatarWindow, currentAvatarId, hideAvatarWindow } from './avatarWindow'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -49,13 +47,13 @@ function getModel(src: string) {
 
 function getAvatarModel(avatarName: string) {
   // Remove possible 'zero width spaces' (unicode 8203) existence in name
-  avatarName = avatarName.replace(/(^[\s\u200b]*|[\s\u200b]*$)/g, '')
+  const fixedAvatarName = avatarName.replace(/(^[\s\u200b]*|[\s\u200b]*$)/g, '')
 
-  if (avatarName.endsWith('.gltf') || avatarName.endsWith('.glb')) {
-    return getModel(`models/avatar/${avatarName}`)
+  if (fixedAvatarName.endsWith('.gltf') || fixedAvatarName.endsWith('.glb')) {
+    return getModel(`models/avatar/${fixedAvatarName}`)
   }
 
-  return getModel(`models/avatar/${avatarName}/head.glb`)
+  return getModel(`models/avatar/${fixedAvatarName}/head.glb`)
 }
 
 function cleanupUnusedModels() {
@@ -153,7 +151,7 @@ export class AvatarEntity extends Entity {
     {
       this.labelEntity.setParent(this)
 
-      let labelTransform = this.labelEntity.getComponentOrCreate(Transform)
+      const labelTransform = this.labelEntity.getComponentOrCreate(Transform)
       labelTransform.position.y = 2
       labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
@@ -334,6 +332,7 @@ function handleUserRemoved({ uuid }: UserRemovedMessage): void {
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
+  // noop
 }
 
 function handleMutedBlockedMessages({ uuid }: UserMessage): void {

@@ -3,7 +3,7 @@ import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from './math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
 import { IEvents } from './Types'
-import { uuidEventSystem } from './Systems';
+import { uuidEventSystem } from './Systems'
 
 export type TranformConstructorArgs = {
   position?: Vector3
@@ -160,13 +160,13 @@ export class Shape extends ObservableComponent {
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.BOX_SHAPE)
-export class BoxShape extends Shape { }
+export class BoxShape extends Shape {}
 
 /**
  * @public
  */
 @DisposableComponent('engine.shape', CLASS_ID.SPHERE_SHAPE)
-export class SphereShape extends Shape { }
+export class SphereShape extends Shape {}
 
 /**
  * @public
@@ -712,14 +712,10 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
     this.callback = callback
   }
 
-  toJSON() {
-    return { uuid: this.uuid, type: this.type }
-  }
-
   static uuidEvent(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       const componentSymbol = propertyKey + '_' + Math.random()
-        ; (target as any)[componentSymbol] = undefined
+      ;(target as any)[componentSymbol] = undefined
 
       Object.defineProperty(target, componentSymbol, {
         ...Object.getOwnPropertyDescriptor(target, componentSymbol),
@@ -727,10 +723,10 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
       })
 
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function () {
+        get: function() {
           return this[componentSymbol]
         },
-        set: function (value) {
+        set: function(value) {
           const oldValue = this[componentSymbol]
 
           if (value) {
@@ -757,8 +753,11 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
       })
     }
   }
-}
 
+  toJSON() {
+    return { uuid: this.uuid, type: this.type }
+  }
+}
 
 /**
  * @public

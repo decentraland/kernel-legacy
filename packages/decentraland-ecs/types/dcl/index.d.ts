@@ -40,10 +40,16 @@ declare class Angle {
     radians(): number;
 }
 
+declare type AnimationParams = {
+    looping?: boolean;
+    speed?: number;
+    weight?: number;
+};
+
 /**
  * @public
  */
-declare class AnimationClip extends ObservableComponent {
+declare class AnimationState extends ObservableComponent {
     /**
      * Name of the animation in the model
      */
@@ -61,6 +67,10 @@ declare class AnimationClip extends ObservableComponent {
      */
     playing: boolean;
     /**
+     * Does any anyone asked to reset the animation? default: false
+     */
+    shouldReset: boolean;
+    /**
      * The animation speed
      */
     speed: number;
@@ -69,6 +79,7 @@ declare class AnimationClip extends ObservableComponent {
      * Sets the clip parameters
      */
     setParams(params: AnimationParams): void;
+    toJSON(): any;
     /**
      * Starts the animation
      */
@@ -77,13 +88,15 @@ declare class AnimationClip extends ObservableComponent {
      * Pauses the animation
      */
     pause(): void;
+    /**
+     * Resets the animation state to the frame 0
+     */
+    reset(): void;
+    /**
+     * Resets and pauses the animation
+     */
+    stop(): void;
 }
-
-declare type AnimationParams = {
-    looping?: boolean;
-    speed?: number;
-    weight?: number;
-};
 
 /**
  * @public
@@ -91,14 +104,14 @@ declare type AnimationParams = {
 declare class Animator extends Shape {
     private states;
     /**
-     * Adds an AnimationClip to the animation lists.
+     * Adds an AnimationState to the animation lists.
      */
-    addClip(clip: AnimationClip): void;
+    addClip(clip: AnimationState): void;
     /**
      * Gets the animation clip instance for the specified clip name.
      * If the clip doesn't exist a new one will be created.
      */
-    getClip(clipName: string): AnimationClip;
+    getClip(clipName: string): AnimationState;
 }
 
 /**
@@ -139,12 +152,12 @@ declare class Arc2 {
      * @param endPoint - Defines the end point of the arc
      */
     constructor(
-        /** Defines the start point of the arc */
-        startPoint: Vector2,
-        /** Defines the mid point of the arc */
-        midPoint: Vector2,
-        /** Defines the end point of the arc */
-        endPoint: Vector2);
+    /** Defines the start point of the arc */
+    startPoint: Vector2, 
+    /** Defines the mid point of the arc */
+    midPoint: Vector2, 
+    /** Defines the end point of the arc */
+    endPoint: Vector2);
 }
 
 /**
@@ -299,18 +312,18 @@ declare class Color3 {
      * @param b - defines the blue component (between 0 and 1, default is 0)
      */
     constructor(
-        /**
-         * Defines the red component (between 0 and 1, default is 0)
-         */
-        r?: number,
-        /**
-         * Defines the green component (between 0 and 1, default is 0)
-         */
-        g?: number,
-        /**
-         * Defines the blue component (between 0 and 1, default is 0)
-         */
-        b?: number);
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number);
     /**
      * Creates a new Color3 from the string containing valid hexadecimal values
      * @param hex - defines a string containing valid hexadecimal values
@@ -615,22 +628,22 @@ declare class Color4 {
      * @param a - defines the alpha component (between 0 and 1, default is 1)
      */
     constructor(
-        /**
-         * Defines the red component (between 0 and 1, default is 0)
-         */
-        r?: number,
-        /**
-         * Defines the green component (between 0 and 1, default is 0)
-         */
-        g?: number,
-        /**
-         * Defines the blue component (between 0 and 1, default is 0)
-         */
-        b?: number,
-        /**
-         * Defines the alpha component (between 0 and 1, default is 1)
-         */
-        a?: number);
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number, 
+    /**
+     * Defines the alpha component (between 0 and 1, default is 1)
+     */
+    a?: number);
     /**
      * Creates a new Color4 from the string containing valid hexadecimal values
      * @param hex - defines a string containing valid hexadecimal values
@@ -911,7 +924,7 @@ declare class ComponentAdded {
 declare interface ComponentConstructor<T extends ComponentLike> {
     isComponent?: boolean;
     originalClassName?: string;
-    new(...args: any[]): T;
+    new (...args: any[]): T;
 }
 
 /**
@@ -1146,7 +1159,7 @@ declare interface DisposableComponentConstructor<T extends DisposableComponentLi
     isComponent?: boolean;
     isDisposableComponent?: true;
     originalClassName?: string;
-    new(...args: any[]): T;
+    new (...args: any[]): T;
 }
 
 /**
@@ -1261,7 +1274,7 @@ declare class Entity {
      * @param component - component class
      */
     getComponentOrCreate<T>(component: ComponentConstructor<T> & {
-        new(): T;
+        new (): T;
     }): T;
     /**
      * Adds a component. If the component already exist, it throws an Error.
@@ -1438,7 +1451,7 @@ declare class Gizmos extends ObservableComponent {
  * @public
  */
 declare interface IEventConstructor<T> {
-    new(...args: any[]): T;
+    new (...args: any[]): T;
 }
 
 declare type IEventNames = keyof IEvents;
@@ -1497,6 +1510,12 @@ declare interface IEvents {
         value?: any;
         /** ID of the pointer that triggered the event */
         pointerId?: number;
+    };
+    /**
+     * `onAnimationEnd` is triggered when an animation clip gets finish
+     */
+    onAnimationEnd: {
+        clipName: string;
     };
     /**
      * `onFocus` is triggered when an entity focus is active.
@@ -2673,18 +2692,18 @@ declare class Observer<T> {
      * @param scope - defines the current scope used to restore the JS context
      */
     constructor(
-        /**
-         * Defines the callback to call when the observer is notified
-         */
-        callback: (eventData: T, eventState: ObserverEventState) => void,
-        /**
-         * Defines the mask of the observer (used to filter notifications)
-         */
-        mask: number,
-        /**
-         * Defines the current scope used to restore the JS context
-         */
-        scope?: any);
+    /**
+     * Defines the callback to call when the observer is notified
+     */
+    callback: (eventData: T, eventState: ObserverEventState) => void, 
+    /**
+     * Defines the mask of the observer (used to filter notifications)
+     */
+    mask: number, 
+    /**
+     * Defines the current scope used to restore the JS context
+     */
+    scope?: any);
 }
 
 /**
@@ -2735,8 +2754,16 @@ declare class ObserverEventState {
 /**
  * @public
  */
+declare class OnAnimationEnd extends OnUUIDEvent<'onAnimationEnd'> {
+    readonly type: string;
+}
+
+/**
+ * @public
+ */
 declare class OnBlur extends OnUUIDEvent<'onBlur'> {
     readonly type: string;
+    constructor(callback: (event: IEvents['onBlur']) => void);
 }
 
 /**
@@ -2744,6 +2771,7 @@ declare class OnBlur extends OnUUIDEvent<'onBlur'> {
  */
 declare class OnChanged extends OnUUIDEvent<'onChange'> {
     readonly type: string;
+    constructor(callback: (event: IEvents['onChange']) => void);
 }
 
 /**
@@ -2751,6 +2779,7 @@ declare class OnChanged extends OnUUIDEvent<'onChange'> {
  */
 declare class OnClick extends OnUUIDEvent<'onClick'> {
     readonly type: string;
+    constructor(callback: (event: IEvents['onClick']) => void);
 }
 
 /**
@@ -2758,6 +2787,7 @@ declare class OnClick extends OnUUIDEvent<'onClick'> {
  */
 declare class OnFocus extends OnUUIDEvent<'onFocus'> {
     readonly type: string;
+    constructor(callback: (event: IEvents['onFocus']) => void);
 }
 
 /**
@@ -2785,6 +2815,7 @@ declare class OnPointerUp extends PointerEventComponent {
  */
 declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
     readonly type: string;
+    constructor(callback: (event: IEvents['onTextSubmit']) => void);
 }
 
 /**
@@ -2912,10 +2943,10 @@ declare class Path3D {
      * @param raw - (optional, default false) : boolean, if true the returned Path3D isn't normalized. Useful to depict path acceleration or speed.
      */
     constructor(
-        /**
-         * an array of Vector3, the curve axis of the Path3D
-         */
-        path: Vector3[], firstNormal?: Nullable<Vector3>, raw?: boolean);
+    /**
+     * an array of Vector3, the curve axis of the Path3D
+     */
+    path: Vector3[], firstNormal?: Nullable<Vector3>, raw?: boolean);
     /**
      * Returns the Path3D array of successive Vector3 designing its curve.
      * @returns the Path3D array of successive Vector3 designing its curve.
@@ -3143,14 +3174,14 @@ declare class Quaternion {
      * @param w - defines the fourth component (1.0 by default)
      */
     constructor(
-        /** defines the first component (0 by default) */
-        x?: number,
-        /** defines the second component (0 by default) */
-        y?: number,
-        /** defines the third component (0 by default) */
-        z?: number,
-        /** defines the fourth component (1.0 by default) */
-        w?: number);
+    /** defines the first component (0 by default) */
+    x?: number, 
+    /** defines the second component (0 by default) */
+    y?: number, 
+    /** defines the third component (0 by default) */
+    z?: number, 
+    /** defines the fourth component (1.0 by default) */
+    w?: number);
     /**
      * Creates a new quaternion from a rotation matrix
      * @param matrix - defines the source matrix
@@ -4053,6 +4084,8 @@ declare class UIInputText extends UIShape {
     placeholder: string;
     margin: number;
     maxWidth: number;
+    hTextAlign: string;
+    vTextAlign: string;
     autoStretchWidth: boolean;
     background: Color4;
     focusedBackground: Color4;
@@ -4137,8 +4170,6 @@ declare class UIText extends UIShape {
     shadowOffsetX: number;
     shadowOffsetY: number;
     shadowColor: Color4;
-    hAlign: string;
-    vAlign: string;
     hTextAlign: string;
     vTextAlign: string;
     paddingTop: number;
@@ -4205,10 +4236,10 @@ declare class Vector2 {
      * @param y - defines the second coordinate
      */
     constructor(
-        /** defines the first coordinate */
-        x?: number,
-        /** defines the second coordinate */
-        y?: number);
+    /** defines the first coordinate */
+    x?: number, 
+    /** defines the second coordinate */
+    y?: number);
     /**
      * Gets a new Vector2(0, 0)
      * @returns a new Vector2
@@ -4600,18 +4631,18 @@ declare class Vector3 {
      * @param z - defines the third coordinates (on Z axis)
      */
     constructor(
-        /**
-         * Defines the first coordinates (on X axis)
-         */
-        x?: number,
-        /**
-         * Defines the second coordinates (on Y axis)
-         */
-        y?: number,
-        /**
-         * Defines the third coordinates (on Z axis)
-         */
-        z?: number);
+    /**
+     * Defines the first coordinates (on X axis)
+     */
+    x?: number, 
+    /**
+     * Defines the second coordinates (on Y axis)
+     */
+    y?: number, 
+    /**
+     * Defines the third coordinates (on Z axis)
+     */
+    z?: number);
     /**
      * Returns a new Vector3 as the result of the addition of the two given vectors.
      * @param vector1 - the first vector
@@ -5257,14 +5288,14 @@ declare class Vector4 {
      * @param w - w value of the vector
      */
     constructor(
-        /** x value of the vector */
-        x: number,
-        /** y value of the vector */
-        y: number,
-        /** z value of the vector */
-        z: number,
-        /** w value of the vector */
-        w: number);
+    /** x value of the vector */
+    x: number, 
+    /** y value of the vector */
+    y: number, 
+    /** z value of the vector */
+    z: number, 
+    /** w value of the vector */
+    w: number);
     /**
      * Returns a new Vector4 as the result of the addition of the two given vectors.
      * @param vector1 - the first vector

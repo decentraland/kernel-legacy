@@ -1,14 +1,5 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
-import {
-  OnChanged,
-  OnClick,
-  Color4,
-  Texture,
-  OnBlur,
-  OnFocus,
-  OnTextSubmit,
-  log
-} from 'decentraland-ecs/src'
+import { OnChanged, OnClick, Color4, Texture, OnBlur, OnFocus, OnTextSubmit } from 'decentraland-ecs/src'
 
 import {
   UIImage,
@@ -18,7 +9,7 @@ import {
   UIContainerRect,
   UIFullScreen,
   UIShape,
-  UIScrollRect,
+  UIScrollRect
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 import { execute } from './rpc'
@@ -31,7 +22,6 @@ declare var require: any
 const UI_CHAT = require('../../../static/images/ui-chat.png')
 const uiChatTexture = new Texture(UI_CHAT)
 
-//const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color4.White()
 const COMMAND_COLOR = Color4.FromHexString('#ffd7a9ff')
 
@@ -69,7 +59,8 @@ function createTextInput(
   parent: UIShape,
   onChanged: (value?: any, pointerId?: Number) => void,
   onFocus: () => void,
-  onBlur: () => void) {
+  onBlur: () => void
+) {
   const component = new UIInputText(parent)
   component.name = 'input'
   component.autoStretchWidth = false
@@ -83,6 +74,8 @@ function createTextInput(
   component.thickness = 0
   component.vAlign = 'bottom'
   component.hAlign = 'left'
+  component.vTextAlign = 'bottom'
+  component.hTextAlign = 'left'
   component.positionX = '10px'
   component.positionY = '15px'
   component.value = ''
@@ -105,8 +98,8 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   component.fontSize = 12
   component.vTextAlign = 'top'
   component.hTextAlign = 'left'
-  component.hAlign = 'left'
   component.vAlign = 'top'
+  component.hAlign = 'left'
   component.adaptWidth = false
   component.adaptHeight = true
   component.width = '300px'
@@ -120,7 +113,7 @@ const internalState = {
   commandsList: [] as Array<any>,
   messages: [] as Array<any>,
   isFocused: false,
-  isSliderVisible: false,
+  isSliderVisible: false
 }
 
 let isMaximized: boolean = false
@@ -159,7 +152,6 @@ transparentMessageContainer.width = '100%'
 transparentMessageContainer.height = '100%'
 transparentMessageContainer.positionX = '10px'
 transparentMessageContainer.spacing = 6
-
 
 const footerContainer = new UIContainerRect(screenSpaceUI)
 footerContainer.adaptHeight = true
@@ -212,10 +204,10 @@ function onInputBlur() {
 }
 
 function onInputChanged(message: string) {
+  // noop
 }
 
 async function onInputSubmit(e: { text: string }) {
-  log("message = " + e.text)
   await sendMsg(e.text)
 }
 
@@ -228,7 +220,6 @@ async function sendMsg(messageToSend: string) {
     }
   }
 }
-
 
 function addMessage(messageEntry: MessageEntry): void {
   internalState.messages.push(messageEntry)
