@@ -4,8 +4,8 @@ import {
   parcelLimits,
   ETHEREUM_NETWORK,
   commConfigurations,
-  getNetworkConfigurations,
-  playerConfigurations
+  playerConfigurations,
+  getServerConfigurations
 } from 'config'
 
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
