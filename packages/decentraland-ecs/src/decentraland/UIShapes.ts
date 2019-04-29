@@ -1,5 +1,5 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { CLASS_ID, OnUUIDEvent, OnTextSubmit, OnChanged, Texture, OnClick, OnFocus, OnBlur } from './Components'
+import { CLASS_ID, OnUUIDEvent, Texture } from './Components'
 import { Color4 } from './math'
 
 /**
