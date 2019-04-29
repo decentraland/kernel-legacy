@@ -1,0 +1,61 @@
+{
+    "display": {
+      "title": "interactive-text",
+      "favicon": "favicon_asset"
+    },
+    "owner": "",
+    "contact": {
+      "name": "author-name",
+      "email": ""
+    },
+    "main": "game.js",
+    "tags": [],
+    "scene": {
+      "parcels": [
+                    "420,420",
+                    "421,420",
+                    "422,420",
+                    "423,420",
+                    "420,421",
+                    "421,421",
+                    "422,421",
+                    "423,421",
+                    "420,422",
+                    "421,422",
+                    "422,422",
+                    "423,422",
+                    "420,423",
+                    "421,423",
+                    "422,423",
+                    "423,423",
+                    "420,424",
+                    "421,424",
+                    "422,424",
+                    "423,424",
+                    "420,425",
+                    "421,425",
+                    "422,425",
+                    "423,425",
+                    "420,426",
+                    "421,426",
+                    "422,426",
+                    "423,426",
+                    "420,427",
+                    "421,427",
+                    "422,427",
+                    "423,427"
+                ],
+      "base":"420,420"
+    },
+    "communications":{
+        "type":"webrtc",
+        "signalling":"https://signalling-01.decentraland.org"
+    },
+    "policy": {
+      "contentRating": "E",
+      "fly": true,
+      "voiceEnabled": true,
+      "blacklist": [],
+      "teleportPosition": ""
+    }
+}
