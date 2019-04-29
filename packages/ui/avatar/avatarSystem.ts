@@ -28,7 +28,7 @@ import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
-const GENERIC_AVATAR = 'avatar/main.gltf'
+const GENERIC_AVATAR = 'fox/completeFox.glb'
 
 const models: Map<string, GLTFShape> = new Map()
 const avatarMap = new Map<string, AvatarEntity>()
