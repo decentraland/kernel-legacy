@@ -139,7 +139,7 @@ export class UIScreenSpace extends DisposableComponent {
     this.screenSpace.paddingLeft = mobile ? '40%' : '30%'
     this.screenSpace.alpha = 0.8
     this.screenSpace.isVisible = false
-    ;(this.screenSpace as any).clipChildren = true
+      ; (this.screenSpace as any).clipChildren = true
     // Block pointer lock when clicking anywhere on screen space UI part
     this.screenSpace.onPointerUpObservable.add($ => {
       this.dispatchOnClick($.buttonIndex)

@@ -150,8 +150,6 @@ export class AvatarEntity extends Entity {
   constructor(public name: string) {
     super(name)
 
-    // const clicked = new OnPointerDown(this.clicked)
-
     {
       this.labelEntity.setParent(this)
 
@@ -159,10 +157,10 @@ export class AvatarEntity extends Entity {
       labelTransform.position.y = 2
       labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
-
+      this.label.fontSize = 5
+      this.label.hTextAlign = 'center'
       this.label.isPickable = true
       this.labelEntity.addComponent(this.label)
-      //this.labelEntity.addComponent(clicked)
 
       const model = getAvatarModel(GENERIC_AVATAR)
       this.currentAvatarType = GENERIC_AVATAR
@@ -170,23 +168,12 @@ export class AvatarEntity extends Entity {
     }
 
     this.body.setParent(this)
-    //this.body.addComponent(clicked)
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
 
     this.setVisible(true)
   }
-
-  // clicked = () => {
-  //   showAvatarWindow({
-  //     displayName: this.displayName,
-  //     isBlocked: this.blocked,
-  //     isMuted: this.muted,
-  //     publicKey: this.publicKey,
-  //     uuid: this.name
-  //   })
-  // }
 
   setBlocked(blocked: boolean, muted: boolean): void {
     this.blocked = blocked
@@ -343,18 +330,10 @@ function handleUserRemoved({ uuid }: UserRemovedMessage): void {
     avatarMap.delete(uuid)
     engine.removeEntity(avatar)
   }
-  // if (uuid === currentAvatarId) {
-  //   hideAvatarWindow()
-  // }
   cleanupUnusedModels()
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
-  //const avatar = avatarMap.get(uuid)
-
-  // if (avatar) {
-  //   avatar.clicked()
-  // }
 }
 
 function handleMutedBlockedMessages({ uuid }: UserMessage): void {

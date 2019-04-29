@@ -434,10 +434,7 @@ export class TextShape extends Shape {
   color: Color3 = new Color3(1, 1, 1)
 
   @ObservableComponent.field
-  fontFamily: string = 'Arial'
-
-  @ObservableComponent.field
-  fontSize: number = 100
+  fontSize: number = 10
 
   @ObservableComponent.field
   fontWeight: string = 'normal'
@@ -476,10 +473,10 @@ export class TextShape extends Shape {
   zIndex: number = 0
 
   @ObservableComponent.field
-  hAlign: string = 'center'
+  hTextAlign: string = 'center'
 
   @ObservableComponent.field
-  vAlign: string = 'center'
+  vTextAlign: string = 'center'
 
   @ObservableComponent.field
   width: number = 1

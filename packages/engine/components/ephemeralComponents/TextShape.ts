@@ -102,8 +102,8 @@ export class TextShape extends BaseComponent<ECSTextShape> {
     if (this.value) {
       this.textBlock.alpha = Math.max(0, Math.min(1, this.value.opacity))
       this.textBlock.color = validators.color(this.value.color, BABYLON.Color3.Black()).toHexString()
-      this.textBlock.fontFamily = this.value.fontFamily
-      this.textBlock.fontSize = this.value.fontSize
+      this.textBlock.fontFamily = 'Arial'
+      this.textBlock.fontSize = this.value.fontSize * 10
       this.textBlock.zIndex = this.value.zIndex
       this.textBlock.shadowBlur = this.value.shadowBlur
       this.textBlock.shadowOffsetX = this.value.shadowOffsetX
@@ -113,8 +113,8 @@ export class TextShape extends BaseComponent<ECSTextShape> {
       this.textBlock.text = this.value.value || ''
       this.textBlock.textWrapping = this.value.textWrapping
       this.textBlock.resizeToFit = this.value.resizeToFit
-      this.textBlock.textHorizontalAlignment = parseHorizontalAlignment(this.value.hAlign)
-      this.textBlock.textVerticalAlignment = parseVerticalAlignment(this.value.vAlign)
+      this.textBlock.textHorizontalAlignment = parseHorizontalAlignment(this.value.hTextAlign)
+      this.textBlock.textVerticalAlignment = parseVerticalAlignment(this.value.vTextAlign)
       this.textBlock.outlineWidth = this.value.outlineWidth
       this.textBlock.outlineColor = validators.color(this.value.outlineColor, BABYLON.Color3.Black()).toHexString()
       this.textBlock.fontWeight = this.value.fontWeight

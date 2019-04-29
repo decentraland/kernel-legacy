@@ -3876,7 +3876,6 @@ declare class TextShape extends Shape {
     outlineWidth: number;
     outlineColor: Color3;
     color: Color3;
-    fontFamily: string;
     fontSize: number;
     fontWeight: string;
     opacity: number;
@@ -3890,8 +3889,8 @@ declare class TextShape extends Shape {
     shadowOffsetY: number;
     shadowColor: Color3;
     zIndex: number;
-    hAlign: string;
-    vAlign: string;
+    hTextAlign: string;
+    vTextAlign: string;
     width: number;
     height: number;
     paddingTop: number;

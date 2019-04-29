@@ -1,17 +1,13 @@
 import { DecentralandInterface, IEvents } from 'decentraland-ecs/src/decentraland/Types'
 import {
-  // Entity,
-  // engine,
   OnChanged,
   OnClick,
   Color4,
-  // OnEnter,
-  // OnPointerLock,
   Texture,
   OnBlur,
   OnFocus,
   OnTextSubmit,
-  //OnTextSubmit
+  log
 } from 'decentraland-ecs/src'
 
 import {
@@ -19,11 +15,10 @@ import {
   UIInputText,
   UIText,
   UIContainerStack,
-  //  UIScrollRect,
   UIContainerRect,
   UIFullScreen,
   UIShape,
-  UIScrollRect
+  UIScrollRect,
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 import { execute } from './rpc'
@@ -38,55 +33,18 @@ const uiChatTexture = new Texture(UI_CHAT)
 
 //const MAX_CHARS = 94
 const PRIMARY_TEXT_COLOR = Color4.White()
-const COMMAND_COLOR = Color4.FromHexString('#d7a9ff')
+const COMMAND_COLOR = Color4.FromHexString('#ffd7a9ff')
 
 // UI creators -------------------
 dcl.subscribe('MESSAGE_RECEIVED')
+dcl.subscribe('MESSAGE_SENT')
 dcl.onEvent(event => {
   const eventType: string = event.type
   const eventData: any = event.data
-  if (eventType === 'MESSAGE_RECEIVED') {
+  if (eventType === 'MESSAGE_RECEIVED' || eventType === 'MESSAGE_SENT') {
     addMessage(eventData.messageEntry as MessageEntry)
   }
 })
-
-
-// function createMinimizeButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-//   const component = new UIImage(parent, uiChatTexture)
-
-//   component.name = 'minimize-icon'
-//   component.width = '20px'
-//   component.height = '20px'
-//   component.sourceWidth = 40
-//   component.sourceHeight = 40
-//   component.sourceTop = 10
-//   component.sourceLeft = 130
-//   component.hAlign = 'right'
-//   component.positionX = '-10px'
-//   component.isPointerBlocker = true
-//   component.onClick = new OnClick(click)
-
-//   return { component }
-// }
-
-// function createSendButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
-//   const component = new UIImage(parent, uiChatTexture)
-//   component.name = 'send-icon'
-//   component.width = '23px'
-//   component.height = '23px'
-//   component.sourceWidth = 48
-//   component.sourceHeight = 48
-//   component.sourceTop = 0
-//   component.sourceLeft = 48
-//   component.hAlign = 'right'
-//   component.vAlign = 'bottom'
-//   component.positionX = '-10px'
-//   component.positionY = '15px'
-//   component.isPointerBlocker = true
-//   component.onClick = new OnClick(click)
-
-//   return { component }
-// }
 
 function createCloseButton(parent: UIShape, click: (ev: IEvents['onClick']) => void) {
   const component = new UIImage(parent, uiChatTexture)
@@ -140,8 +98,8 @@ function createTextInput(
 function createMessage(parent: UIShape, props: { sender: string; message: string; isCommand?: boolean }) {
   const { sender, message, isCommand } = props
   const color = isCommand ? COMMAND_COLOR : PRIMARY_TEXT_COLOR
-
   const component = new UIText(parent)
+
   component.color = color
   component.value = `<b>${sender}:</b> ${message}`
   component.fontSize = 12
@@ -157,43 +115,12 @@ function createMessage(parent: UIShape, props: { sender: string; message: string
   return { component: component }
 }
 
-// function createChatHeader(parent: UIShape) {
-//   const container = new UIContainerRect(parent)
-//   container.name = 'gui-container-header'
-//   container.vAlign = 'top'
-//   container.hAlign = 'left'
-//   container.width = 400
-//   container.height = 45
-//   container.thickness = 0
-
-//   const headerTextComponent = new UIText(parent)
-//   headerTextComponent.color = PRIMARY_TEXT_COLOR
-//   headerTextComponent.value = 'Chat'
-//   headerTextComponent.fontSize = 17
-//   headerTextComponent.hAlign = 'left'
-//   headerTextComponent.vAlign = 'top'
-//   headerTextComponent.hTextAlign = 'left'
-//   headerTextComponent.vTextAlign = 'top'
-//   headerTextComponent.positionX = '15px'
-//   headerTextComponent.positionY = '15px'
-//   headerTextComponent.width = 100
-//   headerTextComponent.height = 40
-
-//   return { container, headerTextComponent }
-// }
-
 // -------------------------------
 const internalState = {
   commandsList: [] as Array<any>,
   messages: [] as Array<any>,
   isFocused: false,
-  sliderMin: -45,
-  sliderMax: -45,
   isSliderVisible: false,
-  sliderValue: -45,
-  helpPanelTop: 50,
-  isHelpVisible: false,
-  rotate: false
 }
 
 let isMaximized: boolean = false
@@ -247,14 +174,8 @@ footerContainer.isPointerBlocker = true
 
 const textInput = createTextInput(footerContainer, onInputChanged, onInputFocus, onInputBlur)
 
-//createSendButton(footerContainer, onSendButtonClick)
 createCloseButton(container, toggleChat)
 setMaximized(isMaximized)
-
-// Chat header text
-//const chatHeader = createChatHeader(container)
-//createMinimizeButton(chatHeader.container, toggleChat)
-// ------------------------------------
 
 // Initialize chat scene
 
@@ -291,28 +212,12 @@ function onInputBlur() {
 }
 
 function onInputChanged(message: string) {
-  // set proper color
-  // if (message.charAt(0) == '/') {
-  //   textInput.component.color = COMMAND_COLOR
-  // } else {
-  //   textInput.component.color = PRIMARY_TEXT_COLOR
-  // }
-
-  // if (message.length < MAX_CHARS) {
-  //   textInput.component.value = message
-  // } else {
-  //   textInput.component.value = message.slice(0, MAX_CHARS)
-  // }
-  textInput.component.value = message
 }
 
 async function onInputSubmit(e: { text: string }) {
+  log("message = " + e.text)
   await sendMsg(e.text)
 }
-
-// function onSendButtonClick() {
-//   sendMsg(textInput.component.value)
-// }
 
 async function sendMsg(messageToSend: string) {
   if (messageToSend) {
