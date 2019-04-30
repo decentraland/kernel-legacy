@@ -152,10 +152,10 @@ export class AvatarEntity extends Entity {
       this.labelEntity.setParent(this)
 
       const labelTransform = this.labelEntity.getComponentOrCreate(Transform)
-      labelTransform.position.y = 2
+      labelTransform.position.y = 4
       labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
-      this.label.fontSize = 5
+      this.label.fontSize = 3.5
       this.label.hTextAlign = 'center'
       this.label.isPickable = true
       this.labelEntity.addComponent(this.label)
@@ -164,6 +164,10 @@ export class AvatarEntity extends Entity {
       this.currentAvatarType = GENERIC_AVATAR
       this.body.addComponentOrReplace(model)
     }
+
+    var bodyTranform = this.body.getComponentOrCreate(Transform)
+    bodyTranform.scale = new Vector3(1, 1, 1)
+    bodyTranform.position.y = 1
 
     this.body.setParent(this)
 
@@ -315,11 +319,11 @@ function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage): boolean {
  * This function handles those visible changes.
  */
 function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
-  const avatar = ensureAvatar(uuid)
+  /* const avatar = ensureAvatar(uuid)
 
   if (avatar) {
     avatar.setVisible(visible)
-  }
+  } */
 }
 
 function handleUserRemoved({ uuid }: UserRemovedMessage): void {
