@@ -430,6 +430,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     let min = boundingInfo.boundingBox.minimumWorld
     let max = boundingInfo.boundingBox.maximumWorld
     for (let i = 1; i < children.length; i++) {
+      if (!children[i].material) continue
       boundingInfo = children[i].getBoundingInfo()
       min = BABYLON.Vector3.Minimize(min, boundingInfo.boundingBox.minimumWorld)
       max = BABYLON.Vector3.Maximize(max, boundingInfo.boundingBox.maximumWorld)
