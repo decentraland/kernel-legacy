@@ -39,7 +39,7 @@ type SystemEntry = { system: ISystem; priority: number }
  */
 function createRootEntity() {
   const entity = new Entity('scene')
-  ;(entity as any).uuid = '0'
+  ; (entity as any).uuid = '0'
   return entity
 }
 
@@ -79,12 +79,12 @@ export class Engine {
     this.eventManager.addListener(ComponentRemoved, this, this.componentRemovedHandler)
   }
 
-  addEntity(entity: Entity): Engine {
+  addEntity(entity: Entity): Entity {
     const parent = entity.getParent()
 
     if (entity.isAddedToEngine()) {
       log('The entity is already in the engine. Please fix this')
-      return this
+      return entity
     }
 
     entity.eventManager = this.eventManager
@@ -113,10 +113,10 @@ export class Engine {
       }
     }
 
-    return this
+    return entity
   }
 
-  removeEntity(entity: Entity) {
+  removeEntity(entity: Entity): boolean {
     const id = entity.uuid
 
     if (entity.isAddedToEngine()) {
@@ -151,6 +151,8 @@ export class Engine {
       entity.eventManager = null
 
       delete this._entities[id]
+
+      return true
     } else {
       log('Engine: Trying to remove non existent entity from engine.')
       if (!entity.isAddedToEngine()) {
@@ -162,9 +164,8 @@ export class Engine {
       for (let componentName in entity.components) {
         log(componentName)
       }
+      return false
     }
-
-    return this
   }
 
   addSystem(system: ISystem, priority: number = 0) {
@@ -337,12 +338,10 @@ export class Engine {
     }
 
     this.simpleSystems.push(system)
-
-    return this
   }
 
   private checkRequirementsAndAdd(entity: Entity) {
-    if (!entity.isAddedToEngine()) return this
+    if (!entity.isAddedToEngine()) return
 
     for (let componentName in entity.components) {
       if (!(componentName in this.entityLists)) {
@@ -367,8 +366,6 @@ export class Engine {
         system.onAddEntity(entity)
       }
     }
-
-    return this
   }
 
   private checkRequirements(entity: Entity, system: ComponentGroup) {
@@ -381,14 +378,12 @@ export class Engine {
         system.removeEntity(entity)
       }
     }
-
-    return this
   }
 
   private componentAddedHandler(event: ComponentAdded) {
     const { entity, componentName } = event
 
-    if (!entity.isAddedToEngine()) return this
+    if (!entity.isAddedToEngine()) return
 
     if (!this.entityLists[componentName]) {
       this.entityLists[componentName] = { [entity.uuid]: entity }
@@ -403,8 +398,6 @@ export class Engine {
         this.checkRequirements(entity, componentGroups[i])
       }
     }
-
-    return this
   }
 
   private componentRemovedHandler(event: ComponentRemoved) {
@@ -412,7 +405,7 @@ export class Engine {
     // all systems that this entity lost this specific component.
     const { entity, componentName } = event
 
-    if (!entity.isAddedToEngine()) return this
+    if (!entity.isAddedToEngine()) return
 
     delete this.entityLists[componentName][entity.uuid]
 
@@ -423,7 +416,5 @@ export class Engine {
         this.checkRequirements(entity, componentGroups[i])
       }
     }
-
-    return this
   }
 }

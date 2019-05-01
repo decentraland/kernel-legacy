@@ -17,7 +17,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
   cachedComponents: Record<string, Record<string, string>> = {}
   engine!: Engine
 
-  constructor(public dcl: DecentralandInterface) {}
+  constructor(public dcl: DecentralandInterface) { }
 
   activate(engine: Engine) {
     this.engine = engine
@@ -47,7 +47,6 @@ export class DecentralandSynchronizationSystem implements ISystem {
           break
       }
     })
-    return this
   }
 
   /**
@@ -94,7 +93,6 @@ export class DecentralandSynchronizationSystem implements ISystem {
         }
       }
     }
-    return this
   }
 
   /**
@@ -111,7 +109,6 @@ export class DecentralandSynchronizationSystem implements ISystem {
       // Remove the caches from local memory
       delete this.cachedComponents[entityId]
     }
-    return this
   }
 
   /**

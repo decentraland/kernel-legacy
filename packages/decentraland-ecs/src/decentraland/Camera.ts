@@ -75,12 +75,10 @@ export class Camera {
   // @internal
   private positionChanged(e: IEvents['positionChanged']) {
     this.lastEventPosition = e.position
-    return this
   }
 
   // @internal
   private rotationChanged(e: IEvents['rotationChanged']) {
     this.lastEventRotation = e.quaternion
-    return this
   }
 }

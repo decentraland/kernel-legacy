@@ -154,7 +154,7 @@ export class Entity {
    * Gets a component, if it doesn't exist, it creates the component and returns it.
    * @param component - component class
    */
-  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new (): T }): T {
+  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new(): T }): T {
     if (typeof (component as any) !== 'function') {
       throw new Error('Entity#getOrCreate(component): component is not a class')
     }
@@ -244,7 +244,7 @@ export class Entity {
       } else {
         log(
           `Entity Warning: Trying to remove wrong (by constructor) component "${componentName}" from entity "${
-            this.identifier
+          this.identifier
           }"`
         )
         return
@@ -300,7 +300,7 @@ export class Entity {
     if (circularAncestor) {
       throw new Error(
         `Failed to set parent for entity "${
-          this.identifier
+        this.identifier
         }": Circular parent references are not allowed (See entity "${circularAncestor}")`
       )
     }
@@ -312,11 +312,11 @@ export class Entity {
     if (newParent.uuid !== '0') {
       if (!newParent.isAddedToEngine() && this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ;(this.engine as any).removeEntity(this)
+        ; (this.engine as any).removeEntity(this)
       }
       if (newParent.isAddedToEngine() && !this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ;(newParent.engine as any).addEntity(this)
+        ; (newParent.engine as any).addEntity(this)
       }
     }
 
@@ -362,8 +362,6 @@ export class Entity {
     if (this.uuid && parent) {
       parent.children[this.uuid] = this
     }
-
-    return this
   }
 }
 

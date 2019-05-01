@@ -72,9 +72,8 @@ export class ComponentGroup {
 
     if (this.entities.indexOf(entity) === -1) {
       // tslint:disable-next-line:semicolon
-      ;(this.entities as Entity[]).push(entity)
+      ; (this.entities as Entity[]).push(entity)
     }
-    return this
   }
 
   // @internal
@@ -83,9 +82,8 @@ export class ComponentGroup {
 
     if (id !== -1) {
       // tslint:disable-next-line:semicolon
-      ;(this.entities as Entity[]).splice(id, 1)
+      ; (this.entities as Entity[]).splice(id, 1)
     }
-    return this
   }
 
   // @internal
@@ -93,7 +91,6 @@ export class ComponentGroup {
     if (this._requiresNames.indexOf(component) !== -1) {
       this.removeEntity(entity)
     }
-    return this
   }
 
   // @internal
