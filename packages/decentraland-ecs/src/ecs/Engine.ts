@@ -39,7 +39,7 @@ type SystemEntry = { system: ISystem; priority: number }
  */
 function createRootEntity() {
   const entity = new Entity('scene')
-  ; (entity as any).uuid = '0'
+  ;(entity as any).uuid = '0'
   return entity
 }
 

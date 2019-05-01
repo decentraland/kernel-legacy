@@ -30,7 +30,7 @@ export class Entity {
    * Adds or replaces a component in the entity.
    * @param component - component instance.
    */
-  addComponentOrReplace<T extends object>(component: T): Entity {
+  addComponentOrReplace<T extends object>(component: T): T {
     if (typeof component === 'function') {
       throw new Error('You passed a function or class as a component, an instance of component is expected')
     }
@@ -43,7 +43,7 @@ export class Entity {
 
     if (this.components[componentName]) {
       if (this.components[componentName] === component) {
-        return this
+        return component
       }
       this.removeComponent(this.components[componentName], false)
     }
@@ -154,7 +154,7 @@ export class Entity {
    * Gets a component, if it doesn't exist, it creates the component and returns it.
    * @param component - component class
    */
-  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new(): T }): T {
+  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new (): T }): T {
     if (typeof (component as any) !== 'function') {
       throw new Error('Entity#getOrCreate(component): component is not a class')
     }
@@ -175,7 +175,7 @@ export class Entity {
    * Adds a component. If the component already exist, it throws an Error.
    * @param component - component instance.
    */
-  addComponent<T extends object>(component: T) {
+  addComponent<T extends object>(component: T): T {
     if (typeof component !== 'object') {
       throw new Error(
         'Entity#add(component): You passed a function or class as a component, an instance of component is expected'
@@ -200,7 +200,7 @@ export class Entity {
     if (typeof storedComponent.addedToEntity === 'function') {
       storedComponent.addedToEntity(this)
     }
-    return this
+    return component
   }
 
   /**
@@ -244,7 +244,7 @@ export class Entity {
       } else {
         log(
           `Entity Warning: Trying to remove wrong (by constructor) component "${componentName}" from entity "${
-          this.identifier
+            this.identifier
           }"`
         )
         return
@@ -300,7 +300,7 @@ export class Entity {
     if (circularAncestor) {
       throw new Error(
         `Failed to set parent for entity "${
-        this.identifier
+          this.identifier
         }": Circular parent references are not allowed (See entity "${circularAncestor}")`
       )
     }
@@ -312,11 +312,11 @@ export class Entity {
     if (newParent.uuid !== '0') {
       if (!newParent.isAddedToEngine() && this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ; (this.engine as any).removeEntity(this)
+        ;(this.engine as any).removeEntity(this)
       }
       if (newParent.isAddedToEngine() && !this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ; (newParent.engine as any).addEntity(this)
+        ;(newParent.engine as any).addEntity(this)
       }
     }
 

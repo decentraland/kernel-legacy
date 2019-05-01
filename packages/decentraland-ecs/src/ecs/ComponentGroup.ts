@@ -72,7 +72,7 @@ export class ComponentGroup {
 
     if (this.entities.indexOf(entity) === -1) {
       // tslint:disable-next-line:semicolon
-      ; (this.entities as Entity[]).push(entity)
+      ;(this.entities as Entity[]).push(entity)
     }
   }
 
@@ -82,7 +82,7 @@ export class ComponentGroup {
 
     if (id !== -1) {
       // tslint:disable-next-line:semicolon
-      ; (this.entities as Entity[]).splice(id, 1)
+      ;(this.entities as Entity[]).splice(id, 1)
     }
   }
 

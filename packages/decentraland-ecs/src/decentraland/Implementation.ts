@@ -17,7 +17,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
   cachedComponents: Record<string, Record<string, string>> = {}
   engine!: Engine
 
-  constructor(public dcl: DecentralandInterface) { }
+  constructor(public dcl: DecentralandInterface) {}
 
   activate(engine: Engine) {
     this.engine = engine
