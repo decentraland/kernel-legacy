@@ -1,12 +1,12 @@
 import { future } from 'fp-future'
 import { ScriptingHost } from 'decentraland-rpc/lib/host'
-import { error } from '../../engine/logger'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { WebWorkerTransport } from 'decentraland-rpc'
 import { playerConfigurations } from '../../config'
 import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src/decentraland/math'
+import { error } from 'decentraland-ecs/src'
 
 // tslint:disable-next-line:whitespace
 type EngineAPI = import('../apis/EngineAPI').EngineAPI
