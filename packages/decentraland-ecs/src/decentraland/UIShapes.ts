@@ -147,7 +147,7 @@ export class UIContainerStack extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_BUTTON_SHAPE)
 export class UIButton extends UIShape {
   @ObservableComponent.field
-  fontSize: number = 30
+  fontSize: number = 10
 
   @ObservableComponent.field
   fontWeight: string = 'normal'

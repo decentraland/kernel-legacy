@@ -103,7 +103,7 @@ export class TextShape extends BaseComponent<ECSTextShape> {
       this.textBlock.alpha = Math.max(0, Math.min(1, this.value.opacity))
       this.textBlock.color = validators.color(this.value.color, BABYLON.Color3.Black()).toHexString()
       this.textBlock.fontFamily = 'Arial'
-      this.textBlock.fontSize = this.value.fontSize * 10
+      this.textBlock.fontSize = this.value.fontSize * 10.0
       this.textBlock.zIndex = this.value.zIndex
       this.textBlock.shadowBlur = this.value.shadowBlur
       this.textBlock.shadowOffsetX = this.value.shadowOffsetX

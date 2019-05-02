@@ -152,7 +152,7 @@ export class AvatarEntity extends Entity {
       this.labelEntity.setParent(this)
 
       const labelTransform = this.labelEntity.getComponentOrCreate(Transform)
-      labelTransform.position.y = 4
+      labelTransform.position.y = 2
       labelTransform.rotate(new Vector3(0, 1, 0), 180)
       this.label.billboard = true
       this.label.fontSize = 3.5
@@ -165,7 +165,7 @@ export class AvatarEntity extends Entity {
       this.body.addComponentOrReplace(model)
     }
 
-    var bodyTranform = this.body.getComponentOrCreate(Transform)
+    let bodyTranform = this.body.getComponentOrCreate(Transform)
     bodyTranform.scale = new Vector3(1, 1, 1)
     bodyTranform.position.y = 1
 
