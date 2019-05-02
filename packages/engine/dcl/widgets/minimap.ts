@@ -4,10 +4,11 @@ import { Vector3 } from 'babylonjs'
 
 export function enableMiniMap() {
   const div = document.createElement('div')
+  div.setAttribute('class', 'minimap')
   const map = document.createElement('img')
   const dot = document.createElement('div')
 
-  const miniMapSize = 150
+  const miniMapSize = 300
   const mapSize = 900
   const landSize = mapSize / 300
   const mapScale = 2
@@ -18,7 +19,7 @@ export function enableMiniMap() {
   dot.style.width = '8px'
   dot.style.height = '8px'
   dot.style.backgroundColor = 'blue'
-  dot.style.borderBottom = '4px solid white'
+  dot.style.borderBottom = '4px solid blue'
   dot.style.position = 'absolute'
   dot.style.top = '50%'
   dot.style.left = '50%'
@@ -26,7 +27,7 @@ export function enableMiniMap() {
   dot.style.margin = '-3px -3px'
   dot.style.borderRadius = '50%'
   dot.style.zIndex = '1'
-  dot.style.borderTop = '8px solid blue'
+  dot.style.borderTop = '8px solid white'
 
   map.src = `https://api.decentraland.org/v1/map.png?size=${landSize}&width=${mapSize}&height=${mapSize}`
   map.style.width = map.style.height = `${mapScale * mapSize}px`
