@@ -2707,6 +2707,7 @@ declare class ObservableComponent {
     private subscriptions;
     static component(target: ObservableComponent, propertyKey: string): void;
     static field(target: ObservableComponent, propertyKey: string): void;
+    static color(target: ObservableComponent, propertyKey: string): void;
     static uiValue(target: ObservableComponent, propertyKey: string): void;
     static readonly(target: ObservableComponent, propertyKey: string): void;
     onChange(fn: ObservableComponentSubscription): void;

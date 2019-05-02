@@ -1,5 +1,5 @@
 import { DisposableComponent } from '../DisposableComponent'
-import { CLASS_ID } from 'decentraland-ecs/src'
+import { CLASS_ID, Color3 } from 'decentraland-ecs/src'
 import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
@@ -20,12 +20,12 @@ const schemaValidator = createSchemaValidator({
   isPointerBlocker: { type: 'boolean', default: false },
 
   opacity: { type: 'number', default: 1 },
-  color: { type: 'color', default: BABYLON.Color3.White() },
+  color: { type: 'color', default: Color3.White() },
 
   adaptWidth: { type: 'boolean', default: false },
   adaptHeight: { type: 'boolean', default: false },
   thickness: { type: 'number', default: 0 },
-  background: { type: 'color', default: BABYLON.Color3.Black() }
+  background: { type: 'color', default: Color3.Black() }
 })
 
 export class UIContainerRect extends UIControl<UIContainerRectShape, BABYLON.GUI.Rectangle> {

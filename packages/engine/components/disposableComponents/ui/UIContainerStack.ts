@@ -1,5 +1,5 @@
 import { DisposableComponent } from '../DisposableComponent'
-import { CLASS_ID } from 'decentraland-ecs/src'
+import { CLASS_ID, Color3 } from 'decentraland-ecs/src'
 import { UIValue } from 'decentraland-ecs/src/ecs/UIValue'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { createSchemaValidator } from '../../helpers/schemaValidator'
@@ -22,7 +22,7 @@ const schemaValidator = createSchemaValidator({
   height: { type: 'number', default: 20 },
   isPointerBlocker: { type: 'boolean', default: false },
 
-  color: { type: 'string', default: 'white' },
+  color: { type: 'color', default: Color3.White() },
   opacity: { type: 'number', default: 1 },
 
   adaptWidth: { type: 'boolean', default: false },

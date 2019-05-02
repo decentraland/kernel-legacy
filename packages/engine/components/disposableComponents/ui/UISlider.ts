@@ -19,7 +19,7 @@ const schemaValidator = createSchemaValidator({
   positionX: { type: 'uiValue', default: new UIValue(0) },
   positionY: { type: 'uiValue', default: new UIValue(0) },
   width: { type: 'number', default: 100 },
-  height: { type: 'number', default: 20 },
+  height: { type: 'number', default: 100 },
   isPointerBlocker: { type: 'boolean', default: false },
 
   color: { type: 'color', default: Color3.White() },
@@ -34,7 +34,7 @@ const schemaValidator = createSchemaValidator({
   maximum: { type: 'number', default: 1 },
   value: { type: 'number', default: 0 },
   borderColor: { type: 'color', default: Color3.White() },
-  background: { type: 'color', default: Color3.Black() },
+  backgroundColor: { type: 'color', default: Color3.Black() },
   barOffset: { type: 'number', default: 5 },
   thumbWidth: { type: 'number', default: 30 },
   isThumbCircle: { type: 'boolean', default: false },

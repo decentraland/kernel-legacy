@@ -1,7 +1,6 @@
 import { executeTask } from 'decentraland-ecs/src'
 import { DecentralandInterface, AVATAR_OBSERVABLE } from 'decentraland-ecs/src/decentraland/Types'
 import { avatarMessageObservable } from './avatar/avatarSystem'
-import { initializeChat } from './avatar/chatWindow'
 
 declare var dcl: DecentralandInterface
 
@@ -24,5 +23,4 @@ executeTask(async () => {
     }
   })
 
-  await initializeChat()
 })

@@ -105,7 +105,7 @@ export class UIContainerRect extends UIShape {
   @ObservableComponent.field
   thickness: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
@@ -131,7 +131,7 @@ export class UIContainerStack extends UIShape {
   @ObservableComponent.field
   adaptHeight: boolean = true
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
@@ -158,10 +158,10 @@ export class UIButton extends UIShape {
   @ObservableComponent.field
   cornerRadius: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   color: Color4 = Color4.White()
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   background: Color4 = Color4.White()
 
   @ObservableComponent.field
@@ -185,7 +185,7 @@ export class UIButton extends UIShape {
   @ObservableComponent.field
   shadowOffsetY: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   shadowColor: Color4 = Color4.Black()
 
   @ObservableComponent.field
@@ -200,10 +200,10 @@ export class UIText extends UIShape {
   @ObservableComponent.field
   outlineWidth: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   outlineColor: Color4 = Color4.White()
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   color: Color4 = Color4.White()
 
   @ObservableComponent.field
@@ -242,7 +242,7 @@ export class UIText extends UIShape {
   @ObservableComponent.field
   shadowOffsetY: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   shadowColor: Color4 = Color4.Black()
 
   @ObservableComponent.field
@@ -269,7 +269,7 @@ export class UIText extends UIShape {
  */
 @DisposableComponent('engine.shape', CLASS_ID.UI_INPUT_TEXT_SHAPE)
 export class UIInputText extends UIShape {
-  @ObservableComponent.field
+  @ObservableComponent.color
   color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
@@ -284,7 +284,7 @@ export class UIInputText extends UIShape {
   @ObservableComponent.field
   value: string = ''
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   placeholderColor: Color4 = Color4.White()
 
   @ObservableComponent.field
@@ -305,10 +305,10 @@ export class UIInputText extends UIShape {
   @ObservableComponent.field
   autoStretchWidth: boolean = true
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   background: Color4 = Color4.Black()
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   focusedBackground: Color4 = Color4.Black()
 
   @ObservableComponent.field
@@ -320,7 +320,7 @@ export class UIInputText extends UIShape {
   @ObservableComponent.field
   shadowOffsetY: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   shadowColor: Color4 = Color4.White()
 
   @ObservableComponent.field
@@ -403,10 +403,10 @@ export class UIScrollRect extends UIShape {
   @ObservableComponent.field
   valueY: number = 0
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   borderColor: Color4 = Color4.White()
 
-  @ObservableComponent.field
+  @ObservableComponent.color
   backgroundColor: Color4 = Color4.Clear()
 
   @ObservableComponent.field

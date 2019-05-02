@@ -1,6 +1,7 @@
 import { newId } from './helpers'
 import { EventConstructor } from './EventManager'
 import { UIValue } from './UIValue'
+import { Color3, Color4 } from '../decentraland/math'
 
 const componentSymbol = '__name__symbol_'
 const componentClassIdSymbol = '__classId__symbol_'
@@ -40,7 +41,7 @@ export interface ComponentConstructor<T extends ComponentLike> {
   [componentClassIdSymbol]?: number
   isComponent?: boolean
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -54,7 +55,7 @@ export interface DisposableComponentConstructor<T extends DisposableComponentLik
   isComponent?: boolean
   isDisposableComponent?: true
   originalClassName?: string
-  new (...args: any[]): T
+  new(...args: any[]): T
 }
 
 /**
@@ -91,7 +92,7 @@ export class DisposableComponentUpdated {
  * @public
  */
 export function Component(componentName: string, classId?: number) {
-  return function<TFunction extends ComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends ComponentConstructor<any>>(target: TFunction): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -143,7 +144,7 @@ export function Component(componentName: string, classId?: number) {
  */
 
 export function DisposableComponent(componentName: string, classId: number) {
-  return function<TFunction extends DisposableComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends DisposableComponentConstructor<any>>(target: TFunction): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -276,7 +277,7 @@ export class ObservableComponent {
   static component(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       const componentSymbol = propertyKey + '_' + Math.random()
-      ;(target as any)[componentSymbol] = undefined
+        ; (target as any)[componentSymbol] = undefined
 
       Object.defineProperty(target, componentSymbol, {
         ...Object.getOwnPropertyDescriptor(target, componentSymbol),
@@ -326,6 +327,41 @@ export class ObservableComponent {
 
             for (let i = 0; i < this.subscriptions.length; i++) {
               this.subscriptions[i](propertyKey, value, oldValue)
+            }
+          }
+        },
+        enumerable: true
+      })
+    }
+  }
+
+  static color(target: ObservableComponent, propertyKey: string) {
+    if (delete (target as any)[propertyKey]) {
+      Object.defineProperty(target, propertyKey, {
+        get: function(this: ObservableComponent): Color4 {
+          return this.data[propertyKey].toHexString()
+        },
+        set: function(this: ObservableComponent, value: Color3 | Color4 | string) {
+          const oldValue = this.data[propertyKey]
+
+          let finalValue: null | Color3 | Color4 = null
+          if (typeof value === 'object') {
+            if ((value as Color4).a) {
+              finalValue = value as Color4
+            } else {
+              finalValue = Color4.FromColor3(value as Color3, 1)
+            }
+          } else {
+            finalValue = Color4.FromHexString(value)
+          }
+
+          this.data[propertyKey] = finalValue
+
+          if (finalValue !== oldValue) {
+            this.dirty = true
+
+            for (let i = 0; i < this.subscriptions.length; i++) {
+              this.subscriptions[i](propertyKey, finalValue, oldValue)
             }
           }
         },

@@ -33,7 +33,7 @@ export class Color4 {
      * Defines the alpha component (between 0 and 1, default is 1)
      */
     public a: number = 1
-  ) {}
+  ) { }
 
   // Statics
 
@@ -50,7 +50,7 @@ export class Color4 {
     let r = parseInt(hex.substring(1, 3), 16)
     let g = parseInt(hex.substring(3, 5), 16)
     let b = parseInt(hex.substring(5, 7), 16)
-    let a = parseInt(hex.substring(7, 9), 16)
+    let a = parseInt(hex.substring(7, 9), 16) || 0
 
     return Color4.FromInts(r, g, b, a)
   }
@@ -368,7 +368,7 @@ export class Color4 {
    * @returns the string representation of the Color4 object
    */
   public toString(): string {
-    return '{R: ' + this.r + ' G:' + this.g + ' B:' + this.b + ' A:' + this.a + '}'
+    return `#${this.r}${this.g}${this.b}${this.a}`
   }
 
   /**

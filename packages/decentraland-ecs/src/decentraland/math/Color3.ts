@@ -28,7 +28,7 @@ export class Color3 {
      * Defines the blue component (between 0 and 1, default is 0)
      */
     public b: number = 0
-  ) {}
+  ) { }
 
   // Statics
 
@@ -179,7 +179,7 @@ export class Color3 {
    * @returns the string representation of the Color3 object
    */
   public toString(): string {
-    return '{R: ' + this.r + ' G:' + this.g + ' B:' + this.b + '}'
+    return `#${this.r}${this.g}${this.b}`
   }
 
   /**
