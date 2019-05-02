@@ -12,7 +12,6 @@ import {
   Transform,
   getComponentName,
   Engine,
-  OnClick,
   UUIDEvent,
   Quaternion,
   Vector3
@@ -43,6 +42,7 @@ import { WebGLParcelScene } from 'engine/dcl/WebGLParcelScene'
 import { BoxShape } from 'engine/components/disposableComponents/BoxShape'
 import { UIScreenSpace } from 'engine/components/disposableComponents/ui/UIScreenSpace'
 import { SharedSceneContext } from 'engine/entities/SharedSceneContext'
+import { OnClick } from 'decentraland-ecs/src/decentraland/UIEvents'
 
 declare var describe: any, it: any
 

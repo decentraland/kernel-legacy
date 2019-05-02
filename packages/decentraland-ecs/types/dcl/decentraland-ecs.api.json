@@ -3937,6 +3937,64 @@
           "isOverride": false,
           "isEventProperty": false
         },
+        "Black": {
+          "kind": "method",
+          "signature": "static Black(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a black color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "Blue": {
+          "kind": "method",
+          "signature": "static Blue(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a blue color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "CheckColors4": {
           "kind": "method",
           "signature": "static CheckColors4(colors: number[], count: number): number[];",
@@ -4049,6 +4107,35 @@
             {
               "kind": "text",
               "text": "Clamps the rgb values by the min and max values and stores the result into \"result\""
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "Clear": {
+          "kind": "method",
+          "signature": "static Clear(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a transparent color"
             }
           ],
           "remarks": [],
@@ -4513,6 +4600,64 @@
           "isVirtual": false,
           "isOverride": false
         },
+        "Gray": {
+          "kind": "method",
+          "signature": "static Gray(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a gray color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "Green": {
+          "kind": "method",
+          "signature": "static Green(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a green color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "Lerp": {
           "kind": "method",
           "signature": "static Lerp(left: Color4, right: Color4, amount: number): Color4;",
@@ -4652,6 +4797,35 @@
           "isVirtual": false,
           "isOverride": false
         },
+        "Magenta": {
+          "kind": "method",
+          "signature": "static Magenta(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a magenta color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "multiply": {
           "kind": "method",
           "signature": "multiply(color: Color4): Color4;",
@@ -4748,6 +4922,35 @@
           "isVirtual": false,
           "isOverride": false
         },
+        "Purple": {
+          "kind": "method",
+          "signature": "static Purple(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a purple color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "r": {
           "kind": "property",
           "signature": "r: number;",
@@ -4768,6 +4971,35 @@
           "isVirtual": false,
           "isOverride": false,
           "isEventProperty": false
+        },
+        "Red": {
+          "kind": "method",
+          "signature": "static Red(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color3 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a red color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
         },
         "scale": {
           "kind": "method",
@@ -5093,6 +5325,35 @@
           "isVirtual": false,
           "isOverride": false
         },
+        "Teal": {
+          "kind": "method",
+          "signature": "static Teal(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a teal color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
         "toArray": {
           "kind": "method",
           "signature": "toArray(array: number[], index?: number): Color4;",
@@ -5339,6 +5600,64 @@
             {
               "kind": "text",
               "text": "Creates a string with the Color4 current values"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "White": {
+          "kind": "method",
+          "signature": "static White(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a white color"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "Yellow": {
+          "kind": "method",
+          "signature": "static Yellow(): Color4;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "Color4",
+            "description": [
+              {
+                "kind": "text",
+                "text": "a new Color4 object"
+              }
+            ]
+          },
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Returns a Color4 value containing a yellow color"
             }
           ],
           "remarks": [],
@@ -9001,6 +9320,32 @@
           "isOverride": false,
           "isEventProperty": false
         },
+        "onAnimationEnd": {
+          "kind": "property",
+          "signature": "onAnimationEnd:",
+          "isOptional": false,
+          "isReadOnly": false,
+          "isStatic": false,
+          "type": "{\n        clipName: string;\n    }",
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "code",
+              "text": "onAnimationEnd",
+              "highlighter": "plain"
+            },
+            {
+              "kind": "text",
+              "text": " is triggered when an animation clip gets finish"
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false,
+          "isEventProperty": false
+        },
         "onBlur": {
           "kind": "property",
           "signature": "onBlur:",
@@ -9152,6 +9497,22 @@
               "text": "Notice: Only entities with ID will be listening for click events."
             }
           ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false,
+          "isEventProperty": false
+        },
+        "onTextSubmit": {
+          "kind": "property",
+          "signature": "onTextSubmit:",
+          "isOptional": false,
+          "isReadOnly": false,
+          "isStatic": false,
+          "type": "{\n        text: string;\n    }",
+          "deprecatedMessage": [],
+          "summary": [],
           "remarks": [],
           "isBeta": false,
           "isSealed": false,
@@ -16779,6 +17140,40 @@
           "isSealed": false,
           "isVirtual": false,
           "isOverride": false
+        },
+        "uiValue": {
+          "kind": "method",
+          "signature": "static uiValue(target: ObservableComponent, propertyKey: string): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {
+            "target": {
+              "name": "target",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "ObservableComponent"
+            },
+            "propertyKey": {
+              "name": "propertyKey",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "string"
+            }
+          },
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
         }
       }
     },
@@ -17220,6 +17615,35 @@
         }
       }
     },
+    "OnAnimationEnd": {
+      "kind": "class",
+      "extends": "OnUUIDEvent",
+      "implements": "",
+      "typeParameters": [],
+      "deprecatedMessage": [],
+      "summary": [],
+      "remarks": [],
+      "isBeta": false,
+      "isSealed": false,
+      "members": {
+        "type": {
+          "kind": "property",
+          "signature": "readonly type: string;",
+          "isOptional": false,
+          "isReadOnly": true,
+          "isStatic": false,
+          "type": "string",
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false,
+          "isEventProperty": false
+        }
+      }
+    },
     "OnBlur": {
       "kind": "class",
       "extends": "OnUUIDEvent",
@@ -17392,6 +17816,35 @@
       "isBeta": false,
       "isSealed": false
     },
+    "OnTextSubmit": {
+      "kind": "class",
+      "extends": "OnUUIDEvent",
+      "implements": "",
+      "typeParameters": [],
+      "deprecatedMessage": [],
+      "summary": [],
+      "remarks": [],
+      "isBeta": false,
+      "isSealed": false,
+      "members": {
+        "type": {
+          "kind": "property",
+          "signature": "readonly type: string;",
+          "isOptional": false,
+          "isReadOnly": true,
+          "isStatic": false,
+          "type": "string",
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false,
+          "isEventProperty": false
+        }
+      }
+    },
     "OnUUIDEvent": {
       "kind": "class",
       "extends": "ObservableComponent",
@@ -17511,6 +17964,40 @@
           "isVirtual": false,
           "isOverride": false,
           "isEventProperty": false
+        },
+        "uuidEvent": {
+          "kind": "method",
+          "signature": "static uuidEvent(target: ObservableComponent, propertyKey: string): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": true,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {
+            "target": {
+              "name": "target",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "ObservableComponent"
+            },
+            "propertyKey": {
+              "name": "propertyKey",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "string"
+            }
+          },
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
         }
       }
     },
@@ -25025,6 +25512,31 @@
           "isOverride": false
         }
       }
+    },
+    "UIStackOrientation": {
+      "kind": "enum",
+      "values": {
+        "HORIZONTAL": {
+          "kind": "enum value",
+          "value": "1",
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false
+        },
+        "VERTICAL": {
+          "kind": "enum value",
+          "value": "0",
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": false
+        }
+      },
+      "deprecatedMessage": [],
+      "summary": [],
+      "remarks": [],
+      "isBeta": false
     },
     "UUIDEvent": {
       "kind": "class",
