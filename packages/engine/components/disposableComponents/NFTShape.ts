@@ -33,6 +33,57 @@ loadingShape.material = loadingShapeMaterial
 
 loadingShape.setEnabled(false)
 
+function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
+  const parsedUrl = /([^:]+):\/\/([^/]+)(?:\/(.+))?/.exec(url)
+
+  if (!parsedUrl) throw new Error('The provided URL is not valid: ' + url)
+
+  const result = {
+    asset: parsedUrl[3],
+    registry: parsedUrl[2],
+    protocol: parsedUrl[1]
+  }
+
+  if (result.protocol.endsWith(':')) {
+    result.protocol = result.protocol.replace(/:$/, '')
+  }
+
+  if (result.protocol !== 'ethereum') {
+    throw new Error('Invalid protocol: ' + result.protocol)
+  }
+
+  return result
+}
+
+async function fetchDARAsset(registry: string, assetId: string): Promise<{ image: string }> {
+  const req = await fetch(`https://schema-api-staging.now.sh/dar/${registry}/asset/${assetId}`)
+  return req.json()
+}
+
+async function fetchBase64Image(url: string) {
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {}, // 'X-KEY': 'asd'
+    mode: 'cors',
+    cache: 'default'
+  })
+
+  const buffer = await response.arrayBuffer()
+  let base64Flag = `data:${response.headers.get('content-type')};base64,`
+  let imageStr = arrayBufferToBase64(buffer)
+
+  return base64Flag + imageStr
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  let binary = ''
+  let bytes = [].slice.call(new Uint8Array(buffer))
+
+  bytes.forEach((b: number) => (binary += String.fromCharCode(b)))
+
+  return btoa(binary)
+}
+
 export class NFTShape extends DisposableComponent {
   src: string | null = null
   assetContainerEntity = new Map<string, BABYLON.AssetContainer>()
@@ -54,11 +105,7 @@ export class NFTShape extends DisposableComponent {
   }
 
   onAttach(entity: BaseEntity): void {
-    console['log']('attach!')
-
     if (!this.entityIsLoading.has(entity.uuid)) {
-      console['log']('attach inside if')
-
       this.entityIsLoading.add(entity.uuid)
 
       const loadingEntity = new BABYLON.TransformNode('loading-padding')
@@ -241,15 +288,6 @@ export class NFTShape extends DisposableComponent {
   }
 
   async updateData(data: any): Promise<void> {
-    console['log']('NFT update data')
-
-    this.tex = new BABYLON.Texture(
-      'https://storage.opensea.io/0x06012c8cf97bead5deae237070f9587f8e7a266d/558536-1555892123.png',
-      scene
-    )
-
-    this.tex.hasAlpha = true
-
     if ('src' in data) {
       if (this.src !== null && this.src !== data.src && DEBUG) {
         log('Cannot set GLTFShape.src twice')
@@ -258,6 +296,13 @@ export class NFTShape extends DisposableComponent {
         this.src = data.src
       }
       if (this.src) {
+        const { registry, asset } = parseProtocolUrl(this.src)
+        const { image } = await fetchDARAsset(registry, asset)
+        const realImage = await fetchBase64Image(image)
+
+        this.tex = new BABYLON.Texture(realImage, scene)
+        this.tex.hasAlpha = true
+
         if ('visible' in data) {
           if (data.visible === false) {
             this.entities.forEach($ => this.onDetach($))
