@@ -18,15 +18,7 @@ import {
 } from 'decentraland-ecs/src'
 
 import { future } from 'fp-future'
-import {
-  loadTestParcel,
-  testScene,
-  saveScreenshot,
-  wait,
-  waitForMesh,
-  PlayerCamera,
-  positionCamera
-} from '../testHelpers'
+import { loadTestParcel, testScene, wait, waitForMesh, PlayerCamera, positionCamera } from '../testHelpers'
 import { sleep } from 'atomicHelpers/sleep'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { AudioClip } from 'engine/components/disposableComponents/AudioClip'
@@ -696,11 +688,6 @@ describe('ECS', () => {
           await waitForMesh(entity)
         })
 
-        saveScreenshot(`gamekit-gltf.png`, {
-          from: [-100, 1.6, 234],
-          lookAt: [-99.5, 1, 234.5]
-        })
-
         wait(100)
       })
 
@@ -1294,11 +1281,6 @@ describe('ECS', () => {
         const parcelScene = await parcelScenePromise
         const texture = await parcelScene.context.getTexture('img #7 @ $1.png')
         expect(texture.isReady()).to.eq(true)
-      })
-
-      saveScreenshot(`material-billboard.png`, {
-        from: [-1, 1.6, 73],
-        lookAt: [-0.5, 1.6, 73.5]
       })
 
       wait(100)
