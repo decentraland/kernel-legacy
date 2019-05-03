@@ -1,37 +1,18 @@
 import { DisposableComponent, BasicShape } from './DisposableComponent'
 import { CLASS_ID } from 'decentraland-ecs/src'
 import { BaseEntity } from 'engine/entities/BaseEntity'
-import { cleanupAssetContainer, processColliders } from 'engine/entities/utils/processModels'
+import { cleanupAssetContainer } from 'engine/entities/utils/processModels'
 import { scene, engine } from 'engine/renderer'
-import { probe } from 'engine/renderer/ambientLights'
 import { DEBUG } from 'config'
 import { log } from 'util'
 import { Animator } from '../ephemeralComponents/Animator'
-import { deleteUnusedTextures, isSceneTexture } from 'engine/renderer/monkeyLoader'
+import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
+import { processGLTFAssetContainer, loadingShape } from './GLTFShape'
 
-BABYLON.SceneLoader.OnPluginActivatedObservable.add(function(plugin) {
-  if (plugin instanceof BABYLON.GLTFFileLoader) {
-    plugin.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
-    plugin.compileMaterials = true
-    plugin.validate = true
-    plugin.animationStartMode = 0
-  }
-})
-
-const loadingShapeMaterial = new BABYLON.StandardMaterial('loading-material', scene)
-loadingShapeMaterial.diffuseColor = loadingShapeMaterial.emissiveColor = BABYLON.Color3.FromHexString('#1D82FF') // a '#ff2d55'
-
-const loadingShape = BABYLON.MeshBuilder.CreateDisc(
-  'loading-disk',
-  {
-    arc: Math.PI * 0.125,
-    radius: 0.3
-  },
-  scene
-)
-loadingShape.material = loadingShapeMaterial
-
-loadingShape.setEnabled(false)
+const noise = new BABYLON.NoiseProceduralTexture('perlin', 256, scene)
+noise.octaves = 6
+noise.animationSpeedFactor = 10
+noise.persistence = 1.5
 
 function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
   const parsedUrl = /([^:]+):\/\/([^/]+)(?:\/(.+))?/.exec(url)
@@ -55,7 +36,7 @@ function parseProtocolUrl(url: string): { protocol: string; registry: string; as
   return result
 }
 
-async function fetchDARAsset(registry: string, assetId: string): Promise<{ image: string }> {
+async function fetchDARAsset(registry: string, assetId: string): Promise<{ image: string; files: any }> {
   const req = await fetch(`https://schema-api-staging.now.sh/dar/${registry}/asset/${assetId}`)
   return req.json()
 }
@@ -63,7 +44,7 @@ async function fetchDARAsset(registry: string, assetId: string): Promise<{ image
 async function fetchBase64Image(url: string) {
   const response = await fetch(url, {
     method: 'GET',
-    headers: {}, // 'X-KEY': 'asd'
+    headers: {},
     mode: 'cors',
     cache: 'default'
   })
@@ -90,6 +71,7 @@ export class NFTShape extends DisposableComponent {
   entityIsLoading = new Set<string>()
   error = false
   tex: BABYLON.Texture | null = null
+  private didFillContributions = false
 
   loadingDone(entity: BaseEntity): boolean {
     if (this.error) {
@@ -113,7 +95,7 @@ export class NFTShape extends DisposableComponent {
       entity.setObject3D(BasicShape.nameInEntity, loadingEntity)
 
       {
-        const loadingInstance = loadingShape.createInstance('a')
+        const loadingInstance = loadingShape.createInstance('nft-loader')
         loadingInstance.parent = loadingEntity
         loadingInstance.position.y = 0.8
         const animationDisposable = scene.onAfterRenderObservable.add(() => {
@@ -130,8 +112,8 @@ export class NFTShape extends DisposableComponent {
       }
 
       BABYLON.SceneLoader.LoadAssetContainer(
-        'models/frames/basic.glb',
-        undefined,
+        'models/frames/',
+        'basic.glb',
         scene,
         assetContainer => {
           this.entityIsLoading.delete(entity.uuid)
@@ -140,80 +122,39 @@ export class NFTShape extends DisposableComponent {
             this.onDetach(entity)
           }
 
-          assetContainer.meshes.forEach(mesh => {
-            if (mesh instanceof BABYLON.Mesh) {
-              if (mesh.geometry && !assetContainer.geometries.includes(mesh.geometry)) {
-                assetContainer.geometries.push(mesh.geometry)
-              }
-            }
-            mesh.subMeshes &&
-              mesh.subMeshes.forEach(subMesh => {
-                const mesh = subMesh.getMesh()
-                if (mesh instanceof BABYLON.Mesh) {
-                  if (mesh.geometry && !assetContainer.geometries.includes(mesh.geometry)) {
-                    assetContainer.geometries.push(mesh.geometry)
-                  }
-                }
-              })
-          })
-
-          processColliders(assetContainer)
-
-          // Find all the materials from all the meshes and add to $.materials
-          assetContainer.meshes.forEach(mesh => {
-            mesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
-            if (mesh.material) {
-              if (!assetContainer.materials.includes(mesh.material)) {
-                assetContainer.materials.push(mesh.material)
-              }
-            }
-          })
-
-          // Find the textures in the materials that share the same domain as the context
-          // then add the textures to the $.textures
-          assetContainer.materials.forEach((material: BABYLON.Material | BABYLON.PBRMaterial) => {
-            for (let i in material) {
-              const t = (material as any)[i]
-
-              if (i.endsWith('Texture') && t instanceof BABYLON.Texture && t !== probe.cubeTexture) {
-                if (!assetContainer.textures.includes(t)) {
-                  if (isSceneTexture(t)) {
-                    assetContainer.textures.push(t)
-                  }
-                }
-              }
-            }
-
-            if ('reflectionTexture' in material) {
-              material.reflectionTexture = probe.cubeTexture
-            }
-
-            if ('albedoTexture' in material) {
-              if (material.alphaMode === 2) {
-                if (material.albedoTexture) {
-                  material.albedoTexture.hasAlpha = true
-                  material.useAlphaFromAlbedoTexture = true
-                }
-              }
-            }
-          })
+          processGLTFAssetContainer(assetContainer)
 
           loadingEntity.dispose(false, false)
 
-          const mat1 = assetContainer.materials[0] as BABYLON.PBRMaterial
-
-          if (this.tex) {
-            mat1.useAlphaFromAlbedoTexture = true
-            mat1.forceAlphaTest = true
-            mat1.albedoTexture = this.tex
-            mat1.emissiveIntensity = 0
-            mat1.metallic = 0
-            mat1.roughness = 1
-            mat1.albedoColor = BABYLON.Color3.White()
-            mat1.enableSpecularAntiAliasing = true
+          if (!this.didFillContributions) {
+            this.didFillContributions = true
+            assetContainer.materials.forEach($ => {
+              this.contributions.materials.add($)
+            })
+            assetContainer.geometries.forEach($ => {
+              this.contributions.geometries.add($)
+            })
+            assetContainer.textures.forEach($ => {
+              this.contributions.textures.add($)
+            })
           }
 
-          assetContainer.addAllToScene()
+          const pictureMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
+          const frameMaterial = assetContainer.materials[1] as BABYLON.PBRMaterial
+
+          frameMaterial.emissiveTexture = noise
+          frameMaterial.albedoTexture = noise
+
+          if (this.tex) {
+            pictureMaterial.useAlphaFromAlbedoTexture = true
+            pictureMaterial.forceAlphaTest = true
+            pictureMaterial.albedoTexture = this.tex
+            pictureMaterial.emissiveIntensity = 0
+            pictureMaterial.metallic = 0
+            pictureMaterial.roughness = 1
+            pictureMaterial.albedoColor = BABYLON.Color3.White()
+            pictureMaterial.enableSpecularAntiAliasing = true
+          }
 
           if (this.isStillValid(entity)) {
             // Fin the main mesh and add it as the BasicShape.nameInEntity component.
@@ -226,13 +167,6 @@ export class NFTShape extends DisposableComponent {
             this.assetContainerEntity.set(entity.uuid, assetContainer)
 
             entity.assetContainer = assetContainer
-
-            for (let ag of assetContainer.animationGroups) {
-              ag.stop()
-              for (let animatable of ag.animatables) {
-                animatable.weight = 0
-              }
-            }
 
             const animator: Animator = entity.getBehaviorByName('animator') as Animator
 
@@ -290,28 +224,35 @@ export class NFTShape extends DisposableComponent {
   async updateData(data: any): Promise<void> {
     if ('src' in data) {
       if (this.src !== null && this.src !== data.src && DEBUG) {
-        log('Cannot set GLTFShape.src twice')
+        log('Cannot set NFTShape.src twice')
+        return
       }
       if (this.src === null) {
         this.src = data.src
       }
       if (this.src) {
         const { registry, asset } = parseProtocolUrl(this.src)
-        const { image } = await fetchDARAsset(registry, asset)
+
+        const assetData = await fetchDARAsset(registry, asset)
+
+        // by default, thumbnail should work
+        let image = assetData.image
+
+        // anyways, we search the original file that is supposed to have a better resolution
+        for (let file of assetData.files) {
+          if (file.role === 'original' && file.name.endsWith('.png')) {
+            image = file.url
+          }
+        }
+
         const realImage = await fetchBase64Image(image)
 
         this.tex = new BABYLON.Texture(realImage, scene)
         this.tex.hasAlpha = true
 
-        if ('visible' in data) {
-          if (data.visible === false) {
-            this.entities.forEach($ => this.onDetach($))
-          } else {
-            this.entities.forEach($ => this.onAttach($))
-          }
-        } else {
-          this.entities.forEach($ => this.onAttach($))
-        }
+        this.contributions.textures.add(this.tex)
+
+        this.entities.forEach($ => this.onAttach($))
       }
     }
   }
