@@ -9,10 +9,7 @@ import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 import { processGLTFAssetContainer, loadingShape } from './GLTFShape'
 
-const noise = new BABYLON.NoiseProceduralTexture('perlin', 256, scene)
-noise.octaves = 6
-noise.animationSpeedFactor = 10
-noise.persistence = 1.5
+const noise = new BABYLON.FireProceduralTexture('perlin', 256, scene)
 
 function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
   const parsedUrl = /([^:]+):\/\/([^/]+)(?:\/(.+))?/.exec(url)
