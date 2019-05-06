@@ -136,8 +136,8 @@ export class NFTShape extends DisposableComponent {
             })
           }
 
-          const pictureMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
-          const frameMaterial = assetContainer.materials[1] as BABYLON.PBRMaterial
+          const pictureMaterial = assetContainer.materials[1] as BABYLON.PBRMaterial
+          const frameMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
 
           frameMaterial.emissiveTexture = noise
           frameMaterial.albedoTexture = noise
