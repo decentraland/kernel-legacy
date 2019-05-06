@@ -668,6 +668,61 @@ declare class Color4 {
    */
   static LerpToRef(left: Color4, right: Color4, amount: number, result: Color4): void
   /**
+   * Returns a Color4 value containing a red color
+   * @returns a new Color3 object
+   */
+  static Red(): Color4
+  /**
+   * Returns a Color4 value containing a green color
+   * @returns a new Color4 object
+   */
+  static Green(): Color4
+  /**
+   * Returns a Color4 value containing a blue color
+   * @returns a new Color4 object
+   */
+  static Blue(): Color4
+  /**
+   * Returns a Color4 value containing a black color
+   * @returns a new Color4 object
+   */
+  static Black(): Color4
+  /**
+   * Returns a Color4 value containing a white color
+   * @returns a new Color4 object
+   */
+  static White(): Color4
+  /**
+   * Returns a Color4 value containing a purple color
+   * @returns a new Color4 object
+   */
+  static Purple(): Color4
+  /**
+   * Returns a Color4 value containing a magenta color
+   * @returns a new Color4 object
+   */
+  static Magenta(): Color4
+  /**
+   * Returns a Color4 value containing a yellow color
+   * @returns a new Color4 object
+   */
+  static Yellow(): Color4
+  /**
+   * Returns a Color4 value containing a gray color
+   * @returns a new Color4 object
+   */
+  static Gray(): Color4
+  /**
+   * Returns a Color4 value containing a teal color
+   * @returns a new Color4 object
+   */
+  static Teal(): Color4
+  /**
+   * Returns a Color4 value containing a transparent color
+   * @returns a new Color4 object
+   */
+  static Clear(): Color4
+  /**
    * Creates a new Color4 from a Color3 and an alpha value
    * @param color3 - defines the source Color3 to read from
    * @param alpha - defines the alpha component (1.0 by default)
@@ -861,10 +916,10 @@ declare function Component(
  * @public
  */
 declare class ComponentAdded {
-  entity: Entity
+  entity: IEntity
   componentName: string
   classId: number | null
-  constructor(entity: Entity, componentName: string, classId: number | null)
+  constructor(entity: IEntity, componentName: string, classId: number | null)
 }
 
 /**
@@ -880,13 +935,13 @@ declare interface ComponentConstructor<T extends ComponentLike> {
  * @public
  */
 declare class ComponentGroup {
-  readonly entities: ReadonlyArray<Entity>
+  readonly entities: ReadonlyArray<IEntity>
   readonly requires: ReadonlyArray<ComponentConstructor<any>>
   readonly requiresNames: ReadonlyArray<string>
   active: boolean
   private _requiresNames
   constructor(...requires: ComponentConstructor<any>[])
-  hasEntity(entity: Entity): boolean
+  hasEntity(entity: IEntity): boolean
 }
 
 /**
@@ -898,10 +953,10 @@ declare interface ComponentLike {}
  * @public
  */
 declare class ComponentRemoved {
-  entity: Entity
+  entity: IEntity
   componentName: string
   component: ComponentLike
-  constructor(entity: Entity, componentName: string, component: ComponentLike)
+  constructor(entity: IEntity, componentName: string, component: ComponentLike)
 }
 
 /**
@@ -1150,23 +1205,23 @@ declare class DisposableComponentUpdated {
 /**
  * @public
  */
-declare class Engine {
+declare class Engine implements IEngine {
   readonly eventManager: EventManager
-  readonly rootEntity: Entity
+  readonly rootEntity: IEntity
   private readonly _entities
   private readonly _disposableComponents
   private readonly _componentGroups
   private readonly simpleSystems
-  readonly entities: Readonly<Record<string, Entity>>
+  readonly entities: Readonly<Record<string, IEntity>>
   readonly disposableComponents: Readonly<Record<string, DisposableComponentLike>>
-  constructor()
-  addEntity(entity: Entity): void
-  removeEntity(entity: Entity): void
+  constructor(rootEntity: IEntity)
+  addEntity(entity: IEntity): void
+  removeEntity(entity: IEntity): void
   addSystem(system: ISystem, priority?: number): void
   removeSystem(system: ISystem): void
   update(dt: number): void
   getEntitiesWithComponent(component: string): Record<string, any>
-  getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, Entity>
+  getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, IEntity>
   registerComponent(component: DisposableComponentLike): void
   disposeComponent(component: DisposableComponentLike): boolean
   updateComponent(component: DisposableComponentLike): void
@@ -1188,9 +1243,9 @@ declare type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = 
 /**
  * @public
  */
-declare class Entity {
+declare class Entity implements IEntity {
   name?: string | undefined
-  children: Record<string, Entity>
+  children: Record<string, IEntity>
   eventManager: EventManager | null
   alive: boolean
   readonly uuid: string
@@ -1250,11 +1305,11 @@ declare class Entity {
   /**
    * Sets the parent entity
    */
-  setParent(newParent: Entity): void
+  setParent(newParent: IEntity): void
   /**
    * Gets the parent entity
    */
-  getParent(): Entity | null
+  getParent(): IEntity | null
   private readonly identifier
   private getCircularAncestor
   private registerAsChild
@@ -1403,6 +1458,61 @@ declare class Gizmos extends ObservableComponent {
 /**
  * @public
  */
+declare interface IEngine {
+  rootEntity: IEntity
+  readonly entities: Readonly<Record<string, IEntity>>
+  addEntity(entity: IEntity): void
+  removeEntity(entity: IEntity): void
+  addSystem(system: ISystem, priority: number): void
+  removeSystem(system: ISystem): void
+}
+
+/**
+ * @public
+ */
+declare interface IEntity {
+  children: Record<string, IEntity>
+  eventManager: EventManager | null
+  alive: boolean
+  readonly uuid: string
+  readonly components: Record<string, any>
+  isAddedToEngine(): boolean
+  getParent(): IEntity | null
+  setParent(e: IEntity): void
+  getComponent<T = any>(component: string): T
+  getComponent<T>(component: ComponentConstructor<T>): T
+  getComponent<T>(component: ComponentConstructor<T> | string): T
+  /**
+   * Gets a component, if it doesn't exist, it returns null.
+   * @param component - component class or name
+   */
+  getComponentOrNull<T = any>(component: string): T | null
+  getComponentOrNull<T>(component: ComponentConstructor<T>): T | null
+  getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null
+  getComponentOrCreate<T>(
+    component: ComponentConstructor<T> & {
+      new (): T
+    }
+  ): T
+  /**
+   * Adds a component. If the component already exist, it throws an Error.
+   * @param component - component instance.
+   */
+  addComponent<T extends object>(component: T): void
+  addComponentOrReplace<T extends object>(component: T): void
+  removeComponent(component: string, triggerRemovedEvent?: boolean): void
+  removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void
+  removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void
+  removeComponent(component: object | string | Function, triggerRemovedEvent: any): void
+  hasComponent<T = any>(component: string): boolean
+  hasComponent<T>(component: ComponentConstructor<T>): boolean
+  hasComponent<T extends object>(component: T): boolean
+  hasComponent<T>(component: ComponentConstructor<T> | string): boolean
+}
+
+/**
+ * @public
+ */
 declare interface IEventConstructor<T> {
   new (...args: any[]): T
 }
@@ -1523,6 +1633,9 @@ declare interface IEvents {
     uuid: string
     payload: any
   }
+  onTextSubmit: {
+    text: string
+  }
   metricsUpdate: {
     given: Record<string, number>
     limit: Record<string, number>
@@ -1555,11 +1668,11 @@ declare interface ISize {
  */
 declare interface ISystem {
   active?: boolean
-  activate?(engine: Engine): void
+  activate?(engine: IEngine): void
   deactivate?(): void
   update?(dt: number): void
-  onAddEntity?(entity: Entity): void
-  onRemoveEntity?(entity: Entity): void
+  onAddEntity?(entity: IEntity): void
+  onRemoveEntity?(entity: IEntity): void
 }
 
 /**
@@ -2697,6 +2810,7 @@ declare class ObservableComponent {
   private subscriptions
   static component(target: ObservableComponent, propertyKey: string): void
   static field(target: ObservableComponent, propertyKey: string): void
+  static uiValue(target: ObservableComponent, propertyKey: string): void
   static readonly(target: ObservableComponent, propertyKey: string): void
   onChange(fn: ObservableComponentSubscription): void
   toJSON(): any
@@ -2806,6 +2920,7 @@ declare class OnAnimationEnd extends OnUUIDEvent<'onAnimationEnd'> {
  */
 declare class OnBlur extends OnUUIDEvent<'onBlur'> {
   readonly type: string
+  constructor(callback: (event: IEvents['onBlur']) => void)
 }
 
 /**
@@ -2813,6 +2928,7 @@ declare class OnBlur extends OnUUIDEvent<'onBlur'> {
  */
 declare class OnChanged extends OnUUIDEvent<'onChange'> {
   readonly type: string
+  constructor(callback: (event: IEvents['onChange']) => void)
 }
 
 /**
@@ -2820,6 +2936,7 @@ declare class OnChanged extends OnUUIDEvent<'onChange'> {
  */
 declare class OnClick extends OnUUIDEvent<'onClick'> {
   readonly type: string
+  constructor(callback: (event: IEvents['onClick']) => void)
 }
 
 /**
@@ -2827,6 +2944,7 @@ declare class OnClick extends OnUUIDEvent<'onClick'> {
  */
 declare class OnFocus extends OnUUIDEvent<'onFocus'> {
   readonly type: string
+  constructor(callback: (event: IEvents['onFocus']) => void)
 }
 
 /**
@@ -2850,11 +2968,20 @@ declare class OnPointerUp extends PointerEventComponent {}
 /**
  * @public
  */
+declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
+  readonly type: string
+  constructor(callback: (event: IEvents['onTextSubmit']) => void)
+}
+
+/**
+ * @public
+ */
 declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
   readonly type: string | undefined
   readonly uuid: string
   callback: (event: any) => void
   constructor(callback: (event: IEvents[T]) => void)
+  static uuidEvent(target: ObservableComponent, propertyKey: string): void
   toJSON(): {
     uuid: string
     type: string | undefined
@@ -2878,9 +3005,9 @@ declare enum Orientation {
  * @public
  */
 declare class ParentChanged {
-  entity: Entity
-  parent: Entity
-  constructor(entity: Entity, parent: Entity)
+  entity: IEntity
+  parent: IEntity
+  constructor(entity: IEntity, parent: IEntity)
 }
 
 /**
@@ -3944,7 +4071,6 @@ declare class TextShape extends Shape {
   outlineWidth: number
   outlineColor: Color3
   color: Color3
-  fontFamily: string
   fontSize: number
   fontWeight: string
   opacity: number
@@ -3958,8 +4084,8 @@ declare class TextShape extends Shape {
   shadowOffsetY: number
   shadowColor: Color3
   zIndex: number
-  hAlign: string
-  vAlign: string
+  hTextAlign: string
+  vTextAlign: string
   width: number
   height: number
   paddingTop: number
@@ -4044,148 +4170,118 @@ declare class Transform extends ObservableComponent {
 /**
  * @alpha
  */
-declare class UIButtonShape extends UIShape {
-  id: string | null
-  opacity: number
-  fontFamily: string
+declare class UIButton extends UIShape {
   fontSize: number
   fontWeight: string
   thickness: number
   cornerRadius: number
-  width: string
-  height: string
-  top: string
-  left: string
-  color: string
-  background: string
-  hAlign: string
-  vAlign: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
+  color: Color4
+  background: Color4
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
+  shadowColor: Color4
   text: string
-  visible: boolean
-  isPointerBlocker: boolean
 }
 
 /**
  * @alpha
  */
-declare class UIContainerRectShape extends UIShape {
-  id: string | null
-  opacity: number
+declare class UICanvas extends UIShape {
+  constructor()
+}
+
+/**
+ * @alpha
+ */
+declare class UIContainerRect extends UIShape {
   adaptWidth: boolean
   adaptHeight: boolean
   thickness: number
-  cornerRadius: number
-  width: string
-  height: string
-  top: string
-  left: string
-  color: string
-  background: string
-  hAlign: string
-  vAlign: string
-  visible: boolean
-  isPointerBlocker: boolean
+  color: Color4
+  alignmentUsesSize: boolean
 }
 
 /**
  * @alpha
  */
-declare class UIContainerStackShape extends UIShape {
-  id: string | null
-  opacity: number
+declare class UIContainerStack extends UIShape {
   adaptWidth: boolean
   adaptHeight: boolean
-  width: string
-  height: string
-  top: string
-  left: string
-  color: string
-  background: string
-  hAlign: string
-  vAlign: string
-  vertical: boolean
-  visible: boolean
-  isPointerBlocker: boolean
+  color: Color4
+  stackOrientation: UIStackOrientation
+  spacing: Number
 }
 
 /**
  * @alpha
  */
-declare class UIImageShape extends UIShape {
-  id: string | null
-  opacity: number
-  sourceLeft: string | null
-  sourceTop: string | null
-  sourceWidth: string | null
-  sourceHeight: string | null
+declare class UIImage extends UIShape {
+  sourceLeft: number
+  sourceTop: number
+  sourceWidth: number
+  sourceHeight: number
   source?: Texture
-  width: string
-  height: string
-  top: string
-  left: string
-  hAlign: string
-  vAlign: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
+  sizeInPixels: boolean
+  onClick: OnClick | null
+  constructor(parent: UIShape, source: Texture)
 }
 
 /**
  * @alpha
  */
-declare class UIInputTextShape extends UIShape {
-  id: string | null
-  color: string
+declare class UIInputText extends UIShape {
+  color: Color4
   thickness: number
-  fontFamily: string
   fontSize: number
   fontWeight: string
-  opacity: number
   value: string
-  placeholderColor: string
+  placeholderColor: Color4
   placeholder: string
-  margin: string
-  maxWidth: string
+  margin: number
+  maxWidth: number
+  hTextAlign: string
+  vTextAlign: string
   autoStretchWidth: boolean
-  background: string
-  focusedBackground: string
+  background: Color4
+  focusedBackground: Color4
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
-  zIndex: number
-  hAlign: string
-  vAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+  shadowColor: Color4
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
+  onTextSubmit: OnTextSubmit | null
+  onChanged: OnChanged | null
+  onFocus: OnFocus | null
+  onBlur: OnBlur | null
 }
 
 /**
  * @alpha
  */
-declare class UIScreenSpaceShape extends UIShape {
-  id: string | null
-  visible: boolean
-  constructor()
+declare class UIScrollRect extends UIShape {
+  valueX: number
+  valueY: number
+  borderColor: Color4
+  backgroundColor: Color4
+  isHorizontal: boolean
+  isVertical: boolean
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
+  onChanged: OnChanged | null
 }
 
 /**
@@ -4195,93 +4291,73 @@ declare abstract class UIShape extends ObservableComponent {
   /**
    * Defines if the entity and its children should be rendered
    */
+  name: string | null
   visible: boolean
+  opacity: number
+  hAlign: string
+  vAlign: string
+  width: string | number
+  height: string | number
+  positionX: string | number
+  positionY: string | number
+  isPointerBlocker: boolean
   private _parent?
   constructor(parent: UIShape | null)
   readonly parent: UIShape | undefined
 }
 
 /**
- * @alpha
+ * @public
  */
-declare class UISliderShape extends UIShape {
-  id: string | null
-  minimum: number
-  maximum: number
-  color: string
-  opacity: number
-  value: number
-  borderColor: string
-  background: string
-  barOffset: string
-  thumbWidth: string
-  isThumbCircle: boolean
-  isThumbClamped: boolean
-  isVertical: boolean
-  visible: boolean
-  zIndex: number
-  hAlign: string
-  vAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  onChanged: string
-  swapOrientation: boolean
-  isPointerBlocker: boolean
+declare enum UIStackOrientation {
+  VERTICAL = 0,
+  HORIZONTAL = 1
 }
 
 /**
  * @alpha
  */
-declare class UITextShape extends UIShape {
-  id: string | null
+declare class UIText extends UIShape {
   outlineWidth: number
-  outlineColor: string
-  color: string
-  fontFamily: string
+  outlineColor: Color4
+  color: Color4
   fontSize: number
+  fontAutoSize: boolean
   fontWeight: string
-  opacity: number
   value: string
-  lineSpacing: string
+  lineSpacing: number
   lineCount: number
-  resizeToFit: boolean
+  adaptWidth: boolean
+  adaptHeight: boolean
   textWrapping: boolean
   shadowBlur: number
   shadowOffsetX: number
   shadowOffsetY: number
-  shadowColor: string
-  zIndex: number
-  hAlign: string
-  vAlign: string
+  shadowColor: Color4
   hTextAlign: string
   vTextAlign: string
-  width: string
-  height: string
-  top: string
-  left: string
-  paddingTop: string
-  paddingRight: string
-  paddingBottom: string
-  paddingLeft: string
-  visible: boolean
-  isPointerBlocker: boolean
+  paddingTop: number
+  paddingRight: number
+  paddingBottom: number
+  paddingLeft: number
 }
 
 /**
  * @alpha
  */
-declare class UIWorldSpaceShape extends UIShape {
-  id: string | null
-  width: string
-  height: string
-  visible: boolean
-  constructor()
+declare class UIValue {
+  value: number
+  type: UIValueType
+  constructor(value: string | number)
+  toString(): string
+}
+
+/**
+ * @alpha
+ */
+declare enum UIValueType {
+  PERCENT = 0,
+  PIXELS = 1
 }
 
 /**
@@ -4302,8 +4378,8 @@ declare class UUIDEventSystem implements ISystem {
   }
   activate(engine: Engine): void
   deactivate(): void
-  onAddEntity(entity: Entity): void
-  onRemoveEntity(entity: Entity): void
+  onAddEntity(entity: IEntity): void
+  onRemoveEntity(entity: IEntity): void
   private componentAdded
   private componentRemoved
   private handleEvent
