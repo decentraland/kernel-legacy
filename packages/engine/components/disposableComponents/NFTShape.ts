@@ -237,7 +237,7 @@ export class NFTShape extends DisposableComponent {
 
         // anyways, we search the original file that is supposed to have a better resolution
         for (let file of assetData.files) {
-          if (file.role === 'original' && file.name.endsWith('.png')) {
+          if (file.role === 'dcl-picture-frame-image' && file.name.endsWith('.png')) {
             image = file.url
           }
         }
