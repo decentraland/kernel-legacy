@@ -325,13 +325,15 @@ export function loadTestParcel(
     root: BABYLON.TransformNode,
     webGLParcelScene: Promise<WebGLParcelScene>,
     parcelSceneFuture: Promise<SceneWorker>
-  ) => void
+  ) => void,
+  skip: boolean = false
 ) {
   enableVisualTests(name, root => {
     const _parcelScene = future<SceneWorker>()
     const _glParcelScene = future<WebGLParcelScene>()
     let context: SharedSceneContext
-    it(`loads the test scene at ${x},${y}`, async function(this: any) {
+    const testFn = skip ? it.skip : it
+    testFn(`loads the test scene at ${x},${y}`, async function(this: any) {
       const origY = scene.activeCamera!.position.y
       gridToWorld(x, y, scene.activeCamera!.position)
       scene.activeCamera!.position.y = origY
@@ -374,12 +376,12 @@ export function loadTestParcel(
       cb(root, _glParcelScene, _parcelScene)
     } catch (e) {
       if (e) {
-        it('failed during test descriptor', () => {
+        testFn('failed during test descriptor', () => {
           throw e
         })
       }
     }
-    it('cleans up the parcelScene', async () => {
+    testFn('cleans up the parcelScene', async () => {
       const parcelScene = await _parcelScene
       parcelScene.dispose()
 
