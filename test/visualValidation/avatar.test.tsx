@@ -55,14 +55,17 @@ enableVisualTests('Avatar visual validation', function(root) {
 
   wait(2000)
 
-  saveScreenshot(`avatar-round-robot.png`, { from: [51.0, 1.8, 0.6], lookAt: [51.0, 1.3, 0.3] })
+  // Skipped
+  // saveScreenshot(`avatar-round-robot.png`, { from: [51.0, 1.8, 0.6], lookAt: [51.0, 1.3, 0.3] })
 
-  saveScreenshot(`avatar-square-robot.png`, {
-    from: [50.0, 1.8, 0.6],
-    lookAt: [50.0, 1.3, 0.3]
-  })
+  // Skipped
+  // saveScreenshot(`avatar-square-robot.png`, {
+  //   from: [50.0, 1.8, 0.6],
+  //   lookAt: [50.0, 1.3, 0.3]
+  // })
 
-  saveScreenshot(`avatar-fox.png`, { from: [52.0, 1.8, 0.6], lookAt: [52.0, 1.3, 0.3] })
+  // Skipped
+  // saveScreenshot(`avatar-fox.png`, { from: [52.0, 1.8, 0.6], lookAt: [52.0, 1.3, 0.3] })
 
   it('open profile ui for avatar1', async () => {
     avatarMessageObservable.notifyObservers({
