@@ -6,6 +6,7 @@ jobs:
         environment:
           # avoid automatic download of LFS files
           GIT_LFS_SKIP_SMUDGE: 1
+    parallelism: 3
 
     working_directory: /tmp/explorer
     steps:
@@ -116,15 +117,16 @@ jobs:
           name: Deploy tag to .today
           command: |
             [ ! -z "${CIRCLE_TAG}" ] && aws s3 sync static s3://explorer.decentraland.today/ --exclude "tags/*" --acl public-read || true
-      - run:
-          name: Invalidate cloudfront cache .today
-          command: |
-            [ ! -z "${CIRCLE_TAG}" ] && aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
+      # - run:
+      #     name: Invalidate cloudfront cache .today
+      #     command: |
+      #       [ ! -z "${CIRCLE_TAG}" ] aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
 
   pull-deploy:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
+    parallelism: 1
     steps:
       - restore_cache:
           keys:
