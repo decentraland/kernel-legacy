@@ -20,7 +20,7 @@
   {
     "name": "Compile test scenes (gamekit, part B)",
     "kind": "Webpack",
-    "file": "./public/test-parcels/![16]*/game.ts",
+    "file": "./public/test-parcels/!([16])*/game.ts",
     "target": "web"
   },
   {
