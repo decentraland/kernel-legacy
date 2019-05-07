@@ -27,7 +27,6 @@ import { initHudSystem } from './widgets/ui'
 import { loadedParcelSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
-import { sceneReadyFuture } from 'engine/renderer/init'
 
 let isEngineRunning = false
 
@@ -173,8 +172,6 @@ export async function initBabylonClient() {
 
   addStats()
   start()
-
-  await sceneReadyFuture
 }
 
 function initDebugCommands() {
