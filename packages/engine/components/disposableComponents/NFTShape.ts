@@ -9,7 +9,14 @@ import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 import { processGLTFAssetContainer, loadingShape } from './GLTFShape'
 
-const noise = new BABYLON.FireProceduralTexture('perlin', 256, scene)
+let noise: BABYLON.Texture | null = null
+
+function getNoiseTexture() {
+  if (!noise) {
+    noise = new BABYLON.FireProceduralTexture('perlin', 256, scene)
+  }
+  return noise
+}
 
 function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
   const parsedUrl = /([^:]+):\/\/([^/]+)(?:\/(.+))?/.exec(url)
@@ -139,8 +146,8 @@ export class NFTShape extends DisposableComponent {
           const pictureMaterial = assetContainer.materials[1] as BABYLON.PBRMaterial
           const frameMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
 
-          frameMaterial.emissiveTexture = noise
-          frameMaterial.albedoTexture = noise
+          frameMaterial.emissiveTexture = getNoiseTexture()
+          frameMaterial.albedoTexture = getNoiseTexture()
 
           if (this.tex) {
             pictureMaterial.useAlphaFromAlbedoTexture = true

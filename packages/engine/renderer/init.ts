@@ -158,19 +158,21 @@ const database: BABYLON.Database = new Database() as any
 
   scene.getBoundingBoxRenderer().showBackLines = false
 
-  scene.onReadyObservable.add(() => {
-    effectLayers.forEach($ => scene.effectLayers.includes($) || scene.addEffectLayer($))
+  if (isRunningTest) {
+    scene.onReadyObservable.add(() => {
+      effectLayers.forEach($ => scene.effectLayers.includes($) || scene.addEffectLayer($))
 
-    scene.removeEffectLayer = function(this: any, layer: BABYLON.EffectLayer) {
-      if (effectLayers.includes(layer)) return
-      scene.constructor.prototype.removeEffectLayer.apply(this, arguments)
-    } as any
+      scene.removeEffectLayer = function(this: any, layer: BABYLON.EffectLayer) {
+        if (effectLayers.includes(layer)) return
+        scene.constructor.prototype.removeEffectLayer.apply(this, arguments)
+      } as any
 
-    scene.addEffectLayer = function(this: any, layer: BABYLON.EffectLayer) {
-      if (effectLayers.includes(layer)) return
-      scene.constructor.prototype.addEffectLayer.apply(this, arguments)
-    } as any
-  })
+      scene.addEffectLayer = function(this: any, layer: BABYLON.EffectLayer) {
+        if (effectLayers.includes(layer)) return
+        scene.constructor.prototype.addEffectLayer.apply(this, arguments)
+      } as any
+    })
+  }
 
   initMonkeyLoader()
 }
