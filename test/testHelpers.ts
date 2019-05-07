@@ -71,8 +71,9 @@ function filterBabylonTextures(texture: BABYLON.BaseTexture) {
  * @param name name of the file to save
  * @param path folder
  */
-export function saveScreenshot(name: string, opts: PlayerCamera | null = null) {
-  it(`save the screenshot ${name} #${count++}`, async function(this: any) {
+export function saveScreenshot(name: string, opts: PlayerCamera | null = null, skip: boolean = false) {
+  const testFn = skip ? it.skip : it
+  testFn(`save the screenshot ${name} #${count++}`, async function(this: any) {
     // tslint:disable-next-line:no-console
     this.timeout(20000)
     const canvas = await domReadyFuture
