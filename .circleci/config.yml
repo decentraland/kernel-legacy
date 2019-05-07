@@ -6,6 +6,7 @@ jobs:
         environment:
           # avoid automatic download of LFS files
           GIT_LFS_SKIP_SMUDGE: 1
+    parallelism: 4
 
     working_directory: /tmp/explorer
     steps:
@@ -93,6 +94,7 @@ jobs:
   deploy:
     docker:
       - image: circleci/node:10-browsers
+    parallelism: 4
     working_directory: /tmp/explorer
     steps:
       - restore_cache:
@@ -125,6 +127,7 @@ jobs:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
+    parallelism: 4
     steps:
       - restore_cache:
           keys:
