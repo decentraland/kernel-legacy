@@ -7,11 +7,8 @@ export class PositionLifecycleController extends EventEmitter {
   currentPosition?: Vector2Component
   isSettled: boolean = false
 
-  sceneController: SceneLifeCycleController
-
-  constructor(sceneController: SceneLifeCycleController) {
+  constructor(public sceneController: SceneLifeCycleController) {
     super()
-    this.sceneController = sceneController
   }
 
   reportCurrentPosition(position: Vector2Component) {

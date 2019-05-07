@@ -1,15 +1,15 @@
 // This gets executed from the main thread and serves as an interface
 // to communicate with the Lifecycle worker, so it's a "Server" in terms of decentraland-rpc
 
+import future, { IFuture } from 'fp-future'
 import { TransportBasedServer } from 'decentraland-rpc/lib/host/TransportBasedServer'
 import { WebWorkerTransport } from 'decentraland-rpc/lib/common/transports/WebWorker'
 
 import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { error } from 'util'
+import { ILand } from 'shared/types'
 
 import { DEBUG, parcelLimits, getServerConfigurations } from '../../config'
-import { ILand } from 'shared/types'
-import future, { IFuture } from 'fp-future'
 
 /*
  * The worker is set up on the first require of this file

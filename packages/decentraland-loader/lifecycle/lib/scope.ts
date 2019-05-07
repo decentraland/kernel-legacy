@@ -11,8 +11,8 @@ export function squareDiff(a: number, b: number) {
 export function parcelsInScope(config: ParcelConfigurationOptions, position: Vector2Component): string[] {
   const result: string[] = []
   const squareRadius = config.lineOfSightRadius * config.lineOfSightRadius
-  for (let x = position.x - config.lineOfSightRadius; x <= position.x + config.lineOfSightRadius; x++) {
-    for (let y = position.y - config.lineOfSightRadius; y <= position.y + config.lineOfSightRadius; y++) {
+  for (const x = position.x - config.lineOfSightRadius; x <= position.x + config.lineOfSightRadius; x++) {
+    for (const y = position.y - config.lineOfSightRadius; y <= position.y + config.lineOfSightRadius; y++) {
       if (squareDiff(x - position.x, y - position.y) <= squareRadius) {
         result.push(`${x},${y}`)
       }

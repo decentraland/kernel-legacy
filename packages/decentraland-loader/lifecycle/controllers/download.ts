@@ -21,8 +21,8 @@ export class SceneDataDownloadManager {
     )
 
     if (!responseContent.ok) {
-      error('Error in content.decentraland.org response!', responseContent)
-      throw new Error('Error in content.decentraland.org response!')
+      error(`Error in ${this.options.contentServer}/mappings response!`, responseContent)
+      throw new Error(`Error in ${this.options.contentServer}/mappings response!`)
     } else {
       const contents = (await responseContent.json()) as MappingsResponse[]
       if (!contents.length) {

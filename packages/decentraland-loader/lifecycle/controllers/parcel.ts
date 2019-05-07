@@ -1,7 +1,9 @@
+import { EventEmitter } from 'events'
+
+import { Vector2Component } from 'atomicHelpers/landHelpers'
+
 import { parcelsInScope, ParcelConfigurationOptions } from '../lib/scope'
 import { ParcelLifeCycleStatus } from '../lib/parcel.status'
-import { Vector2Component } from 'atomicHelpers/landHelpers'
-import { EventEmitter } from 'events'
 
 export class ParcelLifeCycleController extends EventEmitter {
   constructor(config: ParcelConfigurationOptions) {
@@ -30,10 +32,10 @@ export class ParcelLifeCycleController extends EventEmitter {
     this.isTargetPlaced = true
     const sightedParcels = parcelsInScope(this.config, position)
     const sightedParcelsDict: { [key: string]: boolean } = {}
-    for (let parcel of sightedParcels) {
+    for (const parcel of sightedParcels) {
       this.parcelSighted(parcel)
     }
-    for (let parcel of this.currentlySightedParcelsArray) {
+    for (const parcel of this.currentlySightedParcelsArray) {
       if (!sightedParcelsDict[parcel]) {
         this.switchParcelToOutOfSight(parcel)
       }
@@ -59,7 +61,9 @@ export class ParcelLifeCycleController extends EventEmitter {
   }
 
   switchParcelToOutOfSight(parcel: string) {
-    if (!this.parcelStatus[parcel]) return
+    if (!this.parcelStatus[parcel]) {
+      return
+    }
     const status = this.parcelStatus[parcel]
     if (status && status.isInSight()) {
       status.setOffSight()

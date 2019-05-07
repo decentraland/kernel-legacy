@@ -10,7 +10,6 @@ export class SceneLifeCycleStatus {
     | 'unloaded' // scene is not loaded
     | 'awake' // scene is loading assets
     | 'ready' // scene is running
-    | 'unloaded'
 
   isAwake() {
     return this.status !== 'unloaded'
