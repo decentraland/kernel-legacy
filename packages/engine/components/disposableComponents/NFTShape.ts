@@ -148,6 +148,7 @@ export class NFTShape extends DisposableComponent {
 
           frameMaterial.emissiveTexture = getNoiseTexture()
           frameMaterial.albedoTexture = getNoiseTexture()
+          frameMaterial.emissiveIntensity = 1
 
           if (this.tex) {
             pictureMaterial.useAlphaFromAlbedoTexture = true
