@@ -13,9 +13,33 @@ let noise: BABYLON.Texture | null = null
 
 function getNoiseTexture() {
   if (!noise) {
-    noise = new BABYLON.FireProceduralTexture('perlin', 256, scene)
+    noise = new BABYLON.NoiseProceduralTexture('perlin', 256, scene)
   }
   return noise
+}
+
+export type DARAsset = {
+  name: string
+  owner: string
+  description: string
+  image: string
+  registry: string
+  token_id: string
+  uri: string
+  files: DARAssetFile[]
+  traits: any[]
+}
+
+export type DARAssetFile = {
+  name: string
+  url: string
+  role: string
+}
+
+export type DARAssetTrait = {
+  id: string
+  name: string
+  type: string
 }
 
 function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
@@ -40,7 +64,7 @@ function parseProtocolUrl(url: string): { protocol: string; registry: string; as
   return result
 }
 
-async function fetchDARAsset(registry: string, assetId: string): Promise<{ image: string; files: any }> {
+async function fetchDARAsset(registry: string, assetId: string): Promise<DARAsset> {
   const req = await fetch(`https://schema-api-staging.now.sh/dar/${registry}/asset/${assetId}`)
   return req.json()
 }
@@ -116,7 +140,7 @@ export class NFTShape extends DisposableComponent {
       }
 
       BABYLON.SceneLoader.LoadAssetContainer(
-        'models/frames/',
+        '/models/frames/',
         'basic.glb',
         scene,
         assetContainer => {
@@ -147,8 +171,8 @@ export class NFTShape extends DisposableComponent {
           const frameMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
 
           frameMaterial.emissiveTexture = getNoiseTexture()
-          frameMaterial.albedoTexture = getNoiseTexture()
-          frameMaterial.emissiveIntensity = 1
+          frameMaterial.albedoColor = BABYLON.Color3.Purple()
+          frameMaterial.emissiveColor = BABYLON.Color3.White()
 
           if (this.tex) {
             pictureMaterial.useAlphaFromAlbedoTexture = true
@@ -241,19 +265,23 @@ export class NFTShape extends DisposableComponent {
         const assetData = await fetchDARAsset(registry, asset)
 
         // by default, thumbnail should work
-        let image = assetData.image
+        let image: string = assetData.image
 
-        // anyways, we search the original file that is supposed to have a better resolution
-        for (let file of assetData.files) {
-          if (file.role === 'dcl-picture-frame-image' && file.name.endsWith('.png')) {
-            image = file.url
+        const foundFile = assetData.files.find(f => f.role === 'dcl-picture-frame-image')
+
+        if (foundFile) {
+          // anyways, we search the original file that is supposed to have a better resolution
+          for (let file of assetData.files) {
+            if (file.role === 'dcl-picture-frame-image' && file.name.endsWith('.png')) {
+              image = file.url
+            }
           }
+
+          const realImage = await fetchBase64Image(image)
+
+          this.tex = new BABYLON.Texture(realImage, scene)
+          this.tex.hasAlpha = true
         }
-
-        const realImage = await fetchBase64Image(image)
-
-        this.tex = new BABYLON.Texture(realImage, scene)
-        this.tex.hasAlpha = true
 
         this.contributions.textures.add(this.tex)
 
