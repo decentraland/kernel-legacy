@@ -1,22 +1,21 @@
 import { ILand } from 'shared/types'
 
 export class SceneLifeCycleStatus {
-  constructor(description: ILand) {
-    this.sceneDescription = description
-    this.status = 'unloaded'
-  }
+
   sceneDescription: ILand
-  status:
-    | 'unloaded' // scene is not loaded
-    | 'awake' // scene is loading assets
-    | 'ready' // scene is running
+  status: 'unloaded' | 'awake' | 'ready' = 'unloaded'
+  
+  constructor(public sceneDescription: ILand){
+  }
 
   isAwake() {
     return this.status !== 'unloaded'
   }
+
   isDead() {
     return this.status === 'unloaded'
   }
+
   isRunning() {
     return this.status === 'ready'
   }
