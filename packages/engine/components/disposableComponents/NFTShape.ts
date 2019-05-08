@@ -9,11 +9,14 @@ import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 import { processGLTFAssetContainer, loadingShape } from './GLTFShape'
 
-let noise: BABYLON.Texture | null = null
+let noise: BABYLON.NoiseProceduralTexture | null = null
 
 function getNoiseTexture() {
   if (!noise) {
     noise = new BABYLON.NoiseProceduralTexture('perlin', 256, scene)
+    noise.octaves = 6
+    noise.persistence = 1.25
+    noise.animationSpeedFactor = 5
   }
   return noise
 }
@@ -167,12 +170,13 @@ export class NFTShape extends DisposableComponent {
             })
           }
 
-          const pictureMaterial = assetContainer.materials[1] as BABYLON.PBRMaterial
-          const frameMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
+          const pictureMaterial = assetContainer.materials[0] as BABYLON.PBRMaterial
+          const frameMaterial = assetContainer.materials[2] as BABYLON.PBRMaterial
 
           frameMaterial.emissiveTexture = getNoiseTexture()
-          frameMaterial.albedoColor = BABYLON.Color3.Purple()
+          frameMaterial.albedoColor = BABYLON.Color3.FromHexString('#6f28d3')
           frameMaterial.emissiveColor = BABYLON.Color3.White()
+          frameMaterial.disableLighting = true
 
           if (this.tex) {
             pictureMaterial.useAlphaFromAlbedoTexture = true
@@ -183,6 +187,7 @@ export class NFTShape extends DisposableComponent {
             pictureMaterial.roughness = 1
             pictureMaterial.albedoColor = BABYLON.Color3.White()
             pictureMaterial.enableSpecularAntiAliasing = true
+            pictureMaterial.transparencyMode = 2
           }
 
           if (this.isStillValid(entity)) {
