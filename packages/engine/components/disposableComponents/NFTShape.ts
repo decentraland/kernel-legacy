@@ -72,30 +72,6 @@ async function fetchDARAsset(registry: string, assetId: string): Promise<DARAsse
   return req.json()
 }
 
-async function fetchBase64Image(url: string) {
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {},
-    mode: 'cors',
-    cache: 'default'
-  })
-
-  const buffer = await response.arrayBuffer()
-  let base64Flag = `data:${response.headers.get('content-type')};base64,`
-  let imageStr = arrayBufferToBase64(buffer)
-
-  return base64Flag + imageStr
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = ''
-  let bytes = [].slice.call(new Uint8Array(buffer))
-
-  bytes.forEach((b: number) => (binary += String.fromCharCode(b)))
-
-  return btoa(binary)
-}
-
 export class NFTShape extends DisposableComponent {
   src: string | null = null
   assetContainerEntity = new Map<string, BABYLON.AssetContainer>()
@@ -282,9 +258,7 @@ export class NFTShape extends DisposableComponent {
             }
           }
 
-          const realImage = await fetchBase64Image(image)
-
-          this.tex = new BABYLON.Texture(realImage, scene)
+          this.tex = new BABYLON.Texture(image, scene)
           this.tex.hasAlpha = true
         }
 
