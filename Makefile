@@ -5,6 +5,7 @@ PARALLEL_COMPILER = node --max-old-space-size=4096 node_modules/.bin/decentralan
 DCL_PROJECT=../scenes/test
 
 GREEN=\n\033[1;34m
+RED=\n\033[1;31m
 RESET=\033[0m
 
 clean:
@@ -113,6 +114,8 @@ lint:
 
 lint-fix:
 	node_modules/.bin/tslint --project tsconfig.json --fix
+	node_modules/.bin/prettier --write 'packages/**/*.{ts,tsx}'
+	node_modules/.bin/prettier --write 'packages/decentraland-ecs/types/dcl/index.d.ts'
 
 watch: compile-dev
 	@echo "$(GREEN)=================== Watching file changes ==================$(RESET)"

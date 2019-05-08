@@ -6,6 +6,7 @@ jobs:
         environment:
           # avoid automatic download of LFS files
           GIT_LFS_SKIP_SMUDGE: 1
+    parallelism: 3
 
     working_directory: /tmp/explorer
     steps:
@@ -102,6 +103,9 @@ jobs:
       - run:
           name: Deploy to .zone if tests pass and branch is Master
           command: aws s3 sync static s3://explorer.decentraland.zone/ --exclude "branch/*" --acl public-read
+      - run:
+          name: Invalidate cloudfront cache .zone
+          command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
       #      - run:
       #          name: Deploy to .today if tests pass and branch is Master
       #          command: aws s3 sync static s3://explorer.decentraland.today/ --acl public-read
@@ -113,11 +117,16 @@ jobs:
           name: Deploy tag to .today
           command: |
             [ ! -z "${CIRCLE_TAG}" ] && aws s3 sync static s3://explorer.decentraland.today/ --exclude "tags/*" --acl public-read || true
+      # - run:
+      #     name: Invalidate cloudfront cache .today
+      #     command: |
+      #       [ ! -z "${CIRCLE_TAG}" ] aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
 
   pull-deploy:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
+    parallelism: 1
     steps:
       - restore_cache:
           keys:
