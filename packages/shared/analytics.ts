@@ -1,4 +1,6 @@
-declare var analytics: any
+import { DEBUG_ANALYTICS } from 'config'
+
+declare var window: any
 
 export type SegmentEvent = {
   name: string
@@ -12,21 +14,25 @@ export async function initialize(
   segmentKey: string,
   { id, name, email }: { id: string; name: string; email: string }
 ): Promise<void> {
-  if (!analytics) {
+  if (!window.analytics) {
     return
   }
 
-  analytics.load(segmentKey)
-  analytics.page()
+  window.analytics.load(segmentKey)
+  window.analytics.page()
 
-  return analytics.identify(id, {
+  return window.analytics.identify(id, {
     name,
     email
   })
 }
 
 export function queueTrackingEvent(eventName: string, eventData: any) {
-  if (!analytics) {
+  if (DEBUG_ANALYTICS) {
+    console['log'](`Tracking event "${eventName}": `, eventData)
+  }
+
+  if (!window.analytics) {
     return
   }
 
@@ -37,19 +43,18 @@ export function queueTrackingEvent(eventName: string, eventData: any) {
 }
 
 function startTracking() {
-  tracking = true
-  track(trackingQueue.shift())
+  if (trackingQueue.length > 0) {
+    tracking = true
+    track(trackingQueue.shift()!)
+  }
 }
 
 function track({ name, data }: SegmentEvent) {
-  analytics
-    .track(name, data)
-    .then(() => {
-      if (trackingQueue.length === 0) {
-        tracking = false
-        return
-      }
-      track(trackingQueue.shift())
-    })
-    .catch(() => null)
+  window.analytics.track(name, data, {}, () => {
+    if (trackingQueue.length === 0) {
+      tracking = false
+      return
+    }
+    track(trackingQueue.shift()!)
+  })
 }

@@ -4,7 +4,7 @@ import './events'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import {
   ETHEREUM_NETWORK,
-  MOBILE_DEBUG,
+  DEBUG_MOBILE,
   PREVIEW,
   EDITOR,
   AVOID_WEB3,
@@ -20,7 +20,7 @@ import { requestManager, awaitWeb3Approval } from './ethereum/provider'
 import { initialize } from './analytics'
 
 // TODO fill with segment keys and integrate identity server
-async function initializeAnalytics() {
+export async function initializeAnalytics() {
   const TLD = getTLD()
   switch (TLD) {
     case 'org':
@@ -33,7 +33,7 @@ async function initializeAnalytics() {
 }
 
 async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
-  if (MOBILE_DEBUG || PREVIEW || EDITOR || AVOID_WEB3) {
+  if (DEBUG_MOBILE || PREVIEW || EDITOR || AVOID_WEB3) {
     return true
   }
 
