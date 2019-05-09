@@ -1,10 +1,12 @@
+import { parseParcelPosition } from 'atomicHelpers/parcelScenePositions'
+
 export class ParcelLifeCycleStatus {
   x: number
   y: number
   xy: string
 
   constructor(coord: string) {
-    const [x, y] = coord.split(',').map((_: any) => parseInt(_, 10))
+    const { x, y } = parseParcelPosition(coord)
     this.x = x
     this.y = y
     this.xy = coord

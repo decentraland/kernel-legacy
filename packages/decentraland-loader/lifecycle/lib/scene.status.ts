@@ -1,12 +1,9 @@
 import { ILand } from 'shared/types'
 
 export class SceneLifeCycleStatus {
-
-  sceneDescription: ILand
   status: 'unloaded' | 'awake' | 'ready' = 'unloaded'
-  
-  constructor(public sceneDescription: ILand){
-  }
+
+  constructor(public sceneDescription: ILand) {}
 
   isAwake() {
     return this.status !== 'unloaded'
