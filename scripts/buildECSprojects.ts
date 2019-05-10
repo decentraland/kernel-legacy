@@ -1,14 +1,8 @@
-// tslint:disable:no-console
-// this file uses console.log because it is a helper
-
-import glob = require('glob')
-import path = require('path')
-import { dirname } from 'path'
+import * as path from 'path'
 import { spawn } from 'child_process'
 
-const folders = glob
-  .sync(path.resolve(__dirname, '../public/ecs-parcels/*/game.ts'), { absolute: true })
-  .map($ => dirname($))
+import * as fs from 'fs-extra'
+import glob = require('glob')
 
 const PWD = process.cwd()
 
@@ -19,10 +13,43 @@ const env = {
   ECS_PATH: `${PWD}/packages/decentraland-ecs/dist/src/index.js`
 }
 
-folders.map($ => {
-  spawn('node', [`${PWD}/packages/build-ecs/index.js`, ...process.argv], {
-    cwd: $,
-    env,
-    stdio: 'inherit'
-  }).ref()
-})
+const folders = glob
+    .sync(path.resolve(__dirname, '../public/ecs-parcels/*/game.ts'), { absolute: true })
+    .map($ => path.dirname($))
+
+  // tslint:disable-next-line: no-floating-promises
+;(async () => {
+  const [folderDates, ecsStatsExists] = await Promise.all([
+    getLastModificationOfFolders(folders),
+    fs.pathExists('ecs-stats.json')
+  ])
+
+  let targetFolders = folders
+  if (!ecsStatsExists) {
+    await fs.writeFile('ecs-stats.json', JSON.stringify(folderDates))
+  } else {
+    const previousDates = await fs.readJSON('ecs-stats.json')
+    targetFolders = folders.filter(folder => {
+      return previousDates[folder] !== (folderDates[folder] as Date).toISOString()
+    })
+  }
+
+  console['log'](`Detected ${targetFolders.length} projects to be compiled.`)
+
+  targetFolders.map($ => {
+    spawn('node', [`${PWD}/packages/build-ecs/index.js`, ...process.argv], {
+      cwd: $,
+      env,
+      stdio: 'inherit'
+    }).ref()
+  })
+})()
+
+async function getLastModificationOfFolders(folders: string[]): Promise<any> {
+  const result = {}
+  const folderStats = await Promise.all(folders.map(folder => fs.stat(folder)))
+  folderStats.forEach((stat, i) => {
+    result[folders[i]] = stat.mtime
+  })
+  return result
+}
