@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "../../dist",
     "baseUrl": "..",
+    "incremental": true,
     "strictNullChecks": true,
     "strict": true
   },

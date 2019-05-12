@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "outDir": "out",
+    "incremental": true,
     "declaration": false,
     "strictNullChecks": false,
     "lib": ["es2017", "dom"],

@@ -16,6 +16,7 @@
     "emitDecoratorMetadata": true,
     "noUnusedLocals": true,
     "jsx": "react",
+    "incremental": true,
     "jsxFactory": "createElement",
     "plugins": [{ "name": "tslint-language-service" }],
     "baseUrl": "./packages",

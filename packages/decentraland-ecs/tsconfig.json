@@ -4,6 +4,7 @@
     "module": "commonjs",
     "strict": true,
     "declarationDir": "dist",
+    "incremental": true,
     "outDir": "dist",
     "strictNullChecks": true,
     "inlineSourceMap": true,

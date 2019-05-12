@@ -4,6 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
+    "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,

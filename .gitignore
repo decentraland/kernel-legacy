@@ -24,3 +24,5 @@ test/out
 coverage
 
 public/local-ipfs
+
+**/*.tsbuildinfo

@@ -1,25 +1,17 @@
 {
   "$schema": "https://dev.office.com/json-schemas/api-extractor/api-extractor.schema.json",
-  "compiler": {
-    "configType": "tsconfig",
-    "rootFolder": "."
-  },
-  "apiJsonFile": {
+  "projectFolder": ".",
+  "mainEntryPointFilePath": "<projectFolder>/dist/index.d.ts",
+  "docModel": {
     "enabled": true,
-    "outputFolder": "types/dcl"
+    "apiJsonFilePath": "<projectFolder>/types/dcl"
   },
   "dtsRollup": {
     "enabled": true,
-    "publishFolder": "dist"
+    "publicTrimmedFilePath": "<projectFolder>/dist/<unscopedPackageName>-public.d.ts"
   },
-  "apiReviewFile": {
-    "apiReviewFolder": "api-docs-review",
-    "enabled": false
-  },
-  "policies": {
-    "namespaceSupport": "permissive"
-  },
-  "project": {
-    "entryPointSourceFile": "dist/index.d.ts"
+  "apiReport": {
+    "enabled": false,
+    "reportFolder": "<projectFolder>/api-docs-review"
   }
 }

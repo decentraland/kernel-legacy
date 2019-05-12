@@ -4,6 +4,7 @@
     "target": "es2017",
     "inlineSourceMap": false,
     "inlineSources": false,
+    "incremental": true,
     "declaration": false,
     "sourceMap": false,
     "moduleResolution": "node",

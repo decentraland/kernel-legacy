@@ -3,6 +3,7 @@
     "module": "esnext",
     "target": "es2017",
     "emitDecoratorMetadata": true,
+    "incremental": true,
     "experimentalDecorators": true,
     "sourceMap": true,
     "moduleResolution": "node",

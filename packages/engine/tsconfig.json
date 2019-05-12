@@ -3,6 +3,7 @@
     "paths": { "*": ["types/*"] },
     "outDir": "../../dist",
     "baseUrl": "..",
+    "incremental": true,
     "types": ["babylonjs", "babylonjs-materials", "babylonjs-loaders", "babylonjs-gltf2interface", "babylonjs-procedural-textures"],
     "strict": true,
     "strictNullChecks": true

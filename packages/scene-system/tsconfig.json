@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "declaration": false,
     "strictFunctionTypes": true,
+    "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "alwaysStrict": true,
