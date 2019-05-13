@@ -149,6 +149,7 @@ export class Engine implements IEngine {
   addSystem(system: ISystem, priority: number = 0) {
     if (this.addedSystems.indexOf(system) !== -1) {
       log('Engine: Trying to add a system that is already added. Aborting')
+      return this
     }
 
     if (this.systems.length > 0) {
@@ -172,6 +173,8 @@ export class Engine implements IEngine {
     }
 
     this.registerSystem(system)
+
+    return this
   }
 
   removeSystem(system: ISystem) {
@@ -193,6 +196,7 @@ export class Engine implements IEngine {
         }
       }
     }
+    return this
   }
 
   update(dt: number) {
@@ -206,6 +210,7 @@ export class Engine implements IEngine {
         }
       }
     }
+    return this
   }
 
   getEntitiesWithComponent(component: string): Record<string, any>
@@ -229,6 +234,8 @@ export class Engine implements IEngine {
       this.eventManager.fireEvent(new DisposableComponentCreated(id, name, classId))
       this.eventManager.fireEvent(new DisposableComponentUpdated(id, component))
     }
+
+    return this
   }
 
   disposeComponent(component: DisposableComponentLike) {
@@ -247,6 +254,8 @@ export class Engine implements IEngine {
 
   updateComponent(component: DisposableComponentLike) {
     this.eventManager.fireEvent(new DisposableComponentUpdated(getComponentId(component), component))
+
+    return this
   }
 
   getComponentGroup(...requires: ComponentConstructor<any>[]) {
@@ -295,6 +304,8 @@ export class Engine implements IEngine {
         }
       }
     }
+
+    return this
   }
 
   private registerSystem(system: ISystem) {

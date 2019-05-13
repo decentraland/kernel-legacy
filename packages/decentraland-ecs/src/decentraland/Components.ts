@@ -401,6 +401,7 @@ export class Animator extends Shape {
     clip.onChange(() => {
       this.dirty = true
     })
+    return this
   }
 
   /**
