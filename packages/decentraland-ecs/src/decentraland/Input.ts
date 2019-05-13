@@ -132,6 +132,7 @@ export class Input {
     if (index > -1) {
       return this.subscriptions[eventName].splice(index, 1)
     }
+    return null
   }
 
   private getPointerById(id: number): Pointer {
