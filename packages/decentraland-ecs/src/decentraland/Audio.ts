@@ -81,6 +81,5 @@ export class AudioSource extends ObservableComponent {
     this.playing = true
     this.dirty = true
     this.data.nonce = Math.random()
-    return this
   }
 }

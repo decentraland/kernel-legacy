@@ -130,7 +130,7 @@ export class Input {
   public unsubscribe(eventName: InputEventKind, fn: (e: LocalPointerEvent) => void) {
     const index = this.subscriptions[eventName].indexOf(fn)
     if (index > -1) {
-      return this.subscriptions[eventName].splice(index, 1)
+      this.subscriptions[eventName].splice(index, 1)
     }
     return null
   }

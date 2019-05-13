@@ -384,7 +384,6 @@ export class ObservableComponent {
 
   onChange(fn: ObservableComponentSubscription) {
     this.subscriptions.push(fn)
-    return this
   }
 
   toJSON() {
