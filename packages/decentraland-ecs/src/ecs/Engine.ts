@@ -149,6 +149,7 @@ export class Engine implements IEngine {
   addSystem(system: ISystem, priority: number = 0) {
     if (this.addedSystems.indexOf(system) !== -1) {
       log('Engine: Trying to add a system that is already added. Aborting')
+      return
     }
 
     if (this.systems.length > 0) {
