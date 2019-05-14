@@ -17,8 +17,7 @@ const folders = glob
     .sync(path.resolve(__dirname, '../public/ecs-parcels/*/game.ts'), { absolute: true })
     .map($ => path.dirname($))
 
-  // tslint:disable-next-line: no-floating-promises
-;(async () => {
+async function main () {
   const [folderDates, ecsStatsExists] = await Promise.all([
     getLastModificationOfFolders(folders),
     fs.pathExists('ecs-stats.json')
@@ -43,7 +42,7 @@ const folders = glob
       stdio: 'inherit'
     }).ref()
   })
-})()
+}
 
 async function getLastModificationOfFolders(folders: string[]): Promise<any> {
   const result = {}
@@ -53,3 +52,8 @@ async function getLastModificationOfFolders(folders: string[]): Promise<any> {
   })
   return result
 }
+
+main().catch(err => {
+  console.error(err)
+  process.exit(1)
+})
