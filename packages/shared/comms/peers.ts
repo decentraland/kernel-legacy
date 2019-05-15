@@ -1,7 +1,6 @@
 import { Observable } from 'decentraland-ecs/src'
 import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from './types'
 import { getFromLocalStorage, saveToLocalStorage } from 'atomicHelpers/localStorage'
-import { queueTrackingEvent } from 'shared/analytics'
 
 export const getUserProfile = () => getFromLocalStorage('dcl-profile') || {}
 export const getBlockedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-blocked-users') || [])
@@ -164,7 +163,6 @@ export function receiveUserVisible(uuid: string, visible: boolean) {
     uuid,
     visible
   })
-  queueTrackingEvent('User visibility', { uuid, visible })
 }
 
 export function addToBlockedUsers(uuid: string): Set<string> {
@@ -179,7 +177,6 @@ export function addToBlockedUsers(uuid: string): Set<string> {
       uuid
     })
 
-    queueTrackingEvent('Block user', { uuid })
     return updatedSet
   }
 
@@ -196,8 +193,6 @@ export function removeFromBlockedUsers(uuid: string): Set<string> {
     uuid
   })
 
-  queueTrackingEvent('Unblock user', { uuid })
-
   return blockedUsers
 }
 
@@ -212,8 +207,6 @@ export function addToMutedUsers(uuid: string): Set<string> {
       type: AvatarMessageType.USER_MUTED,
       uuid
     })
-
-    queueTrackingEvent('Mute user', { uuid })
 
     return updatedSet
   }
@@ -230,8 +223,6 @@ export function removeFromMutedUsers(uuid: string): Set<string> {
     type: AvatarMessageType.USER_UNMUTED,
     uuid
   })
-
-  queueTrackingEvent('Unmute user', { uuid })
 
   return mutedUsers
 }

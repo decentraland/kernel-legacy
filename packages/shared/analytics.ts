@@ -1,5 +1,8 @@
 import { DEBUG_ANALYTICS } from 'config'
 
+import { chatObservable, ChatEvent } from './comms/chat'
+import { avatarMessageObservable } from './comms/peers'
+
 declare var window: any
 
 export type SegmentEvent = {
@@ -58,3 +61,13 @@ function track({ name, data }: SegmentEvent) {
     track(trackingQueue.shift()!)
   })
 }
+
+chatObservable.add((event: any) => {
+  if (event.type === ChatEvent.MESSAGE_RECEIVED) {
+    queueTrackingEvent('Chat message received', { lenght: event.data.message.lenght })
+  } else if (event.type === ChatEvent.MESSAGE_SENT) {
+    queueTrackingEvent('Send chat message', { messageId: event.data.messageId, length: event.data.message.length })
+  }
+})
+
+avatarMessageObservable.add(({ type, ...data }) => queueTrackingEvent(type, data))

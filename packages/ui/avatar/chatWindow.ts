@@ -13,9 +13,11 @@ import {
   UIScrollRect
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
+import { MessageEntry } from 'shared/types'
+import { queueTrackingEvent } from 'shared/analytics'
+
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
-import { MessageEntry } from 'shared/types'
 
 declare var dcl: DecentralandInterface
 declare var require: any
@@ -183,6 +185,7 @@ export async function initializeChat() {
 
 function toggleChat() {
   setMaximized(!isMaximized)
+  queueTrackingEvent('Toggle Chat', { isMaximized })
 }
 
 function setMaximized(maximized: boolean) {
