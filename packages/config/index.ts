@@ -88,6 +88,7 @@ export const DEBUG = location.search.indexOf('DEBUG') !== -1 || !!(global as any
 export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
 export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
 export const DEBUG_METRICS = location.search.indexOf('DEBUG_METRICS') !== -1
+export const DEBUG_MESSAGES = location.search.indexOf('DEBUG_MESSAGES') !== -1
 
 export namespace commConfigurations {
   export const debug = DEBUG_METRICS
