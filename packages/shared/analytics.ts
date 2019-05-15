@@ -106,6 +106,7 @@ positionObservable.add(({ position }) => {
     seconds++
     if (previousPosition !== currentPosition) {
       queueTrackingEvent('Move to Parcel', { newParcel: currentPosition, oldParcel: previousPosition })
+      previousPosition = currentPosition
     }
     lastTime = performance.now()
   }
