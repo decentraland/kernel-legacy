@@ -14,23 +14,25 @@ const env = {
 }
 
 const folders = glob
-    .sync(path.resolve(__dirname, '../public/ecs-parcels/*/game.ts'), { absolute: true })
-    .map($ => path.dirname($))
+  .sync(path.resolve(__dirname, '../public/ecs-parcels/*/game.ts'), { absolute: true })
+  .map($ => path.dirname($))
 
-async function main () {
+async function main() {
   const [folderDates, ecsStatsExists] = await Promise.all([
     getLastModificationOfFolders(folders),
     fs.pathExists('ecs-stats.json')
   ])
 
   let targetFolders = folders
+
   if (!ecsStatsExists) {
     await fs.writeFile('ecs-stats.json', JSON.stringify(folderDates))
   } else {
     const previousDates = await fs.readJSON('ecs-stats.json')
     targetFolders = folders.filter(folder => {
-      return previousDates[folder] !== (folderDates[folder] as Date).toISOString()
+      return previousDates[folder] !== folderDates[folder]
     })
+    await fs.writeFile('ecs-stats.json', JSON.stringify({ ...folderDates, ...targetFolders }))
   }
 
   console['log'](`Detected ${targetFolders.length} projects to be compiled.`)
@@ -46,14 +48,27 @@ async function main () {
 
 async function getLastModificationOfFolders(folders: string[]): Promise<any> {
   const result = {}
-  const folderStats = await Promise.all(folders.map(folder => fs.stat(folder)))
-  folderStats.forEach((stat, i) => {
-    result[folders[i]] = stat.mtime
+  const folderMtimes = await Promise.all(folders.map(folder => getNewestMtime(folder)))
+  folderMtimes.forEach((mtime, i) => {
+    result[folders[i]] = mtime
   })
   return result
 }
 
+async function getNewestMtime(folder: string): Promise<number> {
+  let all: number[] = []
+  const parent = await fs.stat(folder)
+  all.push(Number(parent.mtime))
+  if (parent.isDirectory()) {
+    const children = (await fs.readdir(folder)).map(file => path.resolve(folder, file))
+    all = all.concat(...(await Promise.all(children.map(getNewestMtime))))
+  }
+
+  return Math.max(...all)
+}
+
 main().catch(err => {
+  // tslint:disable-next-line: no-console
   console.error(err)
   process.exit(1)
 })
