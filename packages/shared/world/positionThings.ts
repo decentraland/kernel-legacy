@@ -9,7 +9,6 @@ import {
 } from 'decentraland-ecs/src/decentraland/math'
 import { Observable } from 'decentraland-ecs/src/ecs/Observable'
 import { ILand } from 'shared/types'
-import { queueTrackingEvent } from 'shared/analytics'
 
 declare var location: any
 declare var history: any
@@ -32,35 +31,17 @@ positionObservable.add(event => {
 
 export function initializeUrlPositionObserver() {
   let lastTime: number = performance.now()
-  let seconds = 0
-  let distanceTraveled = 0
 
   let previousPosition: string | null = null
   const gridPosition = Vector2.Zero()
-  let previousWorldPosition: ReadOnlyVector3 | null = null
 
   function updateUrlPosition(cameraVector: ReadOnlyVector3) {
-    if (previousWorldPosition === null) {
-      previousWorldPosition = { x: cameraVector.x, y: cameraVector.y, z: cameraVector.z }
-    }
-
-    if (seconds === 10 || distanceTraveled > 50) {
-      queueTrackingEvent('User Position', { position: cameraVector, distance: distanceTraveled })
-      seconds = 0
-      distanceTraveled = 0
-      previousWorldPosition = { x: cameraVector.x, y: cameraVector.y, z: cameraVector.z }
-    }
-
     // Update position in URI every second
     if (performance.now() - lastTime > 1000) {
-      distanceTraveled = Vector3.Distance(previousWorldPosition, cameraVector)
-      seconds++
-
       worldToGrid(cameraVector, gridPosition)
       const currentPosition = `${gridPosition.x | 0},${gridPosition.y | 0}`
 
       if (previousPosition !== currentPosition) {
-        queueTrackingEvent('Move to Parcel', { newParcel: currentPosition, oldParcel: previousPosition })
         const stateObj = { position: currentPosition }
         previousPosition = currentPosition
 
