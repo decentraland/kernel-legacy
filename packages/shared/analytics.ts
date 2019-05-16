@@ -30,15 +30,17 @@ export async function initialize(segmentKey: string, id: string): Promise<void> 
 }
 
 export function queueTrackingEvent(eventName: string, eventData: any) {
+  const data = { ...eventData, time: new Date().toISOString() }
+
   if (DEBUG_ANALYTICS) {
-    console['log'](`Tracking event "${eventName}": `, eventData)
+    console['log'](`Tracking event "${eventName}": `, data)
   }
 
   if (!window.analytics) {
     return
   }
 
-  trackingQueue.push({ name: eventName, data: eventData })
+  trackingQueue.push({ name: eventName, data })
   if (!tracking) {
     startTracking()
   }
