@@ -14,7 +14,6 @@ import {
 } from 'decentraland-ecs/src/decentraland/UIShapes'
 
 import { MessageEntry } from 'shared/types'
-import { queueTrackingEvent } from 'shared/analytics'
 
 import { execute } from './rpc'
 import { screenSpaceUI } from './ui'
@@ -185,7 +184,6 @@ export async function initializeChat() {
 
 function toggleChat() {
   setMaximized(!isMaximized)
-  queueTrackingEvent('Toggle Chat', { isMaximized })
 }
 
 function setMaximized(maximized: boolean) {
