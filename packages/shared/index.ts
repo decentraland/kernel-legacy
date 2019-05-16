@@ -1,7 +1,8 @@
+import { Auth } from 'decentraland-auth'
+
 import './apis/index'
 import './events'
 
-import { initializeUrlPositionObserver } from './world/positionThings'
 import {
   ETHEREUM_NETWORK,
   DEBUG_MOBILE,
@@ -11,11 +12,12 @@ import {
   setNetwork,
   decentralandConfigurations,
   getTLD
-} from '../config'
+} from 'config'
+import { info, error } from 'engine/logger'
+import { initializeUrlPositionObserver } from './world/positionThings'
 import { getERC721 } from './ethereum/ERC721'
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { connect } from './comms'
-import { info, error } from '../engine/logger'
 import { requestManager, awaitWeb3Approval } from './ethereum/provider'
 import { initialize } from './analytics'
 
@@ -95,24 +97,28 @@ async function getAddressAndNetwork() {
       address
     }
   } catch (e) {
-    if (PREVIEW) {
-      error('Could not get Ethereum address, WebRTC will be disabled.')
-      info(e)
+    error('Could not get Ethereum address, WebRTC will be disabled.')
+    info(e)
 
-      return {
-        net: getNetworkFromTLD() || ETHEREUM_NETWORK.MAINNET,
-        address: '0x0000000000000000000000000000000000000000'
-      }
-    } else {
-      throw e
+    return {
+      net: getNetworkFromTLD() || ETHEREUM_NETWORK.MAINNET,
+      address: '0x0000000000000000000000000000000000000000'
     }
   }
 }
 
+async function authenticate(): Promise<void> {
+  const auth = new Auth()
+  return auth.login()
+}
+
 export async function initShared() {
+  await authenticate()
   const { address, net } = await getAddressAndNetwork()
+
   // Load contracts from https://contracts.decentraland.org
   await setNetwork(net)
+
   // TODO uncomment analytics initialization when identity ready
   // tslint:disable-next-line: no-commented-out-code
   // await initializeAnalytics()
