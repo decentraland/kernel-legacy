@@ -36,28 +36,6 @@ export async function initializeAnalytics(userId: string) {
   }
 }
 
-async function grantAccess(address: string | null, net: ETHEREUM_NETWORK) {
-  if (DEBUG_MOBILE || PREVIEW || EDITOR || AVOID_WEB3) {
-    return true
-  }
-
-  let isWhitelisted = location.hostname === 'localhost' || navigator.userAgent.includes('Oculus')
-
-  if (!isWhitelisted && address) {
-    const contract = await getERC721(requestManager, decentralandConfigurations.invite)
-
-    const balance = await contract.balanceOf(address)
-
-    isWhitelisted = balance.gt(0)
-
-    if (!isWhitelisted) {
-      throw new Error(`Unauthorized ${address} [${net}]`)
-    }
-  }
-
-  return isWhitelisted
-}
-
 function getNetworkFromTLD(): ETHEREUM_NETWORK | null {
   const tld = getTLD()
   if (tld === 'localhost' || tld === '1') {
@@ -128,21 +106,13 @@ export async function initShared() {
 
   // Load contracts from https://contracts.decentraland.org
   await setNetwork(net)
-
   await initializeAnalytics(user_id)
-  const isWhitelisted = await grantAccess(address, net)
 
-  if (isWhitelisted) {
-    await connect(
-      address,
-      net
-    )
-  } else {
-    throw new Error(`The address ${address} is not whitelisted`)
-  }
-
+  await connect(
+    address,
+    net
+  )
   initializeUrlPositionObserver()
-
   return {
     net,
     address
