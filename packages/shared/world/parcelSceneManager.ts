@@ -34,7 +34,7 @@ export function getParcelByCID(id: string) {
  */
 export function getParcelById(id: string) {
   for (let parcelSceneWorker of loadedParcelSceneWorkers) {
-    if (parcelSceneWorker.parcelScene.data.data.id === id) {
+    if (parcelSceneWorker.parcelScene.data.id === id) {
       return parcelSceneWorker
     }
   }
