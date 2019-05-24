@@ -37,9 +37,14 @@ build-support:
 	@echo "$(GREEN)================== Building support files ==================$(RESET)"
 	$(COMPILER) build.support.json
 
+build-hell-map:
+	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
+	$(COMPILER) build.hell-map.json
+
 build-test-scenes: build-sdk
 	@echo "$(GREEN)=================== Building test scenes ===================$(RESET)"
 	$(COMPILER) build.test-scenes.json
+	$(MAKE) build-hell-map
 	node scripts/buildECSprojects.js
 
 export-preview: | clean compile-entry-points
@@ -117,9 +122,20 @@ lint-fix:
 	node_modules/.bin/prettier --write 'packages/**/*.{ts,tsx}'
 	node_modules/.bin/prettier --write 'packages/decentraland-ecs/types/dcl/index.d.ts'
 
+watch: export NODE_ENV=development
 watch: compile-dev
 	@echo "$(GREEN)=================== Watching file changes ==================$(RESET)"
 	$(MAKE) only-watch
+
+
+FILE=-100.*
+watch-single:
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@node_modules/.bin/concurrently \
+		-n "sdk,entryPoints,debug-scene,server" \
+			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
+			"$(PARALLEL_COMPILER) build.single-debug.json --watch" \
+			"node ./scripts/test.js --keep-open"
 
 only-watch:
 	@node_modules/.bin/concurrently \
@@ -132,6 +148,6 @@ only-watch:
 
 dev-watch:
 	@node_modules/.bin/concurrently \
-		-n "sdk,entryPoints,ecs-builder,server" \
+		-n "sdk,entryPoints,server" \
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
 			"node ./scripts/test.js --keep-open"

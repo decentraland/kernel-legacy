@@ -60,6 +60,10 @@ export class WorldInstanceConnection {
   public positionHandler: ((fromAlias: string, positionData: PositionData) => void) | null = null
   public profileHandler: ((fromAlias: string, profileData: ProfileData) => void) | null = null
   public chatHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
+
+  // TODO: Once we have the correct class, change ChatData
+  public sceneMessageHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
+
   public authenticated = false
   public reliableDataChannel: IDataChannel | null = null
   public unreliableDataChannel: IDataChannel | null = null
@@ -304,7 +308,7 @@ export class WorldInstanceConnection {
               break
             }
 
-            const alias = `${message.getFromAlias()}`
+            const alias = message.getFromAlias().toString()
             const category = dataHeader.getCategory()
             switch (category) {
               case Category.POSITION: {
@@ -328,6 +332,17 @@ export class WorldInstanceConnection {
                 }
 
                 this.chatHandler && this.chatHandler(alias, chatData)
+                break
+              }
+              case Category.SCENE_MESSAGE: {
+                const chatData = ChatData.deserializeBinary(body)
+
+                if (this.stats) {
+                  this.stats.dispatchTopicDuration.stop()
+                  this.stats.scene.incrementRecv(msgSize)
+                }
+
+                this.sceneMessageHandler && this.sceneMessageHandler(alias, chatData)
                 break
               }
               case Category.PROFILE: {
@@ -411,6 +426,23 @@ export class WorldInstanceConnection {
     }
   }
 
+  sendParcelSceneCommsMessage(sceneCID: string, message: string) {
+    const topic = `cid:${sceneCID}`
+
+    // TODO: create its own class once we get the .proto file
+    const d = new ChatData()
+    d.setCategory(Category.SCENE_MESSAGE)
+    d.setTime(Date.now())
+    d.setMessageId(sceneCID)
+    d.setText(message)
+
+    const r = this.sendTopicMessage(true, topic, d)
+
+    if (this.stats) {
+      this.stats.scene.incrementSent(1, r.bytesSize)
+    }
+  }
+
   sendChatMessage(p: Position, messageId: string, text: string) {
     const topic = `chat:${positionHash(p)}`
 
@@ -468,6 +500,7 @@ export class WorldInstanceConnection {
     const subscriptionMessage = new TopicSubscriptionMessage()
     subscriptionMessage.setType(MessageType.TOPIC_SUBSCRIPTION)
     subscriptionMessage.setFormat(Format.PLAIN)
+    // TODO: use TextDecoder instead of Buffer, it is a native browser API, works faster
     subscriptionMessage.setTopics(Buffer.from(rawTopics, 'utf8'))
     const bytes = subscriptionMessage.serializeBinary()
     this.reliableDataChannel.send(bytes)

@@ -100,6 +100,7 @@ export class Stats {
   public position = new PkgStats()
   public profile = new PkgStats()
   public chat = new PkgStats()
+  public scene = new PkgStats()
   public webRtcSession = new PkgStats()
   public collectInfoDuration = new TrackAvgDuration()
   public dispatchTopicDuration = new TrackAvgDuration()

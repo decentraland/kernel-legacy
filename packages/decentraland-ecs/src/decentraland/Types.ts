@@ -235,6 +235,14 @@ export interface IEvents {
   }
 
   /**
+   * This event gets triggered after receiving a comms message.
+   */
+  comms: {
+    sender: string
+    message: string
+  }
+
+  /**
    * After checking entities outside the fences, if any is outside, this event
    * will be triggered with all the entities outside the scene.
    */

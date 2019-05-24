@@ -9746,6 +9746,27 @@
           "isOverride": false,
           "isEventProperty": false
         },
+        "comms": {
+          "kind": "property",
+          "signature": "comms:",
+          "isOptional": false,
+          "isReadOnly": false,
+          "isStatic": false,
+          "type": "{\n        sender: string;\n        message: string;\n    }",
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "This event gets triggered after receiving a comms message."
+            }
+          ],
+          "remarks": [],
+          "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false,
+          "isEventProperty": false
+        },
         "entitiesOutOfBoundaries": {
           "kind": "property",
           "signature": "entitiesOutOfBoundaries:",
@@ -16647,6 +16668,119 @@
           ],
           "remarks": [],
           "isBeta": false,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        }
+      }
+    },
+    "MessageBus": {
+      "kind": "class",
+      "extends": "",
+      "implements": "",
+      "typeParameters": [],
+      "deprecatedMessage": [],
+      "summary": [],
+      "remarks": [],
+      "isBeta": true,
+      "isSealed": false,
+      "members": {
+        "__constructor": {
+          "kind": "constructor",
+          "signature": "constructor();",
+          "parameters": {},
+          "deprecatedMessage": [],
+          "summary": [
+            {
+              "kind": "text",
+              "text": "Constructs a new instance of the "
+            },
+            {
+              "kind": "api-link",
+              "elements": [
+                {
+                  "kind": "text",
+                  "text": "MessageBus"
+                }
+              ],
+              "target": {
+                "scopeName": "",
+                "packageName": "decentraland-ecs",
+                "exportName": "MessageBus",
+                "memberName": ""
+              }
+            },
+            {
+              "kind": "text",
+              "text": " class"
+            }
+          ],
+          "remarks": []
+        },
+        "on": {
+          "kind": "method",
+          "signature": "on(message: string, callback: (value: Record<any, any>, sender: string) => void): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": false,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {
+            "message": {
+              "name": "message",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "string"
+            },
+            "callback": {
+              "name": "callback",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "(value: Record<any, any>, sender: string) => void"
+            }
+          },
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": true,
+          "isSealed": false,
+          "isVirtual": false,
+          "isOverride": false
+        },
+        "send": {
+          "kind": "method",
+          "signature": "send(message: string, payload: Record<any, any>): void;",
+          "accessModifier": "",
+          "isOptional": false,
+          "isStatic": false,
+          "returnValue": {
+            "type": "void",
+            "description": []
+          },
+          "parameters": {
+            "message": {
+              "name": "message",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "string"
+            },
+            "payload": {
+              "name": "payload",
+              "description": [],
+              "isOptional": false,
+              "isSpread": false,
+              "type": "Record<any, any>"
+            }
+          },
+          "deprecatedMessage": [],
+          "summary": [],
+          "remarks": [],
+          "isBeta": true,
           "isSealed": false,
           "isVirtual": false,
           "isOverride": false

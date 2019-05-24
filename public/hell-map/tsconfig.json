@@ -21,8 +21,7 @@
     "jsxFactory": "createElement",
     "removeComments": true,
     "incremental": true,
-    "tsBuildInfoFile": ".tscache",
-    "outDir": "../test-parcels",
+    "outDir": ".",
     "baseUrl": "../../packages",
     "pretty": true,
     "lib": [

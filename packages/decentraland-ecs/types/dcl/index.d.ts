@@ -1613,6 +1613,13 @@ declare interface IEvents {
         entityId: string;
     };
     /**
+     * This event gets triggered after receiving a comms message.
+     */
+    comms: {
+        sender: string;
+        message: string;
+    };
+    /**
      * After checking entities outside the fences, if any is outside, this event
      * will be triggered with all the entities outside the scene.
      */
@@ -2552,6 +2559,17 @@ declare class Matrix {
      * Toggles projection matrix from being right handed to left handed in place and vice versa
      */
     toggleProjectionMatrixHandInPlace(): void;
+}
+
+/**
+ * @beta
+ */
+declare class MessageBus {
+    private messageQueue;
+    constructor();
+    on(message: string, callback: (value: Record<any, any>, sender: string) => void): void;
+    send(message: string, payload: Record<any, any>): void;
+    private flush;
 }
 
 declare type MethodDescriptor = {

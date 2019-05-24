@@ -459,5 +459,6 @@ export enum Category {
   UNKNOWN = 0,
   POSITION = 1,
   PROFILE = 2,
-  CHAT = 3
+  CHAT = 3,
+  SCENE_MESSAGE = 4
 }
