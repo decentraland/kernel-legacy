@@ -73,6 +73,15 @@ export class OnClick extends OnUUIDEvent<'onClick'> {
 }
 
 /**
+ * @internal
+ */
+@Component('engine.onEnter', CLASS_ID.UUID_CALLBACK)
+export class OnEnter extends OnUUIDEvent<'onEnter'> {
+  @ObservableComponent.readonly
+  readonly type: string = 'onEnter'
+}
+
+/**
  * @public
  */
 @Component('engine.onChange', CLASS_ID.UUID_CALLBACK)
