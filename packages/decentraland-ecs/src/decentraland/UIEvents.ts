@@ -73,7 +73,7 @@ export class OnClick extends OnUUIDEvent<'onClick'> {
 }
 
 /**
- * @internal
+ * @public
  */
 @Component('engine.onEnter', CLASS_ID.UUID_CALLBACK)
 export class OnEnter extends OnUUIDEvent<'onEnter'> {
