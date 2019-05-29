@@ -27,7 +27,6 @@ export class CommunicationsController extends ExposableAPI {
   }
 
   apiWillUnmount() {
-    debugger
     // Unsubscribe this parcel from events
     unsubscribeParcelSceneToCommsMessages(this)
   }

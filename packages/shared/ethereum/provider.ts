@@ -12,7 +12,7 @@ export const requestManager = new RequestManager(null)
   if (!AVOID_WEB3) {
     window.addEventListener('load', async () => {
       // Modern dapp browsers...
-      if (window['ethereum']) {
+      if (window['ethereum'] && window['ethereum'].enable) {
         try {
           // Request account access if needed
           await window['ethereum'].enable()

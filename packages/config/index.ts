@@ -101,6 +101,11 @@ export namespace commConfigurations {
 
   export const iceServers = [
     {
+      urls: 'turn:184.73.100.50:3478',
+      credential: 'passworddcl',
+      username: 'usernamedcl'
+    },
+    {
       urls: 'stun:stun.l.google.com:19302'
     }
   ]
@@ -137,7 +142,10 @@ export function getServerConfigurations() {
     landApi: `https://api.decentraland.${TLDDefault}/v1`,
     content: `https://content.decentraland.${TLDDefault}`,
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect?method=noop`,
-    darApi: 'https://schema-api-staging.now.sh/dar'
+    darApi:
+      TLDDefault === 'zone' || TLDDefault === 'today'
+        ? 'https://schema-api-v2.now.sh/dar'
+        : 'https://schema.decentraland.org/dar'
   }
 }
 

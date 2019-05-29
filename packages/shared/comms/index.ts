@@ -33,6 +33,7 @@ import { WorldInstanceConnection } from './worldInstanceConnection'
 import { ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
+import { log } from 'engine/logger'
 
 type Timestamp = number
 type PeerAlias = string
@@ -44,7 +45,6 @@ export class PeerTrackingInfo {
   public lastProfileUpdate: Timestamp = 0
   public lastUpdate: Timestamp = 0
   public receivedPublicChatMessages = new Set<string>()
-  public receivedParcelSceneCommsMessages = new Set<string>()
 }
 
 export class Context {
@@ -92,7 +92,6 @@ export function sendPublicChatMessage(messageId: string, text: string) {
 
 export function sendParcelSceneCommsMessage(cid: string, message: string) {
   if (context && context.currentPosition && context.worldInstanceConnection) {
-    console.log(`Sending PSCM to parcel: ${cid} with content: ${message}`)
     context.worldInstanceConnection.sendParcelSceneCommsMessage(cid, message)
   }
 }
@@ -111,8 +110,6 @@ export function processParcelSceneCommsMessage(context: Context, fromAlias: stri
   const text = data.getText()
 
   const peer = getPeer(fromAlias)
-
-  console.log(`Processing PSCM from: ${fromAlias} to parcel: ${cid} with content: ${text}`)
 
   if (peer) {
     scenesSubscribedToCommsEvents.forEach($ => {
@@ -258,20 +255,21 @@ export function onPositionUpdate(context: Context, p: Position) {
       }
     }
 
-    currentParcelTopics = rawTopics.join('')
+    currentParcelTopics = rawTopics.join(' ')
   }
 
   const parcelSceneSubscriptions = getParcelSceneSubscriptions()
 
   const parcelSceneCommsTopics = parcelSceneSubscriptions.join(' ')
 
-  console.log('Subscriptions: ' + parcelSceneSubscriptions.join(' '))
-
   let topics = currentParcelTopics + (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
 
   if (topics !== previousTopics) {
     worldConnection.updateSubscriptions(topics)
     previousTopics = topics
+    if (commConfigurations.debug) {
+      log('Communication topics: ' + topics)
+    }
   }
 
   context.currentPosition = p

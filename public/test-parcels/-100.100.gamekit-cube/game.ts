@@ -50,7 +50,7 @@ bus.on('click', (evt, sender) => {
   }
 })
 
-cube.addComponentOrReplace(new OnPointerDown(e => bus.send('click', e)))
+cube.addComponentOrReplace(new OnPointerDown(e => bus.emit('click', e)))
 
 engine.addEntity(cube)
 

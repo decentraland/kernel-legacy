@@ -1,5 +1,6 @@
 import { DecentralandInterface, ModuleDescriptor, IEvents } from './Types'
 import { Observable } from '../ecs/Observable'
+import { error } from '../ecs/helpers'
 
 declare const dcl: DecentralandInterface
 
@@ -15,7 +16,7 @@ export function getMessageObserver() {
   if (!_messageObserver) {
     _messageObserver = new Observable<IEvents['comms']>()
   }
-  return _messageObserver!
+  return _messageObserver
 }
 
 function ensureCommunicationsController() {
@@ -29,6 +30,7 @@ function ensureCommunicationsController() {
 
     const observer = getMessageObserver()
 
+    dcl.subscribe('comms')
     dcl.onEvent(event => {
       if (event.type === 'comms') {
         dcl.log('Receiving comms message ', event.data)
@@ -44,20 +46,23 @@ function ensureCommunicationsController() {
  */
 export class MessageBus {
   private messageQueue: string[] = []
+  private connected = false
+  private flushing = false
 
   constructor() {
     ensureCommunicationsController().then($ => {
+      this.connected = true
       this.flush()
     })
   }
 
-  on(message: string, callback: (value: Record<any, any>, sender: string) => void) {
-    getMessageObserver().add(e => {
+  on(message: string, callback: (value: any, sender: string) => void) {
+    return getMessageObserver().add(e => {
       try {
         let m = JSON.parse(e.message)
 
         if (m.message === message) {
-          callback(m.message, e.sender)
+          callback(m.payload, e.sender)
         }
       } catch (e) {
         dcl.error('Error parsing comms message ' + e.message, e)
@@ -68,9 +73,13 @@ export class MessageBus {
   // @internal
   sendRaw(message: string) {
     this.messageQueue.push(message)
+
+    if (this.connected) {
+      this.flush()
+    }
   }
 
-  send(message: string, payload: Record<any, any>) {
+  emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
     getMessageObserver().notifyObservers({ message: messageToSend, sender: 'self' })
@@ -78,8 +87,23 @@ export class MessageBus {
 
   private flush() {
     if (this.messageQueue.length === 0) return
+    if (!this.connected) return
     if (!communicationsController) return
+    if (this.flushing) return
+
     const message = this.messageQueue.shift()
-    dcl.callRpc(communicationsController.rpcHandle, 'send', [message]).then(_ => this.flush())
+
+    this.flushing = true
+
+    dcl.callRpc(communicationsController.rpcHandle, 'send', [message]).then(
+      _ => {
+        this.flushing = false
+        this.flush()
+      },
+      e => {
+        this.flushing = false
+        error('Error flushing MessageBus', e)
+      }
+    )
   }
 }

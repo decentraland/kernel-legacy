@@ -339,7 +339,7 @@ export class WorldInstanceConnection {
 
                 if (this.stats) {
                   this.stats.dispatchTopicDuration.stop()
-                  this.stats.scene.incrementRecv(msgSize)
+                  this.stats.sceneComms.incrementRecv(msgSize)
                 }
 
                 this.sceneMessageHandler && this.sceneMessageHandler(alias, chatData)
@@ -391,7 +391,7 @@ export class WorldInstanceConnection {
   }
 
   sendPositionMessage(p: Position) {
-    const topic = `position:${positionHash(p)}`
+    const topic = positionHash(p)
 
     const d = new PositionData()
     d.setCategory(Category.POSITION)
@@ -411,7 +411,7 @@ export class WorldInstanceConnection {
   }
 
   sendProfileMessage(p: Position, userProfile: UserInformation) {
-    const topic = `profile:${positionHash(p)}`
+    const topic = positionHash(p)
 
     const d = new ProfileData()
     d.setCategory(Category.PROFILE)
@@ -427,7 +427,7 @@ export class WorldInstanceConnection {
   }
 
   sendParcelSceneCommsMessage(sceneCID: string, message: string) {
-    const topic = `cid:${sceneCID}`
+    const topic = sceneCID
 
     // TODO: create its own class once we get the .proto file
     const d = new ChatData()
@@ -439,12 +439,12 @@ export class WorldInstanceConnection {
     const r = this.sendTopicMessage(true, topic, d)
 
     if (this.stats) {
-      this.stats.scene.incrementSent(1, r.bytesSize)
+      this.stats.sceneComms.incrementSent(1, r.bytesSize)
     }
   }
 
   sendChatMessage(p: Position, messageId: string, text: string) {
-    const topic = `chat:${positionHash(p)}`
+    const topic = positionHash(p)
 
     const d = new ChatData()
     d.setCategory(Category.CHAT)
