@@ -1,5 +1,4 @@
 import { log } from 'engine/logger'
-import { SocketReadyState } from './worldInstanceConnection'
 import { Context } from './index'
 import { PositionData } from './commproto_pb'
 
@@ -137,17 +136,12 @@ export class Stats {
       log('World instance: ')
 
       const connection = context.worldInstanceConnection!
-      const url = connection.url
-      if (connection.ws && connection.ws.readyState === SocketReadyState.OPEN) {
-        const state =
-          (connection.authenticated ? 'authenticated' : 'not authenticated') + ` - my alias is ${connection.alias}`
-        if (connection.ping >= 0) {
-          log(`  ${url}, ping: ${connection.ping} ms (${state})`)
-        } else {
-          log(`  ${url}, no ping info available (${state})`)
-        }
+      connection.connection.logDebug()
+
+      if (connection.ping >= 0) {
+        log(`  ping: ${connection.ping} ms`)
       } else {
-        log(`  non active coordinator connection to ${url}`)
+        log(`  ping: ? ms`)
       }
 
       reportPkgStats('  topic (total)', this.topic)

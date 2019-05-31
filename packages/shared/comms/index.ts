@@ -30,6 +30,7 @@ import {
 import { ChatData, PositionData, ProfileData } from './commproto_pb'
 import { chatObservable, ChatEvent } from './chat'
 import { WorldInstanceConnection } from './worldInstanceConnection'
+import { BrokerConnection } from './BrokerConnection'
 import { ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
@@ -230,7 +231,7 @@ let previousTopics = ''
 export function onPositionUpdate(context: Context, p: Position) {
   const worldConnection = context.worldInstanceConnection
 
-  if (!worldConnection || !worldConnection.unreliableDataChannel || !worldConnection.reliableDataChannel) {
+  if (!worldConnection || !worldConnection.connection.hasReliable) {
     return
   }
 
@@ -366,20 +367,31 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, ethAddr
     avatarType: user.avatarType
   }
 
-  const connection = new WorldInstanceConnection(getServerConfigurations().worldInstanceUrl)
-  connection.positionHandler = (alias, data) => processPositionMessage(context!, alias, data)
-  connection.profileHandler = (alias, data) => processProfileMessage(context!, alias, data)
-  connection.chatHandler = (alias, data) => processChatMessage(context!, alias, data)
-  connection.sceneMessageHandler = (alias, data) => processParcelSceneCommsMessage(context!, alias, data)
+  const commsBroker = new BrokerConnection(getServerConfigurations().worldInstanceUrl)
+
+  const connection = new WorldInstanceConnection(commsBroker)
+
+  connection.positionHandler = (alias: string, data: PositionData) => {
+    processPositionMessage(context!, alias, data)
+  }
+  connection.profileHandler = (alias: string, data: ProfileData) => {
+    processProfileMessage(context!, alias, data)
+  }
+  connection.chatHandler = (alias: string, data: ChatData) => {
+    processChatMessage(context!, alias, data)
+  }
+  connection.sceneMessageHandler = (alias: string, data: ChatData) => {
+    processParcelSceneCommsMessage(context!, alias, data)
+  }
+
   context = new Context(userProfile, network)
   context.worldInstanceConnection = connection
 
   if (commConfigurations.debug) {
     context.stats = new Stats(context)
-    context.worldInstanceConnection.stats = context.stats
+    connection.stats = context.stats
+    commsBroker.stats = context.stats
   }
-
-  context.worldInstanceConnection.connect()
 
   setInterval(() => {
     if (context && context.currentPosition && context.worldInstanceConnection) {
