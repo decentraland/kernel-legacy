@@ -93,6 +93,7 @@
   },
   "dependencies": {
     "@createjs/easeljs": "^2.0.0-beta.4",
+    "@types/ws": "^6.0.1",
     "babylonjs": "^3.3.0",
     "babylonjs-gltf2interface": "^3.3.0",
     "babylonjs-gui": "^3.3.0",
@@ -115,6 +116,7 @@
     "multihashes": "^0.4.14",
     "oimo": "^1.0.9",
     "uglify-js": "^3.5.2",
-    "webrtc-adapter": "^6.4.8"
+    "webrtc-adapter": "^6.4.8",
+    "ws": "^7.0.0"
   }
 }

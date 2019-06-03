@@ -5,7 +5,8 @@ import {
   ETHEREUM_NETWORK,
   commConfigurations,
   playerConfigurations,
-  getServerConfigurations
+  getServerConfigurations,
+  DEBUG_LOCAL_COMMS
 } from 'config'
 
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
@@ -27,13 +28,14 @@ import {
   getPeer
 } from './peers'
 
-import { ChatData, PositionData, ProfileData } from './commproto_pb'
+import { ChatData, PositionData, ProfileData } from './proto/comms'
 import { chatObservable, ChatEvent } from './chat'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 import { BrokerConnection } from './BrokerConnection'
 import { ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
+import { CliBrokerConnection } from './CliBrokerConnection'
 import { log } from 'engine/logger'
 
 type Timestamp = number
@@ -367,7 +369,9 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, ethAddr
     avatarType: user.avatarType
   }
 
-  const commsBroker = new BrokerConnection(getServerConfigurations().worldInstanceUrl)
+  const commsBroker = DEBUG_LOCAL_COMMS
+    ? new CliBrokerConnection(document.location.toString().replace(/^http/, 'ws'))
+    : new BrokerConnection(getServerConfigurations().worldInstanceUrl)
 
   const connection = new WorldInstanceConnection(commsBroker)
 

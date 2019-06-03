@@ -1,26 +1,22 @@
 /// <reference lib="dom" />
 
 import { Message } from 'google-protobuf'
-import { log, error as logError } from 'engine/logger'
+import { Category, ChatData, PositionData, ProfileData, DataHeader } from './proto/comms'
 import {
-  Category,
-  ChatData,
-  PositionData,
-  ProfileData,
   MessageType,
   PingMessage,
   TopicMessage,
   DataMessage,
-  DataHeader,
-  WorldCommMessage,
   Format,
-  TopicSubscriptionMessage
-} from './commproto_pb'
+  TopicSubscriptionMessage,
+  MessageHeader
+} from './proto/broker'
 import { Position, position2parcel } from './utils'
 import { UserInformation } from './types'
 import { parcelLimits } from 'config'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { Stats } from './debug'
+import { createLogger } from 'shared/logger'
 
 export enum SocketReadyState {
   CONNECTING,
@@ -50,6 +46,8 @@ export class WorldInstanceConnection {
 
   public stats: Stats | null = null
   private pingInterval: any = null
+
+  private logger = createLogger('World: ')
 
   constructor(public connection: IBrokerConnection) {
     this.pingInterval = setInterval(() => {
@@ -191,9 +189,9 @@ export class WorldInstanceConnection {
 
     let msgType = MessageType.UNKNOWN_MESSAGE_TYPE
     try {
-      msgType = WorldCommMessage.deserializeBinary(message.data).getType()
+      msgType = MessageHeader.deserializeBinary(message.data).getType()
     } catch (err) {
-      logError('cannot deserialize worldcomm message header ' + message.channel + ' ' + msgSize)
+      this.logger.error('cannot deserialize worldcomm message header ' + message.channel + ' ' + msgSize)
       return
     }
 
@@ -202,7 +200,7 @@ export class WorldInstanceConnection {
         if (this.stats) {
           this.stats.others.incrementRecv(msgSize)
         }
-        log('unsopported message')
+        this.logger.log('unsopported message')
         break
       }
       case MessageType.DATA: {
@@ -213,7 +211,7 @@ export class WorldInstanceConnection {
         try {
           dataMessage = DataMessage.deserializeBinary(message.data)
         } catch (e) {
-          logError('cannot process topic message', e)
+          this.logger.error('cannot process topic message', e)
           break
         }
 
@@ -223,7 +221,7 @@ export class WorldInstanceConnection {
         try {
           dataHeader = DataHeader.deserializeBinary(body)
         } catch (e) {
-          logError('cannot process data header', e)
+          this.logger.error('cannot process data header', e)
           break
         }
 
@@ -274,7 +272,7 @@ export class WorldInstanceConnection {
             break
           }
           default: {
-            log('ignoring category', category)
+            this.logger.log('ignoring category', category)
             break
           }
         }
@@ -285,7 +283,7 @@ export class WorldInstanceConnection {
         try {
           pingMessage = PingMessage.deserializeBinary(message.data)
         } catch (e) {
-          logError('cannot deserialize ping message', e, message)
+          this.logger.error('cannot deserialize ping message', e, message)
           break
         }
 
@@ -301,7 +299,7 @@ export class WorldInstanceConnection {
         if (this.stats) {
           this.stats.others.incrementRecv(msgSize)
         }
-        log('ignoring message with type', msgType)
+        this.logger.log('ignoring message with type', msgType)
         break
       }
     }

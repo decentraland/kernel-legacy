@@ -132,10 +132,18 @@ FILE=-100.*
 watch-single:
 	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
 	@node_modules/.bin/concurrently \
-		-n "sdk,entryPoints,debug-scene,server" \
+		-n "entryPoints,debug-scene,server" \
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
 			"$(PARALLEL_COMPILER) build.single-debug.json --watch" \
 			"node ./scripts/test.js --keep-open"
+
+watch-single-no-server:
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@node_modules/.bin/concurrently \
+		-n "entryPoints,debug-scene" \
+			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
+			"$(PARALLEL_COMPILER) build.single-debug.json --watch"
+
 
 only-watch:
 	@node_modules/.bin/concurrently \

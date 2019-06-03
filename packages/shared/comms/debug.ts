@@ -1,6 +1,6 @@
 import { log } from 'engine/logger'
 import { Context } from './index'
-import { PositionData } from './commproto_pb'
+import { PositionData } from './proto/comms'
 
 export class TrackAvgDuration {
   public durationsMs: number[] = []

@@ -6,7 +6,7 @@ import {
   WebRtcMessage,
   AuthMessage,
   Role
-} from './commproto_pb'
+} from './proto/broker'
 
 import { Message } from 'google-protobuf'
 import { SocketReadyState } from './worldInstanceConnection'
@@ -165,13 +165,9 @@ export class BrokerConnection implements IBrokerConnection {
           }
         } else if (msgType === MessageType.WEBRTC_OFFER) {
           try {
-            this.logger.log('1')
-            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: sdp }))
-            this.logger.log('2')
+            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }))
             const desc = await this.webRtcConn!.createAnswer()
-            this.logger.log('3')
             await this.webRtcConn!.setLocalDescription(desc)
-            this.logger.log('4', desc)
 
             if (desc.sdp) {
               const msg = new WebRtcMessage()
@@ -185,7 +181,7 @@ export class BrokerConnection implements IBrokerConnection {
           }
         } else if (msgType === MessageType.WEBRTC_ANSWER) {
           try {
-            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sdp }))
+            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp }))
           } catch (err) {
             this.logger.error(err)
           }
@@ -282,7 +278,7 @@ export class BrokerConnection implements IBrokerConnection {
         const authMessage = new AuthMessage()
         authMessage.setType(MessageType.AUTH)
         authMessage.setRole(Role.CLIENT)
-        authMessage.setMethod('noop')
+        authMessage.setBody('noop')
         const bytes = authMessage.serializeBinary()
 
         if (dc.readyState === 'open') {

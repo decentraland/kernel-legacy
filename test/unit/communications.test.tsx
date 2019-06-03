@@ -11,15 +11,12 @@ import {
   TopicMessage,
   DataMessage,
   PingMessage,
-  PositionData,
-  ProfileData,
-  ChatData,
   TopicSubscriptionMessage,
   MessageType,
   Role,
-  Format,
-  Category
-} from '../../packages/shared/comms/commproto_pb'
+  Format
+} from '../../packages/shared/comms/proto/broker'
+import { PositionData, ProfileData, ChatData, Category } from '../../packages/shared/comms/proto/comms'
 import { Position, CommunicationArea, Parcel, position2parcel } from 'shared/comms/utils'
 import { WorldInstanceConnection, SocketReadyState, positionHash } from 'shared/comms/worldInstanceConnection'
 import {
@@ -251,7 +248,7 @@ describe('Communications', function() {
             const msg = AuthMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.AUTH)
             expect(msg.getRole()).to.equal(Role.CLIENT)
-            expect(msg.getMethod()).to.equal('noop')
+            expect(msg.getBody()).to.equal('noop')
             return true
           })
         })

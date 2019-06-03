@@ -60,7 +60,7 @@ export class PhysicsSystem implements ISystem {
           physics.acceleration.addInPlace(delta)
         }
       }
-
+      transform.lookAt(transform.position.add(physics.velocity))
       physics.velocity.addInPlace(physics.acceleration.scale(dt))
       transform.position.addInPlace(physics.velocity.scale(dt))
     }
@@ -130,7 +130,7 @@ messageBus.on('spawn', (evt: SpawnEvent) => {
   cube.addComponentOrReplace(transform)
   cube.addComponentOrReplace(material2)
   cube.addComponentOrReplace(boxShape)
-  transform.scale.set(0.01 + physics.mass / 1000, 0.01 + physics.mass / 1000, 0.01 + physics.mass / 1000)
+  transform.scale.set(physics.mass / 2000, physics.mass / 2000, 0.01 + physics.mass / 1000)
 
   engine.addEntity(cube)
 })
