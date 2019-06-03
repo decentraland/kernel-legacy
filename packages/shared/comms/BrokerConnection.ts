@@ -278,7 +278,7 @@ export class BrokerConnection implements IBrokerConnection {
         const authMessage = new AuthMessage()
         authMessage.setType(MessageType.AUTH)
         authMessage.setRole(Role.CLIENT)
-        authMessage.setBody('noop')
+        authMessage.setMethod('noop')
         const bytes = authMessage.serializeBinary()
 
         if (dc.readyState === 'open') {

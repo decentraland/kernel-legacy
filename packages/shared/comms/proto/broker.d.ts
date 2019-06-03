@@ -261,6 +261,9 @@ export class AuthMessage extends jspb.Message {
   getType(): MessageType
   setType(value: MessageType): void
 
+  getMethod(): string
+  setMethod(value: string): void
+
   getRole(): Role
   setRole(value: Role): void
 
