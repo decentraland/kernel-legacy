@@ -29,3 +29,6 @@ coverage
 public/local-ipfs
 
 build.single-debug.json
+
+packages/decentraland-ecs/types/dcl/*
+

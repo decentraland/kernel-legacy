@@ -1,12 +1,15 @@
 import { ReadOnlyVector3, ReadOnlyQuaternion } from './math'
 
+/** @public */
 export type ModuleDescriptor = {
   rpcHandle: string
   methods: MethodDescriptor[]
 }
 
+/** @public */
 export type MethodDescriptor = { name: string }
 
+/** @public */
 export type DecentralandInterface = {
   /** are we running in debug mode? */
   DEBUG: boolean
@@ -79,6 +82,7 @@ export type DecentralandInterface = {
   callRpc(rpcHandle: string, methodName: string, args: ArrayLike<any>): PromiseLike<any>
 }
 
+/** @public */
 export type PointerEvent = {
   /** Origin of the ray, relative to the scene */
   origin: ReadOnlyVector3
@@ -279,6 +283,7 @@ export interface IEvents {
   }
 }
 
+/** @public */
 export type GizmoDragEndEvent = {
   type: 'gizmoDragEnded'
   transform: {
@@ -289,14 +294,17 @@ export type GizmoDragEndEvent = {
   entityId: string
 }
 
+/** @public */
 export type GizmoSelectedEvent = {
   type: 'gizmoSelected'
   gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE'
   entityId: string
 }
 
+/** @public */
 export type IEventNames = keyof IEvents
 
+/** @public */
 export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
   /** eventName */
   type: T

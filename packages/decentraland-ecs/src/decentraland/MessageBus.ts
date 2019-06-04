@@ -1,5 +1,5 @@
 import { DecentralandInterface, ModuleDescriptor, IEvents } from './Types'
-import { Observable } from '../ecs/Observable'
+import { Observable, Observer } from '../ecs/Observable'
 import { error } from '../ecs/helpers'
 
 declare const dcl: DecentralandInterface
@@ -56,7 +56,7 @@ export class MessageBus {
     })
   }
 
-  on(message: string, callback: (value: any, sender: string) => void) {
+  on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
     return getMessageObserver().add(e => {
       try {
         let m = JSON.parse(e.message)
@@ -67,7 +67,7 @@ export class MessageBus {
       } catch (e) {
         dcl.error('Error parsing comms message ' + e.message, e)
       }
-    })
+    })!
   }
 
   // @internal

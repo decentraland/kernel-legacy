@@ -27,7 +27,7 @@ compile-dev:
 build-sdk: build-support
 	@echo "$(GREEN)======================= Building SDK =======================$(RESET)"
 	$(COMPILER) build.sdk.json
-	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local
+	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local --verbose
 	node ./scripts/buildEcsTypes.js
 	@echo "$(GREEN)======================= Updating docs ======================$(RESET)"
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter markdown -i types/dcl -o docs
