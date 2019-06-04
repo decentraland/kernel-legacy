@@ -11,7 +11,7 @@ import {
   MessageBus,
   ReadOnlyVector3,
   Input
-} from 'decentraland-ecs'
+} from 'decentraland-ecs/src'
 
 const G = 6.674e-11
 const boxShape = new BoxShape()
