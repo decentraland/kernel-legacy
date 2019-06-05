@@ -1,5 +1,5 @@
 // tslint:disable:prefer-function-over-method
-import { registerAPI, exposeMethod } from 'decentraland-rpc/lib/host'
+import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host'
 
 import {
   sendParcelSceneCommsMessage,
@@ -20,9 +20,8 @@ export class CommunicationsController extends ExposableAPI {
     return this.parcelIdentity.cid
   }
 
-  apiDidMount() {
-    // TODO: this is not working in decentraland-rpc
-    // Subscribe this parcel to events
+  constructor(options: APIOptions) {
+    super(options)
     subscribeParcelSceneToCommsMessages(this)
   }
 

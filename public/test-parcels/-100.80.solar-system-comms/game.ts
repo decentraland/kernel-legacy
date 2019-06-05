@@ -54,10 +54,13 @@ export class PhysicsSystem implements ISystem {
 
           tempVec3.copyFrom(transform.position).subtractInPlace(positionE)
 
-          const gravityForce = (G * (physicsE.mass * physics.mass)) / tempVec3.length()
-          const delta = tempVec3.scale(-gravityForce)
+          const l = tempVec3.length()
+          if (l !== 0) {
+            const gravityForce = (G * (physicsE.mass * physics.mass)) / tempVec3.length()
+            const delta = tempVec3.scale(-gravityForce)
 
-          physics.acceleration.addInPlace(delta)
+            physics.acceleration.addInPlace(delta)
+          }
         }
       }
       transform.lookAt(transform.position.add(physics.velocity))
@@ -91,7 +94,7 @@ function spawnSun(x: number, y: number, z: number) {
 
   physics.rigid = true
 
-  physics.mass = 10000
+  physics.mass = 300
 
   cube.addComponentOrReplace(physics)
   cube.addComponentOrReplace(transform)
@@ -105,7 +108,7 @@ function spawnSun(x: number, y: number, z: number) {
 engine.addSystem(new PhysicsSystem())
 engine.addSystem(new BoundaryCheckSystem())
 
-spawnSun(8, 3, 8)
+// spawnSun(8, 3, 8)
 
 type SpawnEvent = {
   pos: ReadOnlyVector3
@@ -139,8 +142,25 @@ Input.instance.subscribe('BUTTON_DOWN', event => {
   const spawn: SpawnEvent = {
     pos: event.origin,
     vel: event.direction.scale(0.015),
-    mass: 80 + Math.random() * 100
+    mass: 80 + Math.random() * 50 + (Math.random() > 0.9 ? Math.random() * 400 : 0)
   }
 
   messageBus.emit('spawn', spawn)
 })
+
+function infinidesimalRandom() {
+  return (Math.random() - Math.random()) * 0.1
+}
+
+for (let i = 0; i < 10; i++) {
+  const spawn: SpawnEvent = {
+    pos: new Vector3(8 + infinidesimalRandom(), 8 + infinidesimalRandom(), 8 + infinidesimalRandom()),
+    vel: new Vector3(Math.random() - Math.random(), Math.random() - Math.random(), Math.random() - Math.random())
+      .normalize()
+      .scale(0.05)
+      .multiplyByFloats(1, 0.3, 1),
+    mass: 80 + Math.random() * 50
+  }
+
+  messageBus.emit('spawn', spawn)
+}
