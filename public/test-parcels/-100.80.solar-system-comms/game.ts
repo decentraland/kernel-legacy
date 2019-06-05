@@ -108,7 +108,7 @@ function spawnSun(x: number, y: number, z: number) {
 engine.addSystem(new PhysicsSystem())
 engine.addSystem(new BoundaryCheckSystem())
 
-// spawnSun(8, 3, 8)
+spawnSun(8, 3, 8)
 
 type SpawnEvent = {
   pos: ReadOnlyVector3
