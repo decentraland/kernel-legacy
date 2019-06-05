@@ -781,7 +781,8 @@ describe('ECS', () => {
             lookAt: [-99.5, 1, 101.0]
           })
           vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
-          expect(logs.length).to.eq(0)
+          expect(logs.length).to.eq(2)
+          logs.length = 0
         })
         it('clicks in the middle of the screen', async () => {
           const canvas = scene.getEngine().getRenderingCanvas()
@@ -793,7 +794,8 @@ describe('ECS', () => {
           await sleep(100)
 
           expect(logs.length).to.gt(0)
-          expect(logs.filter($ => $[1] === 'cubeClick').length).to.eq(1, 'cubeClick must have been triggered')
+          console.dir(logs)
+          expect(logs.filter($ => $[1] === 'cubeClick1').length).to.eq(1, 'cubeClick must have been triggered')
           expect(logs.filter($ => $[1] === 'event').length).to.eq(2, 'event must have been triggered twice')
           logs.length = 0
         })

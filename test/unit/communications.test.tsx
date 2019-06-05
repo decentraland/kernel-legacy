@@ -248,7 +248,7 @@ describe('Communications', function() {
             const msg = AuthMessage.deserializeBinary(bytes)
             expect(msg.getType()).to.equal(MessageType.AUTH)
             expect(msg.getRole()).to.equal(Role.CLIENT)
-            expect(msg.getBody()).to.equal('noop')
+            expect(msg.getMethod()).to.equal('noop')
             return true
           })
         })
