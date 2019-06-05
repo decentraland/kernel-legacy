@@ -69,8 +69,22 @@ function parseProtocolUrl(url: string): { protocol: string; registry: string; as
   return result
 }
 
+
+export function getDARApiFor(registry: string): string {
+  switch registry:
+    case 'cryptokitties':
+    // Add more cases
+      return ${config.darApi}
+    default:
+      return null
+}
+
 async function fetchDARAsset(registry: string, assetId: string): Promise<DARAsset> {
-  const req = await fetch(`${config.darApi}/${registry}/asset/${assetId}`)
+  const api = getDARApiFor(registry)
+  if (api === null) {
+    throw new Error()
+  }
+  const req = await fetch(`${api}/${registry}/asset/${assetId}`)
   return req.json()
 }
 
