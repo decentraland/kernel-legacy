@@ -24,7 +24,6 @@ function ensureCommunicationsController() {
     communicationsControllerPromise = dcl.loadModule('@decentraland/CommunicationsController')
 
     communicationsControllerPromise.then($ => {
-      dcl.log('Module loaded', $)
       communicationsController = $
     })
 
@@ -42,7 +41,7 @@ function ensureCommunicationsController() {
 }
 
 /**
- * @beta
+ * @public
  */
 export class MessageBus {
   private messageQueue: string[] = []

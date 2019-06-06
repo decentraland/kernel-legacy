@@ -104,7 +104,7 @@
     "body-scroll-lock": "^2.5.10",
     "concurrently": "^4.1.0",
     "decentraland-auth": "^0.3.1",
-    "decentraland-rpc": "^3.1.7",
+    "decentraland-rpc": "^3.1.8",
     "devtools-protocol": "0.0.615714",
     "ephemeralkey": "^2.0.1",
     "eth-connect": "^4.0.1",

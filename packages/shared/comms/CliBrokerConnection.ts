@@ -129,7 +129,7 @@ export class CliBrokerConnection implements IBrokerConnection {
       this.ws = null
     }
 
-    this.ws = new WebSocket(this.url)
+    this.ws = new WebSocket(this.url, 'comms')
     this.ws.binaryType = 'arraybuffer'
 
     this.ws.onerror = event => {

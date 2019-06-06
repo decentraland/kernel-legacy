@@ -37,6 +37,7 @@ import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
 import { CliBrokerConnection } from './CliBrokerConnection'
 import { log } from 'engine/logger'
+import { MessageEntry } from 'shared/types'
 
 type Timestamp = number
 type PeerAlias = string
@@ -101,6 +102,7 @@ export function sendParcelSceneCommsMessage(cid: string, message: string) {
 
 export function subscribeParcelSceneToCommsMessages(controller: CommunicationsController) {
   scenesSubscribedToCommsEvents.add(controller)
+  console['log']('controller comms ', controller)
 }
 
 export function unsubscribeParcelSceneToCommsMessages(controller: CommunicationsController) {
@@ -167,7 +169,7 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
     const user = getUser(fromAlias)
     if (user) {
       const { displayName } = user
-      const entry = {
+      const entry: MessageEntry = {
         id: msgId,
         sender: displayName || user.publicKey || 'unknown',
         message: text,

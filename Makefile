@@ -4,6 +4,8 @@ PARALLEL_COMPILER = node --max-old-space-size=4096 node_modules/.bin/decentralan
 
 DCL_PROJECT=../scenes/test
 
+CWD = $(shell pwd)
+
 GREEN=\n\033[1;34m
 RED=\n\033[1;31m
 RESET=\033[0m
@@ -153,6 +155,25 @@ only-watch:
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
 			"node ./scripts/buildECSprojects.js --watch" \
 			"node ./scripts/test.js --keep-open"
+
+# initializes a local dev environment to test the CLI with a linked version of decentraland-ecs
+initialize-ecs-npm-link: build-sdk
+	rm -rf packages/decentraland-ecs/artifacts || true
+	mkdir packages/decentraland-ecs/artifacts
+	ln -sf $(CWD)/node_modules/dcl-amd/dist/amd.js packages/decentraland-ecs/artifacts/amd.js
+	ln -sf $(CWD)/packages/build-ecs/index.js packages/decentraland-ecs/artifacts/build-ecs.js
+	ln -sf $(CWD)/static/dist/preview.js packages/decentraland-ecs/artifacts/preview.js
+	ln -sf $(CWD)/static/dist/unityPreview.js packages/decentraland-ecs/artifacts/unityPreview.js
+	ln -sf $(CWD)/static/dist/editor.js packages/decentraland-ecs/artifacts/editor.js
+	ln -sf $(CWD)/static/preview.html packages/decentraland-ecs/artifacts/preview.html
+	ln -sf $(CWD)/static/fonts packages/decentraland-ecs/artifacts/fonts
+	ln -sf $(CWD)/static/images packages/decentraland-ecs/artifacts/images
+	ln -sf $(CWD)/static/models packages/decentraland-ecs/artifacts/models
+	ln -sf $(CWD)/static/unity packages/decentraland-ecs/artifacts/unity
+	ln -sf $(CWD)/static/unity-preview.html packages/decentraland-ecs/artifacts/unity-preview.html
+	cd packages/decentraland-ecs; npm link
+
+
 
 dev-watch:
 	@node_modules/.bin/concurrently \
