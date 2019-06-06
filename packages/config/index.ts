@@ -90,7 +90,7 @@ export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
 export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
 export const DEBUG_METRICS = location.search.indexOf('DEBUG_METRICS') !== -1
 export const DEBUG_MESSAGES = location.search.indexOf('DEBUG_MESSAGES') !== -1
-export const DEBUG_AUTH = location.search.indexOf('DEBUG_AUTH') !== -1
+export const DISABLE_AUTH = location.search.indexOf('DISABLE_AUTH') !== -1 || DEBUG
 
 export namespace commConfigurations {
   export const debug = DEBUG_METRICS
@@ -124,10 +124,12 @@ export function getTLD() {
   }
 }
 
+export const knownTLDs = ['zone', 'org', 'today']
+
 function getDefaultTLD() {
   const TLD = getTLD()
-  if (!TLD || TLD === 'localhost') {
-    return network && network === ETHEREUM_NETWORK.ROPSTEN ? 'zone' : 'org'
+  if (!TLD || !knownTLDs.includes(TLD)) {
+    return network === ETHEREUM_NETWORK.ROPSTEN ? 'zone' : 'org'
   }
   return TLD
 }
