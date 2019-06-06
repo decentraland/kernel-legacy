@@ -69,7 +69,7 @@ function hookObservables() {
       queueTrackingEvent('Chat message received', { length: event.messageEntry.message.length })
     } else if (event.type === ChatEvent.MESSAGE_SENT) {
       queueTrackingEvent('Send chat message', {
-        messageId: event.messageEntry.messageId,
+        messageId: event.messageEntry.id,
         length: event.messageEntry.message.length
       })
     }
