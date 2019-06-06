@@ -13,10 +13,11 @@ const cachedDeltas: Vector2Component[] = []
 export function parcelsInScope(config: ParcelConfigurationOptions, position: Vector2Component): string[] {
   const result: string[] = []
   if (!cachedDeltas.length) {
-    const squaredRadius = config.lineOfSightRadius * config.lineOfSightRadius
-    for (let x = -config.lineOfSightRadius; x <= config.lineOfSightRadius; x++) {
-      for (let y = -config.lineOfSightRadius; y <= config.lineOfSightRadius; y++) {
-        if (x * x + y * y < squaredRadius) {
+    const radius = config.lineOfSightRadius
+    const squaredRadius = radius * radius
+    for (let x = -radius; x <= radius; x++) {
+      for (let y = -radius; y <= radius; y++) {
+        if (x * x + y * y <= squaredRadius) {
           cachedDeltas.push({ x, y })
         }
       }
