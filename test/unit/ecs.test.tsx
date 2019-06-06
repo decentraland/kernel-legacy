@@ -781,7 +781,7 @@ describe('ECS', () => {
             lookAt: [-99.5, 1, 101.0]
           })
           vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
-          expect(logs.length).to.eq(2)
+          expect(logs.length).to.eq(1)
           logs.length = 0
         })
         it('clicks in the middle of the screen', async () => {
