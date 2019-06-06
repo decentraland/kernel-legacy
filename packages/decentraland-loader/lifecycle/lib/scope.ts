@@ -12,11 +12,13 @@ const cachedDeltas: Vector2Component[] = []
 
 export function parcelsInScope(config: ParcelConfigurationOptions, position: Vector2Component): string[] {
   const result: string[] = []
-  if (!cachedDeltas.length) {
+  let length = cachedDeltas.length
+  if (!length) {
     calculateCachedDeltas(config)
+    length = cachedDeltas.length
   }
-  for (let delta of cachedDeltas) {
-    result.push(`${position.x + delta.x},${position.y + delta.y}`)
+  for (let i = 0; i < length; i++) {
+    result.push(`${position.x + cachedDeltas[i].x},${position.y + cachedDeltas[i].y}`)
   }
   return result
 }
