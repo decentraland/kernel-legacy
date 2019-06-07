@@ -1281,6 +1281,11 @@ describe('ECS', () => {
     testScene(-1, 73, ({ parcelScenePromise }) => {
       it('should have a transform component', async () => {
         const parcelScene = await parcelScenePromise
+        const url = await parcelScene.context.resolveUrl('img #7 @ $1.png')
+
+        expect(url).to.contain('http')
+        expect(url).to.contain('Qm')
+
         const texture = await parcelScene.context.getTexture('img #7 @ $1.png')
         expect(texture.isReady()).to.eq(true)
       })
