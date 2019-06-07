@@ -1287,7 +1287,18 @@ describe('ECS', () => {
         expect(url).to.contain('Qm')
 
         const texture = await parcelScene.context.getTexture('img #7 @ $1.png')
-        expect(texture.isReady()).to.eq(true)
+
+        const loadFuture = future<BABYLON.Texture>()
+
+        if (!texture.isReady()) {
+          texture.onLoadObservable.add(() => {
+            loadFuture.resolve(texture)
+          })
+        } else {
+          loadFuture.resolve(texture)
+        }
+
+        expect((await loadFuture).isReady()).to.eq(true)
       })
 
       wait(100)
