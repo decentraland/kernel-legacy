@@ -218,7 +218,7 @@ export class BrokerConnection implements IBrokerConnection {
     })
 
     this.webRtcConn.onsignalingstatechange = (e: Event) => {
-      this.logger.log(`signaling state: ${this.webRtcConn!.signalingState}`)
+      this.logger.debug(`signaling state: ${this.webRtcConn!.signalingState}`)
     }
 
     this.webRtcConn.oniceconnectionstatechange = (e: Event) => {
