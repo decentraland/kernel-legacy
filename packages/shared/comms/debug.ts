@@ -136,7 +136,7 @@ export class Stats {
       log('World instance: ')
 
       const connection = context.worldInstanceConnection!
-      connection.connection.logDebug()
+      connection.connection.printDebugInformation()
 
       if (connection.ping >= 0) {
         log(`  ping: ${connection.ping} ms`)

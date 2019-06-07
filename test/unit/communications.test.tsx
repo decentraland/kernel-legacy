@@ -592,10 +592,10 @@ describe('Communications', function() {
   class BrokerMock implements IBrokerConnection {
     onMessageObservable = new Observable<BrokerMessage>()
 
-    get hasUnreliable(): boolean {
+    get hasUnreliableChannel(): boolean {
       return true
     }
-    get hasReliable(): boolean {
+    get hasReliableChannel(): boolean {
       return true
     }
 
@@ -610,7 +610,7 @@ describe('Communications', function() {
       this.unreliableDataChannel.send(data)
     }
 
-    logDebug(): void {
+    printDebugInformation(): void {
       throw new Error('Method not implemented.')
     }
     close(): void {

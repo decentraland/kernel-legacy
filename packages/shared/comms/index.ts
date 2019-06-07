@@ -235,7 +235,7 @@ let previousTopics = ''
 export function onPositionUpdate(context: Context, p: Position) {
   const worldConnection = context.worldInstanceConnection
 
-  if (!worldConnection || !worldConnection.connection.hasReliable) {
+  if (!worldConnection || !worldConnection.connection.hasReliableChannel) {
     return
   }
 
@@ -267,7 +267,7 @@ export function onPositionUpdate(context: Context, p: Position) {
 
   const parcelSceneCommsTopics = parcelSceneSubscriptions.join(' ')
 
-  let topics = currentParcelTopics + (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
+  const topics = currentParcelTopics + (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
 
   if (topics !== previousTopics) {
     worldConnection.updateSubscriptions(topics)

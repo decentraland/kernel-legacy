@@ -32,11 +32,11 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
-  get hasUnreliable() {
+  get hasUnreliableChannel() {
     return (this.unreliableDataChannel && this.unreliableDataChannel.readyState === 'open') || false
   }
 
-  get hasReliable() {
+  get hasReliableChannel() {
     return (this.reliableDataChannel && this.reliableDataChannel.readyState === 'open') || false
   }
 
@@ -48,7 +48,7 @@ export class BrokerConnection implements IBrokerConnection {
     // TODO: reconnect logic, handle disconnections
   }
 
-  logDebug(): void {
+  printDebugInformation(): void {
     if (this.ws && this.ws.readyState === SocketReadyState.OPEN) {
       const state = (this.authenticated ? 'authenticated' : 'not authenticated') + `my alias is ${this.alias}`
       this.logger.log(state)
@@ -58,14 +58,14 @@ export class BrokerConnection implements IBrokerConnection {
   }
 
   sendReliable(data: Uint8Array) {
-    if (!this.hasReliable) {
+    if (!this.hasReliableChannel) {
       throw new Error('trying to message using null reliable channel')
     }
     this.reliableDataChannel!.send(data)
   }
 
   sendUnreliable(data: Uint8Array) {
-    if (!this.hasUnreliable) {
+    if (!this.hasUnreliableChannel) {
       throw new Error('trying to message using null unreliable channel')
     }
     this.unreliableDataChannel!.send(data)

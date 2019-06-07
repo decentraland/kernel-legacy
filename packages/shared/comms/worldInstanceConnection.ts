@@ -56,7 +56,7 @@ export class WorldInstanceConnection {
       msg.setTime(Date.now())
       const bytes = msg.serializeBinary()
 
-      if (this.connection.hasUnreliable) {
+      if (this.connection.hasUnreliableChannel) {
         this.connection.sendUnreliable(bytes)
       } else {
         this.ping = -1
@@ -148,13 +148,13 @@ export class WorldInstanceConnection {
     }
 
     if (reliable) {
-      if (!this.connection.hasReliable) {
+      if (!this.connection.hasReliableChannel) {
         throw new Error('trying to send a topic message using null reliable channel')
       }
 
       this.connection.sendReliable(bytes)
     } else {
-      if (!this.connection.hasUnreliable) {
+      if (!this.connection.hasUnreliableChannel) {
         throw new Error('trying to send a topic message using null unreliable channel')
       }
 
@@ -165,7 +165,7 @@ export class WorldInstanceConnection {
   }
 
   updateSubscriptions(rawTopics: string) {
-    if (!this.connection.hasReliable) {
+    if (!this.connection.hasReliableChannel) {
       throw new Error('trying to send topic subscription message but reliable channel is not ready')
     }
     const subscriptionMessage = new TopicSubscriptionMessage()

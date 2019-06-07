@@ -14,11 +14,11 @@ export class CliBrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
-  get hasUnreliable() {
+  get hasUnreliableChannel() {
     return (this.ws && this.ws.readyState === WebSocket.OPEN) || false
   }
 
-  get hasReliable() {
+  get hasReliableChannel() {
     return (this.ws && this.ws.readyState === WebSocket.OPEN) || false
   }
 
@@ -28,7 +28,7 @@ export class CliBrokerConnection implements IBrokerConnection {
     this.connectWS()
   }
 
-  logDebug(): void {
+  printDebugInformation(): void {
     if (this.ws && this.ws.readyState === SocketReadyState.OPEN) {
       const state = (this.alias ? 'authenticated' : 'not authenticated') + `my alias is ${this.alias}`
       this.logger.log(state)
@@ -38,14 +38,14 @@ export class CliBrokerConnection implements IBrokerConnection {
   }
 
   sendReliable(data: Uint8Array) {
-    if (!this.hasReliable) {
+    if (!this.hasReliableChannel) {
       throw new Error('trying to message using null reliable channel')
     }
     this.sendCoordinatorMessage(data)
   }
 
   sendUnreliable(data: Uint8Array) {
-    if (!this.hasUnreliable) {
+    if (!this.hasUnreliableChannel) {
       throw new Error('trying to message using null unreliable channel')
     }
     this.sendCoordinatorMessage(data)

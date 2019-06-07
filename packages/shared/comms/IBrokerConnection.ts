@@ -7,10 +7,10 @@ export type BrokerMessage = {
 
 export interface IBrokerConnection {
   onMessageObservable: Observable<BrokerMessage>
-  readonly hasUnreliable: boolean
-  readonly hasReliable: boolean
+  readonly hasUnreliableChannel: boolean
+  readonly hasReliableChannel: boolean
   sendReliable(data: Uint8Array): void
   sendUnreliable(data: Uint8Array): void
-  logDebug(): void
+  printDebugInformation(): void
   close(): void
 }
