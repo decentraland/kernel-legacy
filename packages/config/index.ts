@@ -85,7 +85,7 @@ export const EDITOR: boolean = !!(global as any).isEditor
 // Development
 export const AVOID_WEB3: boolean = !!(global as any).avoidWeb3 || EDITOR
 export const DEBUG = location.search.indexOf('DEBUG') !== -1 || !!(global as any).mocha || PREVIEW || EDITOR
-export const DEBUG_LOCAL_COMMS = location.search.indexOf('LOCAL_COMMS') !== -1 || PREVIEW
+export const USE_LOCAL_COMMS = location.search.indexOf('LOCAL_COMMS') !== -1 || PREVIEW
 export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
 export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
 export const DEBUG_METRICS = location.search.indexOf('DEBUG_METRICS') !== -1

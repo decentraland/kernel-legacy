@@ -6,7 +6,7 @@ import {
   commConfigurations,
   playerConfigurations,
   getServerConfigurations,
-  DEBUG_LOCAL_COMMS
+  USE_LOCAL_COMMS
 } from 'config'
 
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
@@ -371,7 +371,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, ethAddr
     avatarType: user.avatarType
   }
 
-  const commsBroker = DEBUG_LOCAL_COMMS
+  const commsBroker = USE_LOCAL_COMMS
     ? new CliBrokerConnection(document.location.toString().replace(/^http/, 'ws'))
     : new BrokerConnection(getServerConfigurations().worldInstanceUrl)
 
