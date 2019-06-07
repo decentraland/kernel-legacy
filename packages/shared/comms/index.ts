@@ -102,7 +102,6 @@ export function sendParcelSceneCommsMessage(cid: string, message: string) {
 
 export function subscribeParcelSceneToCommsMessages(controller: CommunicationsController) {
   scenesSubscribedToCommsEvents.add(controller)
-  console['log']('controller comms ', controller)
 }
 
 export function unsubscribeParcelSceneToCommsMessages(controller: CommunicationsController) {

@@ -146,7 +146,6 @@ watch-single-no-server:
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
 			"$(PARALLEL_COMPILER) build.single-debug.json --watch"
 
-
 only-watch:
 	@node_modules/.bin/concurrently \
 		-n "sdk,test-scenes,entryPoints,ecs-builder,server" \
