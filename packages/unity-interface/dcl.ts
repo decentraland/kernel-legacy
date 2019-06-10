@@ -17,6 +17,7 @@ import {
   ILand
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
+import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
 import { ILogger, createLogger } from '../shared/logger'
 import {
   positionObservable,
@@ -177,6 +178,8 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
   registerWorker(worker: SceneWorker): void {
     super.registerWorker(worker)
+
+    gridToWorld(this.data.data.basePosition.x, this.data.data.basePosition.y, worker.position)
 
     this.worker.system
       .then(system => {
