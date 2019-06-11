@@ -37,7 +37,7 @@ import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import { DEBUG, PREVIEW, DEBUG_INFO, DEBUG_FULL_INFO } from '../config'
+  import { DEBUG, PREVIEW, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
@@ -127,12 +127,12 @@ const unityInterface = {
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   },
   
-  SetDebugInfo(){
-	gameInstance.SendMessage('SceneController', 'SetDebugInfo')
+  SetSceneDebugPanel(){
+	gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   },
   
-  SetDebugFullInfo(){
-	gameInstance.SendMessage('SceneController', 'SetDebugFullInfo')
+    SetEngineDebugPanel(){
+	gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   }
 }
 
@@ -212,12 +212,12 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     unityInterface.SetDebug()
   }
   
-  if(DEBUG_INFO){	  
-	unityInterface.SetDebugInfo();
+  if(SCENE_DEBUG_PANEL){	  
+	unityInterface.SetSceneDebugPanel();
   }	  
   
-  if(DEBUG_FULL_INFO){
-	unityInterface.SetDebugFullInfo();
+  if(ENGINE_DEBUG_PANEL){
+	unityInterface.SetEngineDebugPanel();
   }	  
 
   await initializeDecentralandUI()
