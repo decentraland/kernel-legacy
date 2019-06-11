@@ -37,7 +37,7 @@ import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import { DEBUG, PREVIEW, BENCHMARK_DEV_PANEL, BENCHMARK_PANEL } from '../config'
+import { DEBUG, PREVIEW, DEBUG_INFO, DEBUG_FULL_INFO } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
@@ -127,12 +127,12 @@ const unityInterface = {
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   },
   
-  SetBenchmarkPanel(){
-	gameInstance.SendMessage('SceneController', 'SetBenchmark')
+  SetDebugInfo(){
+	gameInstance.SendMessage('SceneController', 'SetDebugInfo')
   },
   
-  SetBenchmarkDevPanel(){
-	gameInstance.SendMessage('SceneController', 'SetBenchmarkDev')
+  SetDebugFullInfo(){
+	gameInstance.SendMessage('SceneController', 'SetDebugFullInfo')
   }
 }
 
@@ -212,12 +212,12 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     unityInterface.SetDebug()
   }
   
-  if(BENCHMARK_DEV_PANEL){	  
-	unityInterface.SetBenchmarkDevPanel();
+  if(DEBUG_INFO){	  
+	unityInterface.SetDebugInfo();
   }	  
   
-  if(BENCHMARK_PANEL){
-	unityInterface.SetBenchmarkPanel();
+  if(DEBUG_FULL_INFO){
+	unityInterface.SetDebugFullInfo();
   }	  
 
   await initializeDecentralandUI()
