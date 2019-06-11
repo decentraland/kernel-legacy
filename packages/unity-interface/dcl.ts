@@ -37,7 +37,7 @@ import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-  import { DEBUG, PREVIEW, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from '../config'
+import { DEBUG, PREVIEW, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
@@ -131,7 +131,7 @@ const unityInterface = {
 	gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   },
   
-    SetEngineDebugPanel(){
+  SetEngineDebugPanel(){
 	gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   }
 }
