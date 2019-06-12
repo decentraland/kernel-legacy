@@ -1,3 +1,7 @@
+declare var window: Window & {
+  logout?: () => void
+}
+
 import { Auth } from 'decentraland-auth'
 
 import './apis/index'
@@ -70,7 +74,10 @@ async function authenticate(): Promise<any> {
   }
 
   const auth = new Auth()
-  await auth.login(document.getElementsByClassName('loading-image')[0] as HTMLElement)
+  await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
+
+  window.logout = () => auth.logout()
+
   return auth.getPayload()
 }
 
