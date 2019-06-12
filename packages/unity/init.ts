@@ -1,4 +1,4 @@
-import { DEBUG, BENCHMARK_DEV_PANEL, BENCHMARK_PANEL } from '../config'
+import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from '../config'
 import { initShared } from '../shared'
 import { ILandToLoadableParcelScene } from '../shared/types'
 import { lastPlayerPosition, getWorldSpawnpoint, teleportObservable } from '../shared/world/positionThings'
@@ -31,12 +31,12 @@ export async function initializeEngine(gameInstance: UnityGame) {
     unityInterface.SetDebug()
   }
 
-  if (BENCHMARK_DEV_PANEL) {
-    unityInterface.SetBenchmarkDevPanel()
+  if (ENGINE_DEBUG_PANEL) {
+    unityInterface.SetEngineDebugPanel()
   }
 
-  if (BENCHMARK_PANEL) {
-    unityInterface.SetBenchmarkPanel()
+  if (SCENE_DEBUG_PANEL) {
+    unityInterface.SetSceneDebugPanel()
   }
 
   await initializeDecentralandUI(unityInterface)

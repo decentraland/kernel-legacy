@@ -57,11 +57,11 @@ export default class EngineInterface {
     this.gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   }
 
-  SetBenchmarkPanel() {
-    this.gameInstance.SendMessage('SceneController', 'SetBenchmark')
+  SetSceneDebugPanel() {
+    this.gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   }
 
-  SetBenchmarkDevPanel() {
-    this.gameInstance.SendMessage('SceneController', 'SetBenchmarkDev')
+  SetEngineDebugPanel() {
+    this.gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   }
 }
