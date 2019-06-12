@@ -90,10 +90,9 @@ export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
 export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
 export const DEBUG_METRICS = location.search.indexOf('DEBUG_METRICS') !== -1
 export const DEBUG_MESSAGES = location.search.indexOf('DEBUG_MESSAGES') !== -1
-export const DISABLE_AUTH = location.search.indexOf('DISABLE_AUTH') !== -1 || DEBUG
 
 export namespace commConfigurations {
-  export const debug = DEBUG_METRICS
+  export const debug = true
   export const commRadius = 4
 
   export const peerTtlMs = 1000
@@ -139,7 +138,7 @@ export function getServerConfigurations() {
   return {
     landApi: `https://api.decentraland.${TLDDefault}/v1`,
     content: `https://content.decentraland.${TLDDefault}`,
-    worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect?method=noop`,
+    worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
     darApi:
       TLDDefault === 'zone' || TLDDefault === 'today'
         ? 'https://schema-api-v2.now.sh/dar'
