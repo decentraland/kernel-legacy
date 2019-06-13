@@ -28,7 +28,7 @@ const defaults = {
   bumpTexture: '',
   refractionTexture: '',
   disableLighting: false,
-  transparencyMode: -1,
+  transparencyMode: 4,
   hasAlpha: false
 }
 
@@ -101,7 +101,7 @@ export class PBRMaterial extends DisposableComponent {
     }
 
     if ('transparencyMode' in data) {
-      if (data.transparencyMode === -1) {
+      if (data.transparencyMode === 4) {
         m.transparencyMode = null
       } else {
         m.transparencyMode = Math.min(3, Math.max(0, validators.int(data.transparencyMode, defaults.transparencyMode)))
