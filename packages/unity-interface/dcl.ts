@@ -17,6 +17,7 @@ import {
   ILand
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
+import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
 import { ILogger, createLogger } from '../shared/logger'
 import {
   positionObservable,
@@ -28,14 +29,15 @@ import {
   enableParcelSceneLoading,
   loadedParcelSceneWorkers,
   getSceneWorkerByBaseCoordinates,
-  getParcelSceneCID
+  getParcelSceneCID,
+  enablePositionReporting
 } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import { DEBUG, PREVIEW } from '../config'
+import { DEBUG, PREVIEW, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
@@ -123,6 +125,14 @@ const unityInterface = {
       console.log(parcelSceneId, method, payload)
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
+  },
+  
+  SetSceneDebugPanel(){
+	gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
+  },
+  
+  SetEngineDebugPanel(){
+	gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   }
 }
 
@@ -177,6 +187,8 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
   registerWorker(worker: SceneWorker): void {
     super.registerWorker(worker)
 
+    gridToWorld(this.data.data.basePosition.x, this.data.data.basePosition.y, worker.position)
+
     this.worker.system
       .then(system => {
         system.getAPIInstance(DevTools).logger = this.logger
@@ -199,10 +211,19 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (DEBUG) {
     unityInterface.SetDebug()
   }
+  
+  if(SCENE_DEBUG_PANEL){	  
+	unityInterface.SetSceneDebugPanel();
+  }	  
+  
+  if(ENGINE_DEBUG_PANEL){
+	unityInterface.SetEngineDebugPanel();
+  }	  
 
   await initializeDecentralandUI()
 
   if (PREVIEW) {
+    enablePositionReporting()
     await loadPreviewScene()
   } else {
     await enableParcelSceneLoading(net, {
@@ -295,9 +316,7 @@ async function loadPreviewScene() {
     const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
     const parcelSceneWorker = new SceneWorker(parcelScene)
 
-    if (parcelSceneWorker) {
-      loadedParcelSceneWorkers.add(parcelSceneWorker)
-    }
+    loadedParcelSceneWorkers.add(parcelSceneWorker)
 
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
     delete target.land
