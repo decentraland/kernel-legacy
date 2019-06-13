@@ -670,17 +670,18 @@ export class Material extends ObservableComponent {
 
   /**
    * Sets the transparency mode of the material.
-   * Defauts to 0.
+   * Defaults to -1.
    *
    * | Value | Type                                |
    * | ----- | ----------------------------------- |
+   * | -1    | AUTO  (Let the engine decide)       |
    * | 0     | OPAQUE  (default)                   |
    * | 1     | ALPHATEST                           |
    * | 2     | ALPHABLEND                          |
    * | 3     | ALPHATESTANDBLEND                   |
    */
   @ObservableComponent.field
-  transparencyMode?: number
+  transparencyMode?: number = -1
 
   /**
    * Does the albedo texture has alpha?
