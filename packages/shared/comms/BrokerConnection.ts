@@ -58,7 +58,15 @@ export class BrokerConnection implements IBrokerConnection {
   constructor(private auth: Auth, public url: string) {
     this.connectRTC()
     this.connectWS()
+
     // TODO: reconnect logic, handle disconnections
+
+    setTimeout(() => {
+      if (this.connected.isPending) {
+        this.connected.reject(new Error('Communications link cannot be established (Timeout)'))
+        this.stats && this.stats.printDebugInformation()
+      }
+    }, 60000)
   }
 
   printDebugInformation(): void {

@@ -39,6 +39,7 @@ import { CommunicationsController } from 'shared/apis/CommunicationsController'
 import { CliBrokerConnection } from './CliBrokerConnection'
 import { log } from 'engine/logger'
 import { MessageEntry } from 'shared/types'
+import { IBrokerConnection } from './IBrokerConnection'
 
 type Timestamp = number
 type PeerAlias = string
@@ -53,7 +54,7 @@ export class PeerTrackingInfo {
 }
 
 export class Context {
-  public stats: Stats | null = null
+  public readonly stats: Stats = new Stats(this)
   public commRadius: number
 
   public peerData = new Map<PeerAlias, PeerTrackingInfo>()
@@ -272,9 +273,6 @@ export function onPositionUpdate(context: Context, p: Position) {
   if (topics !== previousTopics) {
     worldConnection.updateSubscriptions(topics)
     previousTopics = topics
-    if (commConfigurations.debug) {
-      log('Communication topics: ' + topics)
-    }
   }
 
   context.currentPosition = p
@@ -371,7 +369,8 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     avatarType: user.avatarType
   }
 
-  let commsBroker
+  let commsBroker: IBrokerConnection
+
   if (USE_LOCAL_COMMS) {
     commsBroker = new CliBrokerConnection(document.location.toString().replace(/^http/, 'ws'))
   } else {
@@ -411,7 +410,6 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
   context.worldInstanceConnection = connection
 
   if (commConfigurations.debug) {
-    context.stats = new Stats(context)
     connection.stats = context.stats
     commsBroker.stats = context.stats
   }
@@ -451,4 +449,13 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
       collectInfo(context)
     }
   }, 100)
+}
+
+declare var global: any
+
+global['printCommsInformation'] = function() {
+  if (context) {
+    log('Communication topics: ' + previousTopics)
+    context.stats.printDebugInformation()
+  }
 }

@@ -88,16 +88,16 @@ describe('Communications', function() {
     let connection: BrokerConnection
     let worldConn: WorldInstanceConnection
     let mockWebRtc: any
-      let auth: any = {
-          getMessageCredentials: async (msg: string) => {
-              return {
-                  'x-signature': 'signature',
-                  'x-identity': 'identity',
-                  'x-timestamp': 'timestamp',
-                  'x-access-token': 'access token'
-              }
-          }
+    let auth: any = {
+      getMessageCredentials: async (msg: string) => {
+        return {
+          'x-signature': 'signature',
+          'x-identity': 'identity',
+          'x-timestamp': 'timestamp',
+          'x-access-token': 'access token'
+        }
       }
+    }
 
     beforeEach(() => {
       webSocket = null as any
@@ -611,7 +611,7 @@ describe('Communications', function() {
   class BrokerMock implements IBrokerConnection {
     onMessageObservable = new Observable<BrokerMessage>()
     connected = future<void>()
-
+    stats = null
     get hasUnreliableChannel(): boolean {
       return true
     }

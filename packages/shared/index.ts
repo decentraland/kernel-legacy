@@ -67,7 +67,10 @@ async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
 export async function initShared(): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth()
 
-  let user_id
+  let user_id: string
+
+  console['group']('connect#login')
+
   if (PREVIEW) {
     user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
@@ -78,6 +81,10 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
   }
 
   console['log'](`User ${user_id} logged in`)
+
+  console['groupEnd']()
+
+  console['group']('connect#ethereum')
   const address = await getAddress()
 
   if (address) {
@@ -90,12 +97,17 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
 
   // Load contracts from https://contracts.decentraland.org
   await setNetwork(net)
+  console['groupEnd']()
+
+  console['group']('connect#comms')
   await connect(
     user_id,
     net,
     auth,
     address
   )
+  console['groupEnd']()
+
   initializeUrlPositionObserver()
 
   return net
