@@ -101,10 +101,9 @@ export class PBRMaterial extends DisposableComponent {
     }
 
     if ('transparencyMode' in data) {
-      if(data.transparencyMode == -1){
+      if (data.transparencyMode == -1) {
         m.transparencyMode = null;
-      }
-      else{
+      } else {
         m.transparencyMode = Math.min(3, Math.max(0, validators.int(data.transparencyMode, defaults.transparencyMode)))
       }
     }
