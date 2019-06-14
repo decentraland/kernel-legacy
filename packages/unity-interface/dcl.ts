@@ -119,20 +119,20 @@ const unityInterface = {
       gameInstance.SendMessage('SceneController', 'LoadParcelScenes', finalJson)
     }
   },
-  sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
+  sendSceneMessage(parcelSceneId: string, id: string, method: string, payload: string) {
     if (unityInterface.debug) {
       // tslint:disable-next-line:no-console
-      console.log(parcelSceneId, method, payload)
+      console.log(parcelSceneId, id, method, payload)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${id}\t${method}\t${payload}`)
   },
-  
-  SetSceneDebugPanel(){
-	gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
+
+  SetSceneDebugPanel() {
+    gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   },
-  
-  SetEngineDebugPanel(){
-	gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+
+  SetEngineDebugPanel() {
+    gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   }
 }
 
@@ -158,7 +158,7 @@ class UnityScene<T> implements ParcelSceneAPI {
   sendBatch(actions: EntityAction[]): void {
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      unityInterface.sendSceneMessage(this.unitySceneId, action.type, action.payload)
+      unityInterface.sendSceneMessage(this.unitySceneId, action.id, action.type, action.payload)
     }
   }
 
@@ -211,14 +211,14 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (DEBUG) {
     unityInterface.SetDebug()
   }
-  
-  if(SCENE_DEBUG_PANEL){	  
-	unityInterface.SetSceneDebugPanel();
-  }	  
-  
-  if(ENGINE_DEBUG_PANEL){
-	unityInterface.SetEngineDebugPanel();
-  }	  
+
+  if (SCENE_DEBUG_PANEL) {
+    unityInterface.SetSceneDebugPanel()
+  }
+
+  if (ENGINE_DEBUG_PANEL) {
+    unityInterface.SetEngineDebugPanel()
+  }
 
   await initializeDecentralandUI()
 
