@@ -11,6 +11,7 @@ import { awaitWeb3Approval } from './ethereum/provider'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { connect } from './comms'
 import { initialize, queueTrackingEvent } from './analytics'
+import { fetchAndStoreProfile } from './profile'
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -78,10 +79,10 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
     const payload: any = await auth.getAccessTokenData()
     user_id = payload.user_id
     await initializeAnalytics(user_id)
+    await fetchAndStoreProfile(auth)
   }
 
   console['log'](`User ${user_id} logged in`)
-
   console['groupEnd']()
 
   console['group']('connect#ethereum')
