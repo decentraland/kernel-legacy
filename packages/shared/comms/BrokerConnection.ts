@@ -1,3 +1,5 @@
+import { future } from 'fp-future'
+
 import {
   MessageType,
   CoordinatorMessage,
@@ -7,7 +9,8 @@ import {
   AuthMessage,
   Role
 } from './proto/broker'
-
+import { Auth } from 'decentraland-auth'
+import { AuthData } from './proto/comms'
 import { Message } from 'google-protobuf'
 import { SocketReadyState } from './worldInstanceConnection'
 import { commConfigurations } from 'config'
@@ -32,6 +35,17 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
+  private unreliableFuture = future<void>()
+  private reliableFuture = future<void>()
+
+  get isConnected(): Promise<void> {
+    return Promise.all([this.unreliableFuture, this.reliableFuture]) as Promise<any>
+  }
+
+  get isAuthenticated() {
+    return this.authenticated
+  }
+
   get hasUnreliableChannel() {
     return (this.unreliableDataChannel && this.unreliableDataChannel.readyState === 'open') || false
   }
@@ -42,15 +56,23 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string) {
+  constructor(private auth: Auth, public url: string) {
     this.connectRTC()
     this.connectWS()
+
     // TODO: reconnect logic, handle disconnections
+
+    setTimeout(() => {
+      if (this.reliableFuture.isPending) {
+        this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
+        this.stats && this.stats.printDebugInformation()
+      }
+    }, 60000)
   }
 
   printDebugInformation(): void {
     if (this.ws && this.ws.readyState === SocketReadyState.OPEN) {
-      const state = (this.authenticated ? 'authenticated' : 'not authenticated') + `my alias is ${this.alias}`
+      const state = (this.authenticated ? 'authenticated' : 'not authenticated') + ` my alias is ${this.alias}`
       this.logger.log(state)
     } else {
       this.logger.log(`non active coordinator connection to ${this.url}`)
@@ -269,25 +291,33 @@ export class BrokerConnection implements IBrokerConnection {
       this.logger.log(`DataChannel ${JSON.stringify(dc.label)} has closed`)
     }
 
-    dc.onopen = () => {
+    dc.onopen = async () => {
       const label = dc.label
       this.logger.log(`DataChannel ${JSON.stringify(dc.label)} has opened`)
 
       if (label === 'reliable') {
         this.reliableDataChannel = dc
+        const authData = new AuthData()
+        const credentials = await this.auth.getMessageCredentials('')
+        authData.setSignature(credentials['x-signature'])
+        authData.setIdentity(credentials['x-identity'])
+        authData.setTimestamp(credentials['x-timestamp'])
+        authData.setAccessToken(credentials['x-access-token'])
         const authMessage = new AuthMessage()
         authMessage.setType(MessageType.AUTH)
         authMessage.setRole(Role.CLIENT)
-        authMessage.setMethod('noop')
+        authMessage.setBody(authData.serializeBinary())
         const bytes = authMessage.serializeBinary()
 
         if (dc.readyState === 'open') {
           dc.send(bytes)
           this.authenticated = true
+          this.reliableFuture.resolve()
         } else {
           this.logger.error('cannot send authentication, data channel is not ready')
         }
       } else if (label === 'unreliable') {
+        this.unreliableFuture.resolve()
         this.unreliableDataChannel = dc
       }
     }

@@ -1,13 +1,9 @@
-declare var window: Window & {
-  logout?: () => void
-}
-
 import { Auth } from 'decentraland-auth'
 
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, DISABLE_AUTH, PREVIEW } from 'config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW } from 'config'
 import { info, error } from 'engine/logger'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
@@ -15,6 +11,10 @@ import { awaitWeb3Approval } from './ethereum/provider'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { connect } from './comms'
 import { initialize, queueTrackingEvent } from './analytics'
+
+declare var window: Window & {
+  logout?: () => void
+}
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -68,27 +68,30 @@ async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
   return net
 }
 
-async function authenticate(): Promise<any> {
-  if (DISABLE_AUTH || PREVIEW) {
-    return { user_id: 'email|5cdd68572d5f842a16d6cc17' }
-  }
-
-  const auth = new Auth()
-  await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
-
-  window.logout = () => auth.logout()
-
-  return auth.getPayload()
-}
-
 export async function initShared(): Promise<ETHEREUM_NETWORK> {
-  const { user_id } = await authenticate()
-  console['log'](`User ${user_id} logged in`)
+  const auth = new Auth()
 
-  if (!PREVIEW) {
+  let user_id: string
+
+  console['group']('connect#login')
+
+  if (PREVIEW) {
+    user_id = 'email|5cdd68572d5f842a16d6cc17'
+  } else {
+    await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
+
+    window.logout = () => auth.logout()
+
+    const payload: any = await auth.getAccessTokenData()
+    user_id = payload.user_id
     await initializeAnalytics(user_id)
   }
 
+  console['log'](`User ${user_id} logged in`)
+
+  console['groupEnd']()
+
+  console['group']('connect#ethereum')
   const address = await getAddress()
 
   if (address) {
@@ -101,11 +104,17 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
 
   // Load contracts from https://contracts.decentraland.org
   await setNetwork(net)
+  console['groupEnd']()
+
+  console['group']('connect#comms')
   await connect(
     user_id,
     net,
+    auth,
     address
   )
+  console['groupEnd']()
+
   initializeUrlPositionObserver()
 
   return net
