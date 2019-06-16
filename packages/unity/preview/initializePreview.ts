@@ -9,7 +9,7 @@ import browserInterface from '../browserInterface'
 import { IScene, MappingsResponse, ILand, ILandToLoadableParcelScene, LoadableParcelScene } from '../../shared/types'
 import { SceneWorker } from '../../shared/world/SceneWorker'
 import { chatObservable } from '../../shared/comms/chat'
-import { getUnityClass } from '../unityParcelScene'
+import { getUnityClass } from '../UnityParcelScene'
 
 declare var window: Window & {
   unityInterface?: any
