@@ -29,8 +29,10 @@ import {
   enableParcelSceneLoading,
   loadedParcelSceneWorkers,
   getSceneWorkerByBaseCoordinates,
-  getParcelSceneCID,
-  enablePositionReporting
+  getParcelSceneRootCID,
+  enablePositionReporting,
+  stopParcelSceneWorker,
+  loadParcelScene
 } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
@@ -178,7 +180,7 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
         const parcelIdentity = system.getAPIInstance(ParcelIdentity)
         parcelIdentity.land = this.data.data.land
-        parcelIdentity.cid = getParcelSceneCID(worker)
+        parcelIdentity.cid = getParcelSceneRootCID(worker.parcelScene)
       })
       .catch(e => this.logger.error('Error initializing system', e))
   }
@@ -265,20 +267,19 @@ async function initializeDecentralandUI() {
 
   await ensureUiApis(worker)
 
-  loadedParcelSceneWorkers.add(worker)
+  loadedParcelSceneWorkers['ui'] = worker
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
 }
 
+let currentLoadedScene: SceneWorker
+
 async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
 
-  loadedParcelSceneWorkers.forEach(worker => {
-    if (!worker.persistent) {
-      worker.dispose()
-      loadedParcelSceneWorkers.delete(worker)
-    }
-  })
+  if (currentLoadedScene) {
+    stopParcelSceneWorker(currentLoadedScene)
+  }
 
   if (result.ok) {
     // we load the scene to get the metadata
@@ -297,9 +298,7 @@ async function loadPreviewScene() {
     // tslint:disable-next-line: no-console
     console.log('Starting Preview...')
     const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
-    const parcelSceneWorker = new SceneWorker(parcelScene)
-
-    loadedParcelSceneWorkers.add(parcelSceneWorker)
+    currentLoadedScene = loadParcelScene(parcelScene)
 
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
     delete target.land

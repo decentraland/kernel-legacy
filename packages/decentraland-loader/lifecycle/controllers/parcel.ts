@@ -33,6 +33,7 @@ export class ParcelLifeCycleController extends EventEmitter {
     const sightedParcels = parcelsInScope(this.config, position)
     const sightedParcelsDict: { [key: string]: boolean } = {}
     for (const parcel of sightedParcels) {
+      sightedParcelsDict[parcel] = true
       this.parcelSighted(parcel)
     }
     for (const parcel of this.currentlySightedParcelsArray) {
