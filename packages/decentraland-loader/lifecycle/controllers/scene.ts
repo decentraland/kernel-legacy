@@ -35,14 +35,16 @@ export class SceneLifeCycleController extends EventEmitter {
   async onSight(position: string) {
     let sceneCID = await this.requestSceneCID(position)
     if (sceneCID) {
-      this.sceneParcelSightCount[sceneCID] = this.sceneParcelSightCount[sceneCID] || 1
+      this.sceneParcelSightCount[sceneCID] = this.sceneParcelSightCount[sceneCID] || 0
+      this.sceneParcelSightCount[sceneCID]++
+
       if (!this.sceneStatus[sceneCID]) {
         const data = await this.downloadManager.getParcelData(position)
         if (data) {
           this.sceneStatus[sceneCID] = new SceneLifeCycleStatus(data)
         }
       }
-      if (!this.sceneStatus[sceneCID].isAwake()) {
+      if (this.sceneStatus[sceneCID].isDead()) {
         this.emit('Preload scene', sceneCID)
         this.sceneStatus[sceneCID].status = 'awake'
       }
