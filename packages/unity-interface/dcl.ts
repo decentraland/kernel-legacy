@@ -75,8 +75,6 @@ const browserInterface = {
   }
 }
 
-let lastParcelScenesSent = ''
-
 const unityInterface = {
   debug: false,
   SetDebug() {
@@ -99,25 +97,10 @@ const unityInterface = {
   },
   /** Tells the engine which scenes to load */
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
-    const parcelScenes = JSON.stringify({ parcelsToLoad })
-    if (parcelScenes !== lastParcelScenesSent) {
-      lastParcelScenesSent = parcelScenes
-      let finalJson: string = ''
-
-      // NOTE(Brian): split json to be able to throttle the json parsing process in engine's side
-      for (let i = 0; i < parcelsToLoad.length; i++) {
-        const parcel = parcelsToLoad[i]
-        const json = JSON.stringify(parcel)
-
-        finalJson += json
-
-        if (i < parcelsToLoad.length - 1) {
-          finalJson += '}{'
-        }
-      }
-
-      gameInstance.SendMessage('SceneController', 'LoadParcelScenes', finalJson)
+    if (parcelsToLoad.length > 1) {
+      throw new Error('Only one scene at a time!')
     }
+    gameInstance.SendMessage('SceneController', 'LoadParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
   sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
     if (unityInterface.debug) {
