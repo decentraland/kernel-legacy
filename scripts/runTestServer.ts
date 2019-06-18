@@ -176,7 +176,7 @@ function checkDiff(imageAPath: string, imageBPath: string, threshold: number, di
         return
       }
 
-      if (req.url.includes('ws') || req.url.includes('DEBUG')) {
+      if (req.url.includes('ws')) {
         res.send(data.replace('dist/index.js', 'dist/debug.js'))
       } else {
         res.send(data)
