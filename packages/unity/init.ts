@@ -1,4 +1,4 @@
-import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL } from 'config'
+import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits } from 'config'
 import { initShared } from 'shared'
 import { ILandToLoadableParcelScene } from 'shared/types'
 import { lastPlayerPosition, getWorldSpawnpoint, teleportObservable } from 'shared/world/positionThings'
@@ -24,19 +24,19 @@ export async function initializeEngine(gameInstance: UnityGame) {
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
   teleportObservable.add((position: { x: number; y: number }) => {
-    unityInterface.SetPosition(position.x, 0, position.y)
+    unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
   })
 
   if (DEBUG) {
     unityInterface.SetDebug()
   }
 
-  if (ENGINE_DEBUG_PANEL) {
-    unityInterface.SetEngineDebugPanel()
-  }
-
   if (SCENE_DEBUG_PANEL) {
     unityInterface.SetSceneDebugPanel()
+  }
+
+  if (ENGINE_DEBUG_PANEL) {
+    unityInterface.SetEngineDebugPanel()
   }
 
   await initializeDecentralandUI(unityInterface)
