@@ -7,7 +7,7 @@ import { chatObservable } from 'shared/comms/chat'
 import { queueTrackingEvent } from 'shared/analytics'
 import EngineInterface from './EngineInterface'
 import { UnityGame } from './types'
-import { getUnityClass } from './UnityParcelScene'
+import { getUnityClass } from './unityParcelScene'
 import browserInterface from './browserInterface'
 import initializeDecentralandUI from './initializeDecentralandUI'
 

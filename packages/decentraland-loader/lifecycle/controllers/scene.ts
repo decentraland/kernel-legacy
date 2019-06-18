@@ -7,8 +7,8 @@ import { SceneDataDownloadManager } from './download'
 export class SceneLifeCycleController extends EventEmitter {
   private downloadManager: SceneDataDownloadManager
 
-  private _positionToSceneCID: { [position: string]: string | undefined } = {}
-  private futureOfPositionToCID: { [position: string]: IFuture<string | undefined> } = {}
+  private _positionToSceneCID: { [position: string]: string } = {}
+  private futureOfPositionToCID: { [position: string]: IFuture<string> } = {}
   private sceneStatus: { [sceneCID: string]: SceneLifeCycleStatus } = {}
 
   private sceneParcelSightCount: { [sceneCID: string]: number } = {}
@@ -27,8 +27,8 @@ export class SceneLifeCycleController extends EventEmitter {
   hasStarted(position: string) {
     return (
       this._positionToSceneCID[position] &&
-      this.sceneStatus[this._positionToSceneCID[position]!] &&
-      this.sceneStatus[this._positionToSceneCID[position]!].isAwake()
+      this.sceneStatus[this._positionToSceneCID[position]] &&
+      this.sceneStatus[this._positionToSceneCID[position]].isAwake()
     )
   }
 
@@ -58,7 +58,6 @@ export class SceneLifeCycleController extends EventEmitter {
 
     if (this.sceneParcelSightCount[sceneCID] <= 0) {
       if (this.sceneStatus[sceneCID] && this.sceneStatus[sceneCID].isAwake()) {
-        this.sceneStatus[sceneCID].status = 'unloaded'
         this.emit('Unload scene', sceneCID)
       }
     }
@@ -71,33 +70,29 @@ export class SceneLifeCycleController extends EventEmitter {
     }
   }
 
-  async requestSceneCID(position: string): Promise<string | undefined> {
+  async requestSceneCID(position: string): Promise<string> {
     if (this._positionToSceneCID[position]) {
       return this._positionToSceneCID[position]
     }
     if (!this.futureOfPositionToCID[position]) {
-      this.futureOfPositionToCID[position] = future<string | undefined>()
-      try {
-        const land = await this.downloadManager.getParcelData(position)
+      this.futureOfPositionToCID[position] = future<string>()
+      this.downloadManager.getParcelData(position).then(land => {
         if (!land) {
-          this.futureOfPositionToCID[position].resolve(undefined)
-          return this.futureOfPositionToCID[position]
+          return
         }
-        const sceneCID = land.mappingsResponse.contents.filter($ => $.file === 'scene.json')[0].hash
-        for (const pos of land.scene.scene.parcels) {
+        const sceneCID = land!.mappingsResponse.contents.filter($ => $.file === 'scene.json')[0].hash
+        for (const pos of land!.scene.scene.parcels) {
           if (!this._positionToSceneCID[pos]) {
             this._positionToSceneCID[pos] = sceneCID
           }
           if (!this.futureOfPositionToCID[pos]) {
-            continue
+            return
           }
           if (this.futureOfPositionToCID[pos].isPending) {
             this.futureOfPositionToCID[pos].resolve(sceneCID)
           }
         }
-      } catch (e) {
-        this.futureOfPositionToCID[position].reject(e)
-      }
+      })
       return this.futureOfPositionToCID[position]
     } else {
       const cid = await this.futureOfPositionToCID[position]

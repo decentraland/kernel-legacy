@@ -2,7 +2,7 @@ import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import EngineInterface from './EngineInterface'
-import { UnityScene } from './UnityParcelScene'
+import { UnityScene } from './unityParcelScene'
 
 export default async function initializeDecentralandUI(unityInterface: EngineInterface) {
   const id = 'dcl-ui-scene'
