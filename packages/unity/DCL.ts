@@ -3,7 +3,7 @@ import { UnityGame } from './types'
 import { handleError } from './error'
 
 let instancedJS: ReturnType<typeof initializeEngine> | null = null
-let gameInstance: UnityGame = null
+let gameInstance: UnityGame | null = null
 
 export function setGameInstance(_gameInstance: UnityGame): void {
   gameInstance = _gameInstance
@@ -14,8 +14,10 @@ export function setGameInstance(_gameInstance: UnityGame): void {
  * with the Explorer
  */
 export function EngineStarted() {
-  instancedJS = initializeEngine(gameInstance)
-  instancedJS.catch(handleError)
+  if (gameInstance) {
+    instancedJS = initializeEngine(gameInstance)
+    instancedJS.catch(handleError)
+  }
 }
 
 /**

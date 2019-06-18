@@ -1,15 +1,9 @@
 // tslint:disable:no-console
 import { ETHEREUM_NETWORK, DEBUG, AVOID_WEB3 } from 'config'
 import { initializePreview } from './initializePreview'
-import { UnityGame } from '../types'
 import { handleError } from '../error'
 
 let instancedJS: ReturnType<typeof initializePreview> | null = null
-let gameInstance: UnityGame = null
-
-export function setGameInstance(_gameInstance: UnityGame): void {
-  gameInstance = _gameInstance
-}
 
 /**
  * Function executed by Unity DCL Engine when it's ready to start exchanging messages

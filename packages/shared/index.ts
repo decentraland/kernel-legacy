@@ -78,7 +78,7 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
   if (PREVIEW) {
     user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
-    await auth.login(document.getElementsByClassName('loading-image')[0] as HTMLElement)
+    await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
     const payload: any = await auth.getAccessTokenData()
     user_id = payload.user_id
     await initializeAnalytics(user_id)
