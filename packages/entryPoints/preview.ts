@@ -1,14 +1,20 @@
-// tslint:disable: no-commented-out-code
-// declare var global: any
-// declare var window: any
-// declare var UnityLoader: UnityLoaderType
+declare var global: any & {
+  preview: boolean
+  // tslint:disable-next-line: no-use-before-declare
+  DCL: typeof DCL
+}
+declare var window: Window & {
+  preview: boolean
+}
+declare var UnityLoader: UnityLoaderType
 
-// global['preview'] = window['preview'] = true
+// Must be initialized before importing any module that uses PREVIEW config
+global.preview = window.preview = true
 
-// import { UnityLoaderType } from '../unity/types'
-// import * as DCLPreview from '../unity/preview/DCLPreview'
+import { UnityLoaderType } from '../unity/types'
+import * as DCL from '../unity/preview'
 
-// const gameInstance = UnityLoader.instantiate('gameContainer', '/unity/Build/unity.json')
+const gameInstance = UnityLoader.instantiate('gameContainer', '/unity/Build/unity.json')
 
-// DCLPreview.setGameInstance(gameInstance)
-// global['DCL'] = DCLPreview
+DCL.setGameInstance(gameInstance)
+global.DCL = DCL

@@ -25,10 +25,10 @@ export function EngineStarted() {
  * It parses the message and send it to `browserInterface` object
  */
 export function MessageFromEngine(type: string, jsonEncodedMessage: string) {
-  if (instancedJS) {
-    instancedJS.then($ => $.onMessage(type, JSON.parse(jsonEncodedMessage))).catch(handleError)
-  } else {
-    // tslint:disable:no-console
+  if (!instancedJS) {
+    // tslint:disable-next-line: no-console
     console.error('Message received without initializing engine', type, jsonEncodedMessage)
+    return
   }
+  instancedJS.then($ => $.onMessage(type, JSON.parse(jsonEncodedMessage))).catch(handleError)
 }
