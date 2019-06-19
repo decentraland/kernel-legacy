@@ -151,13 +151,11 @@ export async function initializeChat() {
 function setMaximized(newMaximizedValue: boolean) {
   if (isMaximized == newMaximizedValue) return
 
-  if (newMaximizedValue) {
-    if (!isMaximized) {
-      textInput.value = ''
+  if (newMaximizedValue && !isMaximized) {
+    textInput.value = ''
 
-      chatInnerTopContainer.color = new Color4(0, 0, 0, 0.2)
-      textInputContainer.color = new Color4(0, 0, 0, 0.2)
-    }
+    chatInnerTopContainer.color = new Color4(0, 0, 0, 0.2)
+    textInputContainer.color = new Color4(0, 0, 0, 0.2)
   } else if (isMaximized) {
     chatInnerTopContainer.color = Color4.Clear()
     textInputContainer.color = Color4.Clear()
