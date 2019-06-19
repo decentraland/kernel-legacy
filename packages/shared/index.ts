@@ -13,6 +13,10 @@ import { connect } from './comms'
 import { initialize, queueTrackingEvent } from './analytics'
 import { fetchAndStoreProfile } from './profile'
 
+declare var window: Window & {
+  logout?: () => Promise<void>
+}
+
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
   const TLD = getTLD()
@@ -75,11 +79,12 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
   if (PREVIEW) {
     user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
-    await auth.login(document.getElementsByClassName('loading-image')[0] as HTMLElement)
+    await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
     const payload: any = await auth.getAccessTokenData()
     user_id = payload.user_id
     await initializeAnalytics(user_id)
     await fetchAndStoreProfile(auth)
+    window.logout = () => auth.logout()
   }
 
   console['log'](`User ${user_id} logged in`)
