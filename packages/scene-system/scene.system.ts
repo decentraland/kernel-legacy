@@ -229,7 +229,6 @@ export default class GamekitScene extends Script {
               type: 'UpdateEntityComponent',
               id: entityId,
               payload: JSON.stringify({
-                entityId,
                 classId,
                 name: componentName.replace(componentNameRE, ''),
                 json
@@ -243,11 +242,10 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'AttachEntityComponent',
-              id: entityId,
+              id: id,
               payload: JSON.stringify({
                 entityId,
-                name: componentName.replace(componentNameRE, ''),
-                id
+                name: componentName.replace(componentNameRE, '')
               } as AttachEntityComponentPayload)
             })
           }
@@ -260,7 +258,6 @@ export default class GamekitScene extends Script {
               type: 'ComponentRemoved',
               id: entityId,
               payload: JSON.stringify({
-                entityId,
                 name: componentName.replace(componentNameRE, '')
               } as ComponentRemovedPayload)
             })
@@ -273,7 +270,6 @@ export default class GamekitScene extends Script {
             type: 'SetEntityParent',
             id: entityId,
             payload: JSON.stringify({
-              entityId,
               parentId
             } as SetEntityParentPayload)
           })
@@ -297,7 +293,6 @@ export default class GamekitScene extends Script {
               type: 'ComponentCreated',
               id: id,
               payload: JSON.stringify({
-                id,
                 classId,
                 name: componentName.replace(componentNameRE, '')
               } as ComponentCreatedPayload)
@@ -309,9 +304,7 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'ComponentDisposed',
             id: id,
-            payload: JSON.stringify({
-              id
-            } as ComponentDisposedPayload)
+            payload: JSON.stringify({} as ComponentDisposedPayload)
           })
         },
 
@@ -320,7 +313,6 @@ export default class GamekitScene extends Script {
             type: 'ComponentUpdated',
             id: id,
             payload: JSON.stringify({
-              id,
               json
             } as ComponentUpdatedPayload)
           })
