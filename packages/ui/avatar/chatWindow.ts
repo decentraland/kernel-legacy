@@ -1,6 +1,6 @@
 import { DecentralandInterface } from 'decentraland-ecs/src/decentraland/Types'
 import { Color4 } from 'decentraland-ecs/src'
-import { OnTextSubmit, OnBlur, OnFocus, OnEnter } from 'decentraland-ecs/src/decentraland/UIEvents'
+import { OnTextSubmit, OnBlur, OnFocus } from 'decentraland-ecs/src/decentraland/UIEvents'
 
 import {
   UIInputText,
@@ -40,7 +40,7 @@ function createLogMessage(parent: UIShape, props: { sender: string; message: str
   const messageText = new UIText(parent)
   messageText.color = color
   messageText.value = `<b>${sender}:</b> ${message}`
-  messageText.fontSize = 12
+  messageText.fontSize = 15
   messageText.vAlign = 'top'
   messageText.hAlign = 'left'
   messageText.vTextAlign = 'top'
@@ -71,18 +71,26 @@ chatContainer.name = 'chat-container'
 chatContainer.color = Color4.Clear()
 chatContainer.vAlign = 'bottom'
 chatContainer.hAlign = 'left'
-chatContainer.width = 400
-chatContainer.height = 320
-chatContainer.positionX = 20
-chatContainer.positionY = 0
+chatContainer.width = '400px'
+chatContainer.height = '300px'
+chatContainer.positionX = 10
+chatContainer.positionY = 10
 chatContainer.thickness = 0
 
-const messagesLogScrollContainer = new UIScrollRect(chatContainer)
+const chatInnerTopContainer = new UIContainerRect(chatContainer)
+chatInnerTopContainer.color = Color4.Clear()
+chatInnerTopContainer.name = 'inner-top-container'
+chatInnerTopContainer.vAlign = 'top'
+chatInnerTopContainer.hAlign = 'center'
+chatInnerTopContainer.width = '100%'
+chatInnerTopContainer.height = '84%'
+
+const messagesLogScrollContainer = new UIScrollRect(chatInnerTopContainer)
 messagesLogScrollContainer.name = 'messages-log-scroll-container'
 messagesLogScrollContainer.vAlign = 'top'
 messagesLogScrollContainer.hAlign = 'center'
 messagesLogScrollContainer.width = '100%'
-messagesLogScrollContainer.height = '250px'
+messagesLogScrollContainer.height = '90%'
 messagesLogScrollContainer.positionY = '-10px'
 messagesLogScrollContainer.valueY = 1
 messagesLogScrollContainer.isVertical = false
@@ -93,27 +101,32 @@ const messagesLogStackContainer = new UIContainerStack(messagesLogScrollContaine
 messagesLogStackContainer.name = 'messages-log-stack-container'
 messagesLogStackContainer.vAlign = 'bottom'
 messagesLogStackContainer.hAlign = 'center'
-// messagesLogStackContainer.adaptHeight = true
-// messagesLogStackContainer.adaptWidth = false
 messagesLogStackContainer.width = '90%'
 messagesLogStackContainer.height = '100%'
 messagesLogStackContainer.spacing = 10
 messagesLogStackContainer.positionX = '-10px'
 
-const textInput = new UIInputText(chatContainer)
-textInput.name = 'input'
+const textInputContainer = new UIContainerRect(chatContainer)
+textInputContainer.color = Color4.Clear()
+textInputContainer.name = 'input-text-container'
+textInputContainer.vAlign = 'bottom'
+textInputContainer.hAlign = 'center'
+textInputContainer.width = '100%'
+textInputContainer.height = '15%'
+
+const textInput = new UIInputText(textInputContainer)
+textInput.name = 'input-text'
 textInput.autoStretchWidth = false
 textInput.color = INITIAL_INPUT_TEXT_COLOR
 textInput.background = Color4.Clear()
 textInput.focusedBackground = Color4.Clear()
-textInput.placeholder = 'Write a message...'
-textInput.fontSize = 13
+textInput.placeholder = 'Press enter and start talking...'
+textInput.fontSize = 15
 textInput.width = '90%'
-textInput.height = 25
+textInput.height = '100%'
 textInput.thickness = 0
-textInput.vAlign = 'bottom'
+textInput.vAlign = 'center'
 textInput.hAlign = 'center'
-textInput.positionY = 20
 textInput.positionX = '-5px'
 textInput.vTextAlign = 'center'
 textInput.hTextAlign = 'left'
@@ -123,14 +136,6 @@ textInput.isPointerBlocker = true
 textInput.onFocus = new OnFocus(onInputFocus)
 textInput.onBlur = new OnBlur(onInputBlur)
 textInput.onTextSubmit = new OnTextSubmit(onInputSubmit)
-textInput.onEnter = new OnEnter(() => setMaximized(true))
-
-const textInputUnderLine = new UIContainerRect(textInput)
-textInputUnderLine.color = Color4.Gray()
-textInputUnderLine.width = '98%'
-textInputUnderLine.height = 1
-textInputUnderLine.vAlign = 'bottom'
-textInputUnderLine.hAlign = 'left'
 
 setMaximized(isMaximized)
 
@@ -143,19 +148,19 @@ export async function initializeChat() {
   }
 }
 
-/* function toggleChat() {
-  setMaximized(!isMaximized)
-} */
-
 function setMaximized(newMaximizedValue: boolean) {
+  if (isMaximized == newMaximizedValue) return
+
   if (newMaximizedValue) {
     if (!isMaximized) {
       textInput.value = ''
 
-      chatContainer.color = new Color4(0, 0, 0, 0.2)
+      chatInnerTopContainer.color = new Color4(0, 0, 0, 0.2)
+      textInputContainer.color = new Color4(0, 0, 0, 0.2)
     }
   } else if (isMaximized) {
-    chatContainer.color = Color4.Clear()
+    chatInnerTopContainer.color = Color4.Clear()
+    textInputContainer.color = Color4.Clear()
   }
 
   isMaximized = newMaximizedValue

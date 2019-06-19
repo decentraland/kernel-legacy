@@ -1,7 +1,7 @@
 import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
 import { CLASS_ID, OnUUIDEvent, Texture } from './Components'
 import { Color4 } from './math'
-import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus, OnEnter } from './UIEvents'
+import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'
 /**
  * @public
  */
@@ -38,9 +38,6 @@ export abstract class UIShape extends ObservableComponent {
 
   @ObservableComponent.field
   isPointerBlocker: boolean = true
-
-  @OnUUIDEvent.uuidEvent
-  onEnter: OnEnter | null = null
 
   private _parent?: UIShape
 
