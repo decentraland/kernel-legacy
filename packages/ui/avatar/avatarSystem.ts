@@ -1,15 +1,4 @@
-import {
-  Entity,
-  Observable,
-  engine,
-  Transform,
-  executeTask,
-  Vector3,
-  //Quaternion,
-  //Component,
-  //Scalar,
-  AvatarShape
-} from 'decentraland-ecs/src'
+import { Entity, Observable, engine, Transform, executeTask, Vector3, AvatarShape } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
   UUID,
@@ -23,7 +12,6 @@ import {
   UserInformation
 } from 'shared/comms/types'
 import { execute } from './rpc'
-//import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -31,63 +19,16 @@ const GENERIC_AVATAR = 'fox/completeFox.glb'
 
 const avatarMap = new Map<string, AvatarEntity>()
 
-/*@Component('animatedTransform')
-export class TargetTransform {
-  source: Transform = new Transform()
-  target: Transform = new Transform()
-
-  out: Transform = new Transform()
-
-  endTime = 0
-  currentTime = 0
-
-  animate(currentState: Transform, duration: number) {
-    this.out = currentState
-    this.source.position.copyFrom(currentState.position)
-    this.source.scale.copyFrom(currentState.scale)
-    this.source.rotation.copyFrom(currentState.rotation)
-    this.currentTime = 0
-    this.endTime = duration / 1000
-  }
-
-  update(dt: number) {
-    if (this.currentTime < this.endTime) {
-      this.currentTime += dt
-    }
-
-    this.currentTime = Scalar.Clamp(this.currentTime, 0, this.endTime)
-
-    const d = this.currentTime / this.endTime
-
-    Vector3.LerpToRef(this.source.position, this.target.position, d, this.out.position)
-    Vector3.LerpToRef(this.source.scale, this.target.scale, d, this.out.scale)
-    Quaternion.SlerpToRef(this.source.rotation, this.target.rotation, d, this.out.rotation)
-  }
-}
-
-export class InterpolatorSystem {
-  group: ComponentGroup = engine.getComponentGroup(TargetTransform)
-
-  update(dt: number) {
-    for (let entity of this.group.entities) {
-      const animator = entity.getComponent(TargetTransform)
-      animator.update(dt)
-    }
-  }
-}
-
-engine.addSystem(new InterpolatorSystem())*/
-
 export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
+  removeTimer: NodeJS.Timer | null = null
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
 
   readonly body: Entity = new Entity()
-  //readonly transformAnimation: TargetTransform = this.getComponentOrCreate(TargetTransform)
   readonly transform: Transform = this.getComponentOrCreate(Transform)
   avatarShape!: AvatarShape
 
@@ -96,12 +37,13 @@ export class AvatarEntity extends Entity {
 
     {
       this.avatarShape = new AvatarShape()
-      this.body.addComponentOrReplace(this.avatarShape)
+      //this.body.addComponentOrReplace(this.avatarShape)
+
+      this.addComponentOrReplace(this.avatarShape)
     }
 
     let bodyTranform = this.body.getComponentOrCreate(Transform)
     bodyTranform.scale = new Vector3(1, 1, 1)
-    bodyTranform.position.y = 1
 
     this.body.setParent(this)
 
@@ -138,22 +80,31 @@ export class AvatarEntity extends Entity {
   setPose(pose: Pose): void {
     const [x, y, z, Qx, Qy, Qz, Qw] = pose
 
-    //if (this.transform.position.equalsToFloats(0, 0, 0)) {
     this.transform.position.set(x, y, z)
     this.transform.rotation.set(Qx, Qy, Qz, Qw)
-    //}
+  }
 
-    /*this.transformAnimation.target.position.set(x, y, z)
-    this.transformAnimation.target.rotation.set(Qx, Qy, Qz, Qw)
-
-    this.transformAnimation.animate(this.transform, 100)*/
+  public removeScheduled() {
+    if (this.removeTimer != null) {
+      clearTimeout(this.removeTimer)
+    }
+    this.removeTimer = setTimeout(
+      () => {
+        engine.removeEntity(this)
+      },
+      10000,
+      null
+    )
   }
 
   private updateVisibility() {
     const visible = this.visible && !this.blocked
     if (!visible && this.isAddedToEngine()) {
-      engine.removeEntity(this)
+      this.removeScheduled()
     } else if (visible && !this.isAddedToEngine()) {
+      if (this.removeTimer != null) {
+        clearTimeout(this.removeTimer)
+      }
       engine.addEntity(this)
     }
   }
@@ -241,11 +192,14 @@ function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
 }
 
 function handleUserRemoved({ uuid }: UserRemovedMessage): void {
-  const avatar = avatarMap.get(uuid)
-  if (avatar) {
-    avatarMap.delete(uuid)
-    engine.removeEntity(avatar)
-  }
+  // const avatar = avatarMap.get(uuid)
+  // if (avatar) {
+  //   if (avatar.removeTimer != null) {
+  //     clearTimeout(avatar.removeTimer)
+  //   }
+  //   avatarMap.delete(uuid)
+  //   engine.removeEntity(avatar)
+  // }
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
