@@ -139,7 +139,6 @@ textInput.onTextSubmit = new OnTextSubmit(onInputSubmit)
 
 setMaximized(isMaximized)
 
-// Display initial instructions messages
 const instructionsMessage = {
   id: '',
   isCommand: true,
