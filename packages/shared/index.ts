@@ -17,6 +17,10 @@ declare var window: Window & {
   logout?: () => Promise<void>
 }
 
+declare var window: Window & {
+  logout?: () => Promise<void>
+}
+
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
   const TLD = getTLD()
