@@ -24,7 +24,7 @@ import {
   UserInformation
 } from 'shared/comms/types'
 import { execute } from './rpc'
-import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
+//import { ComponentGroup } from 'decentraland-ecs/src/ecs/ComponentGroup'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -83,7 +83,7 @@ function cleanupUnusedModels() {
   }
 }
 
-@Component('animatedTransform')
+/*@Component('animatedTransform')
 export class TargetTransform {
   source: Transform = new Transform()
   target: Transform = new Transform()
@@ -128,7 +128,7 @@ export class InterpolatorSystem {
   }
 }
 
-engine.addSystem(new InterpolatorSystem())
+engine.addSystem(new InterpolatorSystem())*/
 
 export class AvatarEntity extends Entity {
   blocked = false
@@ -142,7 +142,7 @@ export class AvatarEntity extends Entity {
   readonly label: TextShape = new TextShape(this.displayName)
   readonly body: Entity = new Entity()
   readonly labelEntity = new Entity()
-  readonly transformAnimation: TargetTransform = this.getComponentOrCreate(TargetTransform)
+  //readonly transformAnimation: TargetTransform = this.getComponentOrCreate(TargetTransform)
   readonly transform: Transform = this.getComponentOrCreate(Transform)
 
   constructor(public name: string) {
@@ -223,15 +223,15 @@ export class AvatarEntity extends Entity {
   setPose(pose: Pose): void {
     const [x, y, z, Qx, Qy, Qz, Qw] = pose
 
-    if (this.transform.position.equalsToFloats(0, 0, 0)) {
-      this.transform.position.set(x, y, z)
-      this.transform.rotation.set(Qx, Qy, Qz, Qw)
-    }
+    //if (this.transform.position.equalsToFloats(0, 0, 0)) {
+    this.transform.position.set(x, y, z)
+    this.transform.rotation.set(Qx, Qy, Qz, Qw)
+    //}
 
-    this.transformAnimation.target.position.set(x, y, z)
+    /*this.transformAnimation.target.position.set(x, y, z)
     this.transformAnimation.target.rotation.set(Qx, Qy, Qz, Qw)
 
-    this.transformAnimation.animate(this.transform, 100 /* ms */)
+    this.transformAnimation.animate(this.transform, 100 )*/
   }
 
   private updateVisibility() {
