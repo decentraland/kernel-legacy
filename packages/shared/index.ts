@@ -76,22 +76,22 @@ async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
 export async function initShared(): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth()
 
-  let user_id: string
+  let userId: string
 
   console['group']('connect#login')
 
   if (PREVIEW) {
-    user_id = 'email|5cdd68572d5f842a16d6cc17'
+    userId = 'email|5cdd68572d5f842a16d6cc17'
   } else {
     await auth.login(document.getElementsByClassName('dcl-loading')[0] as HTMLElement)
     const payload: any = await auth.getAccessTokenData()
-    user_id = payload.user_id
-    await initializeAnalytics(user_id)
+    userId = payload.user_id
+    await initializeAnalytics(userId)
     await fetchAndStoreProfile(auth)
     window.logout = () => auth.logout()
   }
 
-  console['log'](`User ${user_id} logged in`)
+  console['log'](`User ${userId} logged in`)
   console['groupEnd']()
 
   console['group']('connect#ethereum')
@@ -111,7 +111,7 @@ export async function initShared(): Promise<ETHEREUM_NETWORK> {
 
   console['group']('connect#comms')
   await connect(
-    user_id,
+    userId,
     net,
     auth,
     address
