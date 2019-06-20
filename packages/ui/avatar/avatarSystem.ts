@@ -28,7 +28,6 @@ export class AvatarEntity extends Entity {
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
 
-  readonly body: Entity = new Entity()
   readonly transform: Transform = this.getComponentOrCreate(Transform)
   avatarShape!: AvatarShape
 
@@ -37,15 +36,8 @@ export class AvatarEntity extends Entity {
 
     {
       this.avatarShape = new AvatarShape()
-      //this.body.addComponentOrReplace(this.avatarShape)
-
       this.addComponentOrReplace(this.avatarShape)
     }
-
-    let bodyTranform = this.body.getComponentOrCreate(Transform)
-    bodyTranform.scale = new Vector3(1, 1, 1)
-
-    this.body.setParent(this)
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
