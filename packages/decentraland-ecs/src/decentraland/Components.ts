@@ -43,6 +43,8 @@ export enum CLASS_ID {
 
   GLTF_SHAPE = 54,
   OBJ_SHAPE = 55,
+  AVATAR_SHAPE = 56,
+
   BASIC_MATERIAL = 64,
   PRB_MATERIAL = 65,
 
@@ -55,6 +57,15 @@ export enum CLASS_ID {
   AUDIO_CLIP = 200,
   AUDIO_SOURCE = 201,
   GIZMOS = 203
+}
+
+/**
+ * @public
+ */
+@Component('engine.avatarShape', CLASS_ID.AVATAR_SHAPE)
+export class AvatarShape extends ObservableComponent {
+  @ObservableComponent.field
+  name!: string
 }
 
 /**
