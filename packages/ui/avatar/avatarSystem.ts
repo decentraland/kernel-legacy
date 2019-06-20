@@ -23,7 +23,7 @@ export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
-  removeTimer: number | null = null
+  removeTimer: NodeJS.Timer | null = null
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
