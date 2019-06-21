@@ -6,7 +6,6 @@ jobs:
         environment:
           # avoid automatic download of LFS files
           GIT_LFS_SKIP_SMUDGE: 1
-    parallelism: 1
 
     working_directory: /tmp/explorer
     steps:
@@ -88,28 +87,10 @@ jobs:
             - static
           key: build-{{ .Revision }}
 
-  deploy-dev:
+  deploy-dev-pr:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
-    parallelism: 1
-    steps:
-      - restore_cache:
-          keys:
-            - build-{{ .Revision }}
-      - run: sudo apt-get -y -qq install awscli
-      - run:
-          name: Deploy to S3 under subfolder if tests pass and branch is not master
-          command: aws s3 sync static s3://explorer.decentraland.zone/branch/${CIRCLE_BRANCH} --acl public-read
-      - run:
-          name: Invalidate cloudfront cache .zone
-          command: aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
-
-  deploy-dev:
-    docker:
-      - image: circleci/node:10-browsers
-    working_directory: /tmp/explorer
-    parallelism: 1
     steps:
       - restore_cache:
           keys:
@@ -120,11 +101,31 @@ jobs:
           command: |
             export AWS_ACCESS_KEY_ID={AWS_DEV_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_DEV_SECRET_ACCESS_KEY}
       - run:
-          name: Deploy to .today if tests pass and branch is master
-          command: aws s3 sync static s3://explorer.decentraland.today/ --exclude "branch/*" --acl public-read
+          name: Deploy to S3 (.zone) under subfolder if tests pass and branch is not master
+          command: aws s3 sync static s3://explorer.decentraland.zone/branch/${CIRCLE_BRANCH} --acl public-read
       - run:
-          name: Invalidate cloudfront cache .today
-          command: aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
+          name: Invalidate cloudfront cache .zone
+          command: aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
+
+  deploy-dev:
+    docker:
+      - image: circleci/node:10-browsers
+    working_directory: /tmp/explorer
+    steps:
+      - restore_cache:
+          keys:
+            - build-{{ .Revision }}
+      - run: sudo apt-get -y -qq install awscli
+      - run:
+          name: Export DEV/STG AWS Keys
+          command: |
+            export AWS_ACCESS_KEY_ID={AWS_DEV_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_DEV_SECRET_ACCESS_KEY}
+      - run:
+          name: Deploy to S3 (.zone) if tests pass and branch is master
+          command: aws s3 sync static s3://explorer.decentraland.zone/ --acl public-read
+      - run:
+          name: Invalidate cloudfront cache .zone
+          command: aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
 
   deploy-stg:
     docker:
@@ -140,8 +141,13 @@ jobs:
           command: |
             export AWS_ACCESS_KEY_ID={AWS_DEV_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_DEV_SECRET_ACCESS_KEY}
       - run:
-          name: Deploy to .today if tests pass and branch is master
-          command: aws s3 sync static s3://explorer.decentraland.today/ --exclude "branch/*" --acl public-read
+          name: Deploy tag to .today/tags/${CIRCLE_TAG}
+          command: |
+            aws s3 sync static s3://explorer.decentraland.today/tags/${CIRCLE_TAG} --acl public-read
+      - run:
+          name: Deploy tag to .today
+          command: |
+            aws s3 sync static s3://explorer.decentraland.today/ --acl public-read
       - run:
           name: Invalidate cloudfront cache .today
           command: aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
@@ -160,15 +166,15 @@ jobs:
           command: |
             export AWS_ACCESS_KEY_ID={AWS_PRD_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_PRD_SECRET_ACCESS_KEY}
       - run:
-          name: Deploy tag to .org/tags/$CIRCLE_TAG
+          name: Deploy tag to .org/tags/${CIRCLE_TAG}
           command: |
-            aws s3 sync static s3://explorer.decentraland.org/tags/${CIRCLE_TAG} --exclude "tags/*" --acl public-read || true
+            aws s3 sync static s3://explorer.decentraland.org/tags/${CIRCLE_TAG} --acl public-read
       - run:
           name: Deploy tag to .org
           command: |
-            aws s3 sync static s3://explorer.decentraland.org/ --exclude "tags/*" --acl public-read || true
+            aws s3 sync static s3://explorer.decentraland.org/ --acl public-read
       - run:
-          name: Invalidate cloudfront cache .zone
+          name: Invalidate cloudfront cache .org
           command: aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
 
 workflows:
@@ -179,21 +185,30 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - deploy-dev:
+      - deploy-dev-pr:
           requires:
             - build
           filters:
             branches:
               ignore: master
-      - deploy-stg:
+      - deploy-dev:
           requires:
             - build
           filters:
             branches:
               only: master
+      - deploy-stg:
+          requires:
+            - build
+            - deploy-dev
+          filters:
+            tags:
+              # Match SemVer N.N.N
+              only: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
       - deploy-prd:
           requires:
             - build
+            - deploy-stg
             - hold
           filters:
             tags:
