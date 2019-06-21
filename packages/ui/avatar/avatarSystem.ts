@@ -39,9 +39,6 @@ export class AvatarEntity extends Entity {
       this.addComponentOrReplace(this.avatarShape)
     }
 
-    let bodyTranform = this.getComponentOrCreate(Transform)
-    bodyTranform.scale = new Vector3(1, 1, 1)
-
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
 
