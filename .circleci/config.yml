@@ -177,6 +177,8 @@ jobs:
           name: Invalidate cloudfront cache .org
           command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
 
+# Ignore branches because CircleCI OR's multiple filters
+# https://discuss.circleci.com/t/workflow-job-with-tag-filter-being-run-for-every-commit/20762/4
 workflows:
   version: 2
   build-deploy:
