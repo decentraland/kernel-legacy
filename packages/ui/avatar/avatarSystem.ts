@@ -1,4 +1,4 @@
-import { Entity, Observable, engine, Transform, executeTask, Vector3, AvatarShape } from 'decentraland-ecs/src'
+import { Entity, Observable, engine, Transform, executeTask, AvatarShape } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
   UUID,
@@ -27,17 +27,19 @@ export class AvatarEntity extends Entity {
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
-
+  name: string = ''
   readonly transform: Transform = this.getComponentOrCreate(Transform)
   avatarShape!: AvatarShape
 
-  constructor(public name: string) {
-    super(name)
+  constructor(public uuid: string) {
+    super(uuid)
 
     {
       this.avatarShape = new AvatarShape()
       this.addComponentOrReplace(this.avatarShape)
     }
+
+    this.name = uuid
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
@@ -79,10 +81,12 @@ export class AvatarEntity extends Entity {
   public removeScheduled() {
     if (this.removeTimer != null) {
       clearTimeout(this.removeTimer)
+      this.removeTimer = null
     }
     this.removeTimer = setTimeout(
       () => {
         engine.removeEntity(this)
+        avatarMap.delete(this.name)
       },
       10000,
       null
@@ -96,6 +100,7 @@ export class AvatarEntity extends Entity {
     } else if (visible && !this.isAddedToEngine()) {
       if (this.removeTimer != null) {
         clearTimeout(this.removeTimer)
+        this.removeTimer = null
       }
 
       engine.addEntity(this)
@@ -185,14 +190,10 @@ function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
 }
 
 function handleUserRemoved({ uuid }: UserRemovedMessage): void {
-  // const avatar = avatarMap.get(uuid)
-  // if (avatar) {
-  //   if (avatar.removeTimer != null) {
-  //     clearTimeout(avatar.removeTimer)
-  //   }
-  //   avatarMap.delete(uuid)
-  //   engine.removeEntity(avatar)
-  // }
+  const avatar = avatarMap.get(uuid)
+  if (avatar) {
+    avatar.removeScheduled()
+  }
 }
 
 function handleShowWindow({ uuid }: UserMessage): void {
