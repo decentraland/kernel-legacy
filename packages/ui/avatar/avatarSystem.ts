@@ -24,7 +24,7 @@ export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
-  removeTimer: NodeJS.Timer | null = null
+  removeTimer: any | null = null
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
@@ -98,6 +98,7 @@ export class AvatarEntity extends Entity {
       if (this.removeTimer != null) {
         clearTimeout(this.removeTimer)
       }
+
       engine.addEntity(this)
     }
   }
