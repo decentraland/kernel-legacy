@@ -1,4 +1,4 @@
-import { Entity, Observable, engine, Transform, executeTask, AvatarShape } from 'decentraland-ecs/src'
+import { Entity, Observable, engine, Transform, executeTask } from 'decentraland-ecs/src'
 import {
   ReceiveUserDataMessage,
   UUID,
@@ -12,6 +12,7 @@ import {
   UserInformation
 } from 'shared/comms/types'
 import { execute } from './rpc'
+import { AvatarShape } from 'decentraland-ecs/src/decentraland/AvatarShape'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 

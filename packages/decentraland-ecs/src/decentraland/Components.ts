@@ -62,15 +62,6 @@ export enum CLASS_ID {
 /**
  * @public
  */
-@Component('engine.avatarShape', CLASS_ID.AVATAR_SHAPE)
-export class AvatarShape extends ObservableComponent {
-  @ObservableComponent.field
-  name!: string
-}
-
-/**
- * @public
- */
 @Component('engine.transform', CLASS_ID.TRANSFORM)
 export class Transform extends ObservableComponent {
   @ObservableComponent.field
