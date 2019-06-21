@@ -23,12 +23,11 @@ export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
-  removeTimer: NodeJS.Timer | null = null
+  removeTimer: any | null = null
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
 
-  readonly body: Entity = new Entity()
   readonly transform: Transform = this.getComponentOrCreate(Transform)
   avatarShape!: AvatarShape
 
@@ -37,13 +36,11 @@ export class AvatarEntity extends Entity {
 
     {
       this.avatarShape = new AvatarShape()
-      this.body.addComponentOrReplace(this.avatarShape)
+      this.addComponentOrReplace(this.avatarShape)
     }
 
-    let bodyTranform = this.body.getComponentOrCreate(Transform)
+    let bodyTranform = this.getComponentOrCreate(Transform)
     bodyTranform.scale = new Vector3(1, 1, 1)
-
-    this.body.setParent(this)
 
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
@@ -103,6 +100,7 @@ export class AvatarEntity extends Entity {
       if (this.removeTimer != null) {
         clearTimeout(this.removeTimer)
       }
+
       engine.addEntity(this)
     }
   }
