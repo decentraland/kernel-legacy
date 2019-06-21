@@ -116,6 +116,10 @@ jobs:
             - build-{{ .Revision }}
       - run: sudo apt-get -y -qq install awscli
       - run:
+          name: Export DEV/STG AWS Keys
+          command: |
+            export AWS_ACCESS_KEY_ID={AWS_DEV_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_DEV_SECRET_ACCESS_KEY}
+      - run:
           name: Deploy to .today if tests pass and branch is master
           command: aws s3 sync static s3://explorer.decentraland.today/ --exclude "branch/*" --acl public-read
       - run:
@@ -131,6 +135,10 @@ jobs:
           keys:
             - build-{{ .Revision }}
       - run: sudo apt-get -y -qq install awscli
+      - run:
+          name: Export DEV/STG AWS Keys
+          command: |
+            export AWS_ACCESS_KEY_ID={AWS_DEV_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_DEV_SECRET_ACCESS_KEY}
       - run:
           name: Deploy to .today if tests pass and branch is master
           command: aws s3 sync static s3://explorer.decentraland.today/ --exclude "branch/*" --acl public-read
@@ -148,6 +156,10 @@ jobs:
             - build-{{ .Revision }}
       - run: sudo apt-get -y -qq install awscli
       - run:
+          name: Export PRD AWS Keys
+          command: |
+            export AWS_ACCESS_KEY_ID={AWS_PRD_ACCESS_KEY_ID} && export AWS_SECRET_ACCESS_KEY={AWS_PRD_SECRET_ACCESS_KEY}
+      - run:
           name: Deploy tag to .org/tags/$CIRCLE_TAG
           command: |
             aws s3 sync static s3://explorer.decentraland.org/tags/${CIRCLE_TAG} --exclude "tags/*" --acl public-read || true
@@ -158,7 +170,6 @@ jobs:
       - run:
           name: Invalidate cloudfront cache .zone
           command: aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
-
 
 workflows:
   version: 2
