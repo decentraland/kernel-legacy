@@ -87,7 +87,7 @@ jobs:
             - static
           key: build-{{ .Revision }}
 
-  deploy-dev-pr:
+  deploy-on-pr:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
@@ -190,10 +190,12 @@ workflows:
           requires:
             - build
           filters:
+            branches:
+              ignore: /.*/
             tags:
               # Match SemVer N.N.N
               only: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
-      - deploy-dev-pr:
+      - deploy-on-pr:
           requires:
             - build
           filters:
