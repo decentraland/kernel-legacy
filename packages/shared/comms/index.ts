@@ -1,16 +1,9 @@
 import 'webrtc-adapter'
 
-import {
-  parcelLimits,
-  ETHEREUM_NETWORK,
-  commConfigurations,
-  playerConfigurations,
-  getServerConfigurations,
-  USE_LOCAL_COMMS
-} from 'config'
+import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
 
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
-import { positionObservable } from 'shared/world/positionThings'
+import { positionObservable, PositionReport } from 'shared/world/positionThings'
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
 import { Stats } from './debug'
 import { Auth } from 'decentraland-auth'
@@ -33,13 +26,12 @@ import { ChatData, PositionData, ProfileData } from './proto/comms'
 import { chatObservable, ChatEvent } from './chat'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 import { BrokerConnection } from './BrokerConnection'
-import { ReadOnlyVector3, ReadOnlyQuaternion } from 'decentraland-ecs/src'
 import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
 import { CliBrokerConnection } from './CliBrokerConnection'
-import { log } from 'engine/logger'
 import { MessageEntry } from 'shared/types'
 import { IBrokerConnection } from './IBrokerConnection'
+import { defaultLogger } from 'shared/logger'
 
 type Timestamp = number
 type PeerAlias = string
@@ -372,7 +364,9 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
   let commsBroker: IBrokerConnection
 
   if (USE_LOCAL_COMMS) {
-    commsBroker = new CliBrokerConnection(document.location.toString().replace(/^http/, 'ws'))
+    const commsUrl = document.location.toString().replace(/^http/, 'ws')
+    defaultLogger.log('Using WebSocket comms: ' + commsUrl)
+    commsBroker = new CliBrokerConnection(commsUrl)
   } else {
     const coordinatorURL = getServerConfigurations().worldInstanceUrl
     const body = `GET:${coordinatorURL}`
@@ -384,8 +378,12 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
       timestamp: credentials['x-timestamp'],
       'access-token': credentials['x-access-token']
     })
+
     const url = new URL(coordinatorURL)
+    defaultLogger.log('Using Remote comms: ' + url)
+
     url.search = qs.toString()
+
     commsBroker = new BrokerConnection(auth, url.toString())
   }
 
@@ -420,29 +418,21 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     }
   }, 1000)
 
-  positionObservable.add(
-    (
-      obj: Readonly<{
-        position: ReadOnlyVector3
-        rotation: ReadOnlyVector3
-        quaternion: ReadOnlyQuaternion
-      }>
-    ) => {
-      const p = [
-        obj.position.x,
-        obj.position.y - playerConfigurations.height,
-        obj.position.z,
-        obj.quaternion.x,
-        obj.quaternion.y,
-        obj.quaternion.z,
-        obj.quaternion.w
-      ] as Position
+  positionObservable.add((obj: Readonly<PositionReport>) => {
+    const p = [
+      obj.position.x,
+      obj.position.y - obj.playerHeight,
+      obj.position.z,
+      obj.quaternion.x,
+      obj.quaternion.y,
+      obj.quaternion.z,
+      obj.quaternion.w
+    ] as Position
 
-      if (context) {
-        onPositionUpdate(context, p)
-      }
+    if (context) {
+      onPositionUpdate(context, p)
     }
-  )
+  })
 
   setInterval(() => {
     if (context) {
@@ -455,7 +445,7 @@ declare var global: any
 
 global['printCommsInformation'] = function() {
   if (context) {
-    log('Communication topics: ' + previousTopics)
+    defaultLogger.log('Communication topics: ' + previousTopics)
     context.stats.printDebugInformation()
   }
 }
