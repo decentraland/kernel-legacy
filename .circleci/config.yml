@@ -185,6 +185,14 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - hold:
+          type: approval
+          requires:
+           - build
+          filters:
+            tags:
+              # Match SemVer N.N.N
+              only: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
       - deploy-dev-pr:
           requires:
             - build
