@@ -188,7 +188,7 @@ workflows:
       - hold:
           type: approval
           requires:
-           - build
+            - build
           filters:
             tags:
               # Match SemVer N.N.N
