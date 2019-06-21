@@ -187,7 +187,7 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 }
 
-class UnityParcelScene extends UnityScene<LoadableParcelScene> {
+export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
   constructor(public data: EnvironmentData<LoadableParcelScene>) {
     super(data.data.id, data)
   }
@@ -292,6 +292,16 @@ async function initializeDecentralandUI() {
   loadedParcelSceneWorkers.add(worker)
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
+}
+
+export function loadBuilderScene(scene: ILand) {
+  try {
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(scene).data }
+    delete target.land
+    unityInterface.LoadParcelScenes([target])
+  } catch (e) {
+    throw new Error('Could not load scene.json')
+  }
 }
 
 export async function loadPreviewScene() {

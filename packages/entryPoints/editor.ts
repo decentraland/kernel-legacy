@@ -1,52 +1,32 @@
+// tslint:disable:no-console
 declare var global: any
 declare var window: any
 
 global['isEditor'] = window['isEditor'] = true
+global['avoidWeb3'] = window['avoidWeb3']
 
-import 'engine'
-
-import { initLocalPlayer, domReadyFuture, onWindowResize } from '../engine/renderer'
-
-import { initBabylonClient } from '../engine/dcl'
-import * as _envHelper from '../engine/renderer/envHelper'
-import { canvas, scene } from '../engine/renderer/init'
-import { loadedParcelSceneWorkers, enablePositionReporting } from '../shared/world/parcelSceneManager'
 import {
-  LoadableParcelScene,
-  ILandToLoadableParcelScene,
-  ILand,
   IScene,
+  normalizeContentMappings,
+  ILand,
+  ILandToLoadableParcelScene,
   EnvironmentData,
-  ContentMapping,
-  normalizeContentMappings
+  LoadableParcelScene
 } from '../shared/types'
-import { SceneWorker } from '../shared/world/SceneWorker'
-import { WebGLParcelScene } from '../engine/dcl/WebGLParcelScene'
-import { EventEmitter } from 'events'
-import { SharedSceneContext } from '../engine/entities/SharedSceneContext'
-import {
-  vrCamera,
-  arcCamera,
-  DEFAULT_CAMERA_ZOOM,
-  setCameraPosition as _setCameraPosition,
-  cameraPositionToRef,
-  rayToGround
-} from '../engine/renderer/camera'
-import { setEditorEnvironment } from '../engine/renderer/ambientLights'
-import { sleep } from '../atomicHelpers/sleep'
-import * as Gizmos from '../engine/components/ephemeralComponents/Gizmos'
-import { Gizmo } from '../decentraland-ecs/src/decentraland/Gizmos'
-import { Vector3 } from 'babylonjs'
-import future, { IFuture } from 'fp-future'
-import { BaseEntity } from '../engine/entities/BaseEntity'
 
-let didStartPosition = false
+import { UnityParcelScene, loadBuilderScene } from '../unity-interface/dcl'
+import { sleep } from '../atomicHelpers/sleep'
+import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
+import { SceneWorker } from '../shared/world/SceneWorker'
+import { EventEmitter } from 'events'
+import { initializeUnity } from '../unity-interface/initializer'
+import future from 'fp-future'
 
 const evtEmitter = new EventEmitter()
 
-let webGlParcelScene: WebGLParcelScene | null = null
-let parcelsX = 1
-let parcelsY = 1
+let scene: UnityParcelScene
+
+const initializedEngine = future<void>()
 
 async function loadScene(scene: IScene & { baseUrl: string }) {
   if (!scene) return
@@ -74,6 +54,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
     }
   }
 
+  loadBuilderScene(defaultScene)
   await initializePreview(ILandToLoadableParcelScene(defaultScene), scene.scene.parcels.length)
 }
 
@@ -82,11 +63,10 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     $.dispose()
     loadedParcelSceneWorkers.delete($)
   })
-  webGlParcelScene = new WebGLParcelScene(userScene)
-  let parcelScene = new SceneWorker(webGlParcelScene)
-  const context = webGlParcelScene.context as SharedSceneContext
+  scene = new UnityParcelScene(userScene)
+  let parcelScene = new SceneWorker(scene)
 
-  context.on('uuidEvent' as any, event => {
+  scene.on('uuidEvent' as any, event => {
     const { type } = event.payload
 
     if (type === 'gizmoSelected') {
@@ -102,40 +82,27 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     }
   })
 
-  context.on('metricsUpdate', e => {
+  scene.on('metricsUpdate', e => {
     evtEmitter.emit('metrics', {
       metrics: e.given,
       limits: e.limit
     })
   })
 
-  context.on('entitiesOutOfBoundaries', e => {
+  scene.on('entitiesOutOfBoundaries', e => {
     evtEmitter.emit('entitiesOutOfBoundaries', e)
   })
 
-  context.on('entityOutOfScene', e => {
+  scene.on('entityOutOfScene', e => {
     evtEmitter.emit('entityOutOfScene', e)
   })
 
-  context.on('entityBackInScene', e => {
+  scene.on('entityBackInScene', e => {
     evtEmitter.emit('entityBackInScene', e)
   })
 
   // we need closeParcelScenes to enable interactions in preview mode
   loadedParcelSceneWorkers.add(parcelScene)
-
-  enablePositionReporting()
-
-  if (!didStartPosition) {
-    // TODO (eordano): Find a fancier way to do this
-    // As the "+5,+5" is a hack to make the scene appear in front of the user
-    initLocalPlayer({
-      x: parcelScene.position.x + 5,
-      y: 0,
-      z: parcelScene.position.z - 5
-    })
-    didStartPosition = true
-  }
 
   const system = await parcelScene.system
 
@@ -145,220 +112,98 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     await sleep(10)
   }
 
+  console['log']('READYY!!')
   evtEmitter.emit('ready', {})
 }
 
-export namespace editor {
-  export const babylon = BABYLON
-
+namespace editor {
   export async function handleMessage(message: any) {
     if (message.type === 'update') {
+      await initializedEngine
       await loadScene(message.payload.scene)
     }
   }
-
   export function setGridResolution(position: number, scale: number, radians: number) {
-    Gizmos.gizmoManager.gizmos.positionGizmo!.snapDistance = position
-    Gizmos.gizmoManager.gizmos.scaleGizmo!.snapDistance = scale
-    Gizmos.gizmoManager.gizmos.rotationGizmo!.snapDistance = radians
+    console.log('setGridResolution')
   }
-
   export function selectEntity(entityId: string) {
-    if (webGlParcelScene) {
-      const context = webGlParcelScene.context as SharedSceneContext
-      const entity = context.entities.get(entityId)
-      if (!entity) {
-        throw new Error(`Entity(${entityId}) not found`)
-      }
-
-      const gizmos = entity.getBehaviorByName('gizmos') as Gizmos.Gizmos
-
-      if (!entity) {
-        throw new Error(`Entity(${entityId}) has no gizmo component`)
-      }
-
-      gizmos.activate()
-    }
+    console.log('selectEntity')
   }
-
   export function getDCLCanvas() {
-    return domReadyFuture.isPending ? domReadyFuture : Promise.resolve(canvas)
+    return document.getElementById('gameContainer')
   }
-
   export function getScenes() {
     return loadedParcelSceneWorkers
   }
-
-  function configureEditorEnvironment(enabled: boolean) {
-    const target = new BABYLON.Vector3((parcelsX * 10) / 2, 0, (parcelsY * 10) / 2)
-
-    setEditorEnvironment(enabled)
-
-    if (enabled) {
-      if (document.pointerLockElement) {
-        document.exitPointerLock()
-      }
-      arcCamera.target.copyFrom(target)
-      arcCamera.alpha = -Math.PI / 4
-      arcCamera.beta = Math.PI / 3
-      arcCamera.radius = DEFAULT_CAMERA_ZOOM
-    } else {
-      canvas.focus()
-      canvas.requestPointerLock()
-      if (webGlParcelScene) {
-        vrCamera.position.x = webGlParcelScene.worker!.position.x + 5
-        vrCamera.position.y = 1.6
-        vrCamera.position.z = webGlParcelScene.worker!.position.z + 5
-      }
-    }
-  }
-
-  /**
-   * Call this function when the content mappings has changed
-   */
-  function setMappings(mappings: Record<string, string> | Array<ContentMapping>) {
-    const context = webGlParcelScene!.context as SharedSceneContext
-    const seenMappings = new Set()
-
-    const sanitizedMappings = normalizeContentMappings(mappings)
-
-    for (let { file, hash } of sanitizedMappings) {
-      seenMappings.add(file)
-      context.registerMappings([{ file, hash: hash }])
-    }
-
-    context.registeredMappings.forEach((_, file) => {
-      // TODO: check no textures or models or sounds are using the mappings we are removing
-      if (!seenMappings.has(file)) {
-        context.registeredMappings.delete(file)
-      }
-    })
-  }
-
-  /**
-   * Call this function when wanting to send an action to the worker
-   */
   export function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
-    if (webGlParcelScene && webGlParcelScene.worker) {
-      const worker = webGlParcelScene.worker as SceneWorker
+    if (scene) {
+      const worker = scene.worker as SceneWorker
 
       if (action.payload.mappings) {
-        setMappings(action.payload.mappings)
+        // TODO: we need a method to update mappings on the fly on the Unity client
       }
 
       worker.engineAPI!.sendSubscriptionEvent('externalAction', action)
     }
   }
+  export async function initEngine(container: HTMLElement, px: number = 1, py: number = 1) {
+    console.log('ction')
 
-  export async function initEngine(px: number = 1, py: number = 1) {
-    parcelsX = px
-    parcelsY = py
-
-    await initBabylonClient()
-    configureEditorEnvironment(true)
+    try {
+      await initializeUnity(container)
+      initializedEngine.resolve()
+    } catch (e) {
+      initializedEngine.reject(e)
+      throw e
+    }
   }
-
-  export function selectGizmo(type: Gizmo) {
-    Gizmos.selectGizmo(type)
+  export function selectGizmo() {
+    console.log('selectGizmo')
   }
-
   export async function setPlayMode(on: boolean) {
-    configureEditorEnvironment(!on)
+    console.log('ction')
   }
-
   export async function resize() {
-    onWindowResize()
+    console.log('ction')
   }
-
   export function on(evt: string, listener: (...args: any[]) => void) {
-    evtEmitter.addListener(evt, listener)
+    console.log('on')
   }
-
   export function off(evt: string, listener: (...args: any[]) => void) {
-    evtEmitter.removeListener(evt, listener)
+    console.log('off')
   }
-
   export function setCameraZoomDelta(delta: number) {
-    arcCamera.radius += delta
-
-    if (arcCamera.radius > arcCamera.upperRadiusLimit!) {
-      arcCamera.radius = arcCamera.upperRadiusLimit!
-    }
-
-    if (arcCamera.radius < arcCamera.lowerRadiusLimit!) {
-      arcCamera.radius = arcCamera.lowerRadiusLimit!
-    }
+    console.log('setCameraZoomDelta')
   }
-
   export function getCameraTarget() {
-    return arcCamera.target.clone()
+    console.log('getCameraTarget')
   }
-
   export function resetCameraZoom() {
-    arcCamera.radius = DEFAULT_CAMERA_ZOOM
+    console.log('resetCameraZoom')
   }
-
   export function getMouseWorldPosition(localX: number, localY: number) {
-    return rayToGround(localX, localY)
+    console.log('getMouseWorldPosition')
   }
-
   export function loadImage(url: string, image: HTMLImageElement) {
-    scene.database.loadImageFromDB(url, image)
+    console.log('loadImage')
   }
-
-  export function preloadFile(url: string, useArrayBuffer = true): Promise<string | ArrayBuffer> {
-    const defer = future()
-
-    BABYLON.Tools.LoadFile(
-      url,
-      data => {
-        defer.resolve(data)
-      },
-      void 0,
-      scene.database,
-      useArrayBuffer,
-      (_: any, err: any) => {
-        defer.reject(err)
-      }
-    )
-
-    return defer
+  export function preloadFile(url: string, useArrayBuffer = true) {
+    console.log('preloadFile')
   }
-
   export function setCameraRotation(alpha: number, beta?: number) {
-    arcCamera.alpha = alpha
-    if (beta !== undefined) {
-      arcCamera.beta = beta
-    }
+    console.log('setCameraRotation')
+  }
+  export function getLoadingEntity() {
+    console.log('getLoadingEntity')
+  }
+  export function takeScreenshot(mime: string = 'image/png') {
+    console.log('takeScreenshot')
   }
 
-  export function getLoadingEntity(): BaseEntity | null {
-    if (webGlParcelScene) {
-      const context = webGlParcelScene.context as SharedSceneContext
-      return context.rootEntity.getLoadingEntity()
-    }
-
-    return null
-  }
-
-  export function takeScreenshot(mime: string = 'image/png'): IFuture<string> {
-    const ret = future()
-
-    scene.onAfterRenderObservable.addOnce(() => {
-      ret.resolve(canvas.toDataURL(mime))
-    })
-
-    return ret
-  }
-
-  export const envHelper = _envHelper
-
-  export const setCameraPosition = _setCameraPosition
-
+  export const envHelper = null
+  export const setCameraPosition = null
   export function getCameraPosition() {
-    const ret = new Vector3()
-    cameraPositionToRef(ret)
-    return ret
+    console.log('getCameraPosition')
   }
 }
 

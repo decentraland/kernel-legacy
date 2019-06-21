@@ -40,7 +40,7 @@ function startPreviewWatcher() {
 }
 
 initializeUnity(container)
-  .then(ret => {
+  .then(_ => {
     startPreviewWatcher()
   })
   .catch(err => {

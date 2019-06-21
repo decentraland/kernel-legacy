@@ -3,7 +3,7 @@ import { Auth } from 'decentraland-auth'
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3, EDITOR } from '../config'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { awaitWeb3Approval } from './ethereum/provider'
@@ -67,18 +67,25 @@ async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
 export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth()
 
-  let user_id: string
+  // The builder doesn't support comms yet
+  if (EDITOR) {
+    // Load contracts from https://contracts.decentraland.org
+    await setNetwork(ETHEREUM_NETWORK.MAINNET)
+    return ETHEREUM_NETWORK.MAINNET
+  }
+
+  let userId: string = ''
 
   console['group']('connect#login')
 
   if (PREVIEW) {
     console['log'](`Using test user.`)
-    user_id = 'email|5cdd68572d5f842a16d6cc17'
+    userId = 'email|5cdd68572d5f842a16d6cc17'
   } else {
     await auth.login(container)
     try {
       const payload: any = await auth.getAccessTokenData()
-      user_id = payload.user_id
+      userId = payload.user_id
     } catch (e) {
       console['error'](e)
       console['groupEnd']()
@@ -86,10 +93,10 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
 
-    await initializeAnalytics(user_id)
+    await initializeAnalytics(userId)
   }
 
-  console['log'](`User ${user_id} logged in`)
+  console['log'](`User ${userId} logged in`)
 
   console['groupEnd']()
 
@@ -110,7 +117,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   console['group']('connect#comms')
   await connect(
-    user_id,
+    userId,
     net,
     auth,
     address
