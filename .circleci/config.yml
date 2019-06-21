@@ -105,7 +105,7 @@ jobs:
           command: aws s3 sync static s3://explorer.decentraland.zone/branch/${CIRCLE_BRANCH} --acl public-read
       - run:
           name: Invalidate cloudfront cache .zone
-          command: aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
+          command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
 
   deploy-dev:
     docker:
@@ -125,7 +125,7 @@ jobs:
           command: aws s3 sync static s3://explorer.decentraland.zone/ --acl public-read
       - run:
           name: Invalidate cloudfront cache .zone
-          command: aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
+          command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
 
   deploy-stg:
     docker:
@@ -150,7 +150,7 @@ jobs:
             aws s3 sync static s3://explorer.decentraland.today/ --acl public-read
       - run:
           name: Invalidate cloudfront cache .today
-          command: aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
+          command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
 
   deploy-prd:
     docker:
@@ -175,7 +175,7 @@ jobs:
             aws s3 sync static s3://explorer.decentraland.org/ --acl public-read
       - run:
           name: Invalidate cloudfront cache .org
-          command: aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
+          command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
 
 workflows:
   version: 2
