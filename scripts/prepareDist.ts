@@ -13,14 +13,15 @@ const commitHash = execSync('git rev-parse HEAD')
   .trim()
 const md5File = require('md5-file/promise')
 
-async function copyIndex(filename: string) {
+async function copyIndex(fileNameToReplace: string) {
   let md5 = ''
 
-  let newFileName = `${filename}.js`
+  let newFileName = `${fileNameToReplace}.js`
 
-  console.log(`> copy ${filename}.js to ${filename}.<hash>.js`)
   {
-    const src = path.resolve(root, `static/dist/${filename}.js`)
+    const src = path.resolve(root, `static/dist/${fileNameToReplace}.js`)
+
+    console.log(`> hashing ${src}`)
 
     if (!fs.existsSync(src)) {
       throw new Error(`${src} does not exist`)
@@ -28,7 +29,9 @@ async function copyIndex(filename: string) {
 
     md5 = await md5File(src)
 
-    newFileName = `${filename}.${md5}.js`
+    newFileName = `${fileNameToReplace}.${md5}.js`
+
+    console.log(`> copy ${fileNameToReplace}.js to ${newFileName}`)
 
     const dst = path.resolve(root, `static/dist/${newFileName}`)
 
@@ -45,19 +48,26 @@ async function copyIndex(filename: string) {
     throw new Error(`${targetIndexHtml} does not exist`)
   }
 
-  console.log(`> replace ${filename}.js -> ${newFileName} in html`)
+  console.log(`> replace ${fileNameToReplace}.js -> ${newFileName} in html`)
   {
     let content = readFileSync(targetIndexHtml).toString()
 
-    if (!content.includes(`${filename}.js`)) {
-      throw new Error(`index.html is dirty and does\'t contain the text "${filename}.js"`)
-    }
+    let didReplace = false
 
-    content = content.replace(new RegExp(filename + '.(S+.)?js'), newFileName)
+    content = content.replace(new RegExp(fileNameToReplace + '.(S+.)?js'), function(original) {
+      console.log(`>   replacing ${original} -> ${newFileName}`)
+      didReplace = true
+      return newFileName
+    })
+
     content = content.replace(/\s*<!--(.+)-->/, '')
     content = content + `\n\n<!-- ${new Date().toISOString()} commit: ${commitHash} -->`
 
     writeFileSync(targetIndexHtml, content)
+
+    if (!didReplace) {
+      throw new Error('/' + fileNameToReplace + '.(S+.)?js/ was not present in index.html')
+    }
   }
 }
 
