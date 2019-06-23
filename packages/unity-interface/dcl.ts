@@ -132,7 +132,7 @@ const unityInterface = {
       // tslint:disable-next-line:no-console
       console.log(parcelSceneId, method, payload, tag)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${tag}\t${method}\t${payload}`)
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
 
   SetSceneDebugPanel() {
