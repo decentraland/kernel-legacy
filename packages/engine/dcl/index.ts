@@ -27,6 +27,7 @@ import { initHudSystem } from './widgets/ui'
 import { loadedSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
+import { SceneWorker } from 'shared/world/SceneWorker'
 
 let isEngineRunning = false
 
@@ -114,24 +115,42 @@ const notifyPositionObservers = (() => {
 }
 
 function getMetrics(): Metrics {
-  return loadedSceneWorkers
-    .filter(parcelScene => (parcelScene.parcelScene as WebGLParcelScene).context)
-    .map(parcelScene => {
-      const context = (parcelScene.parcelScene as WebGLParcelScene).context
-      context.updateMetrics()
-      return context.metrics
+  return [...loadedSceneWorkers]
+    .filter(getContext)
+    .map(retrieveMetricsFromWebGLParcelScene)
+    .filter(onlyTruthy)
+    .reduce<IParcelSceneLimits>(sumRelevantMetrics, {
+      triangles: 0,
+      bodies: 0,
+      entities: 0,
+      materials: 0,
+      textures: 0,
+      geometries: 0
     })
-    .filter(metrics => !!metrics)
-    .reduce<IParcelSceneLimits>(
-      (metrics, m) => {
-        Object.keys(metrics).map(key => {
-          // tslint:disable-next-line:semicolon
-          ;(metrics as any)[key] += (m as any)[key]
-        })
-        return metrics
-      },
-      { triangles: 0, bodies: 0, entities: 0, materials: 0, textures: 0, geometries: 0 }
-    )
+}
+
+function getContext(scene: SceneWorker) {
+  return ((scene as any) as WebGLParcelScene).context
+}
+
+function retrieveMetricsFromWebGLParcelScene(scene: SceneWorker) {
+  const context = (scene.parcelScene as WebGLParcelScene).context
+  context.updateMetrics()
+  return context.metrics
+}
+
+function onlyTruthy(thing: any) {
+  return !!thing
+}
+
+function sumRelevantMetrics(partialResult: IParcelSceneLimits, metrics: IParcelSceneLimits) {
+  partialResult.triangles += metrics.triangles
+  partialResult.bodies += metrics.triangles
+  partialResult.entities += metrics.entities
+  partialResult.materials += metrics.materials
+  partialResult.textures += metrics.textures
+  partialResult.geometries += metrics.geometries
+  return partialResult
 }
 
 function updateMetrics(): void {
@@ -166,10 +185,14 @@ export async function initBabylonClient() {
   initLocalPlayer(lastPlayerPosition)
 
   if (isMobile()) {
+    // tslint disable: difference in typings between TS 3.4 and 3.5 (safe to remove soon)
+    // tslint:disable-next-line: no-unnecessary-type-assertion
     enableVirtualJoystick(engine.getRenderingCanvas()!)
   } else if (!EDITOR) {
     await initHudSystem()
   }
+  // tslint disable: difference in typings between TS 3.4 and 3.5 (safe to remove soon)
+  // tslint:disable-next-line: no-unnecessary-type-assertion
   enableMouseLock(engine.getRenderingCanvas()!)
 
   initKeyboard()

@@ -15,17 +15,17 @@ export type EnableParcelSceneLoadingOptions = {
   onLoadParcelScenes?(x: ILand[]): void
 }
 
-export const loadedParcelSceneWorkers: { [base: string]: SceneWorker } = {}
+export const loadedParcelSceneWorkers = new Map<string, SceneWorker>()
 
-const sceneWorkerByBaseCoordinate: { [base: string]: SceneWorker } = {}
-let userViewMatrixWorkers: SceneWorker[] = []
-export let loadedSceneWorkers: SceneWorker[] = []
+const sceneWorkerByBaseCoordinate = new Map<string, SceneWorker>()
+const userViewMatrixWorkers = new Set<SceneWorker>()
+export const loadedSceneWorkers = new Set<SceneWorker>()
 
 /**
  * Retrieve the Scene based on the Scene Root CID
  */
 export function getSceneWorkerByRootCID(rootCID: string) {
-  return loadedParcelSceneWorkers[rootCID]
+  return loadedParcelSceneWorkers.get(rootCID)
 }
 
 /**
@@ -36,7 +36,7 @@ export function getParcelSceneRootCID(parcelScene: ParcelSceneAPI) {
 }
 
 export function getSceneWorkerByBaseCoordinates(coordinates: string) {
-  return sceneWorkerByBaseCoordinate[coordinates]
+  return sceneWorkerByBaseCoordinate.get(coordinates)
 }
 
 export function getBaseCoordinates(worker: SceneWorker) {
@@ -59,33 +59,33 @@ export function stopParcelSceneWorker(worker: SceneWorker) {
 export function forceStopParcelSceneWorker(worker: SceneWorker) {
   worker.dispose()
   const rootCID = getParcelSceneRootCID(worker.parcelScene)
-  const parcelSceneWorker = loadedParcelSceneWorkers[rootCID]
-  delete loadedParcelSceneWorkers[rootCID]
+  const parcelSceneWorker = loadedParcelSceneWorkers.get(rootCID)!
+  loadedParcelSceneWorkers.delete(rootCID)
   const baseCoordinates = getBaseCoordinates(parcelSceneWorker)
   if (baseCoordinates) {
-    delete sceneWorkerByBaseCoordinate[baseCoordinates]
+    sceneWorkerByBaseCoordinate.delete(baseCoordinates)
   }
-  userViewMatrixWorkers = userViewMatrixWorkers.filter($ => $ !== worker)
-  loadedSceneWorkers = loadedSceneWorkers.filter($ => $ !== worker)
+  userViewMatrixWorkers.delete(worker)
+  loadedSceneWorkers.delete(worker)
 }
 
 export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: ScriptingTransport) {
   const id = getParcelSceneRootCID(parcelScene)
-  if (loadedParcelSceneWorkers[id]) {
-    return loadedParcelSceneWorkers[id]
+  if (loadedParcelSceneWorkers.get(id)) {
+    return loadedParcelSceneWorkers.get(id)!
   }
   const parcelSceneWorker = new SceneWorker(parcelScene, transport)
 
   if (parcelSceneWorker) {
-    loadedParcelSceneWorkers[getParcelSceneRootCID(parcelScene)] = parcelSceneWorker
+    loadedParcelSceneWorkers.set(getParcelSceneRootCID(parcelScene), parcelSceneWorker)
 
     if ('sendUserViewMatrix' in parcelSceneWorker) {
-      userViewMatrixWorkers.push(parcelSceneWorker)
+      userViewMatrixWorkers.add(parcelSceneWorker)
     }
-    loadedSceneWorkers.push(parcelSceneWorker)
+    loadedSceneWorkers.add(parcelSceneWorker)
     const baseCoordinates = getBaseCoordinates(parcelSceneWorker)
     if (baseCoordinates) {
-      sceneWorkerByBaseCoordinate[baseCoordinates] = parcelSceneWorker
+      sceneWorkerByBaseCoordinate.set(baseCoordinates, parcelSceneWorker)
     }
   }
   return parcelSceneWorker
@@ -114,7 +114,10 @@ export async function enableParcelSceneLoading(network: ETHEREUM_NETWORK, option
   })
 
   ret.on('Scene.shouldUnload', async (opts: { sceneCID: string }) => {
-    const worker = loadedParcelSceneWorkers[opts.sceneCID]
+    const worker = loadedParcelSceneWorkers.get(opts.sceneCID)
+    if (!worker) {
+      return
+    }
     stopParcelSceneWorker(worker)
   })
 

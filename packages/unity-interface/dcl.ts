@@ -26,7 +26,6 @@ import {
 } from '../shared/world/positionThings'
 import {
   enableParcelSceneLoading,
-  loadedParcelSceneWorkers,
   getSceneWorkerByBaseCoordinates,
   getParcelSceneRootCID,
   enablePositionReporting,
@@ -269,12 +268,10 @@ async function initializeDecentralandUI() {
     mappings: []
   })
 
-  const worker = new SceneWorker(scene)
+  const worker = loadParcelScene(scene)
   worker.persistent = true
 
   await ensureUiApis(worker)
-
-  loadedParcelSceneWorkers['ui'] = worker
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
 }
