@@ -28,7 +28,6 @@ import { loadedSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
 import { SceneWorker } from 'shared/world/SceneWorker'
-import { IParcelSceneLimits } from '../../atomicHelpers/landHelpers'
 
 let isEngineRunning = false
 
