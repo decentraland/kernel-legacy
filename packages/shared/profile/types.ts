@@ -6,10 +6,18 @@ export type RGB = {
   b: number
 }
 
-export type Weareable = {
-  contentId: string
-  category: string
+export type Mappeable = {
+  contentName: string
   mappings: ContentMapping[]
+}
+
+export type Weareable = Mappeable & {
+  category: string
+}
+
+export type FaceAsset = {
+  mask: string
+  texture: string
 }
 
 export type Profile = {
@@ -19,13 +27,14 @@ export type Profile = {
   avatar?: {
     version: string
     id: string
-    bodyShape: string
-    skinColor: RGB
-    hairColor: RGB
-    eyeColor: RGB
-    eyes: string
-    eyebrow: string
-    mouth: string
+    skinColor: { color: RGB }
+    hairColor: { color: RGB }
+    eyes: FaceAsset & {
+      color: RGB
+    }
+    eyebrow: FaceAsset
+    mouth: FaceAsset
+    bodyShape: Mappeable
     wearables: Weareable[]
   }
 }
