@@ -127,12 +127,12 @@ const unityInterface = {
       gameInstance.SendMessage('SceneController', 'LoadParcelScenes', finalJson)
     }
   },
-  sendSceneMessage(parcelSceneId: string, id: string, method: string, payload: string) {
+  sendSceneMessage(parcelSceneId: string, method: string, payload: string, tag?: string) {
     if (unityInterface.debug) {
       // tslint:disable-next-line:no-console
-      console.log(parcelSceneId, id, method, payload)
+      console.log(parcelSceneId, method, payload, tag)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${id}\t${method}\t${payload}`)
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${tag}\t${method}\t${payload}`)
   },
 
   SetSceneDebugPanel() {
@@ -166,7 +166,7 @@ class UnityScene<T> implements ParcelSceneAPI {
   sendBatch(actions: EntityAction[]): void {
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      unityInterface.sendSceneMessage(this.unitySceneId, action.id, action.type, action.payload)
+      unityInterface.sendSceneMessage(this.unitySceneId, action.type, action.payload, action.tag)
     }
   }
 

@@ -191,7 +191,7 @@ export default class GamekitScene extends Script {
           }
           that.events.push({
             type: 'CreateEntity',
-            id: entityId,
+            tag: entityId,
             payload: JSON.stringify({ id: entityId } as CreateEntityPayload)
           })
         },
@@ -199,7 +199,7 @@ export default class GamekitScene extends Script {
         removeEntity(entityId: string) {
           that.events.push({
             type: 'RemoveEntity',
-            id: entityId,
+            tag: entityId,
             payload: JSON.stringify({ id: entityId } as RemoveEntityPayload)
           })
         },
@@ -227,8 +227,9 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'UpdateEntityComponent',
-              id: entityId,
+              tag: entityId,
               payload: JSON.stringify({
+                entityId,
                 classId,
                 name: componentName.replace(componentNameRE, ''),
                 json
@@ -242,10 +243,11 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'AttachEntityComponent',
-              id: id,
+              tag: id,
               payload: JSON.stringify({
                 entityId,
-                name: componentName.replace(componentNameRE, '')
+                name: componentName.replace(componentNameRE, ''),
+                id
               } as AttachEntityComponentPayload)
             })
           }
@@ -256,8 +258,9 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'ComponentRemoved',
-              id: entityId,
+              tag: entityId,
               payload: JSON.stringify({
+                entityId,
                 name: componentName.replace(componentNameRE, '')
               } as ComponentRemovedPayload)
             })
@@ -268,8 +271,9 @@ export default class GamekitScene extends Script {
         setParent(entityId: string, parentId: string): void {
           that.events.push({
             type: 'SetEntityParent',
-            id: entityId,
+            tag: entityId,
             payload: JSON.stringify({
+              entityId,
               parentId
             } as SetEntityParentPayload)
           })
@@ -291,8 +295,9 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'ComponentCreated',
-              id: id,
+              tag: id,
               payload: JSON.stringify({
+                id,
                 classId,
                 name: componentName.replace(componentNameRE, '')
               } as ComponentCreatedPayload)
@@ -303,16 +308,17 @@ export default class GamekitScene extends Script {
         componentDisposed(id: string) {
           that.events.push({
             type: 'ComponentDisposed',
-            id: id,
-            payload: JSON.stringify({} as ComponentDisposedPayload)
+            tag: id,
+            payload: JSON.stringify({ id } as ComponentDisposedPayload)
           })
         },
 
         componentUpdated(id: string, json: string) {
           that.events.push({
             type: 'ComponentUpdated',
-            id: id,
+            tag: id,
             payload: JSON.stringify({
+              id,
               json
             } as ComponentUpdatedPayload)
           })
@@ -373,7 +379,7 @@ export default class GamekitScene extends Script {
 
         this.events.push({
           type: 'SceneStarted',
-          id: 'none',
+          tag: 'none',
           payload: '{}'
         })
 
