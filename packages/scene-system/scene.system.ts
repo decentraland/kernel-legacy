@@ -379,7 +379,7 @@ export default class GamekitScene extends Script {
 
         this.events.push({
           type: 'SceneStarted',
-          tag: 'none',
+          tag: 'scene',
           payload: '{}'
         })
 
