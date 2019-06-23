@@ -55,7 +55,7 @@ async function copyIndex(fileNameToReplace: string) {
     let didReplace = false
 
     content = content.replace(new RegExp(fileNameToReplace + '.(S+.)?js'), function(original) {
-      console.log(`>   replacing ${original} -> ${newFileName}`)
+      console.log(`> replacing ${original} -> ${newFileName}`)
       didReplace = true
       return newFileName
     })
