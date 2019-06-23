@@ -28,6 +28,7 @@ import { loadedSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
 import { SceneWorker } from 'shared/world/SceneWorker'
+import { IParcelSceneLimits } from '../../atomicHelpers/landHelpers'
 
 let isEngineRunning = false
 
@@ -116,10 +117,10 @@ const notifyPositionObservers = (() => {
 
 function getMetrics(): Metrics {
   return [...loadedSceneWorkers]
-    .filter(getContext)
-    .map(retrieveMetricsFromWebGLParcelScene)
+    .map(getContext)
     .filter(onlyTruthy)
-    .reduce<IParcelSceneLimits>(sumRelevantMetrics, {
+    .map(retrieveMetrics)
+    .reduce(sumRelevantMetrics, {
       triangles: 0,
       bodies: 0,
       entities: 0,
@@ -130,11 +131,10 @@ function getMetrics(): Metrics {
 }
 
 function getContext(scene: SceneWorker) {
-  return ((scene as any) as WebGLParcelScene).context
+  return (scene.parcelScene as WebGLParcelScene).context
 }
 
-function retrieveMetricsFromWebGLParcelScene(scene: SceneWorker) {
-  const context = (scene.parcelScene as WebGLParcelScene).context
+function retrieveMetrics(context: any): IParcelSceneLimits {
   context.updateMetrics()
   return context.metrics
 }
