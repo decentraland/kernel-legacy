@@ -55,6 +55,7 @@ function getTopicList(socket: WebSocket): Set<string> {
 
 wss.on('connection', function connection(ws) {
   connections.add(ws)
+  const alias = ++connectionCounter
 
   ws.on('message', message => {
     const data = message as Buffer
@@ -69,6 +70,7 @@ wss.on('connection', function connection(ws) {
 
       const dataMessage = new proto.DataMessage()
       dataMessage.setType(proto.MessageType.DATA)
+      dataMessage.setFromAlias(alias)
       dataMessage.setBody(topicMessage.getBody_asU8())
 
       const topicData = dataMessage.serializeBinary()
@@ -97,7 +99,7 @@ wss.on('connection', function connection(ws) {
   setTimeout(() => {
     const welcome = new proto.WelcomeMessage()
     welcome.setType(proto.MessageType.WELCOME)
-    welcome.setAlias(++connectionCounter)
+    welcome.setAlias(alias)
     const data = welcome.serializeBinary()
 
     ws.send(data)
@@ -167,21 +169,6 @@ function checkDiff(imageAPath: string, imageBPath: string, threshold: number, di
     `)
 
     res.end()
-  })
-
-  app.get('/', (req, res) => {
-    fs.readFile(resolve(__dirname, '../static/index.html'), 'utf8', (err, data) => {
-      if (err) {
-        res.send('There was an error reading index.html')
-        return
-      }
-
-      if (req.url.includes('ws')) {
-        res.send(data.replace('dist/index.js', 'dist/debug.js'))
-      } else {
-        res.send(data)
-      }
-    })
   })
 
   app.use(
