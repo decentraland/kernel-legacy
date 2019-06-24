@@ -10,12 +10,7 @@ import { initLocalPlayer, domReadyFuture, onWindowResize } from '../engine/rende
 import { initBabylonClient } from '../engine/dcl'
 import * as _envHelper from '../engine/renderer/envHelper'
 import { canvas, scene } from '../engine/renderer/init'
-import {
-  enablePositionReporting,
-  loadParcelScene,
-  loadedSceneWorkers,
-  forceStopParcelSceneWorker
-} from '../shared/world/parcelSceneManager'
+import { loadParcelScene, loadedSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
 import {
   LoadableParcelScene,
   ILandToLoadableParcelScene,
@@ -83,7 +78,8 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 }
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>, parcelCount: number) {
-  loadedSceneWorkers.forEach($ => forceStopParcelSceneWorker($))
+  // unload non-persistent scenes
+  loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
 
   webGlParcelScene = new WebGLParcelScene(userScene)
   let parcelScene = loadParcelScene(webGlParcelScene)
@@ -123,8 +119,6 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
   context.on('entityBackInScene', e => {
     evtEmitter.emit('entityBackInScene', e)
   })
-
-  enablePositionReporting()
 
   if (!didStartPosition) {
     // TODO (eordano): Find a fancier way to do this

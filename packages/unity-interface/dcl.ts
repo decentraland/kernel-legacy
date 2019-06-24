@@ -26,9 +26,8 @@ import {
 } from '../shared/world/positionThings'
 import {
   enableParcelSceneLoading,
-  getSceneWorkerByBaseCoordinates,
-  getParcelSceneRootCID,
-  enablePositionReporting,
+  getSceneWorkerBySceneID,
+  getParcelSceneID,
   stopParcelSceneWorker,
   loadParcelScene
 } from '../shared/world/parcelSceneManager'
@@ -71,7 +70,8 @@ const browserInterface = {
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
-    const scene = getSceneWorkerByBaseCoordinates(data.sceneId)
+    const scene = getSceneWorkerBySceneID(data.sceneId)
+    console.log(data, scene)
 
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
@@ -187,7 +187,7 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
         const parcelIdentity = system.getAPIInstance(ParcelIdentity)
         parcelIdentity.land = this.data.data.land
-        parcelIdentity.cid = getParcelSceneRootCID(worker.parcelScene)
+        parcelIdentity.cid = getParcelSceneID(worker.parcelScene)
       })
       .catch(e => this.logger.error('Error initializing system', e))
   }
@@ -213,8 +213,6 @@ export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: Gam
   }
 
   await initializeDecentralandUI()
-
-  enablePositionReporting()
 
   return {
     net,
