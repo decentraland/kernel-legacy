@@ -10,14 +10,14 @@ GREEN=\n\033[1;34m
 RED=\n\033[1;31m
 RESET=\033[0m
 
-build: | compile
+build: | compile build-docs
 	@echo "$(GREEN)===================== Compilation Done =====================$(RESET)"
 
 clean:
 	@echo "$(GREEN)===================== Cleaning project =====================$(RESET)"
 	$(COMPILER) build.clean.json
 
-compile: | build-test-scenes generate-mocks compile-entry-points
+compile: | generate-mocks compile-entry-points
 
 compile-entry-points: | build-sdk
 	@echo "$(GREEN)================== Compiling entry points ==================$(RESET)"
@@ -31,6 +31,8 @@ build-sdk: build-support
 	$(COMPILER) build.sdk.json
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local --verbose
 	node ./scripts/buildEcsTypes.js
+
+build-docs:
 	@echo "$(GREEN)======================= Updating docs ======================$(RESET)"
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter markdown -i types/dcl -o docs
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter yaml -i types/dcl -o docs-yaml
@@ -57,13 +59,16 @@ publish:
 	@echo "$(GREEN)=================== getting release ready ==================$(RESET)"
 	$(NODE) ./scripts/prepareDist.js
 
+	@echo "$(GREEN)================= building documentation... ================$(RESET)"
+	$(MAKE) build-docs
+
 	@echo "$(GREEN)===================== decentraland-ecs =====================$(RESET)"
 	@cd $(PWD)/packages/decentraland-ecs; node $(PWD)/scripts/npmPublish.js
 
 	@echo "$(GREEN)======================== build-ecs =========================$(RESET)"
 	@cd $(PWD)/packages/build-ecs; node $(PWD)/scripts/npmPublish.js
 
-test: compile-dev
+test: compile-dev build-test-scenes
 	@echo "$(GREEN)================= Running development tests ================$(RESET)"
 	node scripts/runTestServer.js
 
@@ -88,12 +93,12 @@ test-docker:
 	 		node ./scripts/runTestServer.js
 
 test-ci:
-	NODE_ENV=production $(MAKE) compile
+	NODE_ENV=production $(MAKE) compile build-test-scenes
 	@echo "$(GREEN)================= Running production tests =================$(RESET)"
 	SINGLE_RUN=true node ./scripts/runTestServer.js
 	node_modules/.bin/nyc report --temp-directory ./test/tmp --reporter=html --reporter=lcov --reporter=text
 
-generate-images-local: compile-dev
+generate-images-local: compile-dev build-test-scenes
 	@echo "$(GREEN)================== Generating test images ==================$(RESET)"
 	node scripts/runTestServer.js
 
@@ -127,36 +132,34 @@ lint-fix:
 watch: export NODE_ENV=development
 watch: compile-dev
 	@echo "$(GREEN)=================== Watching file changes ==================$(RESET)"
-	$(MAKE) only-watch
+	$(MAKE) watch-dev
 
-
-FILE=-100.*
-watch-single:
-	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+watch-dev:
 	@node_modules/.bin/concurrently \
-		-n "entryPoints,debug-scene,server" \
-			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
-			"$(PARALLEL_COMPILER) build.single-debug.json --watch" \
-			"node ./scripts/runTestServer.js --keep-open"
-
-watch-single-no-server:
-	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
-	@node_modules/.bin/concurrently \
-		-n "entryPoints,debug-scene" \
-			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
-			"$(PARALLEL_COMPILER) build.single-debug.json --watch"
-
-only-watch:
-	@node_modules/.bin/concurrently \
-		-n "sdk,test-scenes,entryPoints,ecs-builder,server" \
+		-n "sdk,entryPoints,ecs-builder,server" \
 			"$(PARALLEL_COMPILER) build.sdk.json --watch" \
 			"$(PARALLEL_COMPILER) build.test-scenes.json --watch" \
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
 			"node ./scripts/buildECSprojects.js --watch" \
 			"node ./scripts/runTestServer.js --keep-open"
 
+watch-minimal:
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@node_modules/.bin/concurrently \
+		-n "entryPoints,debug-scene" \
+			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
+			"$(PARALLEL_COMPILER) build.single-debug.json --watch"
+
+watch-all:
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@node_modules/.bin/concurrently \
+		-n "entryPoints,debug-scene,server,test-scenes,sdk" \
+			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
+			"$(PARALLEL_COMPILER) build.single-debug.json --watch" \
+			"node ./scripts/runTestServer.js --keep-open"
+
 # initializes a local dev environment to test the CLI with a linked version of decentraland-ecs
-initialize-ecs-npm-link: build-sdk
+npm-link-ecs: build-sdk
 	rm -rf packages/decentraland-ecs/artifacts || true
 	mkdir packages/decentraland-ecs/artifacts
 	ln -sf $(CWD)/node_modules/dcl-amd/dist/amd.js packages/decentraland-ecs/artifacts/amd.js
@@ -171,11 +174,3 @@ initialize-ecs-npm-link: build-sdk
 	ln -sf $(CWD)/static/unity packages/decentraland-ecs/artifacts/unity
 	ln -sf $(CWD)/static/unity-preview.html packages/decentraland-ecs/artifacts/unity-preview.html
 	cd packages/decentraland-ecs; npm link
-
-
-
-dev-watch:
-	@node_modules/.bin/concurrently \
-		-n "sdk,entryPoints,server" \
-			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
-			"node ./scripts/runTestServer.js --keep-open"
