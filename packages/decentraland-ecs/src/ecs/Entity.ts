@@ -281,8 +281,8 @@ export class Entity implements IEntity {
   /**
    * Sets the parent entity
    */
-  setParent(newParent: IEntity | null): IEntity {
-    let parent = !newParent && this.engine ? this.engine.rootEntity : newParent
+  setParent(_parent: IEntity | null): IEntity {
+    let newParent = !_parent && this.engine ? this.engine.rootEntity : _parent
     let currentParent = this.getParent()
 
     if (newParent === this) {
@@ -320,11 +320,11 @@ export class Entity implements IEntity {
       }
     }
 
-    this._parent = parent || null
+    this._parent = newParent || null
     this.registerAsChild()
 
     if (this.eventManager && this.engine) {
-      this.eventManager.fireEvent(new ParentChanged(this as IEntity, parent!))
+      this.eventManager.fireEvent(new ParentChanged(this as IEntity, newParent))
     }
 
     return this
