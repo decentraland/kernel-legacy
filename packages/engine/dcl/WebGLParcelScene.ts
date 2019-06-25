@@ -39,7 +39,7 @@ export class WebGLParcelScene extends WebGLScene<LoadableParcelScene> {
       data,
       new SharedSceneContext(
         data.baseUrl,
-        (data.data.basePosition.x + '_' + data.data.basePosition.y + '_' + data.id).substr(0, 32).toLowerCase()
+        (data.data.basePosition.x + '_' + data.data.basePosition.y + '_' + data.sceneId).substr(0, 32).toLowerCase()
       )
     )
 

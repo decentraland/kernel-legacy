@@ -136,7 +136,9 @@ export class SceneWorker {
   }
 
   private async loadSystem(transport?: ScriptingTransport): Promise<ScriptingHost> {
-    const worker = new (Worker as any)(gamekitWorkerUrl, { name: `ParcelSceneWorker(${this.parcelScene.data.id})` })
+    const worker = new (Worker as any)(gamekitWorkerUrl, {
+      name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
+    })
     return this.startSystem(transport || WebWorkerTransport(worker))
   }
 }

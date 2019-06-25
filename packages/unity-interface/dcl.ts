@@ -17,7 +17,7 @@ import {
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
-import { ILogger, createLogger } from '../shared/logger'
+import { ILogger, createLogger, defaultLogger } from '../shared/logger'
 import {
   positionObservable,
   lastPlayerPosition,
@@ -36,19 +36,11 @@ import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import {
-  DEBUG,
-  ENGINE_DEBUG_PANEL,
-  SCENE_DEBUG_PANEL,
-  parcelLimits,
-  playerConfigurations,
-  ETHEREUM_NETWORK
-} from '../config'
+import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
 let gameInstance!: GameInstance
-const preloadedScenes = new Set<string>()
 
 const positionEvent = {
   position: Vector3.Zero(),
@@ -75,11 +67,13 @@ const browserInterface = {
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
+    } else {
+      defaultLogger.error(`SceneEvent: Scene ${data.sceneId} not found`, data)
     }
   },
 
   PreloadFinished(data: { sceneId: string }) {
-    preloadedScenes.add(data.sceneId)
+    // stub. there is no code about this in unity side yet
   }
 }
 
@@ -110,7 +104,10 @@ const unityInterface = {
     }
     gameInstance.SendMessage('SceneController', 'LoadParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
-  sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
+  UnloadScene(sceneId: string) {
+    gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
+  },
+  SendSceneMessage(parcelSceneId: string, method: string, payload: string) {
     if (unityInterface.debug) {
       // tslint:disable-next-line:no-console
       console.log(parcelSceneId, method, payload)
@@ -127,10 +124,6 @@ const unityInterface = {
   }
 }
 
-export function finishScenePreload(id: string): void {
-  preloadedScenes.add(id)
-}
-
 window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,18 +131,17 @@ window['unityInterface'] = unityInterface
 class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
   worker!: SceneWorker
-  unitySceneId: string
   logger: ILogger
 
-  constructor(public id: string, public data: EnvironmentData<T>) {
-    this.unitySceneId = id
-    this.logger = createLogger(this.unitySceneId + ': ')
+  constructor(public data: EnvironmentData<T>) {
+    this.logger = createLogger(getParcelSceneID(this) + ': ')
   }
 
   sendBatch(actions: EntityAction[]): void {
+    const sceneId = getParcelSceneID(this)
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      unityInterface.sendSceneMessage(this.unitySceneId, action.type, action.payload)
+      unityInterface.SendSceneMessage(sceneId, action.type, action.payload)
     }
   }
 
@@ -172,7 +164,8 @@ class UnityScene<T> implements ParcelSceneAPI {
 
 class UnityParcelScene extends UnityScene<LoadableParcelScene> {
   constructor(public data: EnvironmentData<LoadableParcelScene>) {
-    super(data.data.id, data)
+    super(data)
+    this.logger = createLogger(data.data.basePosition.x + ',' + data.data.basePosition.y + ': ')
   }
 
   registerWorker(worker: SceneWorker): void {
@@ -194,7 +187,7 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: GameInstance) {
+export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
@@ -214,7 +207,6 @@ export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: Gam
   await initializeDecentralandUI()
 
   return {
-    net,
     unityInterface,
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
@@ -228,14 +220,14 @@ export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: Gam
   }
 }
 
-export async function startUnityParcelLoading(net: ETHEREUM_NETWORK) {
-  await enableParcelSceneLoading(net, {
+export async function startUnityParcelLoading() {
+  await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
-    shouldLoadParcelScene: () => {
-      return true
-      // TODO integrate with unity the preloading feature
-      // tslint:disable-next-line: no-commented-out-code
-      // return preloadedScenes.has(land.scene.scene.base)
+    preloadScene: async _land => {
+      // TODO:
+      // 1) implement preload call
+      // 2) await for preload message or timeout
+      // 3) return
     },
     onSpawnpoint: initialLand => {
       const newPosition = getWorldSpawnpoint(initialLand)
@@ -250,18 +242,23 @@ export async function startUnityParcelLoading(net: ETHEREUM_NETWORK) {
           return x
         })
       )
+    },
+    onUnloadParcelScenes: lands => {
+      lands.forEach($ => {
+        unityInterface.UnloadScene($.sceneId)
+      })
     }
   })
 }
 
 async function initializeDecentralandUI() {
-  const id = 'dcl-ui-scene'
+  const sceneId = 'dcl-ui-scene'
 
-  const scene = new UnityScene(id, {
+  const scene = new UnityScene({
+    sceneId,
     baseUrl: location.origin,
     main: hudWorkerUrl,
-    data: { id },
-    id,
+    data: {},
     mappings: []
   })
 
@@ -270,7 +267,7 @@ async function initializeDecentralandUI() {
 
   await ensureUiApis(worker)
 
-  unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
+  unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
 }
 
 let currentLoadedScene: SceneWorker
@@ -291,6 +288,7 @@ export async function loadPreviewScene() {
     const mappingsResponse = (await mappingsFetch.json()) as MappingsResponse
 
     let defaultScene: ILand = {
+      sceneId: 'previewScene',
       baseUrl: location.toString().replace(/\?[^\n]+/g, ''),
       scene,
       mappingsResponse: mappingsResponse

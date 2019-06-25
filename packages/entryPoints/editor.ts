@@ -10,7 +10,7 @@ import { initLocalPlayer, domReadyFuture, onWindowResize } from '../engine/rende
 import { initBabylonClient } from '../engine/dcl'
 import * as _envHelper from '../engine/renderer/envHelper'
 import { canvas, scene } from '../engine/renderer/init'
-import { loadParcelScene, loadedParcelSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
+import { loadParcelScene, loadedSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
 import {
   LoadableParcelScene,
   ILandToLoadableParcelScene,
@@ -64,6 +64,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
   if (!scene.baseUrl) throw new Error('baseUrl missing in scene')
 
   let defaultScene: ILand = {
+    sceneId: 'editorScene',
     baseUrl: scene.baseUrl,
     scene,
     mappingsResponse: {
@@ -79,7 +80,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>, parcelCount: number) {
   // unload non-persistent scenes
-  loadedParcelSceneWorkers.forEach($ => stopParcelSceneWorker($))
+  loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
 
   webGlParcelScene = new WebGLParcelScene(userScene)
   let parcelScene = loadParcelScene(webGlParcelScene)
@@ -180,7 +181,7 @@ export namespace editor {
   }
 
   export function getScenes(): Set<SceneWorker> {
-    return new Set(loadedParcelSceneWorkers.values())
+    return new Set(loadedSceneWorkers.values())
   }
 
   function configureEditorEnvironment(enabled: boolean) {
