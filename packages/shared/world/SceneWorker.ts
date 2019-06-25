@@ -1,12 +1,13 @@
 import { future } from 'fp-future'
 import { ScriptingHost } from 'decentraland-rpc/lib/host'
-import { error } from '../../engine/logger'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { WebWorkerTransport } from 'decentraland-rpc'
-import { playerConfigurations } from '../../config'
+
+import { playerConfigurations } from 'config'
+import { Vector3, Quaternion } from 'decentraland-ecs/src/decentraland/math'
+import log from 'shared/logger'
 import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
-import { Vector3, Quaternion } from 'decentraland-ecs/src/decentraland/math'
 import { PositionReport } from './positionThings'
 
 // tslint:disable-next-line:whitespace
@@ -34,7 +35,7 @@ function unmountSystem(system: ScriptingHost) {
   try {
     system.unmount()
   } catch (e) {
-    error('Error unmounting system', e)
+    log.error('Error unmounting system', e)
   }
 }
 
@@ -65,7 +66,7 @@ export class SceneWorker {
 
       // Unmount the system
       if (this.system) {
-        this.system.then(unmountSystem).catch(e => error('Unable to unmount system', e))
+        this.system.then(unmountSystem).catch(e => log.error('Unable to unmount system', e))
       }
 
       this.parcelScene.dispose()

@@ -1,5 +1,6 @@
 import { DEBUG_MESSAGES, ETHEREUM_NETWORK } from '../config'
 import { initShared } from '../shared'
+import log from '../shared/logger'
 import { initializeEngine } from './dcl'
 import future from 'fp-future'
 const queryString = require('query-string')
@@ -93,8 +94,7 @@ namespace DCL {
     if (_instancedJS) {
       _instancedJS.then($ => $.onMessage(type, JSON.parse(jsonEncodedMessage)))
     } else {
-      // tslint:disable-next-line:no-console
-      console.error('Message received without initializing engine', type, jsonEncodedMessage)
+      log.error('Message received without initializing engine', type, jsonEncodedMessage)
     }
   }
 }
@@ -105,23 +105,23 @@ global['DCL'] = DCL
 
 /** This connects the local game to a native client via WebSocket */
 function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): UnityGame {
-  console.info(`Connecting WS to ${webSocketUrl}`)
+  log.info(`Connecting WS to ${webSocketUrl}`)
   container.innerHTML = `<h3>Connecting...</h3>`
   const ws = new WebSocket(webSocketUrl)
 
   ws.onclose = function(e) {
-    console.error('WS closed!', e)
+    log.error('WS closed!', e)
     container.innerHTML = `<h3 style='color:red'>Disconnected</h3>`
   }
 
   ws.onerror = function(e) {
-    console.error('WS error!', e)
+    log.error('WS error!', e)
     container.innerHTML = `<h3 style='color:red'>EERRORR</h3>`
   }
 
   ws.onmessage = function(ev) {
     if (DEBUG_MESSAGES) {
-      console.log('>>>', ev.data)
+      log.info('>>>', ev.data)
     }
 
     try {
@@ -130,10 +130,10 @@ function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): Un
         const payload = JSON.parse(m.payload)
         _instancedJS!.then($ => $.onMessage(m.type, payload))
       } else {
-        console.error('Dont know what to do with ', m)
+        log.error('Dont know what to do with ', m)
       }
     } catch (e) {
-      console.error(e)
+      log.error(e)
     }
   }
 
@@ -151,7 +151,7 @@ function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): Un
 
   ws.onopen = function() {
     container.classList.remove('dcl-loading')
-    console.info('WS open!')
+    log.info('WS open!')
     gameInstance.SendMessage('', 'Reset', '')
     container.innerHTML = `<h3  style='color:green'>Connected</h3>`
     DCL.EngineStarted()

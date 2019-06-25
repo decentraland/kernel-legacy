@@ -5,7 +5,7 @@ BABYLON.DebugLayer.InspectorURL = require('url-loader!babylonjs-inspector')
 import { TaskQueue } from 'atomicHelpers/taskQueue'
 import { isMobile } from 'shared/comms/mobile'
 
-import { error } from '../logger'
+import log from 'shared/logger'
 import './customShaders'
 import { scene, domReadyFuture, canvas, engine, audioEngine, vrHelper } from './init'
 import { vrCamera } from './camera'
@@ -78,7 +78,7 @@ export function initDCL() {
         }
       })
     })
-    .catch(error)
+    .catch(log.error)
 
   domReadyFuture.resolve(canvas)
 

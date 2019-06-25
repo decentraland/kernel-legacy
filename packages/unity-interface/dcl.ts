@@ -17,7 +17,7 @@ import {
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
-import { ILogger, createLogger } from '../shared/logger'
+import log, { ILogger, createLogger } from '../shared/logger'
 import {
   positionObservable,
   lastPlayerPosition,
@@ -113,8 +113,7 @@ const unityInterface = {
   },
   sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
     if (unityInterface.debug) {
-      // tslint:disable-next-line:no-console
-      console.log(parcelSceneId, method, payload)
+      log.info(parcelSceneId, method, payload)
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   },
@@ -224,8 +223,7 @@ export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: Gam
         // tslint:disable-next-line:semicolon
         ;(browserInterface as any)[type](message)
       } else {
-        // tslint:disable-next-line:no-console
-        console.log('MessageFromEngine', type, message)
+        log.info('MessageFromEngine', type, message)
       }
     }
   }
@@ -299,8 +297,7 @@ export async function loadPreviewScene() {
       mappingsResponse: mappingsResponse
     }
 
-    // tslint:disable-next-line: no-console
-    console.log('Starting Preview...')
+    log.info('Starting Preview...')
     const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
     currentLoadedScene = loadParcelScene(parcelScene)
 
