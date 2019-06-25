@@ -1,4 +1,4 @@
-import { DEBUG_MESSAGES, ETHEREUM_NETWORK } from '../config'
+import { DEBUG_MESSAGES } from '../config'
 import { initShared } from '../shared'
 import log from '../shared/logger'
 import { initializeEngine } from './dcl'
@@ -29,18 +29,12 @@ let _instancedJS: ReturnType<typeof initializeEngine> | null = null
 let _container: HTMLElement | null = null
 
 /**
- * Selected Ethereum network
- */
-let _net: ETHEREUM_NETWORK | null = null
-
-/**
  * UnityGame instance (Either Unity WebGL or Or Unity editor via WebSocket)
  */
 let _gameInstance: UnityGame | null = null
 
 export type InitializeUnityResult = {
   engine: UnityGame
-  net: ETHEREUM_NETWORK
   container: HTMLElement
   instancedJS: ReturnType<typeof initializeEngine>
 }
@@ -51,7 +45,7 @@ const engineInitialized = future()
 export async function initializeUnity(container: HTMLElement): Promise<InitializeUnityResult> {
   _container = container
 
-  _net = await initShared(container)
+  await initShared(container)
 
   const qs = queryString.parse(document.location.search)
 
@@ -66,8 +60,7 @@ export async function initializeUnity(container: HTMLElement): Promise<Initializ
   return {
     engine: _gameInstance!,
     container,
-    instancedJS: _instancedJS!,
-    net: _net!
+    instancedJS: _instancedJS!
   }
 }
 
@@ -75,9 +68,8 @@ namespace DCL {
   // This function get's called by the engine
   export function EngineStarted() {
     if (!_gameInstance) throw new Error('There is no UnityGame')
-    if (!_net) throw new Error('There is no ethereum network defined')
 
-    _instancedJS = initializeEngine(_net!, _gameInstance!)
+    _instancedJS = initializeEngine(_gameInstance!)
 
     _instancedJS
       .then($ => {
