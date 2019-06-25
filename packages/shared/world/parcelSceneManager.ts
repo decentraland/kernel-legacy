@@ -65,6 +65,7 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
 
     parcelSceneWorker.onDisposeObservable.addOnce(() => {
       loadedParcelSceneWorkers.delete(rootCID)
+      loadedSceneWorkers.delete(parcelSceneWorker)
     })
   }
 
