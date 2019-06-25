@@ -7,11 +7,19 @@ import { createLogger } from 'shared/logger'
 const logger = createLogger('loader')
 const { error } = logger
 
+export type DeployedScene = {
+  parcel_id: string
+  root_cid: string
+  /** DO NOT USE THIS ONE YET */
+  scene_cid: ''
+}
+
 export type SceneMappingResponse = {
-  data: Array<{
-    parcel_id: string
-    root_cid: string
-  }>
+  data: Array<DeployedScene>
+}
+
+function getSceneIdFromSceneMappingResponse(scene: DeployedScene) {
+  return scene.root_cid
 }
 
 export class SceneDataDownloadManager {
@@ -52,10 +60,14 @@ export class SceneDataDownloadManager {
 
   setSceneRoots(contents: SceneMappingResponse) {
     for (let result of contents.data) {
-      const promised = this.positionToSceneId.get(result.parcel_id) || future<string>()
+      const sceneId = getSceneIdFromSceneMappingResponse(result)
+      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
+
       if (promised.isPending) {
-        promised.resolve(result.root_cid)
+        promised.resolve(sceneId)
       }
+
+      this.positionToSceneId.set(result.parcel_id, promised)
     }
   }
 
@@ -63,6 +75,7 @@ export class SceneDataDownloadManager {
     if (this.sceneIdToLandData.has(sceneId)) {
       return this.sceneIdToLandData.get(sceneId)!
     }
+
     const promised = future<ILand | null>()
     this.sceneIdToLandData.set(sceneId, promised)
     const actualResponse = await fetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
@@ -91,6 +104,7 @@ export class SceneDataDownloadManager {
     }
 
     const baseUrl = this.options.contentServer + '/contents/'
+
     const scene = (await jsonFetch(baseUrl + sceneJsonMapping.hash)) as IScene
 
     if (!promised.isPending) {
@@ -104,14 +118,29 @@ export class SceneDataDownloadManager {
       mappingsResponse: content.content
     }
 
-    const pendingSceneData = this.sceneIdToLandData.get(sceneJsonMapping.hash)! || future<ILand | null>()
+    const pendingSceneData = this.sceneIdToLandData.get(sceneId) || future<ILand | null>()
+
     if (pendingSceneData.isPending) {
       pendingSceneData.resolve(data)
-      if (!this.sceneIdToLandData.has(sceneJsonMapping.hash)) {
-        this.sceneIdToLandData.set(sceneJsonMapping.hash, pendingSceneData)
-      }
     }
+
+    if (!this.sceneIdToLandData.has(sceneId)) {
+      this.sceneIdToLandData.set(sceneId, pendingSceneData)
+    }
+
+    try {
+      const resolvedSceneId = future<string | null>()
+      resolvedSceneId.resolve(sceneId)
+
+      scene.scene.parcels.forEach($ => {
+        this.positionToSceneId.set($, resolvedSceneId)
+      })
+    } catch (e) {
+      logger.error(e)
+    }
+
     promised.resolve(data)
+
     return data
   }
 

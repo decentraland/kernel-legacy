@@ -51,10 +51,10 @@ let parcelsY = 1
 async function loadScene(scene: IScene & { baseUrl: string }) {
   if (!scene) return
 
-  let id = '0x0'
+  let parcel_id = '0,0'
   if (scene && scene.scene && scene.scene.base) {
     const [x, y] = scene.scene.base.split(',').map($ => parseInt($, 10))
-    id = `${x},${y}`
+    parcel_id = `${x},${y}`
   }
 
   const publisher = '0x0'
@@ -69,7 +69,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
     scene,
     mappingsResponse: {
       contents,
-      parcel_id: id,
+      parcel_id,
       publisher,
       root_cid: 'Qmtest'
     }

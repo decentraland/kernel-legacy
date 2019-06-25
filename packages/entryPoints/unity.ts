@@ -15,5 +15,7 @@ initializeUnity(container)
     console['error']('Error loading Unity')
     console['error'](err)
 
+    container.innerText = err.toString()
+
     document.body.classList.remove('dcl-loading')
   })
