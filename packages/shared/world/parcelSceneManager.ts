@@ -16,7 +16,6 @@ export type EnableParcelSceneLoadingOptions = {
 }
 
 export const loadedParcelSceneWorkers = new Map<string, SceneWorker>()
-export const loadedSceneWorkers = new Set<SceneWorker>()
 
 /**
  * Retrieve the Scene based on it's ID, usually RootCID
@@ -61,11 +60,9 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
     parcelSceneWorker = new SceneWorker(parcelScene, transport)
 
     loadedParcelSceneWorkers.set(rootCID, parcelSceneWorker)
-    loadedSceneWorkers.add(parcelSceneWorker)
 
     parcelSceneWorker.onDisposeObservable.addOnce(() => {
       loadedParcelSceneWorkers.delete(rootCID)
-      loadedSceneWorkers.delete(parcelSceneWorker!)
     })
   }
 

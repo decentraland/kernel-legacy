@@ -24,7 +24,7 @@ import { isMobile } from 'shared/comms/mobile'
 import { toggleColliderHighlight, toggleBoundingBoxes } from 'engine/entities/utils/colliders'
 import { initHudSystem } from './widgets/ui'
 
-import { loadedSceneWorkers } from 'shared/world/parcelSceneManager'
+import { loadedParcelSceneWorkers } from 'shared/world/parcelSceneManager'
 import { WebGLParcelScene } from './WebGLParcelScene'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
 import { SceneWorker } from 'shared/world/SceneWorker'
@@ -115,7 +115,7 @@ const notifyPositionObservers = (() => {
 }
 
 function getMetrics(): Metrics {
-  return [...loadedSceneWorkers]
+  return [...loadedParcelSceneWorkers.values()]
     .map(getContext)
     .filter(onlyTruthy)
     .map(retrieveMetrics)
@@ -213,12 +213,12 @@ function initDebugCommands() {
         new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, evt => {
           if (evt.sourceEvent.key === 'c') {
             colliderVisible = !colliderVisible
-            loadedSceneWorkers.forEach($ =>
+            loadedParcelSceneWorkers.forEach($ =>
               toggleColliderHighlight(colliderVisible, ($.parcelScene as WebGLParcelScene).context.rootEntity)
             )
           } else if (evt.sourceEvent.key === 'b') {
             bboxVisible = !bboxVisible
-            loadedSceneWorkers.forEach($ =>
+            loadedParcelSceneWorkers.forEach($ =>
               toggleBoundingBoxes(bboxVisible, ($.parcelScene as WebGLParcelScene).context.rootEntity)
             )
           }
