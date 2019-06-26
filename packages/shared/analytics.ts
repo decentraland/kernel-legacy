@@ -2,7 +2,7 @@ import { DEBUG_ANALYTICS } from 'config'
 
 import { worldToGrid } from 'atomicHelpers/parcelScenePositions'
 import { Vector2, ReadOnlyVector3, Vector3 } from 'decentraland-ecs/src'
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 
 import { chatObservable, ChatEvent } from './comms/chat'
 import { avatarMessageObservable } from './comms/peers'
@@ -35,7 +35,7 @@ export function queueTrackingEvent(eventName: string, eventData: any) {
   const data = { ...eventData, time: new Date().toISOString() }
 
   if (DEBUG_ANALYTICS) {
-    log.info(`Tracking event "${eventName}": `, data)
+    defaultLogger.info(`Tracking event "${eventName}": `, data)
   }
 
   if (!window.analytics) {

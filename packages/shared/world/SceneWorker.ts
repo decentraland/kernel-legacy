@@ -5,7 +5,7 @@ import { WebWorkerTransport } from 'decentraland-rpc'
 
 import { playerConfigurations } from 'config'
 import { worldToGrid } from 'atomicHelpers/parcelScenePositions'
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
 import { Vector3, Quaternion, Vector2 } from 'decentraland-ecs/src/decentraland/math'
@@ -37,7 +37,7 @@ function unmountSystem(system: ScriptingHost) {
   try {
     system.unmount()
   } catch (e) {
-    log.error('Error unmounting system', e)
+    defaultLogger.error('Error unmounting system', e)
   }
 }
 
@@ -75,7 +75,7 @@ export class SceneWorker {
 
       // Unmount the system
       if (this.system) {
-        this.system.then(unmountSystem).catch(e => log.error('Unable to unmount system', e))
+        this.system.then(unmountSystem).catch(e => defaultLogger.error('Unable to unmount system', e))
       }
 
       this.parcelScene.dispose()

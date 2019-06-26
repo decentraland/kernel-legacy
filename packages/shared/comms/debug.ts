@@ -1,4 +1,4 @@
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 import { Context } from './index'
 import { PositionData } from './proto/comms'
 
@@ -115,7 +115,7 @@ export class Stats {
       const durationsMs = duration.durationsMs
       if (durationsMs.length > 0) {
         const avg = durationsMs.reduce((total, d) => total + d) / durationsMs.length
-        log.info(`${name} took an avg of ${avg} ms`)
+        defaultLogger.info(`${name} took an avg of ${avg} ms`)
       }
       duration.clear()
     }
@@ -125,24 +125,24 @@ export class Stats {
       const sentTotal = `${stats.sentTotal}x${stats.sentTotalBytes} bytes in this period`
       const recv = `${stats.recv}x${stats.recvBytes} bytes in this period`
       const recvTotal = `${stats.recvTotal}x${stats.recvTotalBytes} bytes total`
-      log.info(`${name}: sent: ${sent} (${sentTotal}), recv: ${recv} (${recvTotal})`)
+      defaultLogger.info(`${name}: sent: ${sent} (${sentTotal}), recv: ${recv} (${recvTotal})`)
       stats.reset()
     }
 
-    log.info(`------- ${new Date()}: `)
+    defaultLogger.info(`------- ${new Date()}: `)
     reportDuration('collectInfo', this.collectInfoDuration)
     reportDuration('dispatchTopic', this.dispatchTopicDuration)
-    log.info(`tracking peers: ${this.trackingPeersCount}, visible peers: ${this.visiblePeersCount}`)
+    defaultLogger.info(`tracking peers: ${this.trackingPeersCount}, visible peers: ${this.visiblePeersCount}`)
 
-    log.info('World instance: ')
+    defaultLogger.info('World instance: ')
 
     const connection = this.context.worldInstanceConnection!
     connection.connection.printDebugInformation()
 
     if (connection.ping >= 0) {
-      log.info(`  ping: ${connection.ping} ms`)
+      defaultLogger.info(`  ping: ${connection.ping} ms`)
     } else {
-      log.info(`  ping: ? ms`)
+      defaultLogger.info(`  ping: ? ms`)
     }
 
     reportPkgStats('  topic (total)', this.topic)
@@ -159,11 +159,11 @@ export class Stats {
       if (positionAvgFreq.samples > 1) {
         const samples = positionAvgFreq.samples
         const avg = positionAvgFreq.avg()
-        log.info(`${alias} avg duration between position messages ${avg}ms, from ${samples} samples`)
+        defaultLogger.info(`${alias} avg duration between position messages ${avg}ms, from ${samples} samples`)
       }
     })
 
-    log.info('-------')
+    defaultLogger.info('-------')
   }
 
   public onPositionMessage(fromAlias: string, data: PositionData) {

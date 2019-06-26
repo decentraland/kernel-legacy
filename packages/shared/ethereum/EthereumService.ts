@@ -6,7 +6,7 @@ import { generateEphemeralKeys, UserData as EphemeralKey } from 'ephemeralkey'
 import { ETHEREUM_NETWORK, decentralandConfigurations } from 'config'
 import { saveToLocalStorage, removeFromLocalStorage, getFromLocalStorage } from 'atomicHelpers/localStorage'
 import { RPCSendableMessage } from 'shared/types'
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 import { getERC20 } from './ERC20'
 import { requestManager } from './provider'
 import { getERC721 } from './ERC721'
@@ -190,7 +190,7 @@ export async function requirePayment(toAddress: string, amount: number, currency
     }
     return result
   } catch (err) {
-    log.error('Error in EthereumController#requirePayment', err)
+    defaultLogger.error('Error in EthereumController#requirePayment', err)
     throw new Error(err)
   }
 }

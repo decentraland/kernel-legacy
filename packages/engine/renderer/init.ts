@@ -10,7 +10,7 @@ import { Database } from '../database'
 
 import { future } from 'fp-future'
 import { isRunningTest, playerConfigurations, interactionLimits, DEBUG, PREVIEW, EDITOR } from 'config'
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 
 export const canvas = document.createElement('canvas')
 canvas.setAttribute('id', 'main-canvas')
@@ -149,7 +149,7 @@ const database: BABYLON.Database = new Database() as any
         }
       },
       () => {
-        log.error('Error opening IDB')
+        defaultLogger.error('Error opening IDB')
       }
     )
   }

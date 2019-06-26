@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs'
 
 import { UpdateEntityComponentPayload } from 'shared/types'
-import log from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 
 import { componentRegistry, BaseComponent } from '../components'
 import { scene, engineMicroQueue } from '../renderer'
@@ -297,7 +297,7 @@ export class BaseEntity extends BABYLON.AbstractMesh {
     }
 
     if (this.children.length) {
-      log.error(`Warning, disposing an entity with children. This should not happen`)
+      defaultLogger.error(`Warning, disposing an entity with children. This should not happen`)
     }
 
     for (let type in this.object3DMap) {

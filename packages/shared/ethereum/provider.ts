@@ -2,7 +2,6 @@ import { WebSocketProvider, RequestManager } from 'eth-connect'
 import { future } from 'fp-future'
 
 import { ethereumConfigurations, ETHEREUM_NETWORK } from 'config'
-import log from '../logger'
 
 declare var window: Window & {
   ethereum: any
