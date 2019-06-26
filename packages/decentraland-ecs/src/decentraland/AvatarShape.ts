@@ -25,7 +25,7 @@ export class Eyes extends Face {
 }
 
 /**
- * @public
+ * @internal
  */
 @Component('engine.avatarShape', CLASS_ID.AVATAR_SHAPE)
 export class AvatarShape extends ObservableComponent {

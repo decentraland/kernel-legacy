@@ -1,7 +1,11 @@
 // tslint:disable: no-commented-out-code
 import Auth from 'decentraland-auth'
 
+import { getServerConfigurations } from 'config'
+
+import { avatarMessageObservable } from '../comms/peers'
 import { Profile } from './types'
+import { AvatarMessageType } from '../comms/types'
 
 /**
  * The profiles of all the near players
@@ -14,7 +18,7 @@ export let profiles = new Map<string, Profile>()
 let localProfile: Profile | null = null
 
 export async function initializeProfile(auth: Auth): Promise<Profile> {
-  let request = await auth.getRequest('https://profile.decentraland.zone/api/v1/profile')
+  let request = await auth.getRequest(`${getServerConfigurations().profile}/profile`)
   let response = await fetch(request)
   // TODO Should we create a default profile is not created? Maybe autogenerate one?
   if (response.status === 404) {
@@ -43,3 +47,31 @@ export function getCurrentProfile(): Profile {
 
   return localProfile
 }
+
+export function getProfileByUserId(userId: string): Profile | null {
+  return profiles.get(userId) || null
+}
+
+/**
+ * Fetch profile metadata of user from DCL profile service
+ * @param userId Identity service user ID
+ */
+async function fetchProfile(userId: string): Promise<Profile> {
+  const response = await fetch(`${getServerConfigurations().profile}/profile?user_id=${userId}`)
+  return response.json()
+}
+
+avatarMessageObservable.add(async ({ type, ...data }) => {
+  if (type !== AvatarMessageType.USER_VISIBLE) {
+    return
+  }
+
+  if (data.visible && !profiles.has(data.uuid)) {
+    const profile = await fetchProfile(data.uuid)
+    profiles.set(data.uuid, profile)
+  }
+
+  if (!data.visible) {
+    profiles.delete(data.uuid)
+  }
+})
