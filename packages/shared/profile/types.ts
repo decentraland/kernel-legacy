@@ -21,20 +21,18 @@ export type FaceAsset = {
 }
 
 export type Profile = {
-  name?: string
-  description?: string
-  age?: number
-  avatar?: {
-    version: string
-    id: string
-    skinColor: { color: RGB }
-    hairColor: { color: RGB }
-    eyes: FaceAsset & {
-      color: RGB
-    }
-    eyebrow: FaceAsset
-    mouth: FaceAsset
-    bodyShape: Mappeable
-    wearables: Weareable[]
+  id: string
+  version: string
+  name: string
+  description: string
+  age: number
+  skin: { color: RGB }
+  hair: { color: RGB }
+  eyes: FaceAsset & {
+    color: RGB
   }
+  eyebrow: FaceAsset
+  mouth: FaceAsset
+  bodyShape: Mappeable
+  wearables: Weareable[]
 }
