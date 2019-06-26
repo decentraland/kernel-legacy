@@ -2,6 +2,7 @@ import { WebSocketProvider, RequestManager } from 'eth-connect'
 import { future } from 'fp-future'
 
 import { ethereumConfigurations, ETHEREUM_NETWORK } from 'config'
+import { defaultLogger } from 'shared/logger'
 
 declare var window: Window & {
   ethereum: any
@@ -30,7 +31,7 @@ export const requestManager = new RequestManager(null)
     }
   })
 
-  providerFuture.then(provider => requestManager.setProvider(provider)).catch(log.error)
+  providerFuture.then(provider => requestManager.setProvider(provider)).catch(defaultLogger.error)
 }
 
 export async function awaitWeb3Approval() {
