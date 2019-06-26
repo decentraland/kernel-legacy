@@ -71,6 +71,7 @@ const browserInterface = {
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
     const scene = getSceneWorkerByBaseCoordinates(data.sceneId)
+    console.log('SCENE EVENT HERE ' + data.eventType + ' ---  ' + data.payload)
 
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
@@ -296,6 +297,12 @@ async function initializeDecentralandUI() {
 
 export function loadBuilderScene(scene: ILand) {
   try {
+    console.log('Starting Preview...')
+    const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(scene))
+    const parcelSceneWorker = new SceneWorker(parcelScene)
+
+    loadedParcelSceneWorkers.add(parcelSceneWorker)
+
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(scene).data }
     delete target.land
     unityInterface.LoadParcelScenes([target])

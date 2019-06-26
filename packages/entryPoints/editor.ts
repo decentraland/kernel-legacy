@@ -20,6 +20,8 @@ import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { SceneWorker } from '../shared/world/SceneWorker'
 import { EventEmitter } from 'events'
 import { initializeUnity } from '../unity-interface/initializer'
+import { startUnityParcelLoading } from '../unity-interface/dcl'
+
 import future from 'fp-future'
 
 const evtEmitter = new EventEmitter()
@@ -59,6 +61,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 }
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>, parcelCount: number) {
+  console.log('INITIALIZE PREVIEW')
   loadedParcelSceneWorkers.forEach($ => {
     $.dispose()
     loadedParcelSceneWorkers.delete($)
@@ -71,8 +74,8 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
 
     if (type === 'gizmoSelected') {
       evtEmitter.emit('gizmoSelected', {
-        gizmoType: event.payload.gizmoType,
-        entityId: event.payload.entityId
+        gizmoType: event.payload['gizmoType'],
+        entityId: event.payload['entityId']
       })
     } else if (type === 'gizmoDragEnded') {
       evtEmitter.emit('transform', {
@@ -149,6 +152,21 @@ namespace editor {
   export async function initEngine(container: HTMLElement, px: number = 1, py: number = 1) {
     console.log('ction')
 
+    initializeUnity(container)
+      .then(async ret => {
+        await startUnityParcelLoading(ret.net)
+        initializedEngine.resolve()
+        document.body.classList.remove('dcl-loading')
+      })
+      .catch(err => {
+        console['error']('Error loading Unity')
+        console['error'](err)
+        initializedEngine.reject(err)
+        throw err
+        document.body.classList.remove('dcl-loading')
+      })
+
+    /*
     try {
       await initializeUnity(container)
       initializedEngine.resolve()
@@ -156,6 +174,7 @@ namespace editor {
       initializedEngine.reject(e)
       throw e
     }
+*/
   }
   export function selectGizmo() {
     console.log('selectGizmo')
@@ -167,10 +186,10 @@ namespace editor {
     console.log('ction')
   }
   export function on(evt: string, listener: (...args: any[]) => void) {
-    console.log('on')
+    evtEmitter.addListener(evt, listener)
   }
   export function off(evt: string, listener: (...args: any[]) => void) {
-    console.log('off')
+    evtEmitter.removeListener(evt, listener)
   }
   export function setCameraZoomDelta(delta: number) {
     console.log('setCameraZoomDelta')
