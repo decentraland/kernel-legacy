@@ -107,11 +107,11 @@ const unityInterface = {
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
   },
-  SendSceneMessage(parcelSceneId: string, method: string, payload: string) {
+  SendSceneMessage(parcelSceneId: string, method: string, payload: string, tag: string = '') {
     if (unityInterface.debug) {
-      defaultLogger.info(parcelSceneId, method, payload)
+      defaultLogger.info(parcelSceneId, method, payload, tag)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag || ''}`)
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
 
   SetSceneDebugPanel() {
