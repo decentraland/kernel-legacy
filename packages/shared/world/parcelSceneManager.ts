@@ -45,8 +45,8 @@ export function getBaseCoordinates(worker: SceneWorker) {
     worker.parcelScene &&
     worker.parcelScene.data &&
     worker.parcelScene.data.data &&
-    worker.parcelScene.data.data.scene &&
-    worker.parcelScene.data.data.scene.base
+    worker.parcelScene.data.data.basePosition &&
+    worker.parcelScene.data.data.basePosition.x + ',' + worker.parcelScene.data.data.basePosition.y
   )
 }
 
