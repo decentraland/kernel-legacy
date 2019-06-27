@@ -4,24 +4,27 @@ import Auth from 'decentraland-auth'
 import { getServerConfigurations } from 'config'
 
 import { avatarMessageObservable } from '../comms/peers'
-import { Profile } from './types'
+import { Profile, ProfileWithMappings, AssetWithMappings, Wearable } from './types'
 import { AvatarMessageType } from '../comms/types'
+import { fetchDARAsset } from '../ethereum/DAR'
 
 /**
  * The profiles of all the near players
  */
-export let profiles = new Map<string, Profile>()
+export let profiles = new Map<string, Promise<ProfileWithMappings>>()
 
 /**
  * The profile of the current player
  */
-let localProfile: Profile | null = null
+let localProfile: ProfileWithMappings
 
 export async function initializeProfile(auth: Auth): Promise<Profile> {
+  hookObservable()
   let request = await auth.getRequest(`${getServerConfigurations().profile}/profile`)
   let response = await fetch(request)
-  // TODO Should we create a default profile is not created? Maybe autogenerate one?
   if (response.status === 404) {
+    // TODO redirect to avatars creation dapp here
+    // TODO autogenerate profile?
     // request = await auth.getRequest('https://profile.decentraland.zone/api/v1/profile', {
     //   method: 'POST',
     //   body: JSON.stringify({
@@ -31,7 +34,8 @@ export async function initializeProfile(auth: Auth): Promise<Profile> {
     // })
     // response = await fetch(request)
   } else {
-    localProfile = await response.json()
+    const profile = await response.json()
+    localProfile = await getProfileWithMappings(profile)
   }
   return localProfile
 }
@@ -48,30 +52,57 @@ export function getCurrentProfile(): Profile {
   return localProfile
 }
 
-export function getProfileByUserId(userId: string): Profile | null {
-  return profiles.get(userId) || null
+/**
+ * Returns already exising or new fetching promise of profile
+ * @param userId Identity service user ID
+ */
+export function getProfileByUserId(userId: string): Promise<ProfileWithMappings> {
+  if (profiles.has(userId)) {
+    return profiles.get(userId)
+  }
+
+  const profilePromise = fetchProfile(userId)
+
+  profiles.set(userId, profilePromise)
+  return profilePromise
 }
 
 /**
  * Fetch profile metadata of user from DCL profile service
  * @param userId Identity service user ID
  */
-async function fetchProfile(userId: string): Promise<Profile> {
-  const response = await fetch(`${getServerConfigurations().profile}/profile?user_id=${userId}`)
-  return response.json()
+async function fetchProfile(userId: string): Promise<ProfileWithMappings> {
+  let response = await fetch(`${getServerConfigurations().profile}/profile/${userId}`)
+  const profile = await response.json()
+  const profileWithMappings = await getProfileWithMappings(profile)
+  return profileWithMappings
 }
 
-avatarMessageObservable.add(async ({ type, ...data }) => {
-  if (type !== AvatarMessageType.USER_VISIBLE) {
-    return
-  }
+function hookObservable() {
+  avatarMessageObservable.add(async ({ type, ...data }) => {
+    if (type !== AvatarMessageType.USER_VISIBLE) {
+      return
+    }
 
-  if (data.visible && !profiles.has(data.uuid)) {
-    const profile = await fetchProfile(data.uuid)
-    profiles.set(data.uuid, profile)
-  }
+    if (data.visible && !profiles.has(data.uuid)) {
+      const profilePromise = fetchProfile(data.uuid)
+      profiles.set(data.uuid, profilePromise)
+    }
 
-  if (!data.visible) {
-    profiles.delete(data.uuid)
-  }
-})
+    if (!data.visible) {
+      profiles.delete(data.uuid)
+    }
+  })
+}
+
+/**
+ * Iterate over all weareables and no-mapped assets and retrieve them from DAR API
+ * Returns a fully assets-mapped profile object
+ */
+async function getProfileWithMappings(profile: Profile): Promise<any> {
+  const bodyShapePromise = fetchDARAsset<AssetWithMappings>(profile.bodyShape)
+  const promises = profile.wearables.map(darURL => fetchDARAsset<Wearable>(darURL))
+  const [bodyShapeResponse, ...wearablesResponses] = await Promise.all([bodyShapePromise, ...promises])
+  const result = { ...profile, bodyShape: bodyShapeResponse, wearablesResponses }
+  return result
+}

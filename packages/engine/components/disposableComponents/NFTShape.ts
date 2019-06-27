@@ -3,16 +3,15 @@ import { CLASS_ID } from 'decentraland-ecs/src'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { cleanupAssetContainer } from 'engine/entities/utils/processModels'
 import { scene, engine } from 'engine/renderer'
-import { DEBUG, getServerConfigurations } from 'config'
+import { DEBUG } from 'config'
 import { log } from 'util'
 import { Animator } from '../ephemeralComponents/Animator'
 import { deleteUnusedTextures } from 'engine/renderer/monkeyLoader'
 import { processGLTFAssetContainer, loadingShape } from './GLTFShape'
 import { ignoreBoundaryChecksOnObject } from 'engine/entities/utils/checkParcelSceneLimits'
+import { fetchDARAsset } from '../../../shared/ethereum/DAR'
 
 let noise: BABYLON.NoiseProceduralTexture | null = null
-
-const config = getServerConfigurations()
 
 function getNoiseTexture() {
   if (!noise) {
@@ -22,18 +21,6 @@ function getNoiseTexture() {
     noise.animationSpeedFactor = 5
   }
   return noise
-}
-
-export type DARAsset = {
-  name: string
-  owner: string
-  description: string
-  image: string
-  registry: string
-  token_id: string
-  uri: string
-  files: DARAssetFile[]
-  traits: any[]
 }
 
 export type DARAssetFile = {
@@ -46,33 +33,6 @@ export type DARAssetTrait = {
   id: string
   name: string
   type: string
-}
-
-function parseProtocolUrl(url: string): { protocol: string; registry: string; asset: string } {
-  const parsedUrl = /([^:]+):\/\/([^/]+)(?:\/(.+))?/.exec(url)
-
-  if (!parsedUrl) throw new Error('The provided URL is not valid: ' + url)
-
-  const result = {
-    asset: parsedUrl[3],
-    registry: parsedUrl[2],
-    protocol: parsedUrl[1]
-  }
-
-  if (result.protocol.endsWith(':')) {
-    result.protocol = result.protocol.replace(/:$/, '')
-  }
-
-  if (result.protocol !== 'ethereum') {
-    throw new Error('Invalid protocol: ' + result.protocol)
-  }
-
-  return result
-}
-
-async function fetchDARAsset(registry: string, assetId: string): Promise<DARAsset> {
-  const req = await fetch(`${config.darApi}/${registry}/asset/${assetId}`)
-  return req.json()
 }
 
 export class NFTShape extends DisposableComponent {
@@ -236,9 +196,7 @@ export class NFTShape extends DisposableComponent {
         this.src = data.src
       }
       if (this.src) {
-        const { registry, asset } = parseProtocolUrl(this.src)
-
-        const assetData = await fetchDARAsset(registry, asset)
+        const assetData = await fetchDARAsset<DARAssetFile>(this.src)
 
         // by default, thumbnail should work
         let image: string = assetData.image

@@ -152,8 +152,8 @@ async function hideBlockedUsers(): Promise<void> {
   })
 }
 
-function handleUserData(message: ReceiveUserDataMessage): void {
-  const avatar = ensureAvatar(message.uuid)
+async function handleUserData(message: ReceiveUserDataMessage): Promise<void> {
+  const avatar = await getAvatarById(message.uuid)
 
   if (avatar) {
     const userData = message.data
