@@ -121,6 +121,10 @@ const unityInterface = {
 
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+  },
+
+  UnlockCursor() {
+    gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   }
 }
 
@@ -313,3 +317,9 @@ teleportObservable.add((position: { x: number; y: number }) => {
 })
 
 window['messages'] = (e: any) => chatObservable.notifyObservers(e)
+
+document.addEventListener('pointerlockchange', e => {
+  if (!document.pointerLockElement) {
+    unityInterface.UnlockCursor()
+  }
+})
