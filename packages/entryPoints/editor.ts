@@ -176,8 +176,8 @@ namespace editor {
     }
 */
   }
-  export function selectGizmo() {
-    console.log('selectGizmo')
+  export function selectGizmo(type: string) {
+    console.log('selectGizmo ' + type)
   }
   export async function setPlayMode(on: boolean) {
     console.log('ction')
@@ -219,8 +219,11 @@ namespace editor {
     console.log('takeScreenshot')
   }
 
+  export function setCameraPosition(position: string) {
+    console.log('setCameraPosition ' + position)
+  }
+
   export const envHelper = null
-  export const setCameraPosition = null
   export function getCameraPosition() {
     console.log('getCameraPosition')
   }
