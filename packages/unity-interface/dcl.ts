@@ -86,7 +86,7 @@ const browserInterface = {
 
 let lastParcelScenesSent = ''
 
-const unityInterface = {
+export const unityInterface = {
   debug: false,
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
@@ -293,22 +293,6 @@ async function initializeDecentralandUI() {
   loadedParcelSceneWorkers.add(worker)
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
-}
-
-export function loadBuilderScene(scene: ILand) {
-  try {
-    console.log('Starting Preview...')
-    const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(scene))
-    const parcelSceneWorker = new SceneWorker(parcelScene)
-
-    loadedParcelSceneWorkers.add(parcelSceneWorker)
-
-    const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(scene).data }
-    delete target.land
-    unityInterface.LoadParcelScenes([target])
-  } catch (e) {
-    throw new Error('Could not load scene.json')
-  }
 }
 
 export async function loadPreviewScene() {

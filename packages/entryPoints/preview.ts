@@ -1,9 +1,8 @@
 // tslint:disable:no-console
-declare var global: any
-declare var window: any
+declare var global: any & { preview: boolean }
+declare var window: Window & { preview: boolean }
 
-global['preview'] = window['preview'] = true
-global['avoidWeb3'] = window['avoidWeb3']
+global.preview = window.preview = true
 
 import { initializeUnity } from '../unity-interface/initializer'
 import { loadPreviewScene } from '../unity-interface/dcl'

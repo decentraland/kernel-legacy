@@ -1,9 +1,11 @@
 // tslint:disable:no-console
-declare var global: any
-declare var window: any
+declare var global: any & { isEditor: boolean }
+declare var window: Window & { isEditor: boolean }
 
-global['isEditor'] = window['isEditor'] = true
-global['avoidWeb3'] = window['avoidWeb3']
+global.isEditor = window.isEditor = true
+
+import { EventEmitter } from 'events'
+import future from 'fp-future'
 
 import {
   IScene,
@@ -13,39 +15,63 @@ import {
   EnvironmentData,
   LoadableParcelScene
 } from '../shared/types'
-
-import { UnityParcelScene, loadBuilderScene } from '../unity-interface/dcl'
-import { sleep } from '../atomicHelpers/sleep'
-import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { SceneWorker } from '../shared/world/SceneWorker'
-import { EventEmitter } from 'events'
+import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { initializeUnity } from '../unity-interface/initializer'
-import { startUnityParcelLoading } from '../unity-interface/dcl'
-
-import future from 'fp-future'
+import { UnityParcelScene, startUnityParcelLoading, unityInterface } from '../unity-interface/dcl'
 
 const evtEmitter = new EventEmitter()
-
-let scene: UnityParcelScene
-
 const initializedEngine = future<void>()
+let scene: UnityParcelScene | null = null
 
-async function loadScene(scene: IScene & { baseUrl: string }) {
-  if (!scene) return
-
-  let id = '0x0'
+/**
+ * It returns base parcel if exists on `scene.json` or "0,0" if `baseParcel` missing
+ */
+function getBaseCoords(scene: IScene): string {
   if (scene && scene.scene && scene.scene.base) {
     const [x, y] = scene.scene.base.split(',').map($ => parseInt($, 10))
-    id = `${x},${y}`
+    return `${x},${y}`
   }
 
-  const publisher = '0x0'
+  return '0,0'
+}
 
+/**
+ * It creates and instance the a scene worker and adds it to the world and the
+ * `loadedParcelSceneWorkers` list
+ */
+function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): void {
+  try {
+    const parcelScene = new UnityParcelScene(scene)
+    const parcelSceneWorker = new SceneWorker(parcelScene)
+    loadedParcelSceneWorkers.add(parcelSceneWorker)
+
+    const target: LoadableParcelScene = { ...scene.data }
+    delete target.land
+    unityInterface.LoadParcelScenes([target])
+  } catch (e) {
+    throw new Error('Could not load scene.json')
+  }
+}
+
+/**
+ * It fakes the content mappings for being used at the Builder without
+ * content server plus loads and creates the scene worker
+ */
+async function loadScene(scene: IScene & { baseUrl: string }) {
+  if (!scene) {
+    return
+  }
+
+  const id = getBaseCoords(scene)
+  const publisher = '0x0'
   const contents = normalizeContentMappings(scene._mappings || [])
 
-  if (!scene.baseUrl) throw new Error('baseUrl missing in scene')
+  if (!scene.baseUrl) {
+    throw new Error('baseUrl missing in scene')
+  }
 
-  let defaultScene: ILand = {
+  const defaultScene: ILand = {
     baseUrl: scene.baseUrl,
     scene,
     mappingsResponse: {
@@ -56,20 +82,18 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
     }
   }
 
-  loadBuilderScene(defaultScene)
-  await initializePreview(ILandToLoadableParcelScene(defaultScene), scene.scene.parcels.length)
+  await initializePreview(ILandToLoadableParcelScene(defaultScene))
 }
 
-async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>, parcelCount: number) {
-  console.log('INITIALIZE PREVIEW')
+async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>) {
   loadedParcelSceneWorkers.forEach($ => {
     $.dispose()
     loadedParcelSceneWorkers.delete($)
   })
-  scene = new UnityParcelScene(userScene)
-  let parcelScene = new SceneWorker(scene)
 
-  scene.on('uuidEvent' as any, event => {
+  loadBuilderScene(userScene)
+
+  scene!.on('uuidEvent' as any, event => {
     const { type } = event.payload
 
     if (type === 'gizmoSelected') {
@@ -85,35 +109,24 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     }
   })
 
-  scene.on('metricsUpdate', e => {
+  scene!.on('metricsUpdate', e => {
     evtEmitter.emit('metrics', {
       metrics: e.given,
       limits: e.limit
     })
   })
 
-  scene.on('entitiesOutOfBoundaries', e => {
+  scene!.on('entitiesOutOfBoundaries', e => {
     evtEmitter.emit('entitiesOutOfBoundaries', e)
   })
 
-  scene.on('entityOutOfScene', e => {
+  scene!.on('entityOutOfScene', e => {
     evtEmitter.emit('entityOutOfScene', e)
   })
 
-  scene.on('entityBackInScene', e => {
+  scene!.on('entityBackInScene', e => {
     evtEmitter.emit('entityBackInScene', e)
   })
-
-  // we need closeParcelScenes to enable interactions in preview mode
-  loadedParcelSceneWorkers.add(parcelScene)
-
-  const system = await parcelScene.system
-
-  const engineAPI = parcelScene.engineAPI!
-
-  while (!system.isEnabled || !engineAPI.didStart) {
-    await sleep(10)
-  }
 
   console['log']('READYY!!')
   evtEmitter.emit('ready', {})
@@ -163,18 +176,7 @@ namespace editor {
         console['error'](err)
         initializedEngine.reject(err)
         throw err
-        document.body.classList.remove('dcl-loading')
       })
-
-    /*
-    try {
-      await initializeUnity(container)
-      initializedEngine.resolve()
-    } catch (e) {
-      initializedEngine.reject(e)
-      throw e
-    }
-*/
   }
   export function selectGizmo(type: string) {
     console.log('selectGizmo ' + type)
