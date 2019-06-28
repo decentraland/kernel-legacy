@@ -142,6 +142,9 @@ export const unityInterface = {
 
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+  },
+  sendBuilderMessage(method: string, payload: string = '') {
+    gameInstance.SendMessage(`BuilderController`, method, payload)
   }
 }
 
@@ -293,6 +296,28 @@ async function initializeDecentralandUI() {
   loadedParcelSceneWorkers.add(worker)
 
   unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
+}
+
+//Builder functions
+
+export function selectGizmoBuilder(type: string) {
+  unityInterface.sendBuilderMessage('SelectGizmo', type)
+}
+
+export function resetObject() {
+  unityInterface.sendBuilderMessage('ResetObject')
+}
+
+export function setCameraZoomDeltaBuilder(delta: number) {
+  unityInterface.sendBuilderMessage('ZoomDelta', delta.toString())
+}
+
+export function resetCameraBuilder() {
+  unityInterface.sendBuilderMessage('ResetCamera')
+}
+
+export function setPlayModeBuilder(on: string) {
+  unityInterface.sendBuilderMessage('SetPlayMode', on)
 }
 
 export async function loadPreviewScene() {

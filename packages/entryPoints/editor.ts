@@ -18,7 +18,15 @@ import {
 import { SceneWorker } from '../shared/world/SceneWorker'
 import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { initializeUnity } from '../unity-interface/initializer'
-import { UnityParcelScene, startUnityParcelLoading, unityInterface } from '../unity-interface/dcl'
+import {
+  UnityParcelScene,
+  startUnityParcelLoading,
+  unityInterface,
+  selectGizmoBuilder,
+  resetCameraBuilder,
+  setCameraZoomDeltaBuilder,
+  setPlayModeBuilder
+} from '../unity-interface/dcl'
 
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
@@ -179,10 +187,11 @@ namespace editor {
       })
   }
   export function selectGizmo(type: string) {
-    console.log('selectGizmo ' + type)
+    selectGizmoBuilder(type)
   }
   export async function setPlayMode(on: boolean) {
-    console.log('ction')
+    var onString: string = on ? 'true' : 'false'
+    setPlayModeBuilder(onString)
   }
   export async function resize() {
     console.log('ction')
@@ -194,13 +203,13 @@ namespace editor {
     evtEmitter.removeListener(evt, listener)
   }
   export function setCameraZoomDelta(delta: number) {
-    console.log('setCameraZoomDelta')
+    setCameraZoomDeltaBuilder(delta)
   }
   export function getCameraTarget() {
     console.log('getCameraTarget')
   }
   export function resetCameraZoom() {
-    console.log('resetCameraZoom')
+    resetCameraBuilder()
   }
   export function getMouseWorldPosition(localX: number, localY: number) {
     console.log('getMouseWorldPosition')
