@@ -56,6 +56,9 @@ export namespace DataHeader {
 }
 
 export class PositionData extends jspb.Message {
+  getUserId(): string | null
+  setUserId(value: string | null): void
+
   getCategory(): Category
   setCategory(value: Category): void
 
@@ -95,6 +98,7 @@ export class PositionData extends jspb.Message {
 
 export namespace PositionData {
   export type AsObject = {
+    userId: string | null
     category: Category
     time: number
     positionX: number

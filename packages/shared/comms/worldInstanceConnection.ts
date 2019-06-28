@@ -17,6 +17,7 @@ import { parcelLimits } from 'config'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { Stats } from './debug'
 import { createLogger } from 'shared/logger'
+import { localProfileUUID } from './peers'
 
 export enum SocketReadyState {
   CONNECTING,
@@ -69,6 +70,7 @@ export class WorldInstanceConnection {
     const topic = positionHash(p)
 
     const d = new PositionData()
+    d.setUserId(localProfileUUID)
     d.setCategory(Category.POSITION)
     d.setTime(Date.now())
     d.setPositionX(p[0])
