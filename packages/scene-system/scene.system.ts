@@ -227,7 +227,7 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'UpdateEntityComponent',
-              tag: entityId,
+              tag: entityId + '_' + classId,
               payload: JSON.stringify({
                 entityId,
                 classId,
@@ -243,7 +243,7 @@ export default class GamekitScene extends Script {
           if (componentNameRE.test(componentName)) {
             that.events.push({
               type: 'AttachEntityComponent',
-              tag: id,
+              tag: entityId,
               payload: JSON.stringify({
                 entityId,
                 name: componentName.replace(componentNameRE, ''),
