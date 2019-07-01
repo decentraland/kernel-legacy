@@ -20,7 +20,7 @@ export class Environment {
   }
 
   addCreature(newCreature: Creature) {
-    let newCreaturesCount = this.creatures.push(newCreature)
+    const newCreaturesCount = this.creatures.push(newCreature)
 
     if(this.onCreaturesCountUpdated)
       this.onCreaturesCountUpdated(newCreaturesCount)
