@@ -1,4 +1,4 @@
-import { DEBUG_MESSAGES, knownTLDs, getTLD } from '../config'
+import { DEBUG_MESSAGES } from '../config'
 import { initShared } from '../shared'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
@@ -45,13 +45,7 @@ const engineInitialized = future()
 export async function initializeUnity(container: HTMLElement): Promise<InitializeUnityResult> {
   _container = container
 
-  try {
-    await initShared(container)
-  } catch (error) {
-    if (error.message.includes('Authentication error') === '' && knownTLDs.includes(getTLD())) {
-      window.location.href = `https://explorer.decentraland.${getTLD()}${window.location.search}`
-    }
-  }
+  await initShared(container)
 
   const qs = queryString.parse(document.location.search)
 
