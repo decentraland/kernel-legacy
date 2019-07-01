@@ -7,6 +7,7 @@ global.isEditor = window.isEditor = true
 import { EventEmitter } from 'events'
 import future from 'fp-future'
 
+import { loadedSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
 import {
   IScene,
   normalizeContentMappings,
@@ -16,7 +17,6 @@ import {
   LoadableParcelScene
 } from '../shared/types'
 import { SceneWorker } from '../shared/world/SceneWorker'
-import { loadedParcelSceneWorkers } from '../shared/world/parcelSceneManager'
 import { initializeUnity } from '../unity-interface/initializer'
 import {
   UnityParcelScene,
@@ -51,7 +51,6 @@ function getBaseCoords(scene: IScene): string {
 function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene | null {
   try {
     const parcelScene = new UnityParcelScene(scene)
-    const parcelSceneWorker = new SceneWorker(parcelScene)
 
     const target: LoadableParcelScene = { ...scene.data }
     delete target.land
@@ -81,6 +80,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 
   const defaultScene: ILand = {
     baseUrl: scene.baseUrl,
+    sceneId: 'editorScene',
     scene,
     mappingsResponse: {
       contents,
@@ -94,10 +94,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 }
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>) {
-  loadedParcelSceneWorkers.forEach($ => {
-    $.dispose()
-    loadedParcelSceneWorkers.delete($)
-  })
+  loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
 
   scene = loadBuilderScene(userScene)
 
@@ -147,17 +144,18 @@ namespace editor {
       await loadScene(message.payload.scene)
     }
   }
-  export function setGridResolution(position: number, scale: number, radians: number) {
+  export function setGridResolution() {
     console.log('setGridResolution')
   }
-  export function selectEntity(entityId: string) {
+  export function selectEntity() {
     console.log('selectEntity')
   }
   export function getDCLCanvas() {
     return document.getElementById('gameContainer')
   }
-  export function getScenes() {
-    return loadedParcelSceneWorkers
+
+  export function getScenes(): Set<SceneWorker> {
+    return new Set(loadedSceneWorkers.values())
   }
   export function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
     if (scene) {
@@ -170,12 +168,12 @@ namespace editor {
       worker.engineAPI!.sendSubscriptionEvent('externalAction', action)
     }
   }
-  export async function initEngine(container: HTMLElement, px: number = 1, py: number = 1) {
+  export async function initEngine(container: HTMLElement) {
     console.log('ction')
 
     initializeUnity(container)
-      .then(async ret => {
-        await startUnityParcelLoading(ret.net)
+      .then(async () => {
+        await startUnityParcelLoading()
         initializedEngine.resolve()
         document.body.classList.remove('dcl-loading')
       })
@@ -211,22 +209,22 @@ namespace editor {
   export function resetCameraZoom() {
     resetCameraBuilder()
   }
-  export function getMouseWorldPosition(localX: number, localY: number) {
+  export function getMouseWorldPosition() {
     console.log('getMouseWorldPosition')
   }
-  export function loadImage(url: string, image: HTMLImageElement) {
+  export function loadImage() {
     console.log('loadImage')
   }
-  export function preloadFile(url: string, useArrayBuffer = true) {
+  export function preloadFile() {
     console.log('preloadFile')
   }
-  export function setCameraRotation(alpha: number, beta?: number) {
+  export function setCameraRotation() {
     console.log('setCameraRotation')
   }
   export function getLoadingEntity() {
     console.log('getLoadingEntity')
   }
-  export function takeScreenshot(mime: string = 'image/png') {
+  export function takeScreenshot() {
     console.log('takeScreenshot')
   }
 

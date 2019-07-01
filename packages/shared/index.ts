@@ -83,13 +83,13 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     userId = 'email|5cdd68572d5f842a16d6cc17'
   } else {
     await auth.login(container)
+
     try {
       const payload: any = await auth.getAccessTokenData()
       userId = payload.user_id
     } catch (e) {
       console['error'](e)
       console['groupEnd']()
-      auth.logout()
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
 

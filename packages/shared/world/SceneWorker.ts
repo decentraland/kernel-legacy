@@ -1,13 +1,16 @@
 import { future } from 'fp-future'
 import { ScriptingHost } from 'decentraland-rpc/lib/host'
-import { error } from '../../engine/logger'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { WebWorkerTransport } from 'decentraland-rpc'
-import { playerConfigurations } from '../../config'
+
+import { playerConfigurations } from 'config'
+import { worldToGrid } from 'atomicHelpers/parcelScenePositions'
+import { defaultLogger } from 'shared/logger'
 import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
-import { Vector3, Quaternion } from 'decentraland-ecs/src/decentraland/math'
-import { PositionReport } from './positionThings'
+import { Vector3, Quaternion, Vector2 } from 'decentraland-ecs/src/decentraland/math'
+import { PositionReport, positionObservable } from './positionThings'
+import { Observer, Observable } from 'decentraland-ecs/src'
 
 // tslint:disable-next-line:whitespace
 type EngineAPI = import('../apis/EngineAPI').EngineAPI
@@ -34,7 +37,7 @@ function unmountSystem(system: ScriptingHost) {
   try {
     system.unmount()
   } catch (e) {
-    error('Error unmounting system', e)
+    defaultLogger.error('Error unmounting system', e)
   }
 }
 
@@ -46,10 +49,12 @@ export class SceneWorker {
 
   /** false if this worker part of a dynamically loaded scene */
   public persistent = false
+  public readonly onDisposeObservable = new Observable<SceneWorker>()
 
   public readonly position: Vector3 = new Vector3()
   private readonly lastSentPosition = new Vector3(0, 0, 0)
   private readonly lastSentRotation = new Quaternion(0, 0, 0, 1)
+  private positionObserver: Observer<any> | null = null
 
   constructor(public parcelScene: ParcelSceneAPI, transport?: ScriptingTransport) {
     parcelScene.registerWorker(this)
@@ -61,14 +66,21 @@ export class SceneWorker {
 
   dispose() {
     if (this.enabled) {
+      if (this.positionObserver) {
+        positionObservable.remove(this.positionObserver)
+        delete this.positionObserver
+      }
+
       this.enabled = false
 
       // Unmount the system
       if (this.system) {
-        this.system.then(unmountSystem).catch(e => error('Unable to unmount system', e))
+        this.system.then(unmountSystem).catch(e => defaultLogger.error('Unable to unmount system', e))
       }
 
       this.parcelScene.dispose()
+
+      this.onDisposeObservable.notifyObservers(this)
     }
   }
 
@@ -99,6 +111,16 @@ export class SceneWorker {
     }
   }
 
+  private subscribeToPositionEvents() {
+    const position = Vector2.Zero()
+
+    this.positionObserver = positionObservable.add(obj => {
+      worldToGrid(obj.position, position)
+
+      this.sendUserViewMatrix(obj)
+    })
+  }
+
   private async startSystem(transport: ScriptingTransport) {
     const system = await ScriptingHost.fromTransport(transport)
 
@@ -109,11 +131,15 @@ export class SceneWorker {
 
     system.enable()
 
+    this.subscribeToPositionEvents()
+
     return system
   }
 
   private async loadSystem(transport?: ScriptingTransport): Promise<ScriptingHost> {
-    const worker = new (Worker as any)(gamekitWorkerUrl, { name: `ParcelSceneWorker(${this.parcelScene.data.id})` })
+    const worker = new (Worker as any)(gamekitWorkerUrl, {
+      name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
+    })
     return this.startSystem(transport || WebWorkerTransport(worker))
   }
 }

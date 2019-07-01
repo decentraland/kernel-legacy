@@ -17,7 +17,7 @@ import {
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
-import { ILogger, createLogger } from '../shared/logger'
+import { ILogger, createLogger, defaultLogger } from '../shared/logger'
 import {
   positionObservable,
   lastPlayerPosition,
@@ -26,29 +26,21 @@ import {
 } from '../shared/world/positionThings'
 import {
   enableParcelSceneLoading,
-  loadedParcelSceneWorkers,
-  getSceneWorkerByBaseCoordinates,
-  getParcelSceneCID,
-  enablePositionReporting
+  getSceneWorkerBySceneID,
+  getParcelSceneID,
+  stopParcelSceneWorker,
+  loadParcelScene
 } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import {
-  DEBUG,
-  ENGINE_DEBUG_PANEL,
-  SCENE_DEBUG_PANEL,
-  parcelLimits,
-  playerConfigurations,
-  ETHEREUM_NETWORK
-} from '../config'
+import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
 let gameInstance!: GameInstance
-const preloadedScenes = new Set<string>()
 
 const positionEvent = {
   position: Vector3.Zero(),
@@ -70,21 +62,20 @@ const browserInterface = {
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
-    const scene = getSceneWorkerByBaseCoordinates(data.sceneId)
-    console.log('SCENE EVENT HERE ' + data.eventType + ' ---  ' + data.payload)
+    const scene = getSceneWorkerBySceneID(data.sceneId)
 
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
+    } else {
+      defaultLogger.error(`SceneEvent: Scene ${data.sceneId} not found`, data)
     }
   },
 
   PreloadFinished(data: { sceneId: string }) {
-    preloadedScenes.add(data.sceneId)
+    // stub. there is no code about this in unity side yet
   }
 }
-
-let lastParcelScenesSent = ''
 
 export const unityInterface = {
   debug: false,
@@ -108,30 +99,17 @@ export const unityInterface = {
   },
   /** Tells the engine which scenes to load */
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
-    const parcelScenes = JSON.stringify({ parcelsToLoad })
-    if (parcelScenes !== lastParcelScenesSent) {
-      lastParcelScenesSent = parcelScenes
-      let finalJson: string = ''
-
-      // NOTE(Brian): split json to be able to throttle the json parsing process in engine's side
-      for (let i = 0; i < parcelsToLoad.length; i++) {
-        const parcel = parcelsToLoad[i]
-        const json = JSON.stringify(parcel)
-
-        finalJson += json
-
-        if (i < parcelsToLoad.length - 1) {
-          finalJson += '}{'
-        }
-      }
-
-      gameInstance.SendMessage('SceneController', 'LoadParcelScenes', finalJson)
+    if (parcelsToLoad.length > 1) {
+      throw new Error('Only one scene at a time!')
     }
+    gameInstance.SendMessage('SceneController', 'LoadParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
-  sendSceneMessage(parcelSceneId: string, method: string, payload: string) {
+  UnloadScene(sceneId: string) {
+    gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
+  },
+  SendSceneMessage(parcelSceneId: string, method: string, payload: string) {
     if (unityInterface.debug) {
-      // tslint:disable-next-line:no-console
-      console.log(parcelSceneId, method, payload)
+      defaultLogger.info(parcelSceneId, method, payload)
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}`)
   },
@@ -145,11 +123,10 @@ export const unityInterface = {
   },
   sendBuilderMessage(method: string, payload: string = '') {
     gameInstance.SendMessage(`BuilderController`, method, payload)
+  },
+  UnlockCursor() {
+    gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   }
-}
-
-export function finishScenePreload(id: string): void {
-  preloadedScenes.add(id)
 }
 
 window['unityInterface'] = unityInterface
@@ -159,18 +136,17 @@ window['unityInterface'] = unityInterface
 class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
   worker!: SceneWorker
-  unitySceneId: string
   logger: ILogger
 
-  constructor(public id: string, public data: EnvironmentData<T>) {
-    this.unitySceneId = id
-    this.logger = createLogger(this.unitySceneId + ': ')
+  constructor(public data: EnvironmentData<T>) {
+    this.logger = createLogger(getParcelSceneID(this) + ': ')
   }
 
   sendBatch(actions: EntityAction[]): void {
+    const sceneId = getParcelSceneID(this)
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      unityInterface.sendSceneMessage(this.unitySceneId, action.type, action.payload)
+      unityInterface.SendSceneMessage(sceneId, action.type, action.payload)
     }
   }
 
@@ -193,7 +169,8 @@ class UnityScene<T> implements ParcelSceneAPI {
 
 export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
   constructor(public data: EnvironmentData<LoadableParcelScene>) {
-    super(data.data.id, data)
+    super(data)
+    this.logger = createLogger(data.data.basePosition.x + ',' + data.data.basePosition.y + ': ')
   }
 
   registerWorker(worker: SceneWorker): void {
@@ -207,7 +184,7 @@ export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
         const parcelIdentity = system.getAPIInstance(ParcelIdentity)
         parcelIdentity.land = this.data.data.land
-        parcelIdentity.cid = getParcelSceneCID(worker)
+        parcelIdentity.cid = getParcelSceneID(worker.parcelScene)
       })
       .catch(e => this.logger.error('Error initializing system', e))
   }
@@ -215,7 +192,7 @@ export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: GameInstance) {
+export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
@@ -234,31 +211,27 @@ export async function initializeEngine(net: ETHEREUM_NETWORK, _gameInstance: Gam
 
   await initializeDecentralandUI()
 
-  enablePositionReporting()
-
   return {
-    net,
     unityInterface,
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
         ;(browserInterface as any)[type](message)
       } else {
-        // tslint:disable-next-line:no-console
-        console.log('MessageFromEngine', type, message)
+        defaultLogger.info('MessageFromEngine', type, message)
       }
     }
   }
 }
 
-export async function startUnityParcelLoading(net: ETHEREUM_NETWORK) {
-  await enableParcelSceneLoading(net, {
+export async function startUnityParcelLoading() {
+  await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
-    shouldLoadParcelScene: () => {
-      return true
-      // TODO integrate with unity the preloading feature
-      // tslint:disable-next-line: no-commented-out-code
-      // return preloadedScenes.has(land.scene.scene.base)
+    preloadScene: async _land => {
+      // TODO:
+      // 1) implement preload call
+      // 2) await for preload message or timeout
+      // 3) return
     },
     onSpawnpoint: initialLand => {
       const newPosition = getWorldSpawnpoint(initialLand)
@@ -273,29 +246,32 @@ export async function startUnityParcelLoading(net: ETHEREUM_NETWORK) {
           return x
         })
       )
+    },
+    onUnloadParcelScenes: lands => {
+      lands.forEach($ => {
+        unityInterface.UnloadScene($.sceneId)
+      })
     }
   })
 }
 
 async function initializeDecentralandUI() {
-  const id = 'dcl-ui-scene'
+  const sceneId = 'dcl-ui-scene'
 
-  const scene = new UnityScene(id, {
+  const scene = new UnityScene({
+    sceneId,
     baseUrl: location.origin,
     main: hudWorkerUrl,
-    data: { id },
-    id,
+    data: {},
     mappings: []
   })
 
-  const worker = new SceneWorker(scene)
+  const worker = loadParcelScene(scene)
   worker.persistent = true
 
   await ensureUiApis(worker)
 
-  loadedParcelSceneWorkers.add(worker)
-
-  unityInterface.CreateUIScene({ id: scene.unitySceneId, baseUrl: scene.data.baseUrl })
+  unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
 }
 
 //Builder functions
@@ -320,15 +296,14 @@ export function setPlayModeBuilder(on: string) {
   unityInterface.sendBuilderMessage('SetPlayMode', on)
 }
 
+let currentLoadedScene: SceneWorker
+
 export async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
 
-  loadedParcelSceneWorkers.forEach(worker => {
-    if (!worker.persistent) {
-      worker.dispose()
-      loadedParcelSceneWorkers.delete(worker)
-    }
-  })
+  if (currentLoadedScene) {
+    stopParcelSceneWorker(currentLoadedScene)
+  }
 
   if (result.ok) {
     // we load the scene to get the metadata
@@ -339,17 +314,15 @@ export async function loadPreviewScene() {
     const mappingsResponse = (await mappingsFetch.json()) as MappingsResponse
 
     let defaultScene: ILand = {
+      sceneId: 'previewScene',
       baseUrl: location.toString().replace(/\?[^\n]+/g, ''),
       scene,
       mappingsResponse: mappingsResponse
     }
 
-    // tslint:disable-next-line: no-console
-    console.log('Starting Preview...')
+    defaultLogger.info('Starting Preview...')
     const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
-    const parcelSceneWorker = new SceneWorker(parcelScene)
-
-    loadedParcelSceneWorkers.add(parcelSceneWorker)
+    currentLoadedScene = loadParcelScene(parcelScene)
 
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
     delete target.land
@@ -365,3 +338,9 @@ teleportObservable.add((position: { x: number; y: number }) => {
 })
 
 window['messages'] = (e: any) => chatObservable.notifyObservers(e)
+
+document.addEventListener('pointerlockchange', e => {
+  if (!document.pointerLockElement) {
+    unityInterface.UnlockCursor()
+  }
+})
