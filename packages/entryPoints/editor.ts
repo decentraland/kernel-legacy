@@ -1,5 +1,5 @@
 // tslint:disable:no-console
-declare var global: any & { isEditor: boolean }
+declare var global: any & { isEditor: boolean; editor: any }
 declare var window: Window & { isEditor: boolean }
 
 global.isEditor = window.isEditor = true
@@ -48,15 +48,16 @@ function getBaseCoords(scene: IScene): string {
  * It creates and instance the a scene worker and adds it to the world and the
  * `loadedParcelSceneWorkers` list
  */
-function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): void {
+function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene {
   try {
     const parcelScene = new UnityParcelScene(scene)
     const parcelSceneWorker = new SceneWorker(parcelScene)
-    loadedParcelSceneWorkers.add(parcelSceneWorker)
 
     const target: LoadableParcelScene = { ...scene.data }
     delete target.land
     unityInterface.LoadParcelScenes([target])
+
+    return parcelScene
   } catch (e) {
     throw new Error('Could not load scene.json')
   }
@@ -99,7 +100,7 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     loadedParcelSceneWorkers.delete($)
   })
 
-  loadBuilderScene(userScene)
+  scene = loadBuilderScene(userScene)
 
   scene!.on('uuidEvent' as any, event => {
     const { type } = event.payload
@@ -240,4 +241,4 @@ namespace editor {
   }
 }
 
-global['editor'] = editor
+global.editor = editor
