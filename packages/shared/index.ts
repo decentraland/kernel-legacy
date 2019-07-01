@@ -75,20 +75,15 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     defaultLogger.log(`Using test user.`)
     user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
-    try {
-      await auth.login(container)
-    } catch (error) {
-      defaultLogger.error(error)
-      if (knownTLDs.includes(getTLD())) {
-        window.location.href = `https://explorer.decentraland.${getTLD()}`
-      }
-    }
-
+    await auth.login(container)
     try {
       const payload: any = await auth.getAccessTokenData()
       user_id = payload.user_id
     } catch (e) {
-      console['error'](e)
+      defaultLogger.error(e)
+      if (knownTLDs.includes(getTLD())) {
+        window.location.href = `https://explorer.decentraland.${getTLD()}`
+      }
       console['groupEnd']()
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
