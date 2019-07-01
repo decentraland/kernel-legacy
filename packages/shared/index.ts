@@ -3,7 +3,7 @@ import { Auth } from 'decentraland-auth'
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3, knownTLDs } from '../config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../config'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { awaitWeb3Approval } from './ethereum/provider'
@@ -81,9 +81,6 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
       user_id = payload.user_id
     } catch (e) {
       defaultLogger.error(e)
-      if (knownTLDs.includes(getTLD())) {
-        window.location.href = `https://explorer.decentraland.${getTLD()}`
-      }
       console['groupEnd']()
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
