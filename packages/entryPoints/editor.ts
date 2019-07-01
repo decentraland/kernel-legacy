@@ -48,7 +48,7 @@ function getBaseCoords(scene: IScene): string {
  * It creates and instance the a scene worker and adds it to the world and the
  * `loadedParcelSceneWorkers` list
  */
-function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene {
+function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene | null {
   try {
     const parcelScene = new UnityParcelScene(scene)
     const parcelSceneWorker = new SceneWorker(parcelScene)
@@ -56,7 +56,6 @@ function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityPar
     const target: LoadableParcelScene = { ...scene.data }
     delete target.land
     unityInterface.LoadParcelScenes([target])
-
     return parcelScene
   } catch (e) {
     throw new Error('Could not load scene.json')
