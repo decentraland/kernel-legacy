@@ -3,7 +3,7 @@ import { Auth } from 'decentraland-auth'
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3, knownTLDs } from '../config'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { awaitWeb3Approval } from './ethereum/provider'
@@ -72,10 +72,17 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   console['group']('connect#login')
 
   if (PREVIEW) {
-    console['log'](`Using test user.`)
+    defaultLogger.log(`Using test user.`)
     user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
-    await auth.login(container)
+    try {
+      await auth.login(container)
+    } catch (error) {
+      defaultLogger.error(error)
+      if (knownTLDs.includes(getTLD())) {
+        window.location.href = `https://explorer.decentraland.${getTLD()}`
+      }
+    }
 
     try {
       const payload: any = await auth.getAccessTokenData()
@@ -89,7 +96,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     await initializeAnalytics(user_id)
   }
 
-  console['log'](`User ${user_id} logged in`)
+  defaultLogger.log(`User ${user_id} logged in`)
 
   console['groupEnd']()
 
@@ -97,7 +104,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   const address = await getAddress()
 
   if (address) {
-    console['log'](`Identifying address ${address}`)
+    defaultLogger.log(`Identifying address ${address}`)
     queueTrackingEvent('Use web3 address', { address })
   }
 
