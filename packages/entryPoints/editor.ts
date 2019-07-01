@@ -27,10 +27,13 @@ import {
   setCameraZoomDeltaBuilder,
   setPlayModeBuilder
 } from '../unity-interface/dcl'
+import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
+import defaultLogger from '../shared/logger'
 
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
 let scene: UnityParcelScene | null = null
+let sceneData: ILand
 
 /**
  * It returns base parcel if exists on `scene.json` or "0,0" if `baseParcel` missing
@@ -78,7 +81,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
     throw new Error('baseUrl missing in scene')
   }
 
-  const defaultScene: ILand = {
+  sceneData = {
     baseUrl: scene.baseUrl,
     sceneId: 'editorScene',
     scene,
@@ -90,12 +93,11 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
     }
   }
 
-  await initializePreview(ILandToLoadableParcelScene(defaultScene))
+  await initializePreview(ILandToLoadableParcelScene(sceneData))
 }
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>) {
   loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
-
   scene = loadBuilderScene(userScene)
 
   scene!.on('uuidEvent' as any, event => {
@@ -133,7 +135,7 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     evtEmitter.emit('entityBackInScene', e)
   })
 
-  console['log']('READYY!!')
+  console['log']('REsADYY!!')
   evtEmitter.emit('ready', {})
 }
 
@@ -171,9 +173,34 @@ namespace editor {
   export async function initEngine(container: HTMLElement) {
     console.log('ction')
 
+    const mockedDownloaderManager: Partial<SceneDataDownloadManager> = {
+      getParcelDataBySceneId: async id => {
+        if (id === 'editorScene' || id === '0, 0') {
+          return sceneData
+        }
+
+        return null
+      },
+      getParcelData: async position => {
+        try {
+          if (
+            sceneData.scene.scene.parcels.some(p => {
+              return p === position.replace(/\ /, '')
+            })
+          ) {
+            defaultLogger.log(`Returning data of ${position}`, sceneData)
+            return sceneData
+          }
+        } catch (error) {
+          defaultLogger.error('Requesting scene before is initialized.')
+        }
+        return null
+      }
+    }
+
     initializeUnity(container)
       .then(async () => {
-        await startUnityParcelLoading()
+        await startUnityParcelLoading(mockedDownloaderManager as SceneDataDownloadManager)
         initializedEngine.resolve()
         document.body.classList.remove('dcl-loading')
       })
@@ -188,7 +215,7 @@ namespace editor {
     selectGizmoBuilder(type)
   }
   export async function setPlayMode(on: boolean) {
-    var onString: string = on ? 'true' : 'false'
+    const onString: string = on ? 'true' : 'false'
     setPlayModeBuilder(onString)
   }
   export async function resize() {

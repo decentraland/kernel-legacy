@@ -8,6 +8,13 @@ import { SceneLifeCycleController } from './controllers/scene'
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
 import { ILand } from 'shared/types'
+import defaultLogger from 'shared/logger'
+
+export type LifecycleWorkerOptions = {
+  contentServer: string
+  lineOfSightRadius: number
+  mockedDownloadManager?: boolean // For stubbing (builder)
+}
 
 const connector = new Adapter(WebWorkerTransport(self as any))
 
@@ -35,8 +42,14 @@ let downloadManager: SceneDataDownloadManager
  * - 'Scene.prefetchDone' { sceneId: string }
  */
 {
-  connector.on('Lifecycle.initialize', (options: { contentServer: string; lineOfSightRadius: number }) => {
-    downloadManager = new SceneDataDownloadManager({ contentServer: options.contentServer })
+  connector.on('Lifecycle.initialize', (options: LifecycleWorkerOptions) => {
+    defaultLogger.log('Lifecycle.initialize', options.mockedDownloadManager)
+    if (options.mockedDownloadManager) {
+      defaultLogger.log('Using an injected "downloadManager"')
+      downloadManager = getMockedDownloaderManager(connector)
+    } else {
+      downloadManager = new SceneDataDownloadManager({ contentServer: options.contentServer })
+    }
     parcelController = new ParcelLifeCycleController({ lineOfSightRadius: options.lineOfSightRadius })
     sceneController = new SceneLifeCycleController({ downloadManager })
     positionController = new PositionLifecycleController(sceneController)
@@ -79,4 +92,25 @@ let downloadManager: SceneDataDownloadManager
       sceneController.reportDataLoaded(opt.sceneId)
     })
   })
+}
+
+function getMockedDownloaderManager(connector: Adapter): SceneDataDownloadManager {
+  return {
+    getParcelData: position => {
+      connector.notify('getParcelData', { position })
+      return new Promise(resolve => {
+        connector.on('DownloaderManager.getParcelData', ({ scene }: { scene: ILand | null }) => {
+          resolve(scene)
+        })
+      })
+    },
+    getParcelDataBySceneId: id => {
+      connector.notify('getParcelDataBySceneId', { id })
+      return new Promise(resolve => {
+        connector.on('DownloaderManager.getParcelDataBySceneId', ({ scene }: { scene: ILand | null }) => {
+          resolve(scene)
+        })
+      })
+    }
+  } as SceneDataDownloadManager
 }

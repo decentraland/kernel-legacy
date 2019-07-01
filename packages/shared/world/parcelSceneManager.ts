@@ -1,14 +1,16 @@
-import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
-import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
 import { worldToGrid } from 'atomicHelpers/parcelScenePositions'
-
+import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
+import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
+import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
+import { SceneDataDownloadManager } from 'decentraland-loader/lifecycle/controllers/download'
 import { positionObservable, teleportObservable } from './positionThings'
 import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
-import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
+import defaultLogger from 'shared/logger'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
+  downloadManager?: SceneDataDownloadManager
   preloadScene: (parcelToLoad: ILand) => Promise<any>
   onSpawnpoint?: (initialLand: ILand) => void
   onLoadParcelScenes?(x: ILand[]): void
@@ -61,7 +63,11 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
 }
 
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
-  const ret = await initParcelSceneWorker()
+  if (options.downloadManager) {
+    defaultLogger.log('Using an injected "downloadManager"', options.downloadManager)
+  }
+
+  const ret = await initParcelSceneWorker(options.downloadManager)
   const position = Vector2.Zero()
 
   ret.on('Scene.shouldPrefetch', async (opts: { sceneId: string }) => {

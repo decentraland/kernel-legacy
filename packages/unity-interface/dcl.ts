@@ -34,6 +34,7 @@ import {
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
@@ -224,9 +225,19 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 }
 
-export async function startUnityParcelLoading() {
+/**
+ * Initialize scenes loading worker
+ * OPTIONAL: mock the download manager at @param downloaderManager for example
+ * for not using content server. `editor.ts` entrypoint is using it
+ */
+export async function startUnityParcelLoading(downloadManager?: SceneDataDownloadManager) {
+  if (downloadManager) {
+    defaultLogger.log('Using an injected "downloadManager"', downloadManager)
+  }
+
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
+    downloadManager,
     preloadScene: async _land => {
       // TODO:
       // 1) implement preload call

@@ -3,6 +3,7 @@ import { Vector2Component } from 'atomicHelpers/landHelpers'
 import future, { IFuture } from 'fp-future'
 import { EventEmitter } from 'events'
 import { SceneDataDownloadManager } from './download'
+import defaultLogger from 'shared/logger'
 
 export class SceneLifeCycleController extends EventEmitter {
   private downloadManager: SceneDataDownloadManager
@@ -33,7 +34,9 @@ export class SceneLifeCycleController extends EventEmitter {
   }
 
   async onSight(position: string) {
+    defaultLogger.log('position', position)
     let sceneId = await this.requestSceneId(position)
+    defaultLogger.log('requestSceneId', sceneId)
 
     if (sceneId) {
       const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
@@ -46,7 +49,7 @@ export class SceneLifeCycleController extends EventEmitter {
         }
       }
 
-      if (this.sceneStatus.get(sceneId)!.isDead()) {
+      if (this.sceneStatus.has(sceneId) && this.sceneStatus.get(sceneId)!.isDead()) {
         this.emit('Preload scene', sceneId)
         this.sceneStatus.get(sceneId)!.status = 'awake'
       }
@@ -85,6 +88,7 @@ export class SceneLifeCycleController extends EventEmitter {
       this.futureOfPositionToSceneId.set(position, future<string | undefined>())
       try {
         const land = await this.downloadManager.getParcelData(position)
+        defaultLogger.log('land', land)
 
         if (!land) {
           this.futureOfPositionToSceneId.get(position)!.resolve(undefined)

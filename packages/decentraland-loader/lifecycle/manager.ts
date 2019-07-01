@@ -1,14 +1,13 @@
 // This gets executed from the main thread and serves as an interface
 // to communicate with the Lifecycle worker, so it's a "Server" in terms of decentraland-rpc
-
 import future, { IFuture } from 'fp-future'
 import { TransportBasedServer } from 'decentraland-rpc/lib/host/TransportBasedServer'
 import { WebWorkerTransport } from 'decentraland-rpc/lib/common/transports/WebWorker'
 
 import { resolveUrl } from 'atomicHelpers/parseUrl'
-import { error } from 'util'
 import { ILand } from 'shared/types'
-
+import defaultLogger from 'shared/logger'
+import { SceneDataDownloadManager } from './controllers/download'
 import { DEBUG, parcelLimits, getServerConfigurations } from '../../config'
 
 /*
@@ -17,7 +16,7 @@ import { DEBUG, parcelLimits, getServerConfigurations } from '../../config'
 const lifecycleWorkerRaw = require('raw-loader!../../../static/loader/lifecycle/worker.js')
 const lifecycleWorkerUrl = URL.createObjectURL(new Blob([lifecycleWorkerRaw]))
 const worker: Worker = new (Worker as any)(lifecycleWorkerUrl, { name: 'LifecycleWorker' })
-worker.onerror = e => error('Loader worker error', e)
+worker.onerror = e => defaultLogger.error('Loader worker error', e)
 
 export class LifecycleManager extends TransportBasedServer {
   sceneIdToRequest: Map<string, IFuture<ILand>> = new Map()
@@ -49,15 +48,33 @@ let server: LifecycleManager
 
 export const getServer = () => server
 
-export async function initParcelSceneWorker() {
+export async function initParcelSceneWorker(downloadManager?: SceneDataDownloadManager) {
   server = new LifecycleManager(WebWorkerTransport(worker))
 
   server.enable()
 
   server.notify('Lifecycle.initialize', {
     contentServer: DEBUG ? resolveUrl(document.location.origin, '/local-ipfs') : getServerConfigurations().content,
-    lineOfSightRadius: parcelLimits.visibleRadius
+    lineOfSightRadius: parcelLimits.visibleRadius,
+    mockedDownloadManager: !!downloadManager
   })
 
+  if (downloadManager) {
+    defaultLogger.log('Using an injected "downloadManager"', downloadManager)
+    setupMockedDownloaderManager(server, downloadManager)
+  }
+
   return server
+}
+
+function setupMockedDownloaderManager(server: LifecycleManager, downloadManager: SceneDataDownloadManager) {
+  server.on('getParcelData', async ({ position }) => {
+    const scene = await downloadManager.getParcelData(position)
+    server.notify('DownloaderManager.getParcelData', { scene })
+  })
+
+  server.on('getParcelDataBySceneId', async ({ id }) => {
+    const scene = await downloadManager.getParcelDataBySceneId(id)
+    server.notify('DownloaderManager.getParcelDataBySceneId', { scene })
+  })
 }

@@ -23,15 +23,26 @@ function getSceneIdFromSceneMappingResponse(scene: DeployedScene) {
 }
 
 export class SceneDataDownloadManager {
-  positionToSceneId: Map<string, IFuture<string | null>> = new Map()
-  sceneIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
-  rootIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
+  private positionToSceneId: Map<string, IFuture<string | null>> = new Map()
+  private sceneIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
 
-  constructor(public options: { contentServer: string }) {
+  constructor(private options: { contentServer: string }) {
     // stub
   }
 
-  async resolveSceneSceneId(pos: string): Promise<string | null> {
+  async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {
+    return this.sceneIdToLandData.get(sceneId)!
+  }
+
+  async getParcelData(position: string): Promise<ILand | null> {
+    const sceneId = await this.resolveSceneSceneId(position)
+    if (sceneId === null) {
+      return null
+    }
+    return this.resolveLandData(sceneId)
+  }
+
+  private async resolveSceneSceneId(pos: string): Promise<string | null> {
     if (this.positionToSceneId.has(pos)) {
       return this.positionToSceneId.get(pos)!
     }
@@ -58,7 +69,7 @@ export class SceneDataDownloadManager {
     return promised
   }
 
-  setSceneRoots(contents: SceneMappingResponse) {
+  private setSceneRoots(contents: SceneMappingResponse) {
     for (let result of contents.data) {
       const sceneId = getSceneIdFromSceneMappingResponse(result)
       const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
@@ -71,7 +82,7 @@ export class SceneDataDownloadManager {
     }
   }
 
-  async resolveLandData(sceneId: string): Promise<ILand | null> {
+  private async resolveLandData(sceneId: string): Promise<ILand | null> {
     if (this.sceneIdToLandData.has(sceneId)) {
       return this.sceneIdToLandData.get(sceneId)!
     }
@@ -142,17 +153,5 @@ export class SceneDataDownloadManager {
     promised.resolve(data)
 
     return data
-  }
-
-  async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {
-    return this.sceneIdToLandData.get(sceneId)!
-  }
-
-  async getParcelData(position: string): Promise<ILand | null> {
-    const sceneId = await this.resolveSceneSceneId(position)
-    if (sceneId === null) {
-      return null
-    }
-    return this.resolveLandData(sceneId)
   }
 }
