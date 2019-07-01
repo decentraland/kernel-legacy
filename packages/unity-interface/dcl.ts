@@ -231,10 +231,6 @@ export async function initializeEngine(_gameInstance: GameInstance) {
  * for not using content server. `editor.ts` entrypoint is using it
  */
 export async function startUnityParcelLoading(downloadManager?: SceneDataDownloadManager) {
-  if (downloadManager) {
-    defaultLogger.log('Using an injected "downloadManager"', downloadManager)
-  }
-
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
     downloadManager,

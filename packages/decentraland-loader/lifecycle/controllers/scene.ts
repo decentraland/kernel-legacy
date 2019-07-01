@@ -34,9 +34,7 @@ export class SceneLifeCycleController extends EventEmitter {
   }
 
   async onSight(position: string) {
-    defaultLogger.log('position', position)
     let sceneId = await this.requestSceneId(position)
-    defaultLogger.log('requestSceneId', sceneId)
 
     if (sceneId) {
       const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
@@ -88,7 +86,6 @@ export class SceneLifeCycleController extends EventEmitter {
       this.futureOfPositionToSceneId.set(position, future<string | undefined>())
       try {
         const land = await this.downloadManager.getParcelData(position)
-        defaultLogger.log('land', land)
 
         if (!land) {
           this.futureOfPositionToSceneId.get(position)!.resolve(undefined)

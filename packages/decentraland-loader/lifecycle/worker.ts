@@ -43,9 +43,7 @@ let downloadManager: SceneDataDownloadManager
  */
 {
   connector.on('Lifecycle.initialize', (options: LifecycleWorkerOptions) => {
-    defaultLogger.log('Lifecycle.initialize', options.mockedDownloadManager)
     if (options.mockedDownloadManager) {
-      defaultLogger.log('Using an injected "downloadManager"')
       downloadManager = getMockedDownloaderManager(connector)
     } else {
       downloadManager = new SceneDataDownloadManager({ contentServer: options.contentServer })

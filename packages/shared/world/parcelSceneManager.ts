@@ -6,7 +6,6 @@ import { SceneDataDownloadManager } from 'decentraland-loader/lifecycle/controll
 import { positionObservable, teleportObservable } from './positionThings'
 import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
-import defaultLogger from 'shared/logger'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
@@ -63,10 +62,6 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
 }
 
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
-  if (options.downloadManager) {
-    defaultLogger.log('Using an injected "downloadManager"', options.downloadManager)
-  }
-
   const ret = await initParcelSceneWorker(options.downloadManager)
   const position = Vector2.Zero()
 

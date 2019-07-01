@@ -7,6 +7,7 @@ global.isEditor = window.isEditor = true
 import { EventEmitter } from 'events'
 import future from 'fp-future'
 
+import { sleep } from '../atomicHelpers/sleep'
 import { loadedSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
 import {
   IScene,
@@ -34,6 +35,7 @@ const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
 let scene: UnityParcelScene | null = null
 let sceneData: ILand
+let sceneWorker: SceneWorker | null = null
 
 /**
  * It returns base parcel if exists on `scene.json` or "0,0" if `baseParcel` missing
@@ -54,9 +56,11 @@ function getBaseCoords(scene: IScene): string {
 function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene | null {
   try {
     const parcelScene = new UnityParcelScene(scene)
+    sceneWorker = new SceneWorker(parcelScene)
 
     const target: LoadableParcelScene = { ...scene.data }
     delete target.land
+    loadedSceneWorkers.set(parcelScene.data.sceneId, sceneWorker)
     unityInterface.LoadParcelScenes([target])
     return parcelScene
   } catch (e) {
@@ -83,7 +87,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 
   sceneData = {
     baseUrl: scene.baseUrl,
-    sceneId: 'editorScene',
+    sceneId: '0, 0',
     scene,
     mappingsResponse: {
       contents,
@@ -98,6 +102,7 @@ async function loadScene(scene: IScene & { baseUrl: string }) {
 
 async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>) {
   loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
+  loadedSceneWorkers.clear()
   scene = loadBuilderScene(userScene)
 
   scene!.on('uuidEvent' as any, event => {
@@ -135,6 +140,13 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     evtEmitter.emit('entityBackInScene', e)
   })
 
+  const system = await sceneWorker!.system
+
+  const engineAPI = sceneWorker!.engineAPI!
+  while (!system.isEnabled || !engineAPI.didStart) {
+    await sleep(10)
+  }
+
   console['log']('REsADYY!!')
   evtEmitter.emit('ready', {})
 }
@@ -171,11 +183,9 @@ namespace editor {
     }
   }
   export async function initEngine(container: HTMLElement) {
-    console.log('ction')
-
     const mockedDownloaderManager: Partial<SceneDataDownloadManager> = {
       getParcelDataBySceneId: async id => {
-        if (id === 'editorScene' || id === '0, 0') {
+        if (id === '0, 0') {
           return sceneData
         }
 
@@ -188,7 +198,6 @@ namespace editor {
               return p === position.replace(/\ /, '')
             })
           ) {
-            defaultLogger.log(`Returning data of ${position}`, sceneData)
             return sceneData
           }
         } catch (error) {
@@ -205,8 +214,7 @@ namespace editor {
         document.body.classList.remove('dcl-loading')
       })
       .catch(err => {
-        console['error']('Error loading Unity')
-        console['error'](err)
+        defaultLogger.error('Error loading Unity', err)
         initializedEngine.reject(err)
         throw err
       })
