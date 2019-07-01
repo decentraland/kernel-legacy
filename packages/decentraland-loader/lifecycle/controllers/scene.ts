@@ -3,7 +3,6 @@ import { Vector2Component } from 'atomicHelpers/landHelpers'
 import future, { IFuture } from 'fp-future'
 import { EventEmitter } from 'events'
 import { SceneDataDownloadManager } from './download'
-import defaultLogger from 'shared/logger'
 
 export class SceneLifeCycleController extends EventEmitter {
   private downloadManager: SceneDataDownloadManager

@@ -8,7 +8,6 @@ import { SceneLifeCycleController } from './controllers/scene'
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
 import { ILand } from 'shared/types'
-import defaultLogger from 'shared/logger'
 
 export type LifecycleWorkerOptions = {
   contentServer: string
