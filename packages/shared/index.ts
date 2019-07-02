@@ -80,7 +80,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   if (PREVIEW) {
     defaultLogger.log(`Using test user.`)
-    user_id = 'email|5cdd68572d5f842a16d6cc17'
+    userId = 'email|5cdd68572d5f842a16d6cc17'
   } else {
     await auth.login(container)
     try {
@@ -95,7 +95,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     await initializeAnalytics(userId)
   }
 
-  defaultLogger.log(`User ${user_id} logged in`)
+  defaultLogger.log(`User ${userId} logged in`)
 
   console['groupEnd']()
 
