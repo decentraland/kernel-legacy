@@ -79,16 +79,15 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   console['group']('connect#login')
 
   if (PREVIEW) {
-    console['log'](`Using test user.`)
-    userId = 'email|5cdd68572d5f842a16d6cc17'
+    defaultLogger.log(`Using test user.`)
+    user_id = 'email|5cdd68572d5f842a16d6cc17'
   } else {
     await auth.login(container)
-
     try {
       const payload: any = await auth.getAccessTokenData()
       userId = payload.user_id
     } catch (e) {
-      console['error'](e)
+      defaultLogger.error(e)
       console['groupEnd']()
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
@@ -96,7 +95,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     await initializeAnalytics(userId)
   }
 
-  console['log'](`User ${userId} logged in`)
+  defaultLogger.log(`User ${user_id} logged in`)
 
   console['groupEnd']()
 
@@ -104,7 +103,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   const address = await getAddress()
 
   if (address) {
-    console['log'](`Identifying address ${address}`)
+    defaultLogger.log(`Identifying address ${address}`)
     queueTrackingEvent('Use web3 address', { address })
   }
 
