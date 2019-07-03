@@ -24,24 +24,22 @@ export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
-  removeTimer: any | null = null
+  //removeTimer: any | null = null
 
   displayName = 'Avatar'
   publicKey = '0x00000000000000000000000000000000'
-  name: string = ''
   readonly transform: Transform = this.getComponentOrCreate(Transform)
   avatarShape!: AvatarShape
 
-  constructor(public uuid: string) {
+  constructor(uuid?: string) {
     super(uuid)
 
     {
       this.avatarShape = new AvatarShape()
       this.addComponentOrReplace(this.avatarShape)
     }
-
-    this.name = uuid
-
+    console.log('New Avatar: ' + uuid)
+    // avatarShape.name =
     // we need this component to filter the interpolator system
     this.getComponentOrCreate(Transform)
 
@@ -80,18 +78,31 @@ export class AvatarEntity extends Entity {
   }
 
   public removeScheduled() {
-    if (this.removeTimer != null) {
-      clearTimeout(this.removeTimer)
-      this.removeTimer = null
+    this.remove()
+    // if (this.removeTimer != null) {
+    //   clearTimeout(this.removeTimer)
+    //   this.removeTimer = null
+    // }
+    // this.removeTimer = setTimeout(
+    //   () => {
+    //     console.log('Remove avatar: ' + this.uuid)
+    //     this.remove()
+    //   },
+    //   10000,
+    //   null
+    // )
+  }
+
+  public remove() {
+    // if (this.removeTimer != null) {
+    //   clearTimeout(this.removeTimer)
+    //   this.removeTimer = null
+    // }
+
+    if (this.isAddedToEngine()) {
+      engine.removeEntity(this)
+      avatarMap.delete(this.uuid)
     }
-    this.removeTimer = setTimeout(
-      () => {
-        engine.removeEntity(this)
-        avatarMap.delete(this.name)
-      },
-      10000,
-      null
-    )
   }
 
   private updateVisibility() {
@@ -99,11 +110,10 @@ export class AvatarEntity extends Entity {
     if (!visible && this.isAddedToEngine()) {
       this.removeScheduled()
     } else if (visible && !this.isAddedToEngine()) {
-      if (this.removeTimer != null) {
-        clearTimeout(this.removeTimer)
-        this.removeTimer = null
-      }
-
+      // if (this.removeTimer != null) {
+      //   clearTimeout(this.removeTimer)
+      //   this.removeTimer = null
+      // }
       engine.addEntity(this)
     }
   }
@@ -183,6 +193,7 @@ function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage): boolean {
  * This function handles those visible changes.
  */
 function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
+  console.log('user visible = ' + visible + ' ... id ' + uuid)
   const avatar = ensureAvatar(uuid)
 
   if (avatar) {
@@ -192,6 +203,7 @@ function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
 
 function handleUserRemoved({ uuid }: UserRemovedMessage): void {
   const avatar = avatarMap.get(uuid)
+  console.log('removing... ' + uuid)
   if (avatar) {
     avatar.removeScheduled()
   }
