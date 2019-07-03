@@ -340,6 +340,25 @@ export async function loadPreviewScene() {
   }
 }
 
+export function loadBuilderScene(sceneData: ILand) {
+  if (currentLoadedScene) {
+    stopParcelSceneWorker(currentLoadedScene)
+  }
+
+  defaultLogger.info('Starting Builder Scene...')
+
+  defaultLogger.info('mappings: ', sceneData.mappingsResponse)
+
+  const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(sceneData))
+  currentLoadedScene = loadParcelScene(parcelScene)
+
+  const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
+  delete target.land
+
+  unityInterface.LoadParcelScenes([target])
+  return parcelScene
+}
+
 teleportObservable.add((position: { x: number; y: number }) => {
   unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
 })

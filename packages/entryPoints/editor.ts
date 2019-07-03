@@ -8,34 +8,69 @@ import { EventEmitter } from 'events'
 import future from 'fp-future'
 
 import { sleep } from '../atomicHelpers/sleep'
-import { loadedSceneWorkers, stopParcelSceneWorker } from '../shared/world/parcelSceneManager'
-import {
-  IScene,
-  normalizeContentMappings,
-  ILand,
-  ILandToLoadableParcelScene,
-  EnvironmentData,
-  LoadableParcelScene
-} from '../shared/types'
+import { loadedSceneWorkers } from '../shared/world/parcelSceneManager'
+import { IScene, normalizeContentMappings, ILand } from '../shared/types'
 import { SceneWorker } from '../shared/world/SceneWorker'
 import { initializeUnity } from '../unity-interface/initializer'
 import {
   UnityParcelScene,
-  startUnityParcelLoading,
-  unityInterface,
   selectGizmoBuilder,
   resetCameraBuilder,
   setCameraZoomDeltaBuilder,
-  setPlayModeBuilder
+  setPlayModeBuilder,
+  loadBuilderScene
 } from '../unity-interface/dcl'
-import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
 import defaultLogger from '../shared/logger'
 
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
-let scene: UnityParcelScene | null = null
-let sceneData: ILand
-let sceneWorker: SceneWorker | null = null
+
+let unityScene: UnityParcelScene
+
+/**
+ * Function executed by builder secondly
+ * It creates the builder scene, bind the scene events and stub the content mappings
+ */
+async function createBuilderScene(scene: IScene & { baseUrl: string }) {
+  const sceneData = await getSceneData(scene)
+  unityScene = loadBuilderScene(sceneData)
+  bindSceneEvents()
+
+  const system = await unityScene.worker.system
+  const engineAPI = unityScene.worker.engineAPI!
+  while (!system.isEnabled || !engineAPI.didStart) {
+    await sleep(10)
+  }
+
+  console['log']('REsADYY!!')
+  evtEmitter.emit('ready', {})
+}
+
+/**
+ * It fakes the content mappings for being used at the Builder without
+ * content server plus loads and creates the scene worker
+ */
+async function getSceneData(scene: IScene & { baseUrl: string }): Promise<ILand> {
+  const id = getBaseCoords(scene)
+  const publisher = '0x0'
+  const contents = normalizeContentMappings(scene._mappings || [])
+
+  if (!scene.baseUrl) {
+    throw new Error('baseUrl missing in scene')
+  }
+
+  return {
+    baseUrl: scene.baseUrl,
+    sceneId: '0, 0',
+    scene,
+    mappingsResponse: {
+      contents,
+      parcel_id: id,
+      publisher,
+      root_cid: 'Qmtest'
+    }
+  }
+}
 
 /**
  * It returns base parcel if exists on `scene.json` or "0,0" if `baseParcel` missing
@@ -49,63 +84,8 @@ function getBaseCoords(scene: IScene): string {
   return '0,0'
 }
 
-/**
- * It creates and instance the a scene worker and adds it to the world and the
- * `loadedParcelSceneWorkers` list
- */
-function loadBuilderScene(scene: EnvironmentData<LoadableParcelScene>): UnityParcelScene | null {
-  try {
-    const parcelScene = new UnityParcelScene(scene)
-    sceneWorker = new SceneWorker(parcelScene)
-
-    const target: LoadableParcelScene = { ...scene.data }
-    delete target.land
-    loadedSceneWorkers.set(parcelScene.data.sceneId, sceneWorker)
-    unityInterface.LoadParcelScenes([target])
-    return parcelScene
-  } catch (e) {
-    throw new Error('Could not load scene.json')
-  }
-}
-
-/**
- * It fakes the content mappings for being used at the Builder without
- * content server plus loads and creates the scene worker
- */
-async function loadScene(scene: IScene & { baseUrl: string }) {
-  if (!scene) {
-    return
-  }
-
-  const id = getBaseCoords(scene)
-  const publisher = '0x0'
-  const contents = normalizeContentMappings(scene._mappings || [])
-
-  if (!scene.baseUrl) {
-    throw new Error('baseUrl missing in scene')
-  }
-
-  sceneData = {
-    baseUrl: scene.baseUrl,
-    sceneId: '0, 0',
-    scene,
-    mappingsResponse: {
-      contents,
-      parcel_id: id,
-      publisher,
-      root_cid: 'Qmtest'
-    }
-  }
-
-  await initializePreview(ILandToLoadableParcelScene(sceneData))
-}
-
-async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>) {
-  loadedSceneWorkers.forEach($ => stopParcelSceneWorker($))
-  loadedSceneWorkers.clear()
-  scene = loadBuilderScene(userScene)
-
-  scene!.on('uuidEvent' as any, event => {
+function bindSceneEvents() {
+  unityScene.on('uuidEvent' as any, event => {
     const { type } = event.payload
 
     if (type === 'gizmoSelected') {
@@ -121,41 +101,47 @@ async function initializePreview(userScene: EnvironmentData<LoadableParcelScene>
     }
   })
 
-  scene!.on('metricsUpdate', e => {
+  unityScene.on('metricsUpdate', e => {
     evtEmitter.emit('metrics', {
       metrics: e.given,
       limits: e.limit
     })
   })
 
-  scene!.on('entitiesOutOfBoundaries', e => {
+  unityScene.on('entitiesOutOfBoundaries', e => {
     evtEmitter.emit('entitiesOutOfBoundaries', e)
   })
 
-  scene!.on('entityOutOfScene', e => {
+  unityScene.on('entityOutOfScene', e => {
     evtEmitter.emit('entityOutOfScene', e)
   })
 
-  scene!.on('entityBackInScene', e => {
+  unityScene.on('entityBackInScene', e => {
     evtEmitter.emit('entityBackInScene', e)
   })
-
-  const system = await sceneWorker!.system
-
-  const engineAPI = sceneWorker!.engineAPI!
-  while (!system.isEnabled || !engineAPI.didStart) {
-    await sleep(10)
-  }
-
-  console['log']('REsADYY!!')
-  evtEmitter.emit('ready', {})
 }
 
 namespace editor {
+  /**
+   * Function executed by builder which is the first function of the entry point
+   */
+  export async function initEngine(container: HTMLElement) {
+    initializeUnity(container)
+      .then(async () => {
+        defaultLogger.log('Engine initialized.')
+        initializedEngine.resolve()
+      })
+      .catch(err => {
+        defaultLogger.error('Error loading Unity', err)
+        initializedEngine.reject(err)
+        throw err
+      })
+  }
+
   export async function handleMessage(message: any) {
     if (message.type === 'update') {
       await initializedEngine
-      await loadScene(message.payload.scene)
+      await createBuilderScene(message.payload.scene)
     }
   }
   export function setGridResolution() {
@@ -172,8 +158,8 @@ namespace editor {
     return new Set(loadedSceneWorkers.values())
   }
   export function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
-    if (scene) {
-      const worker = scene.worker as SceneWorker
+    if (unityScene) {
+      const { worker } = unityScene
 
       if (action.payload.mappings) {
         // TODO: we need a method to update mappings on the fly on the Unity client
@@ -182,43 +168,7 @@ namespace editor {
       worker.engineAPI!.sendSubscriptionEvent('externalAction', action)
     }
   }
-  export async function initEngine(container: HTMLElement) {
-    const mockedDownloaderManager: Partial<SceneDataDownloadManager> = {
-      getParcelDataBySceneId: async id => {
-        if (id === '0, 0') {
-          return sceneData
-        }
 
-        return null
-      },
-      getParcelData: async position => {
-        try {
-          if (
-            sceneData.scene.scene.parcels.some(p => {
-              return p === position.replace(/\ /, '')
-            })
-          ) {
-            return sceneData
-          }
-        } catch (error) {
-          defaultLogger.error('Requesting scene before is initialized.')
-        }
-        return null
-      }
-    }
-
-    initializeUnity(container)
-      .then(async () => {
-        await startUnityParcelLoading(mockedDownloaderManager as SceneDataDownloadManager)
-        initializedEngine.resolve()
-        document.body.classList.remove('dcl-loading')
-      })
-      .catch(err => {
-        defaultLogger.error('Error loading Unity', err)
-        initializedEngine.reject(err)
-        throw err
-      })
-  }
   export function selectGizmo(type: string) {
     selectGizmoBuilder(type)
   }

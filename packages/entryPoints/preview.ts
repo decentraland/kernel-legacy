@@ -4,6 +4,7 @@ declare var window: Window & { preview: boolean }
 
 global.preview = window.preview = true
 
+import defaultLogger from '../shared/logger'
 import { initializeUnity } from '../unity-interface/initializer'
 import { loadPreviewScene } from '../unity-interface/dcl'
 
@@ -43,6 +44,5 @@ initializeUnity(container)
     startPreviewWatcher()
   })
   .catch(err => {
-    console['error']('Error loading Unity')
-    console['error'](err)
+    defaultLogger.error('There was an error', err)
   })
