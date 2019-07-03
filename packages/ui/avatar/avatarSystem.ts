@@ -24,24 +24,18 @@ export class AvatarEntity extends Entity {
   blocked = false
   muted = false
   visible = true
-  //removeTimer: any | null = null
 
-  displayName = 'Avatar'
-  publicKey = '0x00000000000000000000000000000000'
-  readonly transform: Transform = this.getComponentOrCreate(Transform)
+  readonly transform: Transform
   avatarShape!: AvatarShape
 
   constructor(uuid?: string) {
     super(uuid)
 
-    {
-      this.avatarShape = new AvatarShape()
-      this.addComponentOrReplace(this.avatarShape)
-    }
-    console.log('New Avatar: ' + uuid)
-    // avatarShape.name =
+    this.avatarShape = new AvatarShape()
+    this.addComponentOrReplace(this.avatarShape)
+
     // we need this component to filter the interpolator system
-    this.getComponentOrCreate(Transform)
+    this.transform = this.getComponentOrCreate(Transform)
 
     this.setVisible(true)
   }
@@ -77,28 +71,7 @@ export class AvatarEntity extends Entity {
     this.transform.rotation.set(Qx, Qy, Qz, Qw)
   }
 
-  public removeScheduled() {
-    this.remove()
-    // if (this.removeTimer != null) {
-    //   clearTimeout(this.removeTimer)
-    //   this.removeTimer = null
-    // }
-    // this.removeTimer = setTimeout(
-    //   () => {
-    //     console.log('Remove avatar: ' + this.uuid)
-    //     this.remove()
-    //   },
-    //   10000,
-    //   null
-    // )
-  }
-
   public remove() {
-    // if (this.removeTimer != null) {
-    //   clearTimeout(this.removeTimer)
-    //   this.removeTimer = null
-    // }
-
     if (this.isAddedToEngine()) {
       engine.removeEntity(this)
       avatarMap.delete(this.uuid)
@@ -108,12 +81,8 @@ export class AvatarEntity extends Entity {
   private updateVisibility() {
     const visible = this.visible && !this.blocked
     if (!visible && this.isAddedToEngine()) {
-      this.removeScheduled()
+      this.remove()
     } else if (visible && !this.isAddedToEngine()) {
-      // if (this.removeTimer != null) {
-      //   clearTimeout(this.removeTimer)
-      //   this.removeTimer = null
-      // }
       engine.addEntity(this)
     }
   }
@@ -193,7 +162,6 @@ function handleUserPose({ uuid, pose }: ReceiveUserPoseMessage): boolean {
  * This function handles those visible changes.
  */
 function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
-  console.log('user visible = ' + visible + ' ... id ' + uuid)
   const avatar = ensureAvatar(uuid)
 
   if (avatar) {
@@ -203,9 +171,8 @@ function handleUserVisible({ uuid, visible }: ReceiveUserVisibleMessage): void {
 
 function handleUserRemoved({ uuid }: UserRemovedMessage): void {
   const avatar = avatarMap.get(uuid)
-  console.log('removing... ' + uuid)
   if (avatar) {
-    avatar.removeScheduled()
+    avatar.remove()
   }
 }
 
