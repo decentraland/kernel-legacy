@@ -17,8 +17,10 @@ import {
   selectGizmoBuilder,
   resetCameraBuilder,
   setCameraZoomDeltaBuilder,
+  getCameraTargetBuilder,
   setPlayModeBuilder,
-  loadBuilderScene
+  loadBuilderScene,
+  updateBuilderScene
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 
@@ -44,6 +46,12 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
 
   console['log']('REsADYY!!')
   evtEmitter.emit('ready', {})
+}
+
+async function renewBuilderScene(scene: IScene & { baseUrl: string }) {
+  scene.baseUrl = unityScene.data.baseUrl
+  const sceneData = await getSceneData(scene)
+  updateBuilderScene(sceneData)
 }
 
 /**
@@ -157,14 +165,16 @@ namespace editor {
   export function getScenes(): Set<SceneWorker> {
     return new Set(loadedSceneWorkers.values())
   }
-  export function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
+  export async function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
+    debugger
+    console.log('LPM ' + action)
     if (unityScene) {
       const { worker } = unityScene
-
       if (action.payload.mappings) {
-        // TODO: we need a method to update mappings on the fly on the Unity client
+        var scene = action.payload.scene
+        scene._mappings = action.payload.mappings
+        await renewBuilderScene(scene)
       }
-
       worker.engineAPI!.sendSubscriptionEvent('externalAction', action)
     }
   }
@@ -189,7 +199,7 @@ namespace editor {
     setCameraZoomDeltaBuilder(delta)
   }
   export function getCameraTarget() {
-    console.log('getCameraTarget')
+    return getCameraTargetBuilder()
   }
   export function resetCameraZoom() {
     resetCameraBuilder()
