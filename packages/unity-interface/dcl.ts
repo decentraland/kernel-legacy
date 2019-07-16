@@ -11,6 +11,7 @@ import {
   EntityAction,
   EnvironmentData,
   ILandToLoadableParcelScene,
+  ILandToLoadableParcelSceneUpdate,
   IScene,
   MappingsResponse,
   ILand
@@ -104,6 +105,12 @@ export const unityInterface = {
       throw new Error('Only one scene at a time!')
     }
     gameInstance.SendMessage('SceneController', 'LoadParcelScenes', JSON.stringify(parcelsToLoad[0]))
+  },
+  UpdateParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
+    if (parcelsToLoad.length > 1) {
+      throw new Error('Only one scene at a time!')
+    }
+    gameInstance.SendMessage('SceneController', 'UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
@@ -209,9 +216,9 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (ENGINE_DEBUG_PANEL) {
     unityInterface.SetEngineDebugPanel()
   }
-
-  await initializeDecentralandUI()
-
+  if (!EDITOR) {
+    await initializeDecentralandUI()
+  }
   return {
     unityInterface,
     onMessage(type: string, message: any) {
@@ -295,6 +302,11 @@ export function setCameraZoomDeltaBuilder(delta: number) {
   unityInterface.sendBuilderMessage('ZoomDelta', delta.toString())
 }
 
+export function getCameraTargetBuilder() {
+  return { x: 0, y: 0, z: 0 }
+  //unityInterface.sendBuilderMessage('GetCameraTarget')
+}
+
 export function resetCameraBuilder() {
   unityInterface.sendBuilderMessage('ResetCamera')
 }
@@ -357,6 +369,16 @@ export function loadBuilderScene(sceneData: ILand) {
 
   unityInterface.LoadParcelScenes([target])
   return parcelScene
+}
+
+export function updateBuilderScene(sceneData: ILand) {
+  defaultLogger.info('Updating Builder Scene...')
+  defaultLogger.info('mappings: ', sceneData.mappingsResponse)
+  if (currentLoadedScene) {
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
+    delete target.land
+    unityInterface.UpdateParcelScenes([target])
+  }
 }
 
 teleportObservable.add((position: { x: number; y: number }) => {
