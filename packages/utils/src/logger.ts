@@ -14,7 +14,7 @@ declare var dcl: any
 export function createLogger(prefix: string): ILogger {
   return {
     error(message: string | Error, ...args: any[]): void {
-      const target = typeof dcl === 'undefined' ? dcl.error : console.error
+      const target = typeof dcl === 'undefined' ? console.error : dcl.error
       if (typeof message === 'object' && message.stack) {
         target(prefix + message, ...args, message.stack)
       } else {
