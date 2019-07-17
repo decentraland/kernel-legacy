@@ -2,8 +2,10 @@
   "name": "dcl-client",
   "version": "7.0.0",
   "license": "Apache-2.0",
-  "scripts": {},
-  "private": true,
+  "scripts": {
+    "lint": "prettier --write packages/**/*.ts && tslint ./tslint.json",
+    "lint:fix": "prettier --write packages/**/*.ts && tslint --fix ./tslint.json"
+  },
   "prettier": {
     "semi": false,
     "singleQuote": true,

@@ -1,4 +1,4 @@
-import { Script, inject, EventSubscriber } from "decentraland-rpc";
+import { Script, inject, EventSubscriber } from 'decentraland-rpc'
 import {
   RPCSendableMessage,
   EntityAction,
@@ -11,86 +11,82 @@ import {
   ComponentCreatedPayload,
   ComponentDisposedPayload,
   ComponentUpdatedPayload
-} from "./node_modules/shared/types";
-import { DecentralandInterface } from "./node_modules/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types";
-import { defaultLogger } from "./node_modules/shared/logger";
+} from './node_modules/shared/types'
+import { DecentralandInterface } from './node_modules/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types'
+import { defaultLogger } from './node_modules/shared/logger'
 
-import { customEval, getES5Context } from "./sdk/sandbox";
-import { DevToolsAdapter } from "./sdk/DevToolsAdapter";
-
-// tslint:disable-next-line:whitespace
-type IEngineAPI = import("./node_modules/shared/apis/EngineAPI").IEngineAPI;
+import { customEval, getES5Context } from './sdk/sandbox'
+import { DevToolsAdapter } from './sdk/DevToolsAdapter'
 
 // tslint:disable-next-line:whitespace
-type EnvironmentAPI = import("./node_modules/shared/apis/EnvironmentAPI").EnvironmentAPI;
+type IEngineAPI = import('./node_modules/shared/apis/EngineAPI').IEngineAPI
 
-const FPS = 30;
-const UPDATE_INTERVAL = 1000 / FPS;
-const dataUrlRE = /^data:[^/]+\/[^;]+;base64,/;
-const blobRE = /^blob:http/;
+// tslint:disable-next-line:whitespace
+type EnvironmentAPI = import('./node_modules/shared/apis/EnvironmentAPI').EnvironmentAPI
 
-const WEB3_PROVIDER = "web3-provider";
-const PROVIDER_METHOD = "getProvider";
+const FPS = 30
+const UPDATE_INTERVAL = 1000 / FPS
+const dataUrlRE = /^data:[^/]+\/[^;]+;base64,/
+const blobRE = /^blob:http/
 
-function resolveMapping(
-  mapping: string | undefined,
-  mappingName: string,
-  baseUrl: string
-) {
-  let url = mappingName;
+const WEB3_PROVIDER = 'web3-provider'
+const PROVIDER_METHOD = 'getProvider'
+
+function resolveMapping(mapping: string | undefined, mappingName: string, baseUrl: string) {
+  let url = mappingName
 
   if (mapping) {
-    url = mapping;
+    url = mapping
   }
 
   if (dataUrlRE.test(url)) {
-    return url;
+    return url
   }
 
   if (blobRE.test(url)) {
-    return url;
+    return url
   }
 
-  return (baseUrl.endsWith("/") ? baseUrl : baseUrl + "/") + url;
+  return (baseUrl.endsWith('/') ? baseUrl : baseUrl + '/') + url
 }
 
-const componentNameRE = /^(engine\.)/;
+const componentNameRE = /^(engine\.)/
 
 export default class GamekitScene extends Script {
-  @inject("EngineAPI")
-  engine: IEngineAPI | null = null;
+  @inject('EngineAPI')
+  engine: IEngineAPI | null = null
 
-  @inject("DevTools")
-  devTools: any;
+  @inject('DevTools')
+  devTools: any
 
-  eventSubscriber!: EventSubscriber;
+  eventSubscriber!: EventSubscriber
 
-  onUpdateFunctions: Array<(dt: number) => void> = [];
-  onStartFunctions: Array<Function> = [];
-  onEventFunctions: Array<(event: any) => void> = [];
-  events: EntityAction[] = [];
+  onUpdateFunctions: Array<(dt: number) => void> = []
+  onStartFunctions: Array<Function> = []
+  onEventFunctions: Array<(event: any) => void> = []
+  events: EntityAction[] = []
 
-  updateInterval = UPDATE_INTERVAL;
-  devToolsAdapter: DevToolsAdapter | null = null;
+  updateInterval = UPDATE_INTERVAL
+  devToolsAdapter: DevToolsAdapter | null = null
 
-  manualUpdate: boolean = false;
+  manualUpdate: boolean = false
 
-  didStart = false;
-  provider: any = null;
+  didStart = false
+  provider: any = null
 
   onError(error: Error) {
     if (this.devToolsAdapter) {
-      this.devToolsAdapter.error(error);
+      this.devToolsAdapter.error(error)
     } else {
-      defaultLogger.error("", error);
+      defaultLogger.error('', error)
     }
   }
 
   onLog(...messages: any[]) {
     if (this.devToolsAdapter) {
-      this.devToolsAdapter.log(...messages);
+      this.devToolsAdapter.log(...messages)
     } else {
-      defaultLogger.info("", ...messages);
+      defaultLogger.info('', ...messages)
     }
   }
 
@@ -116,58 +112,46 @@ export default class GamekitScene extends Script {
    * ]
    */
   async getEthereumProvider() {
-    const { EthereumController } = await this.loadAPIs(["EthereumController"]);
+    const { EthereumController } = await this.loadAPIs(['EthereumController'])
 
     return {
       // @internal
-      send(
-        message: RPCSendableMessage,
-        callback?: (error: Error | null, result?: any) => void
-      ): void {
+      send(message: RPCSendableMessage, callback?: (error: Error | null, result?: any) => void): void {
         if (message && callback && callback instanceof Function) {
           EthereumController.sendAsync(message)
             .then((x: any) => callback(null, x))
-            .catch(callback);
+            .catch(callback)
         } else {
-          throw new Error("Decentraland provider only allows async calls");
+          throw new Error('Decentraland provider only allows async calls')
         }
       },
-      sendAsync(
-        message: RPCSendableMessage,
-        callback: (error: Error | null, result?: any) => void
-      ): void {
+      sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void {
         EthereumController.sendAsync(message)
           .then((x: any) => callback(null, x))
-          .catch(callback);
+          .catch(callback)
       }
     } as {
-      send: Function;
-      sendAsync: Function;
-    };
+      send: Function
+      sendAsync: Function
+    }
   }
 
   async loadProject() {
-    const { EnvironmentAPI } = (await this.loadAPIs(["EnvironmentAPI"])) as {
-      EnvironmentAPI: EnvironmentAPI;
-    };
-    const bootstrapData = await EnvironmentAPI.getBootstrapData();
+    const { EnvironmentAPI } = (await this.loadAPIs(['EnvironmentAPI'])) as {
+      EnvironmentAPI: EnvironmentAPI
+    }
+    const bootstrapData = await EnvironmentAPI.getBootstrapData()
 
     if (bootstrapData && bootstrapData.main) {
-      const mappingName = bootstrapData.main;
-      const mapping = bootstrapData.mappings.find($ => $.file === mappingName);
-      const url = resolveMapping(
-        mapping && mapping.hash,
-        mappingName,
-        bootstrapData.baseUrl
-      );
-      const html = await fetch(url);
+      const mappingName = bootstrapData.main
+      const mapping = bootstrapData.mappings.find($ => $.file === mappingName)
+      const url = resolveMapping(mapping && mapping.hash, mappingName, bootstrapData.baseUrl)
+      const html = await fetch(url)
 
       if (html.ok) {
-        return html.text();
+        return html.text()
       } else {
-        throw new Error(
-          `SDK: Error while loading ${url} (${mappingName} -> ${mapping})`
-        );
+        throw new Error(`SDK: Error while loading ${url} (${mappingName} -> ${mapping})`)
       }
     }
   }
@@ -175,112 +159,99 @@ export default class GamekitScene extends Script {
   fireEvent(event: any) {
     try {
       for (let trigger of this.onEventFunctions) {
-        trigger(event);
+        trigger(event)
       }
     } catch (e) {
-      this.onError(e);
+      this.onError(e)
     }
   }
 
   async systemDidEnable() {
-    this.eventSubscriber = new EventSubscriber(this.engine as any);
-    this.devToolsAdapter = new DevToolsAdapter(this.devTools);
+    this.eventSubscriber = new EventSubscriber(this.engine as any)
+    this.devToolsAdapter = new DevToolsAdapter(this.devTools)
 
     try {
-      const source = await this.loadProject();
+      const source = await this.loadProject()
 
       if (!source) {
-        throw new Error("Received empty source.");
+        throw new Error('Received empty source.')
       }
 
-      const that = this;
+      const that = this
 
       const dcl: DecentralandInterface = {
         DEBUG: true,
         log(...args) {
           // tslint:disable-next-line:no-console
-          that.onLog(...args);
+          that.onLog(...args)
         },
 
         addEntity(entityId: string) {
-          if (entityId === "0") {
+          if (entityId === '0') {
             // We dont create the entity 0 in the engine.
-            return;
+            return
           }
           that.events.push({
-            type: "CreateEntity",
+            type: 'CreateEntity',
             tag: entityId,
             payload: JSON.stringify({ id: entityId } as CreateEntityPayload)
-          });
+          })
         },
 
         removeEntity(entityId: string) {
           that.events.push({
-            type: "RemoveEntity",
+            type: 'RemoveEntity',
             tag: entityId,
             payload: JSON.stringify({ id: entityId } as RemoveEntityPayload)
-          });
+          })
         },
 
         /** update tick */
         onUpdate(cb: (deltaTime: number) => void): void {
-          if (typeof (cb as any) !== "function") {
-            that.onError(
-              new Error("onUpdate must be called with only a function argument")
-            );
+          if (typeof (cb as any) !== 'function') {
+            that.onError(new Error('onUpdate must be called with only a function argument'))
           } else {
-            that.onUpdateFunctions.push(cb);
+            that.onUpdateFunctions.push(cb)
           }
         },
 
         /** event from the engine */
         onEvent(cb: (event: any) => void): void {
-          if (typeof (cb as any) !== "function") {
-            that.onError(
-              new Error("onEvent must be called with only a function argument")
-            );
+          if (typeof (cb as any) !== 'function') {
+            that.onError(new Error('onEvent must be called with only a function argument'))
           } else {
-            that.onEventFunctions.push(cb);
+            that.onEventFunctions.push(cb)
           }
         },
 
         /** called after adding a component to the entity or after updating a component */
-        updateEntityComponent(
-          entityId: string,
-          componentName: string,
-          classId: number,
-          json: string
-        ): void {
+        updateEntityComponent(entityId: string, componentName: string, classId: number, json: string): void {
           if (componentNameRE.test(componentName)) {
             that.events.push({
-              type: "UpdateEntityComponent",
-              tag: entityId + "_" + classId,
+              type: 'UpdateEntityComponent',
+              tag: entityId + '_' + classId,
               payload: JSON.stringify({
                 entityId,
                 classId,
-                name: componentName.replace(componentNameRE, ""),
+                name: componentName.replace(componentNameRE, ''),
                 json
               } as UpdateEntityComponentPayload)
-            });
+            })
           }
         },
 
         /** called after adding a DisposableComponent to the entity */
-        attachEntityComponent(
-          entityId: string,
-          componentName: string,
-          id: string
-        ): void {
+        attachEntityComponent(entityId: string, componentName: string, id: string): void {
           if (componentNameRE.test(componentName)) {
             that.events.push({
-              type: "AttachEntityComponent",
+              type: 'AttachEntityComponent',
               tag: entityId,
               payload: JSON.stringify({
                 entityId,
-                name: componentName.replace(componentNameRE, ""),
+                name: componentName.replace(componentNameRE, ''),
                 id
               } as AttachEntityComponentPayload)
-            });
+            })
           }
         },
 
@@ -288,212 +259,203 @@ export default class GamekitScene extends Script {
         removeEntityComponent(entityId: string, componentName: string): void {
           if (componentNameRE.test(componentName)) {
             that.events.push({
-              type: "ComponentRemoved",
+              type: 'ComponentRemoved',
               tag: entityId,
               payload: JSON.stringify({
                 entityId,
-                name: componentName.replace(componentNameRE, "")
+                name: componentName.replace(componentNameRE, '')
               } as ComponentRemovedPayload)
-            });
+            })
           }
         },
 
         /** set a new parent for the entity */
         setParent(entityId: string, parentId: string): void {
           that.events.push({
-            type: "SetEntityParent",
+            type: 'SetEntityParent',
             tag: entityId,
             payload: JSON.stringify({
               entityId,
               parentId
             } as SetEntityParentPayload)
-          });
+          })
         },
 
         /** subscribe to specific events, events will be handled by the onEvent function */
         subscribe(eventName: string): void {
           that.eventSubscriber.on(eventName, event => {
-            that.fireEvent({ type: eventName, data: event.data });
-          });
+            that.fireEvent({ type: eventName, data: event.data })
+          })
         },
 
         /** unsubscribe to specific event */
         unsubscribe(eventName: string): void {
-          that.eventSubscriber.off(eventName);
+          that.eventSubscriber.off(eventName)
         },
 
         componentCreated(id: string, componentName: string, classId: number) {
           if (componentNameRE.test(componentName)) {
             that.events.push({
-              type: "ComponentCreated",
+              type: 'ComponentCreated',
               tag: id,
               payload: JSON.stringify({
                 id,
                 classId,
-                name: componentName.replace(componentNameRE, "")
+                name: componentName.replace(componentNameRE, '')
               } as ComponentCreatedPayload)
-            });
+            })
           }
         },
 
         componentDisposed(id: string) {
           that.events.push({
-            type: "ComponentDisposed",
+            type: 'ComponentDisposed',
             tag: id,
             payload: JSON.stringify({ id } as ComponentDisposedPayload)
-          });
+          })
         },
 
         componentUpdated(id: string, json: string) {
           that.events.push({
-            type: "ComponentUpdated",
+            type: 'ComponentUpdated',
             tag: id,
             payload: JSON.stringify({
               id,
               json
             } as ComponentUpdatedPayload)
-          });
+          })
         },
 
         loadModule: async _moduleName => {
-          const moduleToLoad = _moduleName.replace(/^@decentraland\//, "");
-          let methods: string[] = [];
+          const moduleToLoad = _moduleName.replace(/^@decentraland\//, '')
+          let methods: string[] = []
 
           if (moduleToLoad === WEB3_PROVIDER) {
-            methods.push(PROVIDER_METHOD);
-            this.provider = await this.getEthereumProvider();
+            methods.push(PROVIDER_METHOD)
+            this.provider = await this.getEthereumProvider()
           } else {
-            const proxy = (await this.loadAPIs([moduleToLoad]))[moduleToLoad];
+            const proxy = (await this.loadAPIs([moduleToLoad]))[moduleToLoad]
 
             try {
-              methods = await proxy._getExposedMethods();
+              methods = await proxy._getExposedMethods()
             } catch (e) {
-              throw Object.assign(
-                new Error(
-                  `Error getting the methods of ${moduleToLoad}: ` + e.message
-                ),
-                {
-                  original: e
-                }
-              );
+              throw Object.assign(new Error(`Error getting the methods of ${moduleToLoad}: ` + e.message), {
+                original: e
+              })
             }
           }
 
           return {
             rpcHandle: moduleToLoad,
             methods: methods.map(name => ({ name }))
-          };
+          }
         },
         callRpc: async (rpcHandle: string, methodName: string, args: any[]) => {
           if (rpcHandle === WEB3_PROVIDER && methodName === PROVIDER_METHOD) {
-            return this.provider;
+            return this.provider
           }
 
-          const module = this.loadedAPIs[rpcHandle];
+          const module = this.loadedAPIs[rpcHandle]
           if (!module) {
-            throw new Error(`RPCHandle: ${rpcHandle} is not loaded`);
+            throw new Error(`RPCHandle: ${rpcHandle} is not loaded`)
           }
-          return module[methodName].apply(module, args);
+          return module[methodName].apply(module, args)
         },
         onStart(cb: Function) {
-          that.onStartFunctions.push(cb);
+          that.onStartFunctions.push(cb)
         },
         error(message, data) {
-          that.onError(Object.assign(new Error(message), { data }));
+          that.onError(Object.assign(new Error(message), { data }))
         }
-      };
+      }
 
       {
-        const monkeyPatchDcl: any = dcl;
+        const monkeyPatchDcl: any = dcl
         monkeyPatchDcl.updateEntity = function() {
-          throw new Error(
-            "The scene is using an outdated version of decentraland-ecs, please upgrade to >5.0.0"
-          );
-        };
+          throw new Error('The scene is using an outdated version of decentraland-ecs, please upgrade to >5.0.0')
+        }
       }
 
       try {
-        await customEval((source as any) as string, getES5Context({ dcl }));
+        await customEval((source as any) as string, getES5Context({ dcl }))
 
         this.events.push({
-          type: "SceneStarted",
-          tag: "scene",
-          payload: "{}"
-        });
+          type: 'SceneStarted',
+          tag: 'scene',
+          payload: '{}'
+        })
 
         if (!this.manualUpdate) {
-          this.startLoop();
+          this.startLoop()
         }
 
         this.onStartFunctions.push(() => {
-          const engine: IEngineAPI = this.engine as any;
-          engine.startSignal().catch((e: Error) => this.onError(e));
-        });
+          const engine: IEngineAPI = this.engine as any
+          engine.startSignal().catch((e: Error) => this.onError(e))
+        })
       } catch (e) {
-        that.onError(e);
+        that.onError(e)
       }
 
-      this.sendBatch();
+      this.sendBatch()
 
       setTimeout(() => {
         this.onStartFunctions.forEach($ => {
           try {
-            $();
+            $()
           } catch (e) {
-            that.onError(e);
+            that.onError(e)
           }
-        });
+        })
         // TODO: review this timeout
-      }, 5000);
+      }, 5000)
     } catch (e) {
-      this.onError(e);
+      this.onError(e)
       // unload should be triggered here
     } finally {
-      this.didStart = true;
+      this.didStart = true
     }
   }
 
   update(time: number) {
     for (let trigger of this.onUpdateFunctions) {
       try {
-        trigger(time);
+        trigger(time)
       } catch (e) {
-        this.onError(e);
+        this.onError(e)
       }
     }
 
-    this.sendBatch();
+    this.sendBatch()
   }
 
   private sendBatch() {
     try {
       if (this.events.length) {
-        const batch = this.events.slice();
-        this.events.length = 0;
-        ((this.engine as any) as IEngineAPI)
-          .sendBatch(batch)
-          .catch((e: Error) => this.onError(e));
+        const batch = this.events.slice()
+        this.events.length = 0
+        ;((this.engine as any) as IEngineAPI).sendBatch(batch).catch((e: Error) => this.onError(e))
       }
     } catch (e) {
-      this.onError(e);
+      this.onError(e)
     }
   }
 
   private startLoop() {
-    let start = performance.now();
+    let start = performance.now()
 
     const update = () => {
-      const now = performance.now();
-      const dt = now - start;
-      start = now;
+      const now = performance.now()
+      const dt = now - start
+      start = now
 
-      setTimeout(update, this.updateInterval);
+      setTimeout(update, this.updateInterval)
 
-      let time = dt / 1000;
+      let time = dt / 1000
 
-      this.update(time);
-    };
+      this.update(time)
+    }
 
-    update();
+    update()
   }
 }
