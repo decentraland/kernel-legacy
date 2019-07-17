@@ -1,5 +1,5 @@
 import { buildArray } from '../pure/buildArray'
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 import { Quaternion } from './Quaternion'
 import { Matrix } from './Matrix'
 
@@ -13,9 +13,9 @@ import { Matrix } from './Matrix'
  * Same as Tmp but not exported to keep it only for math functions to avoid conflicts
  */
 export const MathTmp = {
-  Vector3: buildArray(6, Vector3.Zero),
+  Vector3: buildArray(6, MVector3.Zero),
   Matrix: buildArray(2, Matrix.Identity),
   Quaternion: buildArray(3, Quaternion.Zero),
-  staticUp: Vector3.Up() as Readonly<Vector3>,
+  staticUp: MVector3.Up() as Readonly<MVector3>,
   tmpMatrix: Matrix.Zero()
 }

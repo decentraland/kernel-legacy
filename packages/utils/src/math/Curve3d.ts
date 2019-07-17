@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 
 /**
  * A Curve3 object is a logical object, so not a mesh, to handle curves in the 3D geometric space.
@@ -7,7 +7,7 @@ import { Vector3 } from './Vector3'
  * @public
  */
 export class Curve3 {
-  private _points: Vector3[]
+  private _points: MVector3[]
   private _length: number = 0.0
 
   /**
@@ -16,7 +16,7 @@ export class Curve3 {
    * {@link http://doc.babylonjs.com/tutorials/How_to_use_Curve3#curve3-object | Tutorial }
    * @param points - points which make up the curve
    */
-  constructor(points: Vector3[]) {
+  constructor(points: MVector3[]) {
     this._points = points
     this._length = this._computeLength(points)
   }
@@ -29,17 +29,17 @@ export class Curve3 {
    * @param nbPoints - (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  public static CreateQuadraticBezier(v0: Vector3, v1: Vector3, v2: Vector3, nbPoints: number): Curve3 {
+  public static CreateQuadraticBezier(v0: MVector3, v1: MVector3, v2: MVector3, nbPoints: number): Curve3 {
     // tslint:disable-next-line:no-parameter-reassignment
     nbPoints = nbPoints > 2 ? nbPoints : 3
-    let bez = new Array<Vector3>()
+    let bez = new Array<MVector3>()
     let equation = (t: number, val0: number, val1: number, val2: number) => {
       let res = (1.0 - t) * (1.0 - t) * val0 + 2.0 * t * (1.0 - t) * val1 + t * t * val2
       return res
     }
     for (let i = 0; i <= nbPoints; i++) {
       bez.push(
-        new Vector3(
+        new MVector3(
           equation(i / nbPoints, v0.x, v1.x, v2.x),
           equation(i / nbPoints, v0.y, v1.y, v2.y),
           equation(i / nbPoints, v0.z, v1.z, v2.z)
@@ -58,10 +58,10 @@ export class Curve3 {
    * @param nbPoints - (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  public static CreateCubicBezier(v0: Vector3, v1: Vector3, v2: Vector3, v3: Vector3, nbPoints: number): Curve3 {
+  public static CreateCubicBezier(v0: MVector3, v1: MVector3, v2: MVector3, v3: MVector3, nbPoints: number): Curve3 {
     // tslint:disable-next-line:no-parameter-reassignment
     nbPoints = nbPoints > 3 ? nbPoints : 4
-    let bez = new Array<Vector3>()
+    let bez = new Array<MVector3>()
     let equation = (t: number, val0: number, val1: number, val2: number, val3: number) => {
       let res =
         (1.0 - t) * (1.0 - t) * (1.0 - t) * val0 +
@@ -72,7 +72,7 @@ export class Curve3 {
     }
     for (let i = 0; i <= nbPoints; i++) {
       bez.push(
-        new Vector3(
+        new MVector3(
           equation(i / nbPoints, v0.x, v1.x, v2.x, v3.x),
           equation(i / nbPoints, v0.y, v1.y, v2.y, v3.y),
           equation(i / nbPoints, v0.z, v1.z, v2.z, v3.z)
@@ -91,11 +91,11 @@ export class Curve3 {
    * @param nbPoints - (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  public static CreateHermiteSpline(p1: Vector3, t1: Vector3, p2: Vector3, t2: Vector3, nbPoints: number): Curve3 {
-    let hermite = new Array<Vector3>()
+  public static CreateHermiteSpline(p1: MVector3, t1: MVector3, p2: MVector3, t2: MVector3, nbPoints: number): Curve3 {
+    let hermite = new Array<MVector3>()
     let step = 1.0 / nbPoints
     for (let i = 0; i <= nbPoints; i++) {
-      hermite.push(Vector3.Hermite(p1, t1, p2, t2, i * step))
+      hermite.push(MVector3.Hermite(p1, t1, p2, t2, i * step))
     }
     return new Curve3(hermite)
   }
@@ -107,8 +107,8 @@ export class Curve3 {
    * @param closed - (boolean) optional with default false, when true forms a closed loop from the points
    * @returns the created Curve3
    */
-  public static CreateCatmullRomSpline(points: Vector3[], nbPoints: number, closed?: boolean): Curve3 {
-    let catmullRom = new Array<Vector3>()
+  public static CreateCatmullRomSpline(points: MVector3[], nbPoints: number, closed?: boolean): Curve3 {
+    let catmullRom = new Array<MVector3>()
     let step = 1.0 / nbPoints
     let amount = 0.0
     if (closed) {
@@ -117,7 +117,7 @@ export class Curve3 {
         amount = 0
         for (let c = 0; c < nbPoints; c++) {
           catmullRom.push(
-            Vector3.CatmullRom(
+            MVector3.CatmullRom(
               points[i % pointsCount],
               points[(i + 1) % pointsCount],
               points[(i + 2) % pointsCount],
@@ -130,7 +130,7 @@ export class Curve3 {
       }
       catmullRom.push(catmullRom[0])
     } else {
-      let totalPoints = new Array<Vector3>()
+      let totalPoints = new Array<MVector3>()
       totalPoints.push(points[0].clone())
       Array.prototype.push.apply(totalPoints, points)
       totalPoints.push(points[points.length - 1].clone())
@@ -139,14 +139,14 @@ export class Curve3 {
         amount = 0
         for (let c = 0; c < nbPoints; c++) {
           catmullRom.push(
-            Vector3.CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2], totalPoints[i + 3], amount)
+            MVector3.CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2], totalPoints[i + 3], amount)
           )
           amount += step
         }
       }
       i--
       catmullRom.push(
-        Vector3.CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2], totalPoints[i + 3], amount)
+        MVector3.CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2], totalPoints[i + 3], amount)
       )
     }
     return new Curve3(catmullRom)
@@ -184,7 +184,7 @@ export class Curve3 {
     return continuedCurve
   }
 
-  private _computeLength(path: Vector3[]): number {
+  private _computeLength(path: MVector3[]): number {
     let l = 0
     for (let i = 1; i < path.length; i++) {
       l += path[i].subtract(path[i - 1]).length()

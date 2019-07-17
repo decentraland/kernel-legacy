@@ -1,3 +1,5 @@
+import { Vector2 } from '../Vector'
+
 /**
  * Returns `true` if the given parcels are one next to each other
  */

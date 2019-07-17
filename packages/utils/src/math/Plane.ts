@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 import { Matrix } from './Matrix'
 import { MathTmp } from './preallocatedVariables'
 
@@ -10,7 +10,7 @@ export class Plane {
   /**
    * Normal of the plane (a,b,c)
    */
-  public normal: Vector3
+  public normal: MVector3
   /**
    * d component of the plane
    */
@@ -23,7 +23,7 @@ export class Plane {
    * @param d - d component of the plane
    */
   constructor(a: number, b: number, c: number, d: number) {
-    this.normal = new Vector3(a, b, c)
+    this.normal = new MVector3(a, b, c)
     this.d = d
   }
 
@@ -43,7 +43,7 @@ export class Plane {
    * @param point3 - point used to create the plane
    * @returns a new Plane defined by the three given points.
    */
-  static FromPoints(point1: Vector3, point2: Vector3, point3: Vector3): Plane {
+  static FromPoints(point1: MVector3, point2: MVector3, point3: MVector3): Plane {
     let result = new Plane(0.0, 0.0, 0.0, 0.0)
     result.copyFromPoints(point1, point2, point3)
     return result
@@ -55,7 +55,7 @@ export class Plane {
    * @returns a new Plane the normal vector to this plane at the given origin point.
    * Note : the vector "normal" is updated because normalized.
    */
-  static FromPositionAndNormal(origin: Vector3, normal: Vector3): Plane {
+  static FromPositionAndNormal(origin: MVector3, normal: MVector3): Plane {
     let result = new Plane(0.0, 0.0, 0.0, 0.0)
     normal.normalize()
     result.normal = normal
@@ -70,9 +70,9 @@ export class Plane {
    * @param point - point to calculate distance to
    * @returns the signed distance between the plane defined by the normal vector at the "origin"" point and the given other point.
    */
-  static SignedDistanceToPlaneFromPositionAndNormal(origin: Vector3, normal: Vector3, point: Vector3): number {
+  static SignedDistanceToPlaneFromPositionAndNormal(origin: MVector3, normal: MVector3, point: MVector3): number {
     let d = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z)
-    return Vector3.Dot(point, normal) + d
+    return MVector3.Dot(point, normal) + d
   }
 
   /**
@@ -147,7 +147,7 @@ export class Plane {
    * @param point - point to calculate the dot product with
    * @returns the dot product (float) of the point coordinates and the plane normal.
    */
-  public dotCoordinate(point: Vector3): number {
+  public dotCoordinate(point: MVector3): number {
     return this.normal.x * point.x + this.normal.y * point.y + this.normal.z * point.z + this.d
   }
 
@@ -158,7 +158,7 @@ export class Plane {
    * @param point3 - one of the points used to contruct the plane
    * @returns the updated Plane.
    */
-  public copyFromPoints(point1: Vector3, point2: Vector3, point3: Vector3): Plane {
+  public copyFromPoints(point1: MVector3, point2: MVector3, point3: MVector3): Plane {
     let x1 = point2.x - point1.x
     let y1 = point2.y - point1.y
     let z1 = point2.z - point1.z
@@ -191,8 +191,8 @@ export class Plane {
    * @param epsilon - value the dot product is compared against (returns true if dot &lt;= epsilon)
    * @returns True is the vector "direction"  is the same side than the plane normal.
    */
-  public isFrontFacingTo(direction: Vector3, epsilon: number): boolean {
-    let dot = Vector3.Dot(this.normal, direction)
+  public isFrontFacingTo(direction: MVector3, epsilon: number): boolean {
+    let dot = MVector3.Dot(this.normal, direction)
     return dot <= epsilon
   }
 
@@ -201,7 +201,7 @@ export class Plane {
    * @param point - point to calculate distance to
    * @returns the signed distance (float) from the given point to the Plane.
    */
-  public signedDistanceTo(point: Vector3): number {
-    return Vector3.Dot(point, this.normal) + this.d
+  public signedDistanceTo(point: MVector3): number {
+    return MVector3.Dot(point, this.normal) + this.d
   }
 }

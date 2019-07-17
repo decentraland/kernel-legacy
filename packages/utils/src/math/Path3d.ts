@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 import { Epsilon, Nullable } from './types'
 import { Scalar } from './Scalar'
 
@@ -7,11 +7,11 @@ import { Scalar } from './Scalar'
  * @public
  */
 export class Path3D {
-  private _curve = new Array<Vector3>()
+  private _curve = new Array<MVector3>()
   private _distances = new Array<number>()
-  private _tangents = new Array<Vector3>()
-  private _normals = new Array<Vector3>()
-  private _binormals = new Array<Vector3>()
+  private _tangents = new Array<MVector3>()
+  private _normals = new Array<MVector3>()
+  private _binormals = new Array<MVector3>()
   private _raw: boolean
 
   /**
@@ -26,8 +26,8 @@ export class Path3D {
     /**
      * an array of Vector3, the curve axis of the Path3D
      */
-    public path: Vector3[],
-    firstNormal: Nullable<Vector3> = null,
+    public path: MVector3[],
+    firstNormal: Nullable<MVector3> = null,
     raw?: boolean
   ) {
     for (let p = 0; p < path.length; p++) {
@@ -41,7 +41,7 @@ export class Path3D {
    * Returns the Path3D array of successive Vector3 designing its curve.
    * @returns the Path3D array of successive Vector3 designing its curve.
    */
-  public getCurve(): Vector3[] {
+  public getCurve(): MVector3[] {
     return this._curve
   }
 
@@ -49,7 +49,7 @@ export class Path3D {
    * Returns an array populated with tangent vectors on each Path3D curve point.
    * @returns an array populated with tangent vectors on each Path3D curve point.
    */
-  public getTangents(): Vector3[] {
+  public getTangents(): MVector3[] {
     return this._tangents
   }
 
@@ -57,7 +57,7 @@ export class Path3D {
    * Returns an array populated with normal vectors on each Path3D curve point.
    * @returns an array populated with normal vectors on each Path3D curve point.
    */
-  public getNormals(): Vector3[] {
+  public getNormals(): MVector3[] {
     return this._normals
   }
 
@@ -65,7 +65,7 @@ export class Path3D {
    * Returns an array populated with binormal vectors on each Path3D curve point.
    * @returns an array populated with binormal vectors on each Path3D curve point.
    */
-  public getBinormals(): Vector3[] {
+  public getBinormals(): MVector3[] {
     return this._binormals
   }
 
@@ -83,7 +83,7 @@ export class Path3D {
    * @param firstNormal - which should be projected onto the curve
    * @returns the same object updated.
    */
-  public update(path: Vector3[], firstNormal: Nullable<Vector3> = null): Path3D {
+  public update(path: MVector3[], firstNormal: Nullable<MVector3> = null): Path3D {
     for (let p = 0; p < path.length; p++) {
       this._curve[p].x = path[p].x
       this._curve[p].y = path[p].y
@@ -94,7 +94,7 @@ export class Path3D {
   }
 
   // private function compute() : computes tangents, normals and binormals
-  private _compute(firstNormal: Nullable<Vector3>): void {
+  private _compute(firstNormal: Nullable<MVector3>): void {
     let l = this._curve.length
 
     // first and last tangents
@@ -114,18 +114,18 @@ export class Path3D {
     if (!this._raw) {
       this._normals[0].normalize()
     }
-    this._binormals[0] = Vector3.Cross(tg0, this._normals[0])
+    this._binormals[0] = MVector3.Cross(tg0, this._normals[0])
     if (!this._raw) {
       this._binormals[0].normalize()
     }
     this._distances[0] = 0.0
 
     // normals and binormals : next points
-    let prev: Vector3 // previous vector (segment)
-    let cur: Vector3 // current vector (segment)
-    let curTang: Vector3 // current tangent
+    let prev: MVector3 // previous vector (segment)
+    let cur: MVector3 // current vector (segment)
+    let curTang: MVector3 // current tangent
     // previous normal
-    let prevBinor: Vector3 // previous binormal
+    let prevBinor: MVector3 // previous binormal
 
     for (let i = 1; i < l; i++) {
       // tangents
@@ -141,11 +141,11 @@ export class Path3D {
       // http://www.cs.cmu.edu/afs/andrew/scs/cs/15-462/web/old/asst2camera.html
       curTang = this._tangents[i]
       prevBinor = this._binormals[i - 1]
-      this._normals[i] = Vector3.Cross(prevBinor, curTang)
+      this._normals[i] = MVector3.Cross(prevBinor, curTang)
       if (!this._raw) {
         this._normals[i].normalize()
       }
-      this._binormals[i] = Vector3.Cross(curTang, this._normals[i])
+      this._binormals[i] = MVector3.Cross(curTang, this._normals[i])
       if (!this._raw) {
         this._binormals[i].normalize()
       }
@@ -153,9 +153,9 @@ export class Path3D {
   }
 
   // returns the first non null vector from index : curve[index + N].subtract(curve[index])
-  private _getFirstNonNullVector(index: number): Vector3 {
+  private _getFirstNonNullVector(index: number): MVector3 {
     let i = 1
-    let nNVector: Vector3 = this._curve[index + i].subtract(this._curve[index])
+    let nNVector: MVector3 = this._curve[index + i].subtract(this._curve[index])
     while (nNVector.length() === 0 && index + i + 1 < this._curve.length) {
       i++
       nNVector = this._curve[index + i].subtract(this._curve[index])
@@ -164,9 +164,9 @@ export class Path3D {
   }
 
   // returns the last non null vector from index : curve[index].subtract(curve[index - N])
-  private _getLastNonNullVector(index: number): Vector3 {
+  private _getLastNonNullVector(index: number): MVector3 {
     let i = 1
-    let nLVector: Vector3 = this._curve[index].subtract(this._curve[index - i])
+    let nLVector: MVector3 = this._curve[index].subtract(this._curve[index - i])
     while (nLVector.length() === 0 && index > i + 1) {
       i++
       nLVector = this._curve[index].subtract(this._curve[index - i])
@@ -177,29 +177,29 @@ export class Path3D {
   // private function normalVector(v0, vt, va) :
   // returns an arbitrary point in the plane defined by the point v0 and the vector vt orthogonal to this plane
   // if va is passed, it returns the va projection on the plane orthogonal to vt at the point v0
-  private _normalVector(v0: Vector3, vt: Vector3, va: Vector3 | null): Vector3 {
-    let normal0: Vector3
+  private _normalVector(v0: MVector3, vt: MVector3, va: MVector3 | null): MVector3 {
+    let normal0: MVector3
     let tgl = vt.length()
     if (tgl === 0.0) {
       tgl = 1.0
     }
 
     if ((va as any) === undefined || va === null) {
-      let point: Vector3
+      let point: MVector3
       if (!Scalar.WithinEpsilon(Math.abs(vt.y) / tgl, 1.0, Epsilon)) {
         // search for a point in the plane
-        point = new Vector3(0.0, -1.0, 0.0)
+        point = new MVector3(0.0, -1.0, 0.0)
       } else if (!Scalar.WithinEpsilon(Math.abs(vt.x) / tgl, 1.0, Epsilon)) {
-        point = new Vector3(1.0, 0.0, 0.0)
+        point = new MVector3(1.0, 0.0, 0.0)
       } else if (!Scalar.WithinEpsilon(Math.abs(vt.z) / tgl, 1.0, Epsilon)) {
-        point = new Vector3(0.0, 0.0, 1.0)
+        point = new MVector3(0.0, 0.0, 1.0)
       } else {
-        point = Vector3.Zero()
+        point = MVector3.Zero()
       }
-      normal0 = Vector3.Cross(vt, point)
+      normal0 = MVector3.Cross(vt, point)
     } else {
-      normal0 = Vector3.Cross(vt, va)
-      Vector3.CrossToRef(normal0, vt, normal0)
+      normal0 = MVector3.Cross(vt, va)
+      MVector3.CrossToRef(normal0, vt, normal0)
     }
     normal0.normalize()
     return normal0

@@ -1,4 +1,4 @@
-import { parseParcelPosition } from 'atomicHelpers/parcelScenePositions'
+import { parseParcelPosition } from './scene/parcel'
 
 export type MappingsResponse = {
   parcel_id: string

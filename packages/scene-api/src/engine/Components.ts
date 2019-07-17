@@ -1,14 +1,14 @@
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
-import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from '../../../utils/src/math'
+import { MVector3, Quaternion, Matrix, MathTmp, Color3 } from '../../../utils/src/math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/Log'
 import { IEvents } from './Types'
 
 /** @public */
 export type TranformConstructorArgs = {
-  position?: Vector3
+  position?: MVector3
   rotation?: Quaternion
-  scale?: Vector3
+  scale?: MVector3
 }
 
 /**
@@ -65,19 +65,19 @@ export enum CLASS_ID {
 @Component('engine.transform', CLASS_ID.TRANSFORM)
 export class Transform extends ObservableComponent {
   @ObservableComponent.field
-  position!: Vector3
+  position!: MVector3
 
   @ObservableComponent.field
   rotation!: Quaternion
 
   @ObservableComponent.field
-  scale!: Vector3
+  scale!: MVector3
 
   constructor(args: TranformConstructorArgs = {}) {
     super()
-    this.position = args.position || Vector3.Zero()
+    this.position = args.position || MVector3.Zero()
     this.rotation = args.rotation || Quaternion.Identity
-    this.scale = args.scale || new Vector3(1, 1, 1)
+    this.scale = args.scale || new MVector3(1, 1, 1)
   }
 
   /**
@@ -92,7 +92,7 @@ export class Transform extends ObservableComponent {
    * @public
    * Rotates the transform so the forward vector points at target's current position.
    */
-  lookAt(target: Vector3, worldUp: Vector3 = MathTmp.staticUp) {
+  lookAt(target: MVector3, worldUp: MVector3 = MathTmp.staticUp) {
     const result = new Matrix()
     Matrix.LookAtLHToRef(this.position, target, worldUp, result)
     result.invert()
@@ -104,7 +104,7 @@ export class Transform extends ObservableComponent {
    * @public
    * Applies a rotation of euler angles around the x, y and z axis.
    */
-  rotate(axis: Vector3, angle: number) {
+  rotate(axis: MVector3, angle: number) {
     this.rotation.multiplyInPlace(this.rotation.angleAxis(angle, axis))
     return this
   }
@@ -113,7 +113,7 @@ export class Transform extends ObservableComponent {
    * @public
    * Moves the transform in the direction and distance of translation.
    */
-  translate(vec: Vector3) {
+  translate(vec: MVector3) {
     this.position.addInPlace(vec)
     return this
   }

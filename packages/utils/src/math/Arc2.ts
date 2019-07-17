@@ -1,5 +1,5 @@
 import { Angle } from './Angle'
-import { Vector2 } from './Vector2'
+import { MVector2 } from './MVector2'
 import { Orientation } from './types'
 
 /**
@@ -10,7 +10,7 @@ export class Arc2 {
   /**
    * Defines the center point of the arc.
    */
-  public centerPoint: Vector2
+  public centerPoint: MVector2
   /**
    * Defines the radius of the arc.
    */
@@ -36,11 +36,11 @@ export class Arc2 {
    */
   constructor(
     /** Defines the start point of the arc */
-    public startPoint: Vector2,
+    public startPoint: MVector2,
     /** Defines the mid point of the arc */
-    public midPoint: Vector2,
+    public midPoint: MVector2,
     /** Defines the end point of the arc */
-    public endPoint: Vector2
+    public endPoint: MVector2
   ) {
     let temp = Math.pow(midPoint.x, 2) + Math.pow(midPoint.y, 2)
     let startToMid = (Math.pow(startPoint.x, 2) + Math.pow(startPoint.y, 2) - temp) / 2
@@ -48,7 +48,7 @@ export class Arc2 {
     let det =
       (startPoint.x - midPoint.x) * (midPoint.y - endPoint.y) - (midPoint.x - endPoint.x) * (startPoint.y - midPoint.y)
 
-    this.centerPoint = new Vector2(
+    this.centerPoint = new MVector2(
       (startToMid * (midPoint.y - endPoint.y) - midToEnd * (startPoint.y - midPoint.y)) / det,
       ((startPoint.x - midPoint.x) * midToEnd - (midPoint.x - endPoint.x) * startToMid) / det
     )

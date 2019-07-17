@@ -12,7 +12,7 @@ export type ReadOnlyVector2 = {
  * Class representing a vector containing 2 coordinates
  * @public
  */
-export class Vector2 {
+export class MVector2 {
   /**
    * Creates a new Vector2 from the given x and y coordinates
    * @param x - defines the first coordinate
@@ -29,16 +29,16 @@ export class Vector2 {
    * Gets a new Vector2(0, 0)
    * @returns a new Vector2
    */
-  public static Zero(): Vector2 {
-    return new Vector2(0, 0)
+  public static Zero(): MVector2 {
+    return new MVector2(0, 0)
   }
 
   /**
    * Gets a new Vector2(1, 1)
    * @returns a new Vector2
    */
-  public static One(): Vector2 {
-    return new Vector2(1, 1)
+  public static One(): MVector2 {
+    return new MVector2(1, 1)
   }
 
   /**
@@ -47,8 +47,8 @@ export class Vector2 {
    * @param vector2 - the second vector
    * @returns the resulting vector
    */
-  public static Add(vector1: ReadOnlyVector2, vector2: ReadOnlyVector2): Vector2 {
-    return new Vector2(vector1.x, vector1.y).addInPlace(vector2)
+  public static Add(vector1: ReadOnlyVector2, vector2: ReadOnlyVector2): MVector2 {
+    return new MVector2(vector1.x, vector1.y).addInPlace(vector2)
   }
 
   /**
@@ -57,8 +57,8 @@ export class Vector2 {
    * @param offset - defines the offset in the data source
    * @returns a new Vector2
    */
-  public static FromArray(array: ArrayLike<number>, offset: number = 0): Vector2 {
-    return new Vector2(array[offset], array[offset + 1])
+  public static FromArray(array: ArrayLike<number>, offset: number = 0): MVector2 {
+    return new MVector2(array[offset], array[offset + 1])
   }
 
   /**
@@ -67,7 +67,7 @@ export class Vector2 {
    * @param offset - defines the offset in the data source
    * @param result - defines the target vector
    */
-  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: Vector2): void {
+  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: MVector2): void {
     result.x = array[offset]
     result.y = array[offset + 1]
   }
@@ -87,7 +87,7 @@ export class Vector2 {
     value3: ReadOnlyVector2,
     value4: ReadOnlyVector2,
     amount: number
-  ): Vector2 {
+  ): MVector2 {
     let squared = amount * amount
     let cubed = amount * squared
 
@@ -105,7 +105,7 @@ export class Vector2 {
         (2.0 * value1.y - 5.0 * value2.y + 4.0 * value3.y - value4.y) * squared +
         (-value1.y + 3.0 * value2.y - 3.0 * value3.y + value4.y) * cubed)
 
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -117,7 +117,7 @@ export class Vector2 {
    * @param max - defines the upper limit
    * @returns a new Vector2
    */
-  public static Clamp(value: ReadOnlyVector2, min: ReadOnlyVector2, max: ReadOnlyVector2): Vector2 {
+  public static Clamp(value: ReadOnlyVector2, min: ReadOnlyVector2, max: ReadOnlyVector2): MVector2 {
     let x = value.x
     x = x > max.x ? max.x : x
     x = x < min.x ? min.x : x
@@ -126,7 +126,7 @@ export class Vector2 {
     y = y > max.y ? max.y : y
     y = y < min.y ? min.y : y
 
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -144,7 +144,7 @@ export class Vector2 {
     value2: ReadOnlyVector2,
     tangent2: ReadOnlyVector2,
     amount: number
-  ): Vector2 {
+  ): MVector2 {
     let squared = amount * amount
     let cubed = amount * squared
     let part1 = 2.0 * cubed - 3.0 * squared + 1.0
@@ -155,7 +155,7 @@ export class Vector2 {
     let x = value1.x * part1 + value2.x * part2 + tangent1.x * part3 + tangent2.x * part4
     let y = value1.y * part1 + value2.y * part2 + tangent1.y * part3 + tangent2.y * part4
 
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -165,10 +165,10 @@ export class Vector2 {
    * @param amount - defines the interpolation factor
    * @returns a new Vector2
    */
-  public static Lerp(start: ReadOnlyVector2, end: ReadOnlyVector2, amount: number): Vector2 {
+  public static Lerp(start: ReadOnlyVector2, end: ReadOnlyVector2, amount: number): MVector2 {
     let x = start.x + (end.x - start.x) * amount
     let y = start.y + (end.y - start.y) * amount
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -186,8 +186,8 @@ export class Vector2 {
    * @param vector - defines the vector to normalize
    * @returns a new Vector2
    */
-  public static Normalize(vector: ReadOnlyVector2): Vector2 {
-    let newVector = new Vector2(vector.x, vector.y)
+  public static Normalize(vector: ReadOnlyVector2): MVector2 {
+    let newVector = new MVector2(vector.x, vector.y)
     newVector.normalize()
     return newVector
   }
@@ -198,10 +198,10 @@ export class Vector2 {
    * @param right - defines 2nd vector
    * @returns a new Vector2
    */
-  public static Minimize(left: ReadOnlyVector2, right: ReadOnlyVector2): Vector2 {
+  public static Minimize(left: ReadOnlyVector2, right: ReadOnlyVector2): MVector2 {
     let x = left.x < right.x ? left.x : right.x
     let y = left.y < right.y ? left.y : right.y
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -210,10 +210,10 @@ export class Vector2 {
    * @param right - defines 2nd vector
    * @returns a new Vector2
    */
-  public static Maximize(left: ReadOnlyVector2, right: ReadOnlyVector2): Vector2 {
+  public static Maximize(left: ReadOnlyVector2, right: ReadOnlyVector2): MVector2 {
     let x = left.x > right.x ? left.x : right.x
     let y = left.y > right.y ? left.y : right.y
-    return new Vector2(x, y)
+    return new MVector2(x, y)
   }
 
   /**
@@ -222,9 +222,9 @@ export class Vector2 {
    * @param transformation - defines the matrix to apply
    * @returns a new Vector2
    */
-  public static Transform(vector: Vector2, transformation: Matrix): Vector2 {
-    let r = Vector2.Zero()
-    Vector2.TransformToRef(vector, transformation, r)
+  public static Transform(vector: MVector2, transformation: Matrix): MVector2 {
+    let r = MVector2.Zero()
+    MVector2.TransformToRef(vector, transformation, r)
     return r
   }
 
@@ -234,7 +234,7 @@ export class Vector2 {
    * @param transformation - defines the matrix to apply
    * @param result - defines the target vector
    */
-  public static TransformToRef(vector: ReadOnlyVector2, transformation: Matrix, result: Vector2) {
+  public static TransformToRef(vector: ReadOnlyVector2, transformation: Matrix, result: MVector2) {
     const m = transformation.m
     let x = vector.x * m[0] + vector.y * m[4] + m[12]
     let y = vector.x * m[1] + vector.y * m[5] + m[13]
@@ -265,8 +265,8 @@ export class Vector2 {
    * @param value2 - defines second vector
    * @returns the distance between vectors
    */
-  public static Distance(value1: Vector2, value2: Vector2): number {
-    return Math.sqrt(Vector2.DistanceSquared(value1, value2))
+  public static Distance(value1: MVector2, value2: MVector2): number {
+    return Math.sqrt(MVector2.DistanceSquared(value1, value2))
   }
 
   /**
@@ -287,8 +287,8 @@ export class Vector2 {
    * @param value2 - defines second vector
    * @returns a new Vector2
    */
-  public static Center(value1: ReadOnlyVector2, value2: ReadOnlyVector2): Vector2 {
-    let center = Vector2.Add(value1, value2)
+  public static Center(value1: ReadOnlyVector2, value2: ReadOnlyVector2): MVector2 {
+    let center = MVector2.Add(value1, value2)
     center.scaleInPlace(0.5)
     return center
   }
@@ -300,15 +300,15 @@ export class Vector2 {
    * @param segB - defines the other point of the segment
    * @returns the shortest distance
    */
-  public static DistanceOfPointFromSegment(p: Vector2, segA: Vector2, segB: Vector2): number {
-    let l2 = Vector2.DistanceSquared(segA, segB)
+  public static DistanceOfPointFromSegment(p: MVector2, segA: MVector2, segB: MVector2): number {
+    let l2 = MVector2.DistanceSquared(segA, segB)
     if (l2 === 0.0) {
-      return Vector2.Distance(p, segA)
+      return MVector2.Distance(p, segA)
     }
     let v = segB.subtract(segA)
-    let t = Math.max(0, Math.min(1, Vector2.Dot(p.subtract(segA), v) / l2))
+    let t = Math.max(0, Math.min(1, MVector2.Dot(p.subtract(segA), v) / l2))
     let proj = segA.add(v.multiplyByFloats(t, t))
-    return Vector2.Distance(p, proj)
+    return MVector2.Distance(p, proj)
   }
 
   /**
@@ -345,7 +345,7 @@ export class Vector2 {
    * @param index - defines the offset in source array
    * @returns the current Vector2
    */
-  public toArray(array: FloatArray, index: number = 0): Vector2 {
+  public toArray(array: FloatArray, index: number = 0): MVector2 {
     array[index] = this.x
     array[index + 1] = this.y
     return this
@@ -366,7 +366,7 @@ export class Vector2 {
    * @param source - defines the source Vector2
    * @returns the current updated Vector2
    */
-  public copyFrom(source: ReadOnlyVector2): Vector2 {
+  public copyFrom(source: ReadOnlyVector2): MVector2 {
     this.x = source.x
     this.y = source.y
     return this
@@ -378,7 +378,7 @@ export class Vector2 {
    * @param y - defines the second coordinate
    * @returns the current updated Vector2
    */
-  public copyFromFloats(x: number, y: number): Vector2 {
+  public copyFromFloats(x: number, y: number): MVector2 {
     this.x = x
     this.y = y
     return this
@@ -390,7 +390,7 @@ export class Vector2 {
    * @param y - defines the second coordinate
    * @returns the current updated Vector2
    */
-  public set(x: number, y: number): Vector2 {
+  public set(x: number, y: number): MVector2 {
     return this.copyFromFloats(x, y)
   }
   /**
@@ -398,8 +398,8 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns a new Vector2 set with the addition of the current Vector2 and the given one coordinates
    */
-  public add(otherVector: ReadOnlyVector2): Vector2 {
-    return new Vector2(this.x + otherVector.x, this.y + otherVector.y)
+  public add(otherVector: ReadOnlyVector2): MVector2 {
+    return new MVector2(this.x + otherVector.x, this.y + otherVector.y)
   }
 
   /**
@@ -408,7 +408,7 @@ export class Vector2 {
    * @param result - defines the target vector
    * @returns the unmodified current Vector2
    */
-  public addToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2 {
+  public addToRef(otherVector: ReadOnlyVector2, result: MVector2): MVector2 {
     result.x = this.x + otherVector.x
     result.y = this.y + otherVector.y
     return this
@@ -419,7 +419,7 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns the current updated Vector2
    */
-  public addInPlace(otherVector: ReadOnlyVector2): Vector2 {
+  public addInPlace(otherVector: ReadOnlyVector2): MVector2 {
     this.x += otherVector.x
     this.y += otherVector.y
     return this
@@ -430,8 +430,8 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns a new Vector2
    */
-  public addVector3(otherVector: ReadOnlyVector2): Vector2 {
-    return new Vector2(this.x + otherVector.x, this.y + otherVector.y)
+  public addVector3(otherVector: ReadOnlyVector2): MVector2 {
+    return new MVector2(this.x + otherVector.x, this.y + otherVector.y)
   }
 
   /**
@@ -439,8 +439,8 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns a new Vector2
    */
-  public subtract(otherVector: ReadOnlyVector2): Vector2 {
-    return new Vector2(this.x - otherVector.x, this.y - otherVector.y)
+  public subtract(otherVector: ReadOnlyVector2): MVector2 {
+    return new MVector2(this.x - otherVector.x, this.y - otherVector.y)
   }
 
   /**
@@ -449,7 +449,7 @@ export class Vector2 {
    * @param result - defines the target vector
    * @returns the unmodified current Vector2
    */
-  public subtractToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2 {
+  public subtractToRef(otherVector: ReadOnlyVector2, result: MVector2): MVector2 {
     result.x = this.x - otherVector.x
     result.y = this.y - otherVector.y
     return this
@@ -459,7 +459,7 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns the current updated Vector2
    */
-  public subtractInPlace(otherVector: ReadOnlyVector2): Vector2 {
+  public subtractInPlace(otherVector: ReadOnlyVector2): MVector2 {
     this.x -= otherVector.x
     this.y -= otherVector.y
     return this
@@ -470,7 +470,7 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns the current updated Vector2
    */
-  public multiplyInPlace(otherVector: ReadOnlyVector2): Vector2 {
+  public multiplyInPlace(otherVector: ReadOnlyVector2): MVector2 {
     this.x *= otherVector.x
     this.y *= otherVector.y
     return this
@@ -481,8 +481,8 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns a new Vector2
    */
-  public multiply(otherVector: ReadOnlyVector2): Vector2 {
-    return new Vector2(this.x * otherVector.x, this.y * otherVector.y)
+  public multiply(otherVector: ReadOnlyVector2): MVector2 {
+    return new MVector2(this.x * otherVector.x, this.y * otherVector.y)
   }
 
   /**
@@ -491,7 +491,7 @@ export class Vector2 {
    * @param result - defines the target vector
    * @returns the unmodified current Vector2
    */
-  public multiplyToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2 {
+  public multiplyToRef(otherVector: ReadOnlyVector2, result: MVector2): MVector2 {
     result.x = this.x * otherVector.x
     result.y = this.y * otherVector.y
     return this
@@ -503,8 +503,8 @@ export class Vector2 {
    * @param y - defines the second coordinate
    * @returns a new Vector2
    */
-  public multiplyByFloats(x: number, y: number): Vector2 {
-    return new Vector2(this.x * x, this.y * y)
+  public multiplyByFloats(x: number, y: number): MVector2 {
+    return new MVector2(this.x * x, this.y * y)
   }
 
   /**
@@ -512,8 +512,8 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns a new Vector2
    */
-  public divide(otherVector: ReadOnlyVector2): Vector2 {
-    return new Vector2(this.x / otherVector.x, this.y / otherVector.y)
+  public divide(otherVector: ReadOnlyVector2): MVector2 {
+    return new MVector2(this.x / otherVector.x, this.y / otherVector.y)
   }
 
   /**
@@ -522,7 +522,7 @@ export class Vector2 {
    * @param result - defines the target vector
    * @returns the unmodified current Vector2
    */
-  public divideToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2 {
+  public divideToRef(otherVector: ReadOnlyVector2, result: MVector2): MVector2 {
     result.x = this.x / otherVector.x
     result.y = this.y / otherVector.y
     return this
@@ -533,7 +533,7 @@ export class Vector2 {
    * @param otherVector - defines the other vector
    * @returns the current updated Vector2
    */
-  public divideInPlace(otherVector: ReadOnlyVector2): Vector2 {
+  public divideInPlace(otherVector: ReadOnlyVector2): MVector2 {
     return this.divideToRef(otherVector, this)
   }
 
@@ -541,8 +541,8 @@ export class Vector2 {
    * Gets a new Vector2 with current Vector2 negated coordinates
    * @returns a new Vector2
    */
-  public negate(): Vector2 {
-    return new Vector2(-this.x, -this.y)
+  public negate(): MVector2 {
+    return new MVector2(-this.x, -this.y)
   }
 
   /**
@@ -550,7 +550,7 @@ export class Vector2 {
    * @param scale - defines the scaling factor
    * @returns the current updated Vector2
    */
-  public scaleInPlace(scale: number): Vector2 {
+  public scaleInPlace(scale: number): MVector2 {
     this.x *= scale
     this.y *= scale
     return this
@@ -561,8 +561,8 @@ export class Vector2 {
    * @param scale - defines the scaling factor
    * @returns a new Vector2
    */
-  public scale(scale: number): Vector2 {
-    let result = new Vector2(0, 0)
+  public scale(scale: number): MVector2 {
+    let result = new MVector2(0, 0)
     this.scaleToRef(scale, result)
     return result
   }
@@ -573,7 +573,7 @@ export class Vector2 {
    * @param result - defines the Vector2 object where to store the result
    * @returns the unmodified current Vector2
    */
-  public scaleToRef(scale: number, result: Vector2): Vector2 {
+  public scaleToRef(scale: number, result: MVector2): MVector2 {
     result.x = this.x * scale
     result.y = this.y * scale
     return this
@@ -585,7 +585,7 @@ export class Vector2 {
    * @param result - defines the Vector2 object where to store the result
    * @returns the unmodified current Vector2
    */
-  public scaleAndAddToRef(scale: number, result: Vector2): Vector2 {
+  public scaleAndAddToRef(scale: number, result: MVector2): MVector2 {
     result.x += this.x * scale
     result.y += this.y * scale
     return this
@@ -618,16 +618,16 @@ export class Vector2 {
    * Gets a new Vector2 from current Vector2 floored values
    * @returns a new Vector2
    */
-  public floor(): Vector2 {
-    return new Vector2(Math.floor(this.x), Math.floor(this.y))
+  public floor(): MVector2 {
+    return new MVector2(Math.floor(this.x), Math.floor(this.y))
   }
 
   /**
    * Gets a new Vector2 from current Vector2 floored values
    * @returns a new Vector2
    */
-  public fract(): Vector2 {
-    return new Vector2(this.x - Math.floor(this.x), this.y - Math.floor(this.y))
+  public fract(): MVector2 {
+    return new MVector2(this.x - Math.floor(this.x), this.y - Math.floor(this.y))
   }
 
   // Properties
@@ -654,7 +654,7 @@ export class Vector2 {
    * Normalize the vector
    * @returns the current updated Vector2
    */
-  public normalize(): Vector2 {
+  public normalize(): MVector2 {
     let len = this.length()
 
     if (len === 0) {
@@ -673,7 +673,7 @@ export class Vector2 {
    * Gets a new Vector2 copied from the Vector2
    * @returns a new Vector2
    */
-  public clone(): Vector2 {
-    return new Vector2(this.x, this.y)
+  public clone(): MVector2 {
+    return new MVector2(this.x, this.y)
   }
 }

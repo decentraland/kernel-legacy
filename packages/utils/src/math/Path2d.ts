@@ -1,4 +1,4 @@
-import { Vector2 } from './Vector2'
+import { MVector2 } from './MVector2'
 import { Arc2 } from './Arc2'
 import { Orientation } from './types'
 
@@ -11,7 +11,7 @@ export class Path2 {
    * If the path start and end point are the same
    */
   public closed = false
-  private _points = new Array<Vector2>()
+  private _points = new Array<MVector2>()
   private _length = 0.0
 
   /**
@@ -20,7 +20,7 @@ export class Path2 {
    * @param y - the starting points y value
    */
   constructor(x: number, y: number) {
-    this._points.push(new Vector2(x, y))
+    this._points.push(new MVector2(x, y))
   }
 
   /**
@@ -43,7 +43,7 @@ export class Path2 {
     if (this.closed) {
       return this
     }
-    let newPoint = new Vector2(x, y)
+    let newPoint = new MVector2(x, y)
     let previousPoint = this._points[this._points.length - 1]
     this._points.push(newPoint)
     this._length += newPoint.subtract(previousPoint).length()
@@ -64,8 +64,8 @@ export class Path2 {
       return this
     }
     let startPoint = this._points[this._points.length - 1]
-    let midPoint = new Vector2(midX, midY)
-    let endPoint = new Vector2(endX, endY)
+    let midPoint = new MVector2(midX, midY)
+    let endPoint = new MVector2(endX, endY)
 
     let arc = new Arc2(startPoint, midPoint, endPoint)
 
@@ -110,7 +110,7 @@ export class Path2 {
    * Gets the points which construct the path
    * @returns the Path2 internal array of points.
    */
-  public getPoints(): Vector2[] {
+  public getPoints(): MVector2[] {
     return this._points
   }
 
@@ -119,9 +119,9 @@ export class Path2 {
    * @param normalizedLengthPosition - the length along the path to retreive the point from
    * @returns a new Vector2 located at a percentage of the Path2 total length on this path.
    */
-  public getPointAtLengthPosition(normalizedLengthPosition: number): Vector2 {
+  public getPointAtLengthPosition(normalizedLengthPosition: number): MVector2 {
     if (normalizedLengthPosition < 0 || normalizedLengthPosition > 1) {
-      return Vector2.Zero()
+      return MVector2.Zero()
     }
 
     let lengthPosition = normalizedLengthPosition * this.length()
@@ -139,11 +139,11 @@ export class Path2 {
         let dir = bToA.normalize()
         let localOffset = lengthPosition - previousOffset
 
-        return new Vector2(a.x + dir.x * localOffset, a.y + dir.y * localOffset)
+        return new MVector2(a.x + dir.x * localOffset, a.y + dir.y * localOffset)
       }
       previousOffset = nextOffset
     }
 
-    return Vector2.Zero()
+    return MVector2.Zero()
   }
 }

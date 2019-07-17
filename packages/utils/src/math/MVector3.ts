@@ -18,7 +18,7 @@ export type ReadOnlyVector3 = {
  * Reminder: Babylon.js uses a left handed forward facing system
  * @public
  */
-export class Vector3 {
+export class MVector3 {
   /**
    * Gets a boolean indicating that the vector is non uniform meaning x, y or z are not all the same
    */
@@ -69,8 +69,8 @@ export class Vector3 {
    * @param vector2 - the second vector
    * @returns the resulting vector
    */
-  public static Add(vector1: ReadOnlyVector3, vector2: ReadOnlyVector3): Vector3 {
-    return new Vector3(vector1.x, vector1.y, vector1.z).addInPlace(vector2)
+  public static Add(vector1: ReadOnlyVector3, vector2: ReadOnlyVector3): MVector3 {
+    return new MVector3(vector1.x, vector1.y, vector1.z).addInPlace(vector2)
   }
 
   /**
@@ -82,8 +82,8 @@ export class Vector3 {
    * @returns the clip factor
    */
   public static GetClipFactor(vector0: ReadOnlyVector3, vector1: ReadOnlyVector3, axis: ReadOnlyVector3, size: number) {
-    let d0 = Vector3.Dot(vector0, axis) - size
-    let d1 = Vector3.Dot(vector1, axis) - size
+    let d0 = MVector3.Dot(vector0, axis) - size
+    let d1 = MVector3.Dot(vector1, axis) - size
 
     let s = d0 / (d0 - d1)
 
@@ -97,13 +97,13 @@ export class Vector3 {
    * @param normal - direction of the normal
    * @returns the angle between vector0 and vector1
    */
-  public static GetAngleBetweenVectors(vector0: Vector3, vector1: Vector3, normal: ReadOnlyVector3): number {
-    const v0: Vector3 = vector0.normalizeToRef(MathTmp.Vector3[1])
-    const v1: Vector3 = vector1.normalizeToRef(MathTmp.Vector3[2])
-    const dot: number = Vector3.Dot(v0, v1)
+  public static GetAngleBetweenVectors(vector0: MVector3, vector1: MVector3, normal: ReadOnlyVector3): number {
+    const v0: MVector3 = vector0.normalizeToRef(MathTmp.Vector3[1])
+    const v1: MVector3 = vector1.normalizeToRef(MathTmp.Vector3[2])
+    const dot: number = MVector3.Dot(v0, v1)
     const n = MathTmp.Vector3[3]
-    Vector3.CrossToRef(v0, v1, n)
-    if (Vector3.Dot(n, normal) > 0) {
+    MVector3.CrossToRef(v0, v1, n)
+    if (MVector3.Dot(n, normal) > 0) {
       return Math.acos(dot)
     }
     return -Math.acos(dot)
@@ -115,8 +115,8 @@ export class Vector3 {
    * @param offset - defines the offset in the source array
    * @returns the new Vector3
    */
-  public static FromArray(array: ArrayLike<number>, offset: number = 0): Vector3 {
-    return new Vector3(array[offset], array[offset + 1], array[offset + 2])
+  public static FromArray(array: ArrayLike<number>, offset: number = 0): MVector3 {
+    return new MVector3(array[offset], array[offset + 1], array[offset + 2])
   }
 
   /**
@@ -126,8 +126,8 @@ export class Vector3 {
    * @param offset - defines the offset in the source array
    * @returns the new Vector3
    */
-  public static FromFloatArray(array: FloatArray, offset?: number): Vector3 {
-    return Vector3.FromArray(array, offset)
+  public static FromFloatArray(array: FloatArray, offset?: number): MVector3 {
+    return MVector3.FromArray(array, offset)
   }
 
   /**
@@ -136,7 +136,7 @@ export class Vector3 {
    * @param offset - defines the offset in the source array
    * @param result - defines the Vector3 where to store the result
    */
-  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: Vector3): void {
+  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: MVector3): void {
     result.x = array[offset]
     result.y = array[offset + 1]
     result.z = array[offset + 2]
@@ -149,8 +149,8 @@ export class Vector3 {
    * @param offset - defines the offset in the source array
    * @param result - defines the Vector3 where to store the result
    */
-  public static FromFloatArrayToRef(array: FloatArray, offset: number, result: Vector3): void {
-    return Vector3.FromArrayToRef(array, offset, result)
+  public static FromFloatArrayToRef(array: FloatArray, offset: number, result: MVector3): void {
+    return MVector3.FromArrayToRef(array, offset, result)
   }
 
   /**
@@ -160,7 +160,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the source
    * @param result - defines the Vector3 where to store the result
    */
-  public static FromFloatsToRef(x: number, y: number, z: number, result: Vector3): void {
+  public static FromFloatsToRef(x: number, y: number, z: number, result: MVector3): void {
     result.copyFromFloats(x, y, z)
   }
 
@@ -168,57 +168,57 @@ export class Vector3 {
    * Returns a new Vector3 set to (0.0, 0.0, 0.0)
    * @returns a new empty Vector3
    */
-  public static Zero(): Vector3 {
-    return new Vector3(0.0, 0.0, 0.0)
+  public static Zero(): MVector3 {
+    return new MVector3(0.0, 0.0, 0.0)
   }
   /**
    * Returns a new Vector3 set to (1.0, 1.0, 1.0)
    * @returns a new unit Vector3
    */
-  public static One(): Vector3 {
-    return new Vector3(1.0, 1.0, 1.0)
+  public static One(): MVector3 {
+    return new MVector3(1.0, 1.0, 1.0)
   }
   /**
    * Returns a new Vector3 set to (0.0, 1.0, 0.0)
    * @returns a new up Vector3
    */
-  public static Up(): Vector3 {
-    return new Vector3(0.0, 1.0, 0.0)
+  public static Up(): MVector3 {
+    return new MVector3(0.0, 1.0, 0.0)
   }
   /**
    * Returns a new Vector3 set to (0.0, -1.0, 0.0)
    * @returns a new down Vector3
    */
-  public static Down(): Vector3 {
-    return new Vector3(0.0, -1.0, 0.0)
+  public static Down(): MVector3 {
+    return new MVector3(0.0, -1.0, 0.0)
   }
   /**
    * Returns a new Vector3 set to (0.0, 0.0, 1.0)
    * @returns a new forward Vector3
    */
-  public static Forward(): Vector3 {
-    return new Vector3(0.0, 0.0, 1.0)
+  public static Forward(): MVector3 {
+    return new MVector3(0.0, 0.0, 1.0)
   }
   /**
    * Returns a new Vector3 set to (0.0, 0.0, -1.0)
    * @returns a new forward Vector3
    */
-  public static Backward(): Vector3 {
-    return new Vector3(0.0, 0.0, -1.0)
+  public static Backward(): MVector3 {
+    return new MVector3(0.0, 0.0, -1.0)
   }
   /**
    * Returns a new Vector3 set to (1.0, 0.0, 0.0)
    * @returns a new right Vector3
    */
-  public static Right(): Vector3 {
-    return new Vector3(1.0, 0.0, 0.0)
+  public static Right(): MVector3 {
+    return new MVector3(1.0, 0.0, 0.0)
   }
   /**
    * Returns a new Vector3 set to (-1.0, 0.0, 0.0)
    * @returns a new left Vector3
    */
-  public static Left(): Vector3 {
-    return new Vector3(-1.0, 0.0, 0.0)
+  public static Left(): MVector3 {
+    return new MVector3(-1.0, 0.0, 0.0)
   }
 
   /**
@@ -228,9 +228,9 @@ export class Vector3 {
    * @param transformation - defines the transformation matrix
    * @returns the transformed Vector3
    */
-  public static TransformCoordinates(vector: ReadOnlyVector3, transformation: Matrix): Vector3 {
-    let result = Vector3.Zero()
-    Vector3.TransformCoordinatesToRef(vector, transformation, result)
+  public static TransformCoordinates(vector: ReadOnlyVector3, transformation: Matrix): MVector3 {
+    let result = MVector3.Zero()
+    MVector3.TransformCoordinatesToRef(vector, transformation, result)
     return result
   }
 
@@ -244,9 +244,9 @@ export class Vector3 {
   public static TransformCoordinatesToRef(
     vector: ReadOnlyVector3,
     transformation: Readonly<Matrix>,
-    result: Vector3
+    result: MVector3
   ): void {
-    return Vector3.TransformCoordinatesFromFloatsToRef(vector.x, vector.y, vector.z, transformation, result)
+    return MVector3.TransformCoordinatesFromFloatsToRef(vector.x, vector.y, vector.z, transformation, result)
   }
 
   /**
@@ -263,7 +263,7 @@ export class Vector3 {
     y: number,
     z: number,
     transformation: Readonly<Matrix>,
-    result: Vector3
+    result: MVector3
   ): void {
     const m = transformation.m
     let rx = x * m[0] + y * m[4] + z * m[8] + m[12]
@@ -283,9 +283,9 @@ export class Vector3 {
    * @param transformation - defines the transformation matrix
    * @returns the new Vector3
    */
-  public static TransformNormal(vector: ReadOnlyVector3, transformation: Matrix): Vector3 {
-    let result = Vector3.Zero()
-    Vector3.TransformNormalToRef(vector, transformation, result)
+  public static TransformNormal(vector: ReadOnlyVector3, transformation: Matrix): MVector3 {
+    let result = MVector3.Zero()
+    MVector3.TransformNormalToRef(vector, transformation, result)
     return result
   }
 
@@ -296,7 +296,11 @@ export class Vector3 {
    * @param transformation - defines the transformation matrix
    * @param result - defines the Vector3 where to store the result
    */
-  public static TransformNormalToRef(vector: ReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void {
+  public static TransformNormalToRef(
+    vector: ReadOnlyVector3,
+    transformation: Readonly<Matrix>,
+    result: MVector3
+  ): void {
     this.TransformNormalFromFloatsToRef(vector.x, vector.y, vector.z, transformation, result)
   }
 
@@ -314,7 +318,7 @@ export class Vector3 {
     y: number,
     z: number,
     transformation: Readonly<Matrix>,
-    result: Vector3
+    result: MVector3
   ): void {
     const m = transformation.m
     result.x = x * m[0] + y * m[4] + z * m[8]
@@ -337,7 +341,7 @@ export class Vector3 {
     value3: ReadOnlyVector3,
     value4: ReadOnlyVector3,
     amount: number
-  ): Vector3 {
+  ): MVector3 {
     let squared = amount * amount
     let cubed = amount * squared
 
@@ -362,7 +366,7 @@ export class Vector3 {
         (2.0 * value1.z - 5.0 * value2.z + 4.0 * value3.z - value4.z) * squared +
         (-value1.z + 3.0 * value2.z - 3.0 * value3.z + value4.z) * cubed)
 
-    return new Vector3(x, y, z)
+    return new MVector3(x, y, z)
   }
 
   /**
@@ -374,9 +378,9 @@ export class Vector3 {
    * @param max - defines the upper range value
    * @returns the new Vector3
    */
-  public static Clamp(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3): Vector3 {
-    const v = new Vector3()
-    Vector3.ClampToRef(value, min, max, v)
+  public static Clamp(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3): MVector3 {
+    const v = new MVector3()
+    MVector3.ClampToRef(value, min, max, v)
     return v
   }
   /**
@@ -388,7 +392,7 @@ export class Vector3 {
    * @param max - defines the upper range value
    * @param result - defines the Vector3 where to store the result
    */
-  public static ClampToRef(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3, result: Vector3): void {
+  public static ClampToRef(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3, result: MVector3): void {
     let x = value.x
     x = x > max.x ? max.x : x
     x = x < min.x ? min.x : x
@@ -419,7 +423,7 @@ export class Vector3 {
     value2: ReadOnlyVector3,
     tangent2: ReadOnlyVector3,
     amount: number
-  ): Vector3 {
+  ): MVector3 {
     let squared = amount * amount
     let cubed = amount * squared
     let part1 = 2.0 * cubed - 3.0 * squared + 1.0
@@ -430,7 +434,7 @@ export class Vector3 {
     let x = value1.x * part1 + value2.x * part2 + tangent1.x * part3 + tangent2.x * part4
     let y = value1.y * part1 + value2.y * part2 + tangent1.y * part3 + tangent2.y * part4
     let z = value1.z * part1 + value2.z * part2 + tangent1.z * part3 + tangent2.z * part4
-    return new Vector3(x, y, z)
+    return new MVector3(x, y, z)
   }
 
   /**
@@ -440,9 +444,9 @@ export class Vector3 {
    * @param amount - max defines amount between both (between 0 and 1)
    * @returns the new Vector3
    */
-  public static Lerp(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number): Vector3 {
-    let result = new Vector3(0, 0, 0)
-    Vector3.LerpToRef(start, end, amount, result)
+  public static Lerp(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number): MVector3 {
+    let result = new MVector3(0, 0, 0)
+    MVector3.LerpToRef(start, end, amount, result)
     return result
   }
 
@@ -453,7 +457,7 @@ export class Vector3 {
    * @param amount - max defines amount between both (between 0 and 1)
    * @param result - defines the Vector3 where to store the result
    */
-  public static LerpToRef(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number, result: Vector3): void {
+  public static LerpToRef(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number, result: MVector3): void {
     result.x = start.x + (end.x - start.x) * amount
     result.y = start.y + (end.y - start.y) * amount
     result.z = start.z + (end.z - start.z) * amount
@@ -476,9 +480,9 @@ export class Vector3 {
    * @param right - defines the right operand
    * @returns the cross product
    */
-  public static Cross(left: ReadOnlyVector3, right: ReadOnlyVector3): Vector3 {
-    let result = Vector3.Zero()
-    Vector3.CrossToRef(left, right, result)
+  public static Cross(left: ReadOnlyVector3, right: ReadOnlyVector3): MVector3 {
+    let result = MVector3.Zero()
+    MVector3.CrossToRef(left, right, result)
     return result
   }
 
@@ -489,7 +493,7 @@ export class Vector3 {
    * @param right - defines the right operand
    * @param result - defines the Vector3 where to store the result
    */
-  public static CrossToRef(left: ReadOnlyVector3, right: ReadOnlyVector3, result: Vector3): void {
+  public static CrossToRef(left: ReadOnlyVector3, right: ReadOnlyVector3, result: MVector3): void {
     const x = left.y * right.z - left.z * right.y
     const y = left.z * right.x - left.x * right.z
     const z = left.x * right.y - left.y * right.x
@@ -501,9 +505,9 @@ export class Vector3 {
    * @param vector - defines the Vector3 to normalize
    * @returns the new Vector3
    */
-  public static Normalize(vector: Vector3): Vector3 {
-    let result = Vector3.Zero()
-    Vector3.NormalizeToRef(vector, result)
+  public static Normalize(vector: MVector3): MVector3 {
+    let result = MVector3.Zero()
+    MVector3.NormalizeToRef(vector, result)
     return result
   }
 
@@ -512,7 +516,7 @@ export class Vector3 {
    * @param vector - defines the Vector3 to normalize
    * @param result - defines the Vector3 where to store the result
    */
-  public static NormalizeToRef(vector: Vector3, result: Vector3): void {
+  public static NormalizeToRef(vector: MVector3, result: MVector3): void {
     vector.normalizeToRef(result)
   }
 
@@ -522,8 +526,8 @@ export class Vector3 {
    * @param right - defines the second operand
    * @returns the new Vector3
    */
-  public static Minimize(left: ReadOnlyVector3, right: ReadOnlyVector3): Vector3 {
-    let min = new Vector3(left.x, left.y, left.z)
+  public static Minimize(left: ReadOnlyVector3, right: ReadOnlyVector3): MVector3 {
+    let min = new MVector3(left.x, left.y, left.z)
     min.minimizeInPlace(right)
     return min
   }
@@ -534,8 +538,8 @@ export class Vector3 {
    * @param right - defines the second operand
    * @returns the new Vector3
    */
-  public static Maximize(left: Vector3, right: Vector3): Vector3 {
-    let max = new Vector3(left.x, left.y, left.z)
+  public static Maximize(left: MVector3, right: MVector3): MVector3 {
+    let max = new MVector3(left.x, left.y, left.z)
     max.maximizeInPlace(right)
     return max
   }
@@ -547,7 +551,7 @@ export class Vector3 {
    * @returns the distance
    */
   public static Distance(value1: ReadOnlyVector3, value2: ReadOnlyVector3): number {
-    return Math.sqrt(Vector3.DistanceSquared(value1, value2))
+    return Math.sqrt(MVector3.DistanceSquared(value1, value2))
   }
 
   /**
@@ -570,8 +574,8 @@ export class Vector3 {
    * @param value2 - defines the second operand
    * @returns the new Vector3
    */
-  public static Center(value1: ReadOnlyVector3, value2: ReadOnlyVector3): Vector3 {
-    let center = Vector3.Add(value1, value2)
+  public static Center(value1: ReadOnlyVector3, value2: ReadOnlyVector3): MVector3 {
+    let center = MVector3.Add(value1, value2)
     center.scaleInPlace(0.5)
     return center
   }
@@ -586,9 +590,9 @@ export class Vector3 {
    * @param axis3 - defines the third axis
    * @returns a new Vector3
    */
-  public static RotationFromAxis(axis1: Vector3, axis2: Vector3, axis3: Vector3): Vector3 {
-    let rotation = Vector3.Zero()
-    Vector3.RotationFromAxisToRef(axis1, axis2, axis3, rotation)
+  public static RotationFromAxis(axis1: MVector3, axis2: MVector3, axis3: MVector3): MVector3 {
+    let rotation = MVector3.Zero()
+    MVector3.RotationFromAxisToRef(axis1, axis2, axis3, rotation)
     return rotation
   }
 
@@ -599,7 +603,7 @@ export class Vector3 {
    * @param axis3 - defines the third axis
    * @param ref - defines the Vector3 where to store the result
    */
-  public static RotationFromAxisToRef(axis1: Vector3, axis2: Vector3, axis3: Vector3, ref: Vector3): void {
+  public static RotationFromAxisToRef(axis1: MVector3, axis2: MVector3, axis3: MVector3, ref: MVector3): void {
     let quat = MathTmp.Quaternion[0]
     Quaternion.RotationQuaternionFromAxisToRef(axis1, axis2, axis3, quat)
     ref.copyFrom(quat.eulerAngles)
@@ -650,7 +654,7 @@ export class Vector3 {
    * @param index - defines the offset in the destination array
    * @returns the current Vector3
    */
-  public toArray(array: FloatArray, index: number = 0): Vector3 {
+  public toArray(array: FloatArray, index: number = 0): MVector3 {
     array[index] = this.x
     array[index + 1] = this.y
     array[index + 2] = this.z
@@ -670,7 +674,7 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the current updated Vector3
    */
-  public addInPlace(otherVector: ReadOnlyVector3): Vector3 {
+  public addInPlace(otherVector: ReadOnlyVector3): MVector3 {
     return this.addInPlaceFromFloats(otherVector.x, otherVector.y, otherVector.z)
   }
 
@@ -681,7 +685,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the current updated Vector3
    */
-  public addInPlaceFromFloats(x: number, y: number, z: number): Vector3 {
+  public addInPlaceFromFloats(x: number, y: number, z: number): MVector3 {
     this.x += x
     this.y += y
     this.z += z
@@ -693,8 +697,8 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the resulting Vector3
    */
-  public add(otherVector: ReadOnlyVector3): Vector3 {
-    return new Vector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z)
+  public add(otherVector: ReadOnlyVector3): MVector3 {
+    return new MVector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z)
   }
 
   /**
@@ -703,7 +707,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public addToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3 {
+  public addToRef(otherVector: ReadOnlyVector3, result: MVector3): MVector3 {
     return result.copyFromFloats(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z)
   }
 
@@ -712,7 +716,7 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the current updated Vector3
    */
-  public subtractInPlace(otherVector: ReadOnlyVector3): Vector3 {
+  public subtractInPlace(otherVector: ReadOnlyVector3): MVector3 {
     this.x -= otherVector.x
     this.y -= otherVector.y
     this.z -= otherVector.z
@@ -724,8 +728,8 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the resulting Vector3
    */
-  public subtract(otherVector: ReadOnlyVector3): Vector3 {
-    return new Vector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z)
+  public subtract(otherVector: ReadOnlyVector3): MVector3 {
+    return new MVector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z)
   }
 
   /**
@@ -734,7 +738,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public subtractToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3 {
+  public subtractToRef(otherVector: ReadOnlyVector3, result: MVector3): MVector3 {
     return this.subtractFromFloatsToRef(otherVector.x, otherVector.y, otherVector.z, result)
   }
 
@@ -745,8 +749,8 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the resulting Vector3
    */
-  public subtractFromFloats(x: number, y: number, z: number): Vector3 {
-    return new Vector3(this.x - x, this.y - y, this.z - z)
+  public subtractFromFloats(x: number, y: number, z: number): MVector3 {
+    return new MVector3(this.x - x, this.y - y, this.z - z)
   }
 
   /**
@@ -757,7 +761,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public subtractFromFloatsToRef(x: number, y: number, z: number, result: Vector3): Vector3 {
+  public subtractFromFloatsToRef(x: number, y: number, z: number, result: MVector3): MVector3 {
     return result.copyFromFloats(this.x - x, this.y - y, this.z - z)
   }
 
@@ -775,7 +779,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public applyMatrix4ToRef(matrix: Matrix, result: Vector3) {
+  public applyMatrix4ToRef(matrix: Matrix, result: MVector3) {
     const { x, y, z } = this
     const { m } = matrix
     const w = 1 / (m[3] * x + m[7] * y + m[11] * z + m[15])
@@ -802,7 +806,7 @@ export class Vector3 {
    * @param result - defines the target Vector3
    * @returns the current Vector3
    */
-  public rotateToRef(q: Quaternion, result: Vector3) {
+  public rotateToRef(q: Quaternion, result: MVector3) {
     const { x, y, z } = this
     const { x: qx, y: qy, z: qz, w: qw } = q
 
@@ -826,8 +830,8 @@ export class Vector3 {
    * Gets a new Vector3 set with the current Vector3 negated coordinates
    * @returns a new Vector3
    */
-  public negate(): Vector3 {
-    return new Vector3(-this.x, -this.y, -this.z)
+  public negate(): MVector3 {
+    return new MVector3(-this.x, -this.y, -this.z)
   }
 
   /**
@@ -835,7 +839,7 @@ export class Vector3 {
    * @param scale - defines the multiplier factor
    * @returns the current updated Vector3
    */
-  public scaleInPlace(scale: number): Vector3 {
+  public scaleInPlace(scale: number): MVector3 {
     this.x *= scale
     this.y *= scale
     this.z *= scale
@@ -847,8 +851,8 @@ export class Vector3 {
    * @param scale - defines the multiplier factor
    * @returns a new Vector3
    */
-  public scale(scale: number): Vector3 {
-    return new Vector3(this.x * scale, this.y * scale, this.z * scale)
+  public scale(scale: number): MVector3 {
+    return new MVector3(this.x * scale, this.y * scale, this.z * scale)
   }
 
   /**
@@ -857,7 +861,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public scaleToRef(scale: number, result: Vector3): Vector3 {
+  public scaleToRef(scale: number, result: MVector3): MVector3 {
     return result.copyFromFloats(this.x * scale, this.y * scale, this.z * scale)
   }
 
@@ -867,7 +871,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the unmodified current Vector3
    */
-  public scaleAndAddToRef(scale: number, result: Vector3): Vector3 {
+  public scaleAndAddToRef(scale: number, result: MVector3): MVector3 {
     return result.addInPlaceFromFloats(this.x * scale, this.y * scale, this.z * scale)
   }
 
@@ -911,7 +915,7 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the current updated Vector3
    */
-  public multiplyInPlace(otherVector: ReadOnlyVector3): Vector3 {
+  public multiplyInPlace(otherVector: ReadOnlyVector3): MVector3 {
     this.x *= otherVector.x
     this.y *= otherVector.y
     this.z *= otherVector.z
@@ -923,7 +927,7 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the new Vector3
    */
-  public multiply(otherVector: ReadOnlyVector3): Vector3 {
+  public multiply(otherVector: ReadOnlyVector3): MVector3 {
     return this.multiplyByFloats(otherVector.x, otherVector.y, otherVector.z)
   }
 
@@ -933,7 +937,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public multiplyToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3 {
+  public multiplyToRef(otherVector: ReadOnlyVector3, result: MVector3): MVector3 {
     return result.copyFromFloats(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z)
   }
 
@@ -944,8 +948,8 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the new Vector3
    */
-  public multiplyByFloats(x: number, y: number, z: number): Vector3 {
-    return new Vector3(this.x * x, this.y * y, this.z * z)
+  public multiplyByFloats(x: number, y: number, z: number): MVector3 {
+    return new MVector3(this.x * x, this.y * y, this.z * z)
   }
 
   /**
@@ -953,8 +957,8 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the new Vector3
    */
-  public divide(otherVector: ReadOnlyVector3): Vector3 {
-    return new Vector3(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z)
+  public divide(otherVector: ReadOnlyVector3): MVector3 {
+    return new MVector3(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z)
   }
 
   /**
@@ -963,7 +967,7 @@ export class Vector3 {
    * @param result - defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  public divideToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3 {
+  public divideToRef(otherVector: ReadOnlyVector3, result: MVector3): MVector3 {
     return result.copyFromFloats(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z)
   }
 
@@ -972,7 +976,7 @@ export class Vector3 {
    * @param otherVector - defines the second operand
    * @returns the current updated Vector3
    */
-  public divideInPlace(otherVector: ReadOnlyVector3): Vector3 {
+  public divideInPlace(otherVector: ReadOnlyVector3): MVector3 {
     return this.divideToRef(otherVector, this)
   }
 
@@ -981,7 +985,7 @@ export class Vector3 {
    * @param other - defines the second operand
    * @returns the current updated Vector3
    */
-  public minimizeInPlace(other: ReadOnlyVector3): Vector3 {
+  public minimizeInPlace(other: ReadOnlyVector3): MVector3 {
     return this.minimizeInPlaceFromFloats(other.x, other.y, other.z)
   }
 
@@ -990,7 +994,7 @@ export class Vector3 {
    * @param other - defines the second operand
    * @returns the current updated Vector3
    */
-  public maximizeInPlace(other: ReadOnlyVector3): Vector3 {
+  public maximizeInPlace(other: ReadOnlyVector3): MVector3 {
     return this.maximizeInPlaceFromFloats(other.x, other.y, other.z)
   }
 
@@ -1001,7 +1005,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the current updated Vector3
    */
-  public minimizeInPlaceFromFloats(x: number, y: number, z: number): Vector3 {
+  public minimizeInPlaceFromFloats(x: number, y: number, z: number): MVector3 {
     if (x < this.x) {
       this.x = x
     }
@@ -1021,7 +1025,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the current updated Vector3
    */
-  public maximizeInPlaceFromFloats(x: number, y: number, z: number): Vector3 {
+  public maximizeInPlaceFromFloats(x: number, y: number, z: number): MVector3 {
     if (x > this.x) {
       this.x = x
     }
@@ -1038,16 +1042,16 @@ export class Vector3 {
    * Gets a new Vector3 from current Vector3 floored values
    * @returns a new Vector3
    */
-  public floor(): Vector3 {
-    return new Vector3(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z))
+  public floor(): MVector3 {
+    return new MVector3(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z))
   }
 
   /**
    * Gets a new Vector3 from current Vector3 floored values
    * @returns a new Vector3
    */
-  public fract(): Vector3 {
-    return new Vector3(this.x - Math.floor(this.x), this.y - Math.floor(this.y), this.z - Math.floor(this.z))
+  public fract(): MVector3 {
+    return new MVector3(this.x - Math.floor(this.x), this.y - Math.floor(this.y), this.z - Math.floor(this.z))
   }
 
   // Properties
@@ -1072,7 +1076,7 @@ export class Vector3 {
    * Please note that this is an in place operation.
    * @returns the current updated Vector3
    */
-  public normalize(): Vector3 {
+  public normalize(): MVector3 {
     return this.normalizeFromLength(this.length())
   }
 
@@ -1082,7 +1086,7 @@ export class Vector3 {
    * @param len - the length of the vector
    * @returns the current updated Vector3
    */
-  public normalizeFromLength(len: number): Vector3 {
+  public normalizeFromLength(len: number): MVector3 {
     if (len === 0 || len === 1.0) {
       return this
     }
@@ -1094,8 +1098,8 @@ export class Vector3 {
    * Normalize the current Vector3 to a new vector
    * @returns the new Vector3
    */
-  public normalizeToNew(): Vector3 {
-    const normalized = new Vector3(0, 0, 0)
+  public normalizeToNew(): MVector3 {
+    const normalized = new MVector3(0, 0, 0)
     this.normalizeToRef(normalized)
     return normalized
   }
@@ -1105,7 +1109,7 @@ export class Vector3 {
    * @param reference - define the Vector3 to update
    * @returns the updated Vector3
    */
-  public normalizeToRef(reference: Vector3): Vector3 {
+  public normalizeToRef(reference: MVector3): MVector3 {
     let len = this.length()
     if (len === 0 || len === 1.0) {
       return reference.copyFromFloats(this.x, this.y, this.z)
@@ -1118,8 +1122,8 @@ export class Vector3 {
    * Creates a new Vector3 copied from the current Vector3
    * @returns the new Vector3
    */
-  public clone(): Vector3 {
-    return new Vector3(this.x, this.y, this.z)
+  public clone(): MVector3 {
+    return new MVector3(this.x, this.y, this.z)
   }
 
   /**
@@ -1127,7 +1131,7 @@ export class Vector3 {
    * @param source - defines the source Vector3
    * @returns the current updated Vector3
    */
-  public copyFrom(source: ReadOnlyVector3): Vector3 {
+  public copyFrom(source: ReadOnlyVector3): MVector3 {
     return this.copyFromFloats(source.x, source.y, source.z)
   }
 
@@ -1138,7 +1142,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the current updated Vector3
    */
-  public copyFromFloats(x: number, y: number, z: number): Vector3 {
+  public copyFromFloats(x: number, y: number, z: number): MVector3 {
     this.x = x
     this.y = y
     this.z = z
@@ -1152,7 +1156,7 @@ export class Vector3 {
    * @param z - defines the z coordinate of the operand
    * @returns the current updated Vector3
    */
-  public set(x: number, y: number, z: number): Vector3 {
+  public set(x: number, y: number, z: number): MVector3 {
     return this.copyFromFloats(x, y, z)
   }
 
@@ -1161,7 +1165,7 @@ export class Vector3 {
    * @param v - defines the x, y and z coordinates of the operand
    * @returns the current updated Vector3
    */
-  public setAll(v: number): Vector3 {
+  public setAll(v: number): MVector3 {
     this.x = this.y = this.z = v
     return this
   }

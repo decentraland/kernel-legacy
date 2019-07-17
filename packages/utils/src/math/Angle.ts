@@ -1,4 +1,4 @@
-import { Vector2 } from './Vector2'
+import { MVector2 } from './MVector2'
 
 /**
  * Defines angle representation
@@ -23,7 +23,7 @@ export class Angle {
    * @param b - defines second vector
    * @returns a new Angle
    */
-  public static BetweenTwoPoints(a: Vector2, b: Vector2): Angle {
+  public static BetweenTwoPoints(a: MVector2, b: MVector2): Angle {
     let delta = b.subtract(a)
     let theta = Math.atan2(delta.y, delta.x)
     return new Angle(theta)

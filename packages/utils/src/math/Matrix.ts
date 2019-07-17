@@ -1,9 +1,9 @@
 import { FloatArray, Nullable } from './types'
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 import { Quaternion } from './Quaternion'
 import { MathTmp } from './preallocatedVariables'
 import { Plane } from './Plane'
-import { Vector4 } from './Vector4'
+import { MVector4 } from './MVector4'
 
 /**
  * Class used to store matrix data (4x4)
@@ -216,7 +216,7 @@ export class Matrix {
    * @param translation - defines the translation vector3
    * @returns a new matrix
    */
-  public static Compose(scale: Vector3, rotation: Quaternion, translation: Vector3): Matrix {
+  public static Compose(scale: MVector3, rotation: Quaternion, translation: MVector3): Matrix {
     let result = new Matrix()
     Matrix.ComposeToRef(scale, rotation, translation, result)
     return result
@@ -229,7 +229,7 @@ export class Matrix {
    * @param translation - defines the translation vector3
    * @param result - defines the target matrix
    */
-  public static ComposeToRef(scale: Vector3, rotation: Quaternion, translation: Vector3, result: Matrix): void {
+  public static ComposeToRef(scale: MVector3, rotation: Quaternion, translation: MVector3, result: Matrix): void {
     Matrix.ScalingToRef(scale.x, scale.y, scale.z, MathTmp.Matrix[1])
     rotation.toRotationMatrix(MathTmp.Matrix[0])
     MathTmp.Matrix[1].multiplyToRef(MathTmp.Matrix[0], result)
@@ -355,7 +355,7 @@ export class Matrix {
    * @param angle - defines the angle (in radians) to use
    * @returns the new matrix
    */
-  public static RotationAxis(axis: Vector3, angle: number): Matrix {
+  public static RotationAxis(axis: MVector3, angle: number): Matrix {
     let result = new Matrix()
     Matrix.RotationAxisToRef(axis, angle, result)
     return result
@@ -367,7 +367,7 @@ export class Matrix {
    * @param angle - defines the angle (in radians) to use
    * @param result - defines the target matrix
    */
-  public static RotationAxisToRef(axis: Vector3, angle: number, result: Matrix): void {
+  public static RotationAxisToRef(axis: MVector3, angle: number, result: Matrix): void {
     let s = Math.sin(-angle)
     let c = Math.cos(-angle)
     let c1 = 1 - c
@@ -538,12 +538,12 @@ export class Matrix {
     endValue.decompose(endScale, endRotation, endTranslation)
 
     let resultScale = MathTmp.Vector3[4]
-    Vector3.LerpToRef(startScale, endScale, gradient, resultScale)
+    MVector3.LerpToRef(startScale, endScale, gradient, resultScale)
     let resultRotation = MathTmp.Quaternion[2]
     Quaternion.SlerpToRef(startRotation, endRotation, gradient, resultRotation)
 
     let resultTranslation = MathTmp.Vector3[5]
-    Vector3.LerpToRef(startTranslation, endTranslation, gradient, resultTranslation)
+    MVector3.LerpToRef(startTranslation, endTranslation, gradient, resultTranslation)
 
     Matrix.ComposeToRef(resultScale, resultRotation, resultTranslation, result)
   }
@@ -556,7 +556,7 @@ export class Matrix {
    * @param up - defines the up vector for the entity
    * @returns the new matrix
    */
-  public static LookAtLH(eye: Vector3, target: Vector3, up: Vector3): Matrix {
+  public static LookAtLH(eye: MVector3, target: MVector3, up: MVector3): Matrix {
     let result = new Matrix()
     Matrix.LookAtLHToRef(eye, target, up, result)
     return result
@@ -570,7 +570,7 @@ export class Matrix {
    * @param up - defines the up vector for the entity
    * @param result - defines the target matrix
    */
-  public static LookAtLHToRef(eye: Vector3, target: Vector3, up: Vector3, result: Matrix): void {
+  public static LookAtLHToRef(eye: MVector3, target: MVector3, up: MVector3, result: Matrix): void {
     const xAxis = MathTmp.Vector3[0]
     const yAxis = MathTmp.Vector3[1]
     const zAxis = MathTmp.Vector3[2]
@@ -580,7 +580,7 @@ export class Matrix {
     zAxis.normalize()
 
     // X axis
-    Vector3.CrossToRef(up, zAxis, xAxis)
+    MVector3.CrossToRef(up, zAxis, xAxis)
 
     const xSquareLength = xAxis.lengthSquared()
     if (xSquareLength === 0) {
@@ -590,13 +590,13 @@ export class Matrix {
     }
 
     // Y axis
-    Vector3.CrossToRef(zAxis, xAxis, yAxis)
+    MVector3.CrossToRef(zAxis, xAxis, yAxis)
     yAxis.normalize()
 
     // Eye angles
-    let ex = -Vector3.Dot(xAxis, eye)
-    let ey = -Vector3.Dot(yAxis, eye)
-    let ez = -Vector3.Dot(zAxis, eye)
+    let ex = -MVector3.Dot(xAxis, eye)
+    let ey = -MVector3.Dot(yAxis, eye)
+    let ez = -MVector3.Dot(zAxis, eye)
 
     Matrix.FromValuesToRef(
       xAxis.x,
@@ -627,7 +627,7 @@ export class Matrix {
    * @param up - defines the up vector for the entity
    * @returns the new matrix
    */
-  public static LookAtRH(eye: Vector3, target: Vector3, up: Vector3): Matrix {
+  public static LookAtRH(eye: MVector3, target: MVector3, up: MVector3): Matrix {
     let result = new Matrix()
     Matrix.LookAtRHToRef(eye, target, up, result)
     return result
@@ -641,7 +641,7 @@ export class Matrix {
    * @param up - defines the up vector for the entity
    * @param result - defines the target matrix
    */
-  public static LookAtRHToRef(eye: Vector3, target: Vector3, up: Vector3, result: Matrix): void {
+  public static LookAtRHToRef(eye: MVector3, target: MVector3, up: MVector3, result: Matrix): void {
     const xAxis = MathTmp.Vector3[0]
     const yAxis = MathTmp.Vector3[1]
     const zAxis = MathTmp.Vector3[2]
@@ -651,7 +651,7 @@ export class Matrix {
     zAxis.normalize()
 
     // X axis
-    Vector3.CrossToRef(up, zAxis, xAxis)
+    MVector3.CrossToRef(up, zAxis, xAxis)
 
     const xSquareLength = xAxis.lengthSquared()
     if (xSquareLength === 0) {
@@ -661,13 +661,13 @@ export class Matrix {
     }
 
     // Y axis
-    Vector3.CrossToRef(zAxis, xAxis, yAxis)
+    MVector3.CrossToRef(zAxis, xAxis, yAxis)
     yAxis.normalize()
 
     // Eye angles
-    let ex = -Vector3.Dot(xAxis, eye)
-    let ey = -Vector3.Dot(yAxis, eye)
-    let ez = -Vector3.Dot(zAxis, eye)
+    let ex = -MVector3.Dot(xAxis, eye)
+    let ey = -MVector3.Dot(yAxis, eye)
+    let ez = -MVector3.Dot(zAxis, eye)
 
     Matrix.FromValuesToRef(
       xAxis.x,
@@ -1108,7 +1108,7 @@ export class Matrix {
    * @param zaxis - defines the value of the 3rd axis
    * @param result - defines the target matrix
    */
-  public static FromXYZAxesToRef(xaxis: Vector3, yaxis: Vector3, zaxis: Vector3, result: Matrix) {
+  public static FromXYZAxesToRef(xaxis: MVector3, yaxis: MVector3, zaxis: MVector3, result: Matrix) {
     Matrix.FromValuesToRef(
       xaxis.x,
       xaxis.y,
@@ -1523,7 +1523,7 @@ export class Matrix {
    * @param vector3 - defines the translation to insert
    * @returns the current updated matrix
    */
-  public setTranslation(vector3: Vector3): Matrix {
+  public setTranslation(vector3: MVector3): Matrix {
     return this.setTranslationFromFloats(vector3.x, vector3.y, vector3.z)
   }
 
@@ -1531,8 +1531,8 @@ export class Matrix {
    * Gets the translation value of the current matrix
    * @returns a new Vector3 as the extracted translation from the matrix
    */
-  public getTranslation(): Vector3 {
-    return new Vector3(this._m[12], this._m[13], this._m[14])
+  public getTranslation(): MVector3 {
+    return new MVector3(this._m[12], this._m[13], this._m[14])
   }
 
   /**
@@ -1540,7 +1540,7 @@ export class Matrix {
    * @param result - defines the Vector3 where to store the translation
    * @returns the current matrix
    */
-  public getTranslationToRef(result: Vector3): Matrix {
+  public getTranslationToRef(result: MVector3): Matrix {
     result.x = this._m[12]
     result.y = this._m[13]
     result.z = this._m[14]
@@ -1759,7 +1759,7 @@ export class Matrix {
    * @param translation - defines the translation vector3 given as a reference to update
    * @returns true if operation was successful
    */
-  public decompose(scale?: Vector3, rotation?: Quaternion, translation?: Vector3): boolean {
+  public decompose(scale?: MVector3, rotation?: Quaternion, translation?: MVector3): boolean {
     if (this._isIdentity) {
       if (translation) {
         translation.setAll(0)
@@ -1830,12 +1830,12 @@ export class Matrix {
    * @param index - defines the number of the row to get
    * @returns the index-th row of the current matrix as a new Vector4
    */
-  public getRow(index: number): Nullable<Vector4> {
+  public getRow(index: number): Nullable<MVector4> {
     if (index < 0 || index > 3) {
       return null
     }
     let i = index * 4
-    return new Vector4(this._m[i + 0], this._m[i + 1], this._m[i + 2], this._m[i + 3])
+    return new MVector4(this._m[i + 0], this._m[i + 1], this._m[i + 2], this._m[i + 3])
   }
 
   /**
@@ -1844,7 +1844,7 @@ export class Matrix {
    * @param row - defines the target vector4
    * @returns the updated current matrix
    */
-  public setRow(index: number, row: Vector4): Matrix {
+  public setRow(index: number, row: MVector4): Matrix {
     return this.setRowFromFloats(index, row.x, row.y, row.z, row.w)
   }
 

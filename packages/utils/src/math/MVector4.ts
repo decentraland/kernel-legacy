@@ -1,7 +1,7 @@
 import { FloatArray, Epsilon } from './types'
 import { Matrix } from './Matrix'
 import { Scalar } from './Scalar'
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 
 /** @public */
 export type ReadOnlyVector4 = {
@@ -15,7 +15,7 @@ export type ReadOnlyVector4 = {
  * Vector4 class created for EulerAngle class conversion to Quaternion
  * @public
  */
-export class Vector4 {
+export class MVector4 {
   /**
    * Creates a Vector4 object from the given floats.
    * @param x - x value of the vector
@@ -42,8 +42,8 @@ export class Vector4 {
    * @param vector2 - the second vector
    * @returns the resulting vector
    */
-  public static Add(vector1: ReadOnlyVector4, vector2: ReadOnlyVector4): Vector4 {
-    return new Vector4(vector1.x, vector1.y, vector1.z, vector1.w).addInPlace(vector2)
+  public static Add(vector1: ReadOnlyVector4, vector2: ReadOnlyVector4): MVector4 {
+    return new MVector4(vector1.x, vector1.y, vector1.z, vector1.w).addInPlace(vector2)
   }
 
   /**
@@ -52,8 +52,8 @@ export class Vector4 {
    * @param offset - the offset into the array to start at
    * @returns the new vector
    */
-  public static FromArray(array: ArrayLike<number>, offset: number = 0): Vector4 {
-    return new Vector4(array[offset], array[offset + 1], array[offset + 2], array[offset + 3])
+  public static FromArray(array: ArrayLike<number>, offset: number = 0): MVector4 {
+    return new MVector4(array[offset], array[offset + 1], array[offset + 2], array[offset + 3])
   }
   /**
    * Updates the given vector "result" from the starting index of the given array.
@@ -61,7 +61,7 @@ export class Vector4 {
    * @param offset - the offset into the array to start at
    * @param result - the vector to store the result in
    */
-  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: Vector4): void {
+  public static FromArrayToRef(array: ArrayLike<number>, offset: number, result: MVector4): void {
     result.x = array[offset]
     result.y = array[offset + 1]
     result.z = array[offset + 2]
@@ -73,8 +73,8 @@ export class Vector4 {
    * @param offset - the offset into the array to start at
    * @param result - the vector to store the result in
    */
-  public static FromFloatArrayToRef(array: FloatArray, offset: number, result: Vector4): void {
-    Vector4.FromArrayToRef(array, offset, result)
+  public static FromFloatArrayToRef(array: FloatArray, offset: number, result: MVector4): void {
+    MVector4.FromArrayToRef(array, offset, result)
   }
   /**
    * Updates the given vector "result" coordinates from the given floats.
@@ -84,7 +84,7 @@ export class Vector4 {
    * @param w - float to set from
    * @param result - the vector to the floats in
    */
-  public static FromFloatsToRef(x: number, y: number, z: number, w: number, result: Vector4): void {
+  public static FromFloatsToRef(x: number, y: number, z: number, w: number, result: MVector4): void {
     result.x = x
     result.y = y
     result.z = z
@@ -94,24 +94,24 @@ export class Vector4 {
    * Returns a new Vector4 set to (0.0, 0.0, 0.0, 0.0)
    * @returns the new vector
    */
-  public static Zero(): Vector4 {
-    return new Vector4(0.0, 0.0, 0.0, 0.0)
+  public static Zero(): MVector4 {
+    return new MVector4(0.0, 0.0, 0.0, 0.0)
   }
   /**
    * Returns a new Vector4 set to (1.0, 1.0, 1.0, 1.0)
    * @returns the new vector
    */
-  public static One(): Vector4 {
-    return new Vector4(1.0, 1.0, 1.0, 1.0)
+  public static One(): MVector4 {
+    return new MVector4(1.0, 1.0, 1.0, 1.0)
   }
   /**
    * Returns a new normalized Vector4 from the given one.
    * @param vector - the vector to normalize
    * @returns the vector
    */
-  public static Normalize(vector: ReadOnlyVector4): Vector4 {
-    let result = Vector4.Zero()
-    Vector4.NormalizeToRef(vector, result)
+  public static Normalize(vector: ReadOnlyVector4): MVector4 {
+    let result = MVector4.Zero()
+    MVector4.NormalizeToRef(vector, result)
     return result
   }
   /**
@@ -119,7 +119,7 @@ export class Vector4 {
    * @param vector - the vector to normalize
    * @param result - the vector to store the result in
    */
-  public static NormalizeToRef(vector: ReadOnlyVector4, result: Vector4): void {
+  public static NormalizeToRef(vector: ReadOnlyVector4, result: MVector4): void {
     result.copyFrom(vector)
     result.normalize()
   }
@@ -130,8 +130,8 @@ export class Vector4 {
    * @param right - right vector to minimize
    * @returns a new vector with the minimum of the left and right vector values
    */
-  public static Minimize(left: ReadOnlyVector4, right: ReadOnlyVector4): Vector4 {
-    let min = new Vector4(left.x, left.y, left.z, left.w)
+  public static Minimize(left: ReadOnlyVector4, right: ReadOnlyVector4): MVector4 {
+    let min = new MVector4(left.x, left.y, left.z, left.w)
     min.minimizeInPlace(right)
     return min
   }
@@ -142,8 +142,8 @@ export class Vector4 {
    * @param right - right vector to maximize
    * @returns a new vector with the maximum of the left and right vector values
    */
-  public static Maximize(left: ReadOnlyVector4, right: ReadOnlyVector4): Vector4 {
-    let max = new Vector4(left.x, left.y, left.z, left.w)
+  public static Maximize(left: ReadOnlyVector4, right: ReadOnlyVector4): MVector4 {
+    let max = new MVector4(left.x, left.y, left.z, left.w)
     max.maximizeInPlace(right)
     return max
   }
@@ -154,7 +154,7 @@ export class Vector4 {
    * @returns the distance between the two vectors
    */
   public static Distance(value1: ReadOnlyVector4, value2: ReadOnlyVector4): number {
-    return Math.sqrt(Vector4.DistanceSquared(value1, value2))
+    return Math.sqrt(MVector4.DistanceSquared(value1, value2))
   }
   /**
    * Returns the squared distance (float) between the vectors "value1" and "value2".
@@ -176,8 +176,8 @@ export class Vector4 {
    * @param value2 - value to calulate the center between
    * @returns the center between the two vectors
    */
-  public static Center(value1: ReadOnlyVector4, value2: ReadOnlyVector4): Vector4 {
-    let center = Vector4.Add(value1, value2)
+  public static Center(value1: ReadOnlyVector4, value2: ReadOnlyVector4): MVector4 {
+    let center = MVector4.Add(value1, value2)
     center.scaleInPlace(0.5)
     return center
   }
@@ -189,9 +189,9 @@ export class Vector4 {
    * @param transformation - the transformation matrix to apply
    * @returns the new vector
    */
-  public static TransformNormal(vector: ReadOnlyVector4, transformation: Matrix): Vector4 {
-    let result = Vector4.Zero()
-    Vector4.TransformNormalToRef(vector, transformation, result)
+  public static TransformNormal(vector: ReadOnlyVector4, transformation: Matrix): MVector4 {
+    let result = MVector4.Zero()
+    MVector4.TransformNormalToRef(vector, transformation, result)
     return result
   }
 
@@ -202,7 +202,7 @@ export class Vector4 {
    * @param transformation - the transformation matrix to apply
    * @param result - the vector to store the result in
    */
-  public static TransformNormalToRef(vector: ReadOnlyVector4, transformation: Matrix, result: Vector4): void {
+  public static TransformNormalToRef(vector: ReadOnlyVector4, transformation: Matrix, result: MVector4): void {
     const m = transformation.m
     let x = vector.x * m[0] + vector.y * m[4] + vector.z * m[8]
     let y = vector.x * m[1] + vector.y * m[5] + vector.z * m[9]
@@ -229,7 +229,7 @@ export class Vector4 {
     z: number,
     w: number,
     transformation: Matrix,
-    result: Vector4
+    result: MVector4
   ): void {
     const m = transformation.m
     result.x = x * m[0] + y * m[4] + z * m[8]
@@ -285,7 +285,7 @@ export class Vector4 {
    * @param index - index of the array to start at (default: 0)
    * @returns the Vector4.
    */
-  public toArray(array: FloatArray, index: number = 0): Vector4 {
+  public toArray(array: FloatArray, index: number = 0): MVector4 {
     array[index] = this.x
     array[index + 1] = this.y
     array[index + 2] = this.z
@@ -298,7 +298,7 @@ export class Vector4 {
    * @param otherVector - the vector to add
    * @returns the updated Vector4.
    */
-  public addInPlace(otherVector: ReadOnlyVector4): Vector4 {
+  public addInPlace(otherVector: ReadOnlyVector4): MVector4 {
     this.x += otherVector.x
     this.y += otherVector.y
     this.z += otherVector.z
@@ -311,8 +311,8 @@ export class Vector4 {
    * @param otherVector - the vector to add
    * @returns the resulting vector
    */
-  public add(otherVector: ReadOnlyVector4): Vector4 {
-    return new Vector4(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z, this.w + otherVector.w)
+  public add(otherVector: ReadOnlyVector4): MVector4 {
+    return new MVector4(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z, this.w + otherVector.w)
   }
 
   /**
@@ -321,7 +321,7 @@ export class Vector4 {
    * @param result - the vector to store the result
    * @returns the current Vector4.
    */
-  public addToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4 {
+  public addToRef(otherVector: ReadOnlyVector4, result: MVector4): MVector4 {
     result.x = this.x + otherVector.x
     result.y = this.y + otherVector.y
     result.z = this.z + otherVector.z
@@ -334,7 +334,7 @@ export class Vector4 {
    * @param otherVector - the vector to subtract
    * @returns the updated Vector4.
    */
-  public subtractInPlace(otherVector: ReadOnlyVector4): Vector4 {
+  public subtractInPlace(otherVector: ReadOnlyVector4): MVector4 {
     this.x -= otherVector.x
     this.y -= otherVector.y
     this.z -= otherVector.z
@@ -347,8 +347,8 @@ export class Vector4 {
    * @param otherVector - the vector to add
    * @returns the new vector with the result
    */
-  public subtract(otherVector: ReadOnlyVector4): Vector4 {
-    return new Vector4(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z, this.w - otherVector.w)
+  public subtract(otherVector: ReadOnlyVector4): MVector4 {
+    return new MVector4(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z, this.w - otherVector.w)
   }
 
   /**
@@ -357,7 +357,7 @@ export class Vector4 {
    * @param result - the vector to store the result
    * @returns the current Vector4.
    */
-  public subtractToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4 {
+  public subtractToRef(otherVector: ReadOnlyVector4, result: MVector4): MVector4 {
     result.x = this.x - otherVector.x
     result.y = this.y - otherVector.y
     result.z = this.z - otherVector.z
@@ -376,8 +376,8 @@ export class Vector4 {
    * @param w - value to subtract
    * @returns new vector containing the result
    */
-  public subtractFromFloats(x: number, y: number, z: number, w: number): Vector4 {
-    return new Vector4(this.x - x, this.y - y, this.z - z, this.w - w)
+  public subtractFromFloats(x: number, y: number, z: number, w: number): MVector4 {
+    return new MVector4(this.x - x, this.y - y, this.z - z, this.w - w)
   }
 
   /**
@@ -389,7 +389,7 @@ export class Vector4 {
    * @param result - the vector to store the result in
    * @returns the current Vector4.
    */
-  public subtractFromFloatsToRef(x: number, y: number, z: number, w: number, result: Vector4): Vector4 {
+  public subtractFromFloatsToRef(x: number, y: number, z: number, w: number, result: MVector4): MVector4 {
     result.x = this.x - x
     result.y = this.y - y
     result.z = this.z - z
@@ -401,8 +401,8 @@ export class Vector4 {
    * Returns a new Vector4 set with the current Vector4 negated coordinates.
    * @returns a new vector with the negated values
    */
-  public negate(): Vector4 {
-    return new Vector4(-this.x, -this.y, -this.z, -this.w)
+  public negate(): MVector4 {
+    return new MVector4(-this.x, -this.y, -this.z, -this.w)
   }
 
   /**
@@ -410,7 +410,7 @@ export class Vector4 {
    * @param scale - the number to scale with
    * @returns the updated Vector4.
    */
-  public scaleInPlace(scale: number): Vector4 {
+  public scaleInPlace(scale: number): MVector4 {
     this.x *= scale
     this.y *= scale
     this.z *= scale
@@ -423,8 +423,8 @@ export class Vector4 {
    * @param scale - the number to scale with
    * @returns a new vector with the result
    */
-  public scale(scale: number): Vector4 {
-    return new Vector4(this.x * scale, this.y * scale, this.z * scale, this.w * scale)
+  public scale(scale: number): MVector4 {
+    return new MVector4(this.x * scale, this.y * scale, this.z * scale, this.w * scale)
   }
 
   /**
@@ -433,7 +433,7 @@ export class Vector4 {
    * @param result - a vector to store the result in
    * @returns the current Vector4.
    */
-  public scaleToRef(scale: number, result: Vector4): Vector4 {
+  public scaleToRef(scale: number, result: MVector4): MVector4 {
     result.x = this.x * scale
     result.y = this.y * scale
     result.z = this.z * scale
@@ -447,7 +447,7 @@ export class Vector4 {
    * @param result - defines the Vector4 object where to store the result
    * @returns the unmodified current Vector4
    */
-  public scaleAndAddToRef(scale: number, result: Vector4): Vector4 {
+  public scaleAndAddToRef(scale: number, result: MVector4): MVector4 {
     result.x += this.x * scale
     result.y += this.y * scale
     result.z += this.z * scale
@@ -503,7 +503,7 @@ export class Vector4 {
    * @param otherVector - vector to multiple with
    * @returns the updated Vector4.
    */
-  public multiplyInPlace(otherVector: ReadOnlyVector4): Vector4 {
+  public multiplyInPlace(otherVector: ReadOnlyVector4): MVector4 {
     this.x *= otherVector.x
     this.y *= otherVector.y
     this.z *= otherVector.z
@@ -516,8 +516,8 @@ export class Vector4 {
    * @param otherVector - vector to multiple with
    * @returns resulting new vector
    */
-  public multiply(otherVector: ReadOnlyVector4): Vector4 {
-    return new Vector4(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z, this.w * otherVector.w)
+  public multiply(otherVector: ReadOnlyVector4): MVector4 {
+    return new MVector4(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z, this.w * otherVector.w)
   }
   /**
    * Updates the given vector "result" with the multiplication result of the current Vector4 and the given one.
@@ -525,7 +525,7 @@ export class Vector4 {
    * @param result - vector to store the result
    * @returns the current Vector4.
    */
-  public multiplyToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4 {
+  public multiplyToRef(otherVector: ReadOnlyVector4, result: MVector4): MVector4 {
     result.x = this.x * otherVector.x
     result.y = this.y * otherVector.y
     result.z = this.z * otherVector.z
@@ -540,16 +540,16 @@ export class Vector4 {
    * @param w - w value multiply with
    * @returns resulting new vector
    */
-  public multiplyByFloats(x: number, y: number, z: number, w: number): Vector4 {
-    return new Vector4(this.x * x, this.y * y, this.z * z, this.w * w)
+  public multiplyByFloats(x: number, y: number, z: number, w: number): MVector4 {
+    return new MVector4(this.x * x, this.y * y, this.z * z, this.w * w)
   }
   /**
    * Returns a new Vector4 set with the division result of the current Vector4 by the given one.
    * @param otherVector - vector to devide with
    * @returns resulting new vector
    */
-  public divide(otherVector: ReadOnlyVector4): Vector4 {
-    return new Vector4(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z, this.w / otherVector.w)
+  public divide(otherVector: ReadOnlyVector4): MVector4 {
+    return new MVector4(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z, this.w / otherVector.w)
   }
   /**
    * Updates the given vector "result" with the division result of the current Vector4 by the given one.
@@ -557,7 +557,7 @@ export class Vector4 {
    * @param result - vector to store the result
    * @returns the current Vector4.
    */
-  public divideToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4 {
+  public divideToRef(otherVector: ReadOnlyVector4, result: MVector4): MVector4 {
     result.x = this.x / otherVector.x
     result.y = this.y / otherVector.y
     result.z = this.z / otherVector.z
@@ -570,7 +570,7 @@ export class Vector4 {
    * @param otherVector - vector to devide with
    * @returns the updated Vector3.
    */
-  public divideInPlace(otherVector: ReadOnlyVector4): Vector4 {
+  public divideInPlace(otherVector: ReadOnlyVector4): MVector4 {
     return this.divideToRef(otherVector, this)
   }
 
@@ -579,7 +579,7 @@ export class Vector4 {
    * @param other - defines the second operand
    * @returns the current updated Vector4
    */
-  public minimizeInPlace(other: ReadOnlyVector4): Vector4 {
+  public minimizeInPlace(other: ReadOnlyVector4): MVector4 {
     if (other.x < this.x) {
       this.x = other.x
     }
@@ -599,7 +599,7 @@ export class Vector4 {
    * @param other - defines the second operand
    * @returns the current updated Vector4
    */
-  public maximizeInPlace(other: ReadOnlyVector4): Vector4 {
+  public maximizeInPlace(other: ReadOnlyVector4): MVector4 {
     if (other.x > this.x) {
       this.x = other.x
     }
@@ -619,16 +619,16 @@ export class Vector4 {
    * Gets a new Vector4 from current Vector4 floored values
    * @returns a new Vector4
    */
-  public floor(): Vector4 {
-    return new Vector4(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z), Math.floor(this.w))
+  public floor(): MVector4 {
+    return new MVector4(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z), Math.floor(this.w))
   }
 
   /**
    * Gets a new Vector4 from current Vector3 floored values
    * @returns a new Vector4
    */
-  public fract(): Vector4 {
-    return new Vector4(
+  public fract(): MVector4 {
+    return new MVector4(
       this.x - Math.floor(this.x),
       this.y - Math.floor(this.y),
       this.z - Math.floor(this.z),
@@ -657,7 +657,7 @@ export class Vector4 {
    * Normalizes in place the Vector4.
    * @returns the updated Vector4.
    */
-  public normalize(): Vector4 {
+  public normalize(): MVector4 {
     let len = this.length()
 
     if (len === 0) {
@@ -671,22 +671,22 @@ export class Vector4 {
    * Returns a new Vector3 from the Vector4 (x, y, z) coordinates.
    * @returns this converted to a new vector3
    */
-  public toVector3(): Vector3 {
-    return new Vector3(this.x, this.y, this.z)
+  public toVector3(): MVector3 {
+    return new MVector3(this.x, this.y, this.z)
   }
   /**
    * Returns a new Vector4 copied from the current one.
    * @returns the new cloned vector
    */
-  public clone(): Vector4 {
-    return new Vector4(this.x, this.y, this.z, this.w)
+  public clone(): MVector4 {
+    return new MVector4(this.x, this.y, this.z, this.w)
   }
   /**
    * Updates the current Vector4 with the given one coordinates.
    * @param source - the source vector to copy from
    * @returns the updated Vector4.
    */
-  public copyFrom(source: ReadOnlyVector4): Vector4 {
+  public copyFrom(source: ReadOnlyVector4): MVector4 {
     this.x = source.x
     this.y = source.y
     this.z = source.z
@@ -701,7 +701,7 @@ export class Vector4 {
    * @param w - float to copy from
    * @returns the updated Vector4.
    */
-  public copyFromFloats(x: number, y: number, z: number, w: number): Vector4 {
+  public copyFromFloats(x: number, y: number, z: number, w: number): MVector4 {
     this.x = x
     this.y = y
     this.z = z
@@ -716,7 +716,7 @@ export class Vector4 {
    * @param w - float to set from
    * @returns the updated Vector4.
    */
-  public set(x: number, y: number, z: number, w: number): Vector4 {
+  public set(x: number, y: number, z: number, w: number): MVector4 {
     return this.copyFromFloats(x, y, z, w)
   }
 
@@ -725,7 +725,7 @@ export class Vector4 {
    * @param v - defines the x, y, z and w coordinates of the operand
    * @returns the current updated Vector3
    */
-  public setAll(v: number): Vector4 {
+  public setAll(v: number): MVector4 {
     this.x = this.y = this.z = this.w = v
     return this
   }

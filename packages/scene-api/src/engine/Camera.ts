@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/src/math'
+import { MVector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/src/math'
 import { DecentralandInterface, IEvents } from './Types'
 
 declare let dcl: DecentralandInterface | void
@@ -18,14 +18,14 @@ export class Camera {
   }
 
   /** Camera position, relative to the parcel. */
-  public readonly position: Vector3 = new Vector3()
+  public readonly position: MVector3 = new MVector3()
   /** Camera rotation */
   public readonly rotation: Quaternion = new Quaternion()
 
   /** Feet position, relative to the parcel.  */
-  public readonly feetPosition: Vector3 = new Vector3()
+  public readonly feetPosition: MVector3 = new MVector3()
   /** Camera position, absolute. */
-  public readonly worldPosition: Vector3 = new Vector3()
+  public readonly worldPosition: MVector3 = new MVector3()
 
   /** Player height. */
   get playerHeight(): number {

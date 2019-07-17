@@ -1,5 +1,5 @@
 import { Matrix } from './Matrix'
-import { Vector3 } from './Vector3'
+import { MVector3 } from './MVector3'
 import { MathTmp } from './preallocatedVariables'
 import { DEG2RAD, RAD2DEG, Epsilon } from './types'
 
@@ -155,7 +155,7 @@ export class Quaternion {
    * @param angle - defines the angle to use (in Euler degrees)
    * @returns a new quaternion created from the given axis (Vector3) and angle in radians (float)
    */
-  public static RotationAxis(axis: Vector3, angle: number): Quaternion {
+  public static RotationAxis(axis: MVector3, angle: number): Quaternion {
     const angleRad = angle * DEG2RAD
     return Quaternion.RotationAxisToRef(axis, angleRad, new Quaternion())
   }
@@ -167,7 +167,7 @@ export class Quaternion {
    * @param result - defines the target quaternion
    * @returns the target quaternion
    */
-  public static RotationAxisToRef(axis: Vector3, angle: number, result: Quaternion): Quaternion {
+  public static RotationAxisToRef(axis: MVector3, angle: number, result: Quaternion): Quaternion {
     const angleRad = angle * DEG2RAD
     let sin = Math.sin(angleRad / 2)
     axis.normalize()
@@ -273,7 +273,7 @@ export class Quaternion {
    * @param axis3 - defines the third axis
    * @returns the new quaternion
    */
-  public static RotationQuaternionFromAxis(axis1: Vector3, axis2: Vector3, axis3: Vector3): Quaternion {
+  public static RotationQuaternionFromAxis(axis1: MVector3, axis2: MVector3, axis3: MVector3): Quaternion {
     let quat = new Quaternion(0.0, 0.0, 0.0, 0.0)
     Quaternion.RotationQuaternionFromAxisToRef(axis1, axis2, axis3, quat)
     return quat
@@ -286,7 +286,12 @@ export class Quaternion {
    * @param axis3 - defines the third axis
    * @param ref - defines the target quaternion
    */
-  public static RotationQuaternionFromAxisToRef(axis1: Vector3, axis2: Vector3, axis3: Vector3, ref: Quaternion): void {
+  public static RotationQuaternionFromAxisToRef(
+    axis1: MVector3,
+    axis2: MVector3,
+    axis3: MVector3,
+    ref: Quaternion
+  ): void {
     let rotMat = MathTmp.Matrix[0]
     Matrix.FromXYZAxesToRef(axis1.normalize(), axis2.normalize(), axis3.normalize(), rotMat)
     Quaternion.FromRotationMatrixToRef(rotMat, ref)
@@ -409,10 +414,10 @@ export class Quaternion {
    * @param forward - the direction to look in
    * @param up - the vector that defines in which direction up is
    */
-  public static LookRotation(forward: Vector3, up: Vector3 = MathTmp.staticUp): Quaternion {
-    const forwardNew = Vector3.Normalize(forward)
-    const right: Vector3 = Vector3.Normalize(Vector3.Cross(up, forwardNew))
-    const upNew = Vector3.Cross(forwardNew, right)
+  public static LookRotation(forward: MVector3, up: MVector3 = MathTmp.staticUp): Quaternion {
+    const forwardNew = MVector3.Normalize(forward)
+    const right: MVector3 = MVector3.Normalize(MVector3.Cross(up, forwardNew))
+    const upNew = MVector3.Cross(forwardNew, right)
     let m00 = right.x
     let m01 = right.y
     let m02 = right.z
@@ -486,24 +491,24 @@ export class Quaternion {
    * @param from - defines the first Vector
    * @param to - defines the second Vector
    */
-  public static FromToRotation(from: Vector3, to: Vector3): Quaternion {
+  public static FromToRotation(from: MVector3, to: MVector3): Quaternion {
     const result = new Quaternion()
     let v0 = from.normalize()
     let v1 = to.normalize()
-    let d = Vector3.Dot(v0, v1)
+    let d = MVector3.Dot(v0, v1)
 
     if (d > -1 + Epsilon) {
       let s = Math.sqrt((1 + d) * 2)
       let invs = 1 / s
-      let c = Vector3.Cross(v0, v1).scaleInPlace(invs)
+      let c = MVector3.Cross(v0, v1).scaleInPlace(invs)
       result.set(c.x, c.y, c.z, s * 0.5)
     } else if (d > 1 - Epsilon) {
       return new Quaternion(0, 0, 0, 1)
     } else {
-      let axis = Vector3.Cross(Vector3.Right(), v0)
+      let axis = MVector3.Cross(MVector3.Right(), v0)
 
       if (axis.lengthSquared() < Epsilon) {
-        axis = Vector3.Cross(Vector3.Forward(), v0)
+        axis = MVector3.Cross(MVector3.Forward(), v0)
       }
 
       result.set(axis.x, axis.y, axis.z, 0)
@@ -525,7 +530,7 @@ export class Quaternion {
    * @param to - defines the second Vector
    * @param up - defines the direction
    */
-  public setFromToRotation(from: Vector3, to: Vector3, up: Vector3 = MathTmp.staticUp) {
+  public setFromToRotation(from: MVector3, to: MVector3, up: MVector3 = MathTmp.staticUp) {
     MathTmp.tmpMatrix = Matrix.Zero() // clean up preallocated matrix
     Matrix.LookAtLHToRef(from, to, up, MathTmp.tmpMatrix)
     MathTmp.tmpMatrix.invert()
@@ -535,7 +540,7 @@ export class Quaternion {
   /**
    * Gets the euler angle representation of the rotation.
    */
-  public set eulerAngles(euler: Vector3) {
+  public set eulerAngles(euler: MVector3) {
     this.setEuler(euler.x, euler.y, euler.z)
   }
 
@@ -543,7 +548,7 @@ export class Quaternion {
    * Sets the euler angle representation of the rotation.
    */
   public get eulerAngles() {
-    const out = new Vector3()
+    const out = new MVector3()
     const mat = new Matrix()
     this.toRotationMatrix(mat)
     const m = Matrix.GetAsMatrix3x3(mat)
@@ -847,7 +852,7 @@ export class Quaternion {
     return this
   }
 
-  public angleAxis(degress: number, axis: Vector3) {
+  public angleAxis(degress: number, axis: MVector3) {
     if (axis.lengthSquared() === 0) {
       return Quaternion.Identity
     }

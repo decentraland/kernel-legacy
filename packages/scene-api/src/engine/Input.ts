@@ -2,7 +2,7 @@
 // tslint:disable:ter-indent
 
 import { DecentralandInterface, PointerEvent } from './Types'
-import { Vector3 } from '../../../utils/src/math'
+import { MVector3 } from '../../../utils/src/math'
 import { Component, DisposableComponent } from '../ecs/Component'
 
 declare let dcl: DecentralandInterface | void
@@ -28,13 +28,13 @@ export type InputState = Record<
 
 /** @public */
 export type LocalPointerEvent = PointerEvent & {
-  origin: Vector3
-  direction: Vector3
+  origin: MVector3
+  direction: MVector3
   pointer: Pointer
   hit?: PointerEvent['hit'] & {
-    hitPoint: Vector3
-    normal: Vector3
-    worldNormal: Vector3
+    hitPoint: MVector3
+    normal: MVector3
+    worldNormal: MVector3
   }
 }
 
@@ -148,14 +148,14 @@ export class Input {
     const newData: LocalPointerEvent = {
       ...data,
       pointer,
-      direction: new Vector3().copyFrom(data.direction),
-      origin: new Vector3().copyFrom(data.origin),
+      direction: new MVector3().copyFrom(data.direction),
+      origin: new MVector3().copyFrom(data.origin),
       hit: data.hit
         ? {
             ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
+            hitPoint: new MVector3().copyFrom(data.hit.hitPoint),
+            normal: new MVector3().copyFrom(data.hit.normal),
+            worldNormal: new MVector3().copyFrom(data.hit.worldNormal)
           }
         : undefined
     }
@@ -180,14 +180,14 @@ export class Input {
     const newData: LocalPointerEvent = {
       ...data,
       pointer,
-      direction: new Vector3().copyFrom(data.direction),
-      origin: new Vector3().copyFrom(data.origin),
+      direction: new MVector3().copyFrom(data.direction),
+      origin: new MVector3().copyFrom(data.origin),
       hit: data.hit
         ? {
             ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
+            hitPoint: new MVector3().copyFrom(data.hit.hitPoint),
+            normal: new MVector3().copyFrom(data.hit.normal),
+            worldNormal: new MVector3().copyFrom(data.hit.worldNormal)
           }
         : undefined
     }
