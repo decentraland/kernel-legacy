@@ -1,47 +1,11 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "declarationDir": "dist",
-    "outDir": "dist",
-    "strictNullChecks": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "sourceMap": true,
-    "declaration": true,
-    "stripInternal": true,
-    "moduleResolution": "node",
-    "pretty": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
-    "downlevelIteration": true,
-    "keyofStringsOnly": true,
-    "noUnusedLocals": true,
+    "outDir": "../../dist/scene-api",
     "baseUrl": ".",
-    "plugins": [
-      {
-        "name": "tslint-language-service"
-      }
-    ],
     "paths": {
-      "@dcl/utils/*": ["../utils/*"]
-    }, "../scene-lifecycle/src/handler/ExposableAPI.ts"
+      "@dcl/utils/*": ["../utils/src/*"],
+      "@dcl/config": ["../config"]
+    }
   },
-  "include": [
-    "./src", "../utils/**/*.ts"
-  ],
-  "exclude": [
-    "../../node_modules",
-    "../../src",
-    "../../test",
-    "../test",
-    "dist",
-    "etc",
-    "temp",
-    "types",
-    "api-docs-review/decentraland-scene-api.api.ts"
-  ]
+  "extends": "../../tsconfig.json"
 }

@@ -1,5 +1,5 @@
 import { ObservableComponent } from '../ecs/Component'
-import { newId } from '../ecs/Log'
+import { newId } from '../ecs/IdGenerator'
 
 /** @public */
 export type AnimationParams = {

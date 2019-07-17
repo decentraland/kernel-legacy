@@ -1,18 +1,20 @@
+// UTILS
+export * from '@dcl/utils/Task'
+export * from '@dcl/utils/Logger'
+export * from '@dcl/utils/Observable'
+
 // CORE DEPENDENCIES
 export * from './ecs/ECSEngine'
 export * from './ecs/Component'
 export * from './ecs/Entity'
 export * from './ecs/IEntity'
-export * from '../../utils/Task'
-export * from './ecs/Log'
-export * from '../../utils/Observable'
 export * from './ecs/UIValue'
 export * from './ecs/EventManager'
 
 import { DecentralandSynchronizationSystem } from './engine/Implementation'
 
 // ECS INITIALIZATION
-import { Engine } from './ecs/ECSEngine'
+import { ECSEngine } from './ecs/ECSEngine'
 import { Entity } from './ecs/Entity'
 
 const entity = new Entity('scene')
@@ -20,7 +22,7 @@ const entity = new Entity('scene')
 
 // Initialize engine
 /** @public */
-const engine = new Engine(entity)
+const engine = new ECSEngine(entity)
 
 import { DisposableComponent } from './ecs/Component'
 DisposableComponent.engine = engine
@@ -41,12 +43,12 @@ import { uuidEventSystem } from './engine/Systems'
 engine.addSystem(uuidEventSystem)
 
 // DECENTRALAND DEPENDENCIES
+export * from '@dcl/utils/math'
 export * from './engine/Types'
 export * from './engine/Components'
 export * from './engine/Systems'
 export * from './engine/Events'
 export * from './engine/Camera'
-export * from '@dcl/utils/math'
 export * from './engine/AnimationState'
 export * from './engine/Input'
 export * from './engine/Audio'

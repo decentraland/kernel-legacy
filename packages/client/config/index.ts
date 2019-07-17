@@ -1,111 +1,120 @@
-declare var window: any
+import { Auth } from 'decentraland-auth'
 
-// Entry points
-export const PREVIEW: boolean = !!(global as any).preview
-export const EDITOR: boolean = !!(global as any).isEditor
+import './apis/index'
+import '../shared/events'
 
-// Development
-export const AVOID_WEB3: boolean = !!(global as any).avoidWeb3 || EDITOR
-export const DEBUG = location.search.indexOf('DEBUG_MODE') !== -1 || !!(global as any).mocha || PREVIEW || EDITOR
-export const USE_LOCAL_COMMS = location.search.indexOf('LOCAL_COMMS') !== -1 || PREVIEW
-export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
-export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
-export const DEBUG_MESSAGES = location.search.indexOf('DEBUG_MESSAGES') !== -1
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../../config'
 
-export const DISABLE_AUTH = location.search.indexOf('DISABLE_AUTH') !== -1 || DEBUG
-export const ENGINE_DEBUG_PANEL = location.search.indexOf('ENGINE_DEBUG_PANEL') !== -1
-export const SCENE_DEBUG_PANEL = location.search.indexOf('SCENE_DEBUG_PANEL') !== -1 && !ENGINE_DEBUG_PANEL
+import { connect } from '../comms'
+import { defaultLogger } from '@dcl/utils/Logger'
 
-export namespace commConfigurations {
-  export const debug = true
-  export const commRadius = 4
-
-  export const peerTtlMs = 60000
-
-  export const maxVisiblePeers = 25
-
-  export const iceServers = [
-    {
-      urls: 'stun:stun.l.google.com:19302'
-    },
-    {
-      urls: 'turn:184.73.100.50:3478',
-      credential: 'passworddcl',
-      username: 'usernamedcl'
-    }
-  ]
-}
-
-// take address from http://contracts.decentraland.org/addresses.json
-
-export enum ETHEREUM_NETWORK {
-  MAINNET = 'mainnet',
-  ROPSTEN = 'ropsten'
-}
-
-export let decentralandConfigurations: any = {}
-let contracts: any = null
-let network: ETHEREUM_NETWORK | null = null
-
-export function getTLD() {
-  if (window) {
-    return window.location.hostname.match(/(\w+)$/)[0]
-  }
-}
-
-export const knownTLDs = ['zone', 'org', 'today']
-
-function getDefaultTLD() {
+// TODO fill with segment keys and integrate identity server
+export async function initializeAnalytics(userId: string) {
   const TLD = getTLD()
-  if (!TLD || !knownTLDs.includes(TLD)) {
-    return network === ETHEREUM_NETWORK.ROPSTEN ? 'zone' : 'org'
-  }
-  return TLD
-}
-
-export function getServerConfigurations() {
-  const TLDDefault = getDefaultTLD()
-  return {
-    landApi: `https://api.decentraland.${TLDDefault}/v1`,
-    content: `https://content.decentraland.${TLDDefault}`,
-    worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
-    darApi:
-      TLDDefault === 'zone' || TLDDefault === 'today'
-        ? 'https://schema-api-v2.now.sh/dar'
-        : 'https://schema.decentraland.org/dar'
+  switch (TLD) {
+    case 'org':
+      return initialize('1plAT9a2wOOgbPCrTaU8rgGUMzgUTJtU', userId)
+    case 'today':
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
+    case 'zone':
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
+    default:
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
   }
 }
 
-export async function setNetwork(net: ETHEREUM_NETWORK) {
-  const response = await fetch('https://contracts.decentraland.org/addresses.json')
-  const json = await response.json()
-
-  network = net
-  contracts = json[net]
-
-  decentralandConfigurations = {
-    contractAddress: contracts.LANDProxy,
-    contracts: {
-      serviceLocator: contracts.ServiceLocator
-    },
-    paymentTokens: {
-      MANA: contracts.MANAToken
-    },
-    invite: contracts.DecentralandInvite
+function getNetworkFromTLD(): ETHEREUM_NETWORK | null {
+  const tld = getTLD()
+  if (tld === 'zone') {
+    return ETHEREUM_NETWORK.ROPSTEN
   }
+
+  if (tld === 'today' || tld === 'org') {
+    return ETHEREUM_NETWORK.MAINNET
+  }
+
+  return null
 }
 
-export namespace ethereumConfigurations {
-  export const mainnet = {
-    wss: 'wss://mainnet.infura.io/ws',
-    http: 'https://mainnet.infura.io/',
-    etherscan: 'https://etherscan.io'
+async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
+  const web3Network = await getNetwork()
+  const web3net = web3Network === '1' ? ETHEREUM_NETWORK.MAINNET : ETHEREUM_NETWORK.ROPSTEN
+  // TLD environment have priority
+  const net = getNetworkFromTLD() || web3net
+
+  if (web3net && net !== web3net) {
+    // TODO @fmiras show an HTML error if web3 networks differs from domain network and do not load client at all
+    defaultLogger.error(`Switch to network ${net}`)
   }
-  export const ropsten = {
-    wss: 'wss://ropsten.infura.io/ws',
-    http: 'https://ropsten.infura.io/',
-    etherscan: 'https://ropsten.etherscan.io'
-  }
+
+  defaultLogger.info('Using ETH network: ', net)
+  return net
 }
 
-export const isRunningTest: boolean = (global as any)['isRunningTests'] === true
+export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
+  const auth = new Auth()
+
+  let user_id: string
+
+  console['group']('connect#login')
+
+  if (PREVIEW) {
+    defaultLogger.log(`Using test user.`)
+    user_id = 'email|5cdd68572d5f842a16d6cc17'
+  } else {
+    await auth.login(container)
+    try {
+      const payload: any = await auth.getAccessTokenData()
+      user_id = payload.user_id
+    } catch (e) {
+      defaultLogger.error(e)
+      console['groupEnd']()
+      throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
+    }
+
+    await initializeAnalytics(user_id)
+  }
+
+  defaultLogger.log(`User ${user_id} logged in`)
+
+  console['groupEnd']()
+
+  console['group']('connect#ethereum')
+  const address = await getAddress()
+
+  if (address) {
+    defaultLogger.log(`Identifying address ${address}`)
+    queueTrackingEvent('Use web3 address', { address })
+  }
+
+  const net = await getAppNetwork()
+  queueTrackingEvent('Use network', { net })
+
+  // Load contracts from https://contracts.decentraland.org
+  await setNetwork(net)
+  console['groupEnd']()
+
+  console['group']('connect#comms')
+  await connect(
+    user_id,
+    net,
+    auth,
+    address
+  )
+  console['groupEnd']()
+
+  initializeUrlPositionObserver()
+
+  // Warn in case wallet is set in mainnet
+  if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
+    const style = document.createElement('style')
+    style.appendChild(
+      document.createTextNode(
+        `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
+      )
+    )
+    document.head.appendChild(style)
+  }
+
+  return net
+}

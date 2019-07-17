@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist",
+    "outDir": "../../dist/client",
     "baseUrl": "..",
     "strict": true,
     "strictNullChecks": true

@@ -1,6 +1,6 @@
 import { ObservableComponent, Component } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color4 } from '../../../utils/src/math'
+import { Color4 } from '@dcl/utils/math'
 
 export class Wearable {
   category!: string

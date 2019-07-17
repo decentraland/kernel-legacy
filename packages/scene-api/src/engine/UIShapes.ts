@@ -1,7 +1,10 @@
-import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
+import { Color4 } from '@dcl/utils/math'
+
 import { CLASS_ID, OnUUIDEvent, Texture } from './Components'
-import { Color4 } from '../../../utils/src/math'
 import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'
+
+import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
+
 /**
  * @public
  */

@@ -13,7 +13,7 @@ export class Frustum {
    * @returns a new array of 6 Frustum planes computed by the given transformation matrix.
    */
   public static GetPlanes(transform: Matrix): Plane[] {
-    let frustumPlanes = []
+    let frustumPlanes: Plane[] = []
     for (let index = 0; index < 6; index++) {
       frustumPlanes.push(new Plane(0.0, 0.0, 0.0, 0.0))
     }

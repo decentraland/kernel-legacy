@@ -4,6 +4,8 @@ import { Scalar } from './Scalar'
 
 import { ToLinearSpace, ToGammaSpace } from './types'
 
+export type ReadOnlyColor4 = Readonly<{ r: number; g: number; b: number; a: number }>
+
 /**
  * Class used to hold a RBGA color
  * @public
@@ -202,7 +204,7 @@ export class Color4 {
   public static CheckColors4(colors: number[], count: number): number[] {
     // Check if color3 was used
     if (colors.length === count * 3) {
-      let colors4 = []
+      let colors4: number[] = []
       for (let index = 0; index < colors.length; index += 3) {
         let newIndex = (index / 3) * 4
         colors4[newIndex] = colors[index]

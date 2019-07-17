@@ -3,8 +3,9 @@ import { registerAPI, exposeMethod, API } from 'decentraland-rpc/lib/host'
 // THIS INTERFACE MOCKS THE chromedevtools API
 import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'
 import Protocol from 'devtools-protocol'
-import { DEBUG } from 'config'
-import { ILogger, defaultLogger } from 'shared/logger'
+
+import { DEBUG } from '@dcl/config'
+import { ILogger, defaultLogger } from '@dcl/utils/Logger'
 
 export interface DevToolsServer {
   event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void>

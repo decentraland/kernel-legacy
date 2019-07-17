@@ -1,8 +1,9 @@
-import { Engine } from '../ecs/ECSEngine'
 import { UUIDEvent } from './Events'
 import { DecentralandInterface } from './Types'
 import { OnUUIDEvent } from './Components'
+
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
+import { ECSEngine } from '../ecs/ECSEngine'
 
 declare var dcl: DecentralandInterface | void
 
@@ -12,7 +13,7 @@ declare var dcl: DecentralandInterface | void
 export class UUIDEventSystem implements ISystem {
   handlerMap: { [uuid: string]: OnUUIDEvent<any> } = {}
 
-  activate(engine: Engine) {
+  activate(engine: ECSEngine) {
     engine.eventManager.addListener(UUIDEvent, this, this.handleEvent)
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
     engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)

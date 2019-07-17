@@ -1,4 +1,4 @@
-import { Engine } from '../ecs/ECSEngine'
+import { ECSEngine } from '../ecs/ECSEngine'
 import { IEntity, ISystem, ComponentAdded, ComponentRemoved, ParentChanged } from '../ecs/IEntity'
 import { UUIDEvent } from './Events'
 import {
@@ -18,11 +18,11 @@ const ROOT_ENTITY_ID = '0'
 
 export class DecentralandSynchronizationSystem implements ISystem {
   cachedComponents: Record<string, Record<string, string>> = {}
-  engine!: Engine
+  engine!: ECSEngine
 
   constructor(public dcl: DecentralandInterface) {}
 
-  activate(engine: Engine) {
+  activate(engine: ECSEngine) {
     this.engine = engine
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
     engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)

@@ -4,6 +4,8 @@ import { Color4 } from './Color4'
 
 import { Scalar } from './Scalar'
 
+export type ReadOnlyColor3 = Readonly<{ r: number; g: number; b: number }>
+
 /**
  * Class used to hold a RBG color
  * @public

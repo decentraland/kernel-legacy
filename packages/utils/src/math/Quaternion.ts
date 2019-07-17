@@ -4,12 +4,12 @@ import { MathTmp } from './preallocatedVariables'
 import { DEG2RAD, RAD2DEG, Epsilon } from './types'
 
 /** @public */
-export type ReadOnlyQuaternion = {
-  readonly x: number
-  readonly y: number
-  readonly z: number
-  readonly w: number
-}
+export type ReadOnlyQuaternion = Readonly<{
+  x: number
+  y: number
+  z: number
+  w: number
+}>
 
 /**
  * Class used to store quaternion data

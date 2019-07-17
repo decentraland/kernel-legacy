@@ -1,6 +1,8 @@
-import { UIValue } from '@dcl/scene-api/UIValue'
-import { UIStackOrientation } from '@dcl/scene-api/engine/UIShapes'
-import { defaultLogger } from '@dcl/utils/logger'
+import { defaultLogger } from '@dcl/utils/Logger'
+
+import { UIValue } from '../ecs/UIValue'
+import { UIStackOrientation } from '../engine/UIShapes'
+import { ReadOnlyVector2, ReadOnlyVector3, Color3, ReadOnlyColor3, Color4, ReadOnlyQuaternion } from '@dcl/utils/math'
 
 export type ISchema<Keys> = { [key: string]: { type: keyof Keys; default?: any } }
 export type Validator<T = any> = (x: any, defaultValue: T) => T
@@ -18,7 +20,7 @@ export const validators = {
     return def | 0
   },
 
-  float(x: any, def: number) {
+  float(x: any, def: number): number {
     if (x === null || x === undefined) return def
     if (typeof x === 'number' && isFinite(x)) return x
     try {
@@ -214,7 +216,7 @@ export const validators = {
   },
 
   floatArray(x: any, def: number[]) {
-    let ret = []
+    let ret: number[] = []
     if (x === null || x === undefined || x.length === 0 || x.constructor !== Array) return def
     for (let i = 0; i < x.length; i++) {
       ret.push(validators.float(x[i], 0))

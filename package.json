@@ -2,7 +2,9 @@
   "name": "dcl-client",
   "version": "7.0.0",
   "license": "Apache-2.0",
+  "repository": "https://github.com/decentraland/explorer",
   "scripts": {
+    "clean": "rm -rf dist/*",
     "lint": "prettier --write packages/**/*.ts && tslint ./tslint.json",
     "lint:fix": "prettier --write packages/**/*.ts && tslint --fix ./tslint.json"
   },
@@ -22,8 +24,8 @@
     "husky": "^3.0.0",
     "prettier": "^1.18.2",
     "tslint": "^5.18.0",
-    "tslint-language-service": "^0.9.9",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
     "decentraland-auth": "^0.12.0",

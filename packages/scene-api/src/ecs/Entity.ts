@@ -1,7 +1,8 @@
+import { log } from '@dcl/utils/Logger'
+
 import { getComponentName, ComponentConstructor, getComponentClassId, ComponentLike } from './Component'
-import { IEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'
+import { IECSEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'
 import { EventManager } from './EventManager'
-import { log } from '@dcl/utils/AnywhereLog'
 import { newId } from './IdGenerator'
 
 // tslint:disable:no-use-before-declare
@@ -18,7 +19,7 @@ export class Entity implements IEntity {
   public readonly components: Record<string, any> = {}
 
   // @internal
-  public engine: IEngine | null = null
+  public engine: IECSEngine | null = null
 
   // @internal
   private _parent: IEntity | null = null
@@ -309,11 +310,11 @@ export class Entity implements IEntity {
     if (newParent !== null && newParent.uuid !== '0') {
       if (!newParent.isAddedToEngine() && this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ;(this.engine as IEngine).removeEntity(this)
+        ;(this.engine as IECSEngine).removeEntity(this)
       }
       if (newParent.isAddedToEngine() && !this.isAddedToEngine()) {
         // tslint:disable-next-line:semicolon
-        ;(newParent.engine as IEngine).addEntity(this)
+        ;(newParent.engine as IECSEngine).addEntity(this)
       }
     }
 

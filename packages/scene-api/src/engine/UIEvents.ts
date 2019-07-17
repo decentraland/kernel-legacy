@@ -1,7 +1,8 @@
-import { Component, ObservableComponent } from '../ecs/Component'
 import { IEvents } from './Types'
 import { uuidEventSystem } from './Systems'
 import { CLASS_ID, OnUUIDEvent } from './Components'
+
+import { Component, ObservableComponent } from '../ecs/Component'
 
 /**
  * @public

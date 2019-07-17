@@ -1,7 +1,8 @@
+import { MVector3, Quaternion, Matrix, MathTmp, Color3 } from '@dcl/utils/math'
+
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
-import { MVector3, Quaternion, Matrix, MathTmp, Color3 } from '../../../utils/src/math'
 import { AnimationState } from './AnimationState'
-import { newId } from '../ecs/Log'
+import { newId } from '../ecs/IdGenerator'
 import { IEvents } from './Types'
 
 /** @public */
@@ -382,7 +383,7 @@ export class Texture extends ObservableComponent {
 
     if (opts) {
       for (let i in opts) {
-        this[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
+        ;(this[i as 'samplingMode' | 'wrap' | 'hasAlpha'] as any) = (opts as any)[i]
       }
     }
   }

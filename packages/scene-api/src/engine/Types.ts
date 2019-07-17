@@ -1,5 +1,5 @@
-import { ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/src/math'
-export { Color3, Color4, ReadOnlyColor3, ReadOnlyColor4 } from './color'
+import { ReadOnlyVector3, ReadOnlyQuaternion } from '@dcl/utils/math'
+export { Color3, Color4 } from '@dcl/utils/math'
 
 /** @public */
 export type ModuleDescriptor = {

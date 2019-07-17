@@ -13,7 +13,7 @@ import {
 import { EventManager } from './EventManager'
 import { ComponentGroup } from './ComponentGroup'
 
-import { log, error } from '@dcl/utils/math'
+import { log, error } from '@dcl/utils/Logger'
 
 /**
  * @internal
@@ -23,7 +23,7 @@ type SystemEntry = { system: ISystem; priority: number }
 /**
  * @public
  */
-export class Engine implements IECSEngine {
+export class ECSEngine implements IECSEngine {
   readonly eventManager: EventManager = new EventManager()
   readonly rootEntity: IEntity
 

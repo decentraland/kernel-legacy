@@ -1,6 +1,7 @@
+import { error } from '@dcl/utils/Logger'
+import { Observable, Observer } from '@dcl/utils/Observable'
+
 import { DecentralandInterface, ModuleDescriptor, IEvents } from './Types'
-import { Observable, Observer } from '../../../utils/Observable'
-import { error } from '../ecs/Log'
 
 declare const dcl: DecentralandInterface
 
