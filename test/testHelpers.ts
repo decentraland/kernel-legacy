@@ -1,6 +1,5 @@
 import { dirname, basename } from 'path'
 
-import * as BABYLON from 'babylonjs'
 import { future } from 'fp-future'
 import { domReadyFuture } from 'engine'
 
@@ -23,7 +22,7 @@ import { ILandToLoadableParcelScene } from 'shared/types'
 import { SceneWorker } from 'shared/world/SceneWorker'
 import { MemoryTransport } from 'decentraland-rpc'
 
-import GamekitScene from '../packages/scene-system/scene.system'
+import GamekitScene from '../packages/scene-runner/ecs-init'
 import { gridToWorld } from 'atomicHelpers/parcelScenePositions'
 import { BasicShape } from 'engine/components/disposableComponents/DisposableComponent'
 import { initHudSystem } from 'engine/dcl/widgets/ui'
@@ -56,10 +55,10 @@ export function wait(ms: number) {
   })
 }
 
-function filterBabylonMaterials(material: BABYLON.Material) {
+function filterBabylonMaterials(material: Material) {
   return !['colorShader'].includes(material.name)
 }
-function filterBabylonTextures(texture: BABYLON.BaseTexture) {
+function filterBabylonTextures(texture: BaseTexture) {
   return !['HighlightLayerMainRTT', 'GlowLayerBlurRTT', 'GlowLayerBlurRTT2', 'VerifiedBadge'].includes(texture.name)
 }
 
@@ -174,9 +173,9 @@ let hud = initHud()
  * This method should be located directly inside a `describe` body.
  * NOT INSIDE A `it`
  */
-export function enableVisualTests(name: string, cb: (root: BABYLON.TransformNode) => void) {
+export function enableVisualTests(name: string, cb: (root: TransformNode) => void) {
   describe(name, () => {
-    let root = new BABYLON.TransformNode('rootForTests')
+    let root = new TransformNode('rootForTests')
 
     scene.removeTransformNode(root)
 
@@ -323,7 +322,7 @@ export function loadTestParcel(
   x: number,
   y: number,
   cb: (
-    root: BABYLON.TransformNode,
+    root: TransformNode,
     webGLParcelScene: Promise<WebGLParcelScene>,
     parcelSceneFuture: Promise<SceneWorker>
   ) => void,
@@ -389,27 +388,27 @@ export function loadTestParcel(
   })
 }
 
-function LookAtRef(camera: BABYLON.TargetCamera, target: BABYLON.Vector3, ref: BABYLON.Quaternion) {
-  const result = BABYLON.Matrix.Zero()
-  BABYLON.Matrix.LookAtLHToRef(camera.position, target, new BABYLON.Vector3(0, 1, 0), result)
+function LookAtRef(camera: TargetCamera, target: Vector3, ref: Quaternion) {
+  const result = Matrix.Zero()
+  Matrix.LookAtLHToRef(camera.position, target, new Vector3(0, 1, 0), result)
   result.invert()
-  BABYLON.Quaternion.FromRotationMatrixToRef(result, ref)
+  Quaternion.FromRotationMatrixToRef(result, ref)
 }
 
 export async function positionCamera(opts: PlayerCamera | null = null) {
   await untilNextFrame()
 
-  const camera = scene.activeCamera as BABYLON.FreeCamera
+  const camera = scene.activeCamera as FreeCamera
 
   if (opts) {
     gridToWorld(opts.from[0], opts.from[2], camera.position)
     camera.position.y = opts.from[1]
 
     if (!camera.rotationQuaternion) {
-      camera.rotationQuaternion = BABYLON.Quaternion.Identity()
+      camera.rotationQuaternion = Quaternion.Identity()
     }
 
-    const at = new BABYLON.Vector3()
+    const at = new Vector3()
     gridToWorld(opts.lookAt[0], opts.lookAt[2], at)
     at.y = opts.lookAt[1]
 
@@ -435,7 +434,7 @@ export function testScene(
     ensureNoErrors: () => void
     sceneHost: GamekitScene
     parcelScenePromise: Promise<WebGLParcelScene>
-    root: BABYLON.TransformNode
+    root: TransformNode
     logs: any[]
   }) => void,
   manualUpdate = false

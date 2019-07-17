@@ -22,9 +22,9 @@ import { loadTestParcel, testScene, wait, waitForMesh, PlayerCamera, positionCam
 import { sleep } from 'atomicHelpers/sleep'
 import { BaseEntity } from 'engine/entities/BaseEntity'
 import { AudioClip } from 'engine/components/disposableComponents/AudioClip'
-import { AudioSource } from 'engine/components/ephemeralComponents/AudioSource'
+import { AudioSource } from 'engine/components/recyclable/AudioSource'
 import { GLTFShape } from 'engine/components/disposableComponents/GLTFShape'
-import { Animator } from 'engine/components/ephemeralComponents/Animator'
+import { Animator } from 'engine/components/recyclable/Animator'
 import { vrCamera } from 'engine/renderer/camera'
 import { interactWithScene } from 'engine/renderer/input'
 import { scene } from 'engine/renderer'
@@ -844,7 +844,7 @@ describe('ECS', () => {
             from: [-99.5, 1, 100.0],
             lookAt: [-99.5, 1, 101.0]
           })
-          vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
+          vrCamera!.rotationQuaternion.copyFrom(Quaternion.Identity())
           expect(logs.length).to.eq(1)
           logs.length = 0
         })
@@ -879,7 +879,7 @@ describe('ECS', () => {
     testScene(-100, 104, ({ parcelScenePromise, sceneHost, logs }) => {
       it('locate camera', async () => {
         vrCamera!.position.set(-995, 1, 1040)
-        vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
+        vrCamera!.rotationQuaternion.copyFrom(Quaternion.Identity())
       })
 
       it('changing a material must work', async () => {
@@ -892,7 +892,7 @@ describe('ECS', () => {
           }
         })
         expect(!!entity!).to.eq(true)
-        const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+        const mesh = entity!.getObject3D(BasicShape.nameInEntity) as AbstractMesh
         expect(!!mesh).to.eq(true)
 
         const materials = getMaterials(parcelScene.context)
@@ -910,7 +910,7 @@ describe('ECS', () => {
 
         expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
-        const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+        const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as AbstractMesh
         expect(!!newMesh).to.eq(true)
         expect(newMesh == mesh).to.eq(true, 'mesh == oldmesh')
 
@@ -923,7 +923,7 @@ describe('ECS', () => {
       it('locate camera', async () => {
         scene = await parcelScenePromise
         vrCamera!.position.set(-995, 1, 1000)
-        vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
+        vrCamera!.rotationQuaternion.copyFrom(Quaternion.Identity())
       })
 
       function doTest() {
@@ -1010,7 +1010,7 @@ describe('ECS', () => {
         it('must set the material', async () => {
           expect(scene.context.metrics.materials).eq(0, 'material counters must start with 0')
 
-          const mesh = entity.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+          const mesh = entity.getObject3D(BasicShape.nameInEntity) as AbstractMesh
           expect(!!mesh).to.eq(true, 'mesh must exist')
           const originalMaterial = mesh.material
           expect(scene.context.disposableComponents.size).to.eq(1)
@@ -1047,7 +1047,7 @@ describe('ECS', () => {
           sceneHost.fireEvent({ type: 'TEST_TRIGGER' })
           await sleep(100)
 
-          const mesh = entity.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+          const mesh = entity.getObject3D(BasicShape.nameInEntity) as AbstractMesh
 
           expect(mesh.material != materialComponent.material).eq(true, 'the material shape must have been removed')
           expect(materialComponent.entities.has(entity)).eq(
@@ -1067,7 +1067,7 @@ describe('ECS', () => {
           sceneHost.fireEvent({ type: 'TEST_TRIGGER' })
           await sleep(100)
 
-          const mesh = entity.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+          const mesh = entity.getObject3D(BasicShape.nameInEntity) as AbstractMesh
 
           expect(!!mesh).eq(false, 'the shape must have been removed from the entity')
 
@@ -1130,7 +1130,7 @@ describe('ECS', () => {
     testScene(-100, 104, ({ parcelScenePromise, sceneHost, logs }) => {
       it('locate camera', async () => {
         vrCamera!.position.set(-995, 1, 1040)
-        vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
+        vrCamera!.rotationQuaternion.copyFrom(Quaternion.Identity())
       })
 
       it('changing a material must work', async () => {
@@ -1144,7 +1144,7 @@ describe('ECS', () => {
         })
 
         expect(!!entity!).to.eq(true)
-        const mesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+        const mesh = entity!.getObject3D(BasicShape.nameInEntity) as AbstractMesh
         expect(!!mesh).to.eq(true)
 
         const materials = getMaterials(parcelScene.context)
@@ -1162,7 +1162,7 @@ describe('ECS', () => {
 
         expect(newLogs).to.include(`setting ${entity!.uuid} <- ${M2.uuid}`)
 
-        const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as BABYLON.AbstractMesh
+        const newMesh = entity!.getObject3D(BasicShape.nameInEntity) as AbstractMesh
         expect(!!newMesh).to.eq(true)
         expect(newMesh == mesh).to.eq(true, 'mesh == oldmesh')
 
@@ -1178,7 +1178,7 @@ describe('ECS', () => {
 
       it('locate camera', async () => {
         vrCamera!.position.set(-1999, 1, 1001)
-        vrCamera!.rotationQuaternion.copyFrom(BABYLON.Quaternion.Identity())
+        vrCamera!.rotationQuaternion.copyFrom(Quaternion.Identity())
       })
 
       it('should have an UIScreenSpace component', async () => {
@@ -1352,7 +1352,7 @@ describe('ECS', () => {
 
         const texture = await parcelScene.context.getTexture('img #7 @ $1.png')
 
-        const loadFuture = future<BABYLON.Texture>()
+        const loadFuture = future<Texture>()
 
         if (!texture.isReady()) {
           texture.onLoadObservable.add(() => {

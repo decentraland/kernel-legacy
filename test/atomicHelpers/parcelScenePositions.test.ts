@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { isValidParcelSceneShape, isOnLimits, areConnected } from 'atomicHelpers/parcelScenePositions'
-import { Vector2Component } from 'atomicHelpers/landHelpers'
+import { Vector2 } from 'atomicHelpers/landHelpers'
 
 describe('parcelScenePositions unit tests', () => {
   describe('isValidParcelSceneShape', () => {
     it('should return true with parcels that have a valid parcelScene shape', () => {
-      const parcels: Vector2Component[] = [
+      const parcels: Vector2[] = [
         { x: -130, y: -35 },
         { x: -129, y: -35 },
         { x: -130, y: -34 },
@@ -19,12 +19,7 @@ describe('parcelScenePositions unit tests', () => {
     })
 
     it('should return false with parcels that have an invalid parcelScene shape', () => {
-      const parcels: Vector2Component[] = [
-        { x: -130, y: -34 },
-        { x: -130, y: -35 },
-        { x: -129, y: 35 },
-        { x: -128, y: -34 }
-      ]
+      const parcels: Vector2[] = [{ x: -130, y: -34 }, { x: -130, y: -35 }, { x: -129, y: 35 }, { x: -128, y: -34 }]
 
       const result = isValidParcelSceneShape(parcels)
 

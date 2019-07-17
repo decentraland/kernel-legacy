@@ -4,8 +4,8 @@ import { gridToWorld, worldToGrid } from 'atomicHelpers/parcelScenePositions'
 
 function verifyW2G(worldX: number, worldZ: number, gridX: number, gridY: number) {
   it(`world(${worldX},${worldZ}) -> grid(${gridX},${gridY})`, () => {
-    const wPosition = BABYLON.Vector2.Zero()
-    worldToGrid(new BABYLON.Vector3(worldX, 0, worldZ), wPosition)
+    const wPosition = Vector2.Zero()
+    worldToGrid(new Vector3(worldX, 0, worldZ), wPosition)
     expect(wPosition.x).to.eq(gridX, 'x')
     expect(wPosition.y).to.eq(gridY, 'y')
   })
@@ -13,7 +13,7 @@ function verifyW2G(worldX: number, worldZ: number, gridX: number, gridY: number)
 
 describe('position unit tests', function() {
   it('converts grid to the right coordinate system', () => {
-    const wPosition = BABYLON.Vector3.Zero()
+    const wPosition = Vector3.Zero()
 
     gridToWorld(0, 0, wPosition)
     expect(wPosition.x).to.eq(0)

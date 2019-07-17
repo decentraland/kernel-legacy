@@ -24,7 +24,7 @@
 // testScene("releasing a system's EntityComponent", Game, (_root, { parcelScenePromise }) => {
 //   const materialDisposedFuture = future()
 //   let boxEntity: BoxEntity
-//   let boxMesh: BABYLON.TransformNode
+//   let boxMesh: TransformNode
 
 //   it('getObject3D(content) == entityController.renderEntity', async () => {
 //     const parcelScene = await parcelScenePromise

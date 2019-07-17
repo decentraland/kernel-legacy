@@ -1,0 +1,51 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "projectFolder": ".",
+  "mainEntryPointFilePath": "dist/index.d.ts",
+  "compiler": {
+    "tsconfigFilePath": "tsconfig.json",
+    "overrideTsconfig": {
+      "types": [
+        "env"
+      ],
+      "typeRoots": [
+        "types/env"
+      ]
+    },
+    "skipLibCheck": true
+  },
+  "apiReport": {
+    "enabled": true,
+    "reportFolder": "<projectFolder>/types/dcl/"
+  },
+  "docModel": {
+    "enabled": true,
+    "apiJsonFilePath": "types/dcl/decentraland-scene-api.api.json"
+  },
+  "dtsRollup": {
+    "enabled": true,
+    "untrimmedFilePath": "types/dcl/index-full.d.ts",
+    "betaTrimmedFilePath": "types/dcl/index-beta.d.ts",
+    "publicTrimmedFilePath": "<projectFolder>/dist/index.d.ts"
+  },
+  "tsdocMetadata": {
+    "enabled": true
+  },
+  "messages": {
+    "compilerMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    },
+    "extractorMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    },
+    "tsdocMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host
 import { ExposableAPI } from './ExposableAPI'
 import { EntityAction } from '../types'
 import { ParcelSceneAPI } from 'shared/world/SceneWorker'
-import { IEventNames, IEvents } from 'decentraland-ecs/src/decentraland/Types'
+import { IEventNames, IEvents } from 'scene-runner/node_modules/decentraland-ecs/src/decentraland/Types'
 
 export interface IEngineAPI {
   /**

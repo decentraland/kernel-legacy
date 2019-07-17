@@ -4,12 +4,10 @@ import BigNumber from 'bignumber.js'
 import { generateEphemeralKeys, UserData as EphemeralKey } from 'ephemeralkey'
 
 import { ETHEREUM_NETWORK, decentralandConfigurations } from 'config'
-import { saveToLocalStorage, removeFromLocalStorage, getFromLocalStorage } from 'atomicHelpers/localStorage'
+import { saveToLocalStorage, removeFromLocalStorage, getFromLocalStorage } from '@dcl/utils/localStorage'
 import { RPCSendableMessage } from 'shared/types'
 import { defaultLogger } from 'shared/logger'
-import { getERC20 } from './ERC20'
 import { requestManager } from './provider'
-import { getERC721 } from './ERC721'
 
 export interface MessageDict {
   [key: string]: string

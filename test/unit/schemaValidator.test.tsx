@@ -33,7 +33,7 @@ describe('schema validator tests', function() {
       floatArray: { type: 'floatArray' }
     })
 
-    const untouchedVector = new BABYLON.Vector3(10, 10, 10)
+    const untouchedVector = new Vector3(10, 10, 10)
 
     const result = schemaValidator({
       stringFromNumber: 1.0,

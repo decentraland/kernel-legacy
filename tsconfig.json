@@ -24,6 +24,10 @@
         "name": "tslint-language-service"
       }
     ],
+    "paths": {
+      "@dcl/scene-api/*": ["./packages/scene-api/src/*"],
+      "@dcl/utils/*": ["./packages/utils/src/*"]
+    },
     "baseUrl": "./packages",
     "lib": [
       "es2017",

@@ -1,11 +1,11 @@
 // TODO: This needs to be reimplemented using ECS
 // tslint:disable:no-commented-out-code
 
-// import { createElement, ScriptableScene, Vector3Component } from 'decentraland-api/src'
+// import { createElement, ScriptableScene, Vector3 } from 'decentraland-api/src'
 // import { Axis } from 'dcl/entities/debug/AxisEntity'
 
 // export interface IState {
-//   position: Vector3Component
+//   position: Vector3
 //   timer: any
 // }
 
