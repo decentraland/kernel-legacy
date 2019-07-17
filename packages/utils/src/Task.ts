@@ -1,4 +1,4 @@
-import { error } from './src/AnywhereLog'
+import { error } from './AnywhereLog'
 
 declare var Promise: any
 
