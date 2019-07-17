@@ -1,4 +1,4 @@
-import { error } from './Log'
+import { error } from '@dcl/utils/AnywhereLog'
 import { newId } from './IdGenerator'
 
 const eventNameSymbol = '__event_name__'

@@ -1,7 +1,7 @@
 import { getComponentName, ComponentConstructor, getComponentClassId, ComponentLike } from './Component'
 import { IEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'
 import { EventManager } from './EventManager'
-import { log } from './Log'
+import { log } from '@dcl/utils/AnywhereLog'
 import { newId } from './IdGenerator'
 
 // tslint:disable:no-use-before-declare

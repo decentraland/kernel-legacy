@@ -24,10 +24,13 @@
       {
         "name": "tslint-language-service"
       }
-    ]
+    ],
+    "paths": {
+      "@dcl/utils/*": ["../utils/*"]
+    }
   },
   "include": [
-    "./src", "../utils/math", "../utils/Task.ts", "../utils/Observable.ts"
+    "./src", "../utils/**/*.ts"
   ],
   "exclude": [
     "../../node_modules",

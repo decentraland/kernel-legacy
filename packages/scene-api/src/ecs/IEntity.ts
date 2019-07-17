@@ -7,7 +7,7 @@ import { EventConstructor, EventManager } from './EventManager'
 export interface ISystem {
   active?: boolean
 
-  activate?(engine: IEngine): void
+  activate?(engine: IECSEngine): void
   deactivate?(): void
 
   update?(dt: number): void
@@ -19,7 +19,7 @@ export interface ISystem {
 /**
  * @public
  */
-export interface IEngine {
+export interface IECSEngine {
   rootEntity: IEntity
   readonly entities: Readonly<Record<string, IEntity>>
 
@@ -40,7 +40,7 @@ export interface IEntity {
   readonly components: Record<string, any>
 
   // @internal
-  engine: IEngine | null
+  engine: IECSEngine | null
 
   isAddedToEngine(): boolean
   getParent(): IEntity | null
