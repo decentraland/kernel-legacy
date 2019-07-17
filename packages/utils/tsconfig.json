@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist",
+    "outDir": "../../dist/utils",
     "baseUrl": ".",
     "strictNullChecks": true,
     "strict": true

@@ -17,6 +17,7 @@
     "tsBuildInfoFile": ".tsbuildinfo",
     "emitDecoratorMetadata": true,
     "noUnusedLocals": true,
+    "declaration": true,
     "plugins": [
       {
         "name": "tslint-language-service"
