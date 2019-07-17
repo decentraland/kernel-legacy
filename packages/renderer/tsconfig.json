@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist",
-    "baseUrl": "..",
-    "experimentalDecorators": true,
-    "strict": true,
-    "strictNullChecks": true
+    "outDir": "../../dist/renderer",
+    "baseUrl": "."
   },
   "extends": "../../tsconfig.json"
 }

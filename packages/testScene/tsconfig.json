@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "outFile": "./build/game.js",
+    "baseUrl": ".",
+    "paths": {
+      "@dcl/scene-api": ["../scene-api/src/index"],
+      "@dcl/utils/*": ["../utils/src/*"],
+      "@dcl/config": ["../config"]
+    }
+  },
+  "extends": "../../tsconfig.json"
+}
