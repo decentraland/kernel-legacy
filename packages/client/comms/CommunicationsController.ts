@@ -6,7 +6,7 @@ import {
   subscribeParcelSceneToCommsMessages,
   unsubscribeParcelSceneToCommsMessages
 } from 'shared/comms'
-import { ExposableAPI } from 'shared/apis/ExposableAPI'
+import { ExposableAPI } from 'scene-lifecycle/src/handler/apis/ExposableAPI'
 import { EngineAPI } from 'shared/apis/EngineAPI'
 import { ParcelIdentity } from './ParcelIdentity'
 import { PeerInformation } from 'shared/comms/types'

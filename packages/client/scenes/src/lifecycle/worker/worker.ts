@@ -3,10 +3,10 @@
 
 import { WebWorkerTransport } from 'decentraland-rpc'
 import { Adapter } from './lib/adapter'
-import { ParcelLifeCycleController } from './controllers/parcel'
-import { SceneLifeCycleController } from './controllers/scene'
-import { PositionLifecycleController } from './controllers/position'
-import { SceneDataDownloadManager } from './controllers/download'
+import { ParcelLifeCycleController } from '../parcel'
+import { SceneLifeCycleController } from '../scene'
+import { PositionLifecycleController } from '../position'
+import { SceneDataDownloadManager } from '../../../../map/parcelInfo'
 import { ILand } from 'shared/types'
 
 const connector = new Adapter(WebWorkerTransport(self as any))

@@ -11,18 +11,18 @@ import {
   ComponentCreatedPayload,
   ComponentDisposedPayload,
   ComponentUpdatedPayload
-} from "shared/types";
-import { DecentralandInterface } from "explorer/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types";
-import { defaultLogger } from "shared/logger";
+} from "./node_modules/shared/types";
+import { DecentralandInterface } from "./node_modules/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types";
+import { defaultLogger } from "./node_modules/shared/logger";
 
 import { customEval, getES5Context } from "./sdk/sandbox";
 import { DevToolsAdapter } from "./sdk/DevToolsAdapter";
 
 // tslint:disable-next-line:whitespace
-type IEngineAPI = import("shared/apis/EngineAPI").IEngineAPI;
+type IEngineAPI = import("./node_modules/shared/apis/EngineAPI").IEngineAPI;
 
 // tslint:disable-next-line:whitespace
-type EnvironmentAPI = import("shared/apis/EnvironmentAPI").EnvironmentAPI;
+type EnvironmentAPI = import("./node_modules/shared/apis/EnvironmentAPI").EnvironmentAPI;
 
 const FPS = 30;
 const UPDATE_INTERVAL = 1000 / FPS;

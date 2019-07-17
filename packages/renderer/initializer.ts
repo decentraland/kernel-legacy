@@ -1,5 +1,5 @@
 import { DEBUG_MESSAGES } from '../config'
-import { initShared } from '../shared'
+import { initShared } from '../config/initialized'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
 import future from 'fp-future'

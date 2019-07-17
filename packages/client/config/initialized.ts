@@ -1,9 +1,9 @@
 import { Auth } from 'decentraland-auth'
 
 import './apis/index'
-import './events'
+import '../shared/events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '.'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { awaitWeb3Approval } from './ethereum/provider'

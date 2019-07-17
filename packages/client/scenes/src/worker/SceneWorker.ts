@@ -9,7 +9,7 @@ import { defaultLogger } from 'shared/logger'
 import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
 import { Vector3, Quaternion, Vector2 } from 'decentraland-ecs/src/decentraland/math'
-import { PositionReport, positionObservable } from './positionThings'
+import { PositionReport, positionObservable } from '../../../shared/world/positionThings'
 import { Observer, Observable } from 'decentraland-ecs/src'
 
 // tslint:disable-next-line:whitespace

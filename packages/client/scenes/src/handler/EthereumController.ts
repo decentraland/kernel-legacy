@@ -6,8 +6,8 @@ import {
   convertMessageToObject,
   signMessage,
   getUserAccount
-} from 'explorer/web3access/EthereumService'
-import { ExposableAPI } from './ExposableAPI'
+} from 'shared/ethereum/EthereumService'
+import { ExposableAPI } from '../exposedApis/ExposableAPI'
 import { RPCSendableMessage } from 'shared/types'
 
 export interface IEthereumController {

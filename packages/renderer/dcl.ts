@@ -30,15 +30,15 @@ import {
   getParcelSceneID,
   stopParcelSceneWorker,
   loadParcelScene
-} from '../shared/world/parcelSceneManager'
-import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
-import { ensureUiApis } from '../shared/world/uiSceneInitializer'
-import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+} from '../scene-lifecycle/src/system/sceneManager'
+import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../scenes/src/worker/SceneWorker'
+import { ensureUiApis } from '../system-scenes/src/uiSceneInitializer'
+import { ParcelIdentity } from '../scene-lifecycle/src/handler/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
-import { queueTrackingEvent } from '../shared/analytics'
+import { queueTrackingEvent } from './analytics'
 
 let gameInstance!: GameInstance
 

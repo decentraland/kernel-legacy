@@ -9,7 +9,7 @@ import { resolveUrl } from '@dcl'
 import { error } from 'util'
 import { ILand } from 'shared/types'
 
-import { DEBUG, parcelLimits, getServerConfigurations } from '../../../config'
+import { DEBUG, parcelLimits, getServerConfigurations } from '../../../../config'
 
 /*
  * The worker is set up on the first require of this file

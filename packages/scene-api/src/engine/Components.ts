@@ -1,5 +1,5 @@
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
-import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from '../../../utils/math'
+import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from '../../../utils/src/math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/Log'
 import { IEvents } from './Types'

@@ -1,4 +1,4 @@
-import { ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/math'
+import { ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/src/math'
 export { Color3, Color4, ReadOnlyColor3, ReadOnlyColor4 } from './color'
 
 /** @public */

@@ -3,7 +3,7 @@ import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host
 
 import { persistCurrentUser, sendPublicChatMessage } from 'shared/comms'
 import { chatObservable, ChatEvent } from 'shared/comms/chat'
-import { ExposableAPI } from 'shared/apis/ExposableAPI'
+import { ExposableAPI } from 'scene-lifecycle/src/handler/apis/ExposableAPI'
 import { IChatCommand, MessageEntry } from 'shared/types'
 import { EngineAPI } from 'shared/apis/EngineAPI'
 import { teleportObservable } from 'shared/world/positionThings'

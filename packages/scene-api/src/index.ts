@@ -1,5 +1,5 @@
 // CORE DEPENDENCIES
-export * from './ecs/Engine'
+export * from './ecs/ECSEngine'
 export * from './ecs/Component'
 export * from './ecs/Entity'
 export * from './ecs/IEntity'
@@ -12,7 +12,7 @@ export * from './ecs/EventManager'
 import { DecentralandSynchronizationSystem } from './engine/Implementation'
 
 // ECS INITIALIZATION
-import { Engine } from './ecs/Engine'
+import { Engine } from './ecs/ECSEngine'
 import { Entity } from './ecs/Entity'
 
 const entity = new Entity('scene')

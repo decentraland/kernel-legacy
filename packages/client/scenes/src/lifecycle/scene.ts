@@ -2,7 +2,7 @@ import { SceneLifeCycleStatus } from '../lib/scene.status'
 import { Vector2 } from 'atomicHelpers/landHelpers'
 import future, { IFuture } from 'fp-future'
 import { EventEmitter } from 'events'
-import { SceneDataDownloadManager } from './download'
+import { SceneDataDownloadManager } from '../../../map/parcelInfo'
 
 export class SceneLifeCycleController extends EventEmitter {
   private downloadManager: SceneDataDownloadManager

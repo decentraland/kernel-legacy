@@ -1,37 +1,10 @@
 node_modules/
 npm-debug.log
 .DS_Store
-static/dist
-public/systems
-static/systems
-static/loader
-static/lifecycle
-
 .decentraland
 
 **/.decentraland
 
-public/test-parcels/*/*.js
-public/hell-map/*/*.js
-public/ecs-parcels/*/*.js
-public/test-parcels/*/bin/*.js
-
-scripts/**/*.js
-scripts/**/*.d.ts
-
-test/tmp
-test/diff
-test/out
-
 .idea
 coverage
-
-public/local-ipfs
-
-build.single-debug.json
-
-packages/decentraland-ecs/types/dcl/*
-
-packages/decentraland-ecs/artifacts
-packages/decentraland-ecs/package-lock.json
 .tsbuildinfo

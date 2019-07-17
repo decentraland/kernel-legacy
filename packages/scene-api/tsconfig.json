@@ -27,7 +27,7 @@
     ],
     "paths": {
       "@dcl/utils/*": ["../utils/*"]
-    }
+    }, "../scene-lifecycle/src/handler/ExposableAPI.ts"
   },
   "include": [
     "./src", "../utils/**/*.ts"

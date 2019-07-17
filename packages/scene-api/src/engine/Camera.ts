@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/math'
+import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../../../utils/src/math'
 import { DecentralandInterface, IEvents } from './Types'
 
 declare let dcl: DecentralandInterface | void

@@ -1,5 +1,5 @@
 import { registerAPI, exposeMethod } from 'decentraland-rpc/lib/host'
-import { ExposableAPI } from './ExposableAPI'
+import { ExposableAPI } from '../../scene-lifecycle/src/handler/ExposableAPI'
 import { EnvironmentData } from 'shared/types'
 
 @registerAPI('EnvironmentAPI')

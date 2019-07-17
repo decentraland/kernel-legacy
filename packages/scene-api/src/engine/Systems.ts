@@ -1,4 +1,4 @@
-import { Engine } from '../ecs/Engine'
+import { Engine } from '../ecs/ECSEngine'
 import { UUIDEvent } from './Events'
 import { DecentralandInterface } from './Types'
 import { OnUUIDEvent } from './Components'
