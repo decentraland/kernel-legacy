@@ -1,7 +1,3 @@
-import { getConfiguration } from '../config/env'
-
-const API_URL = getConfiguration('AUTH_API_URL')
-
 export function createHeaders(idToken: string) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -11,7 +7,7 @@ export function createHeaders(idToken: string) {
 }
 
 async function request(path: string, params: object): Promise<object> {
-  const url = API_URL + path
+  const url = path
   const response = await fetch(url, params)
   return response.json()
 }

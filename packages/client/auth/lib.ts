@@ -1,10 +1,10 @@
 import { promisify } from 'util'
 import { WebAuth, Auth0UserProfile } from 'auth0-js'
 
+import { getConfiguration } from '../../utils/src/parametrization'
 import { AuthInfo } from './types'
-import { getConfiguration } from '@dcl/utils/'
 
-export const webAuth = new WebAuth({
+const webAuth = new WebAuth({
   clientID: getConfiguration('AUTH0_CLIENT_ID'),
   domain: getConfiguration('AUTH0_DOMAIN'),
   redirectUri: getConfiguration('AUTH0_REDIRECT'),
@@ -12,7 +12,14 @@ export const webAuth = new WebAuth({
   scope: 'openid email'
 })
 
-export async function getCode(email: string): Promise<void> {
+export async function checkSession(): Promise<void> {
+  const start = promisify(webAuth.checkSession as Function)
+  const result = await start()
+  debugger
+  return result
+}
+
+export async function getVerificationCode(email: string): Promise<void> {
   const start = promisify(webAuth.passwordlessStart as Function)
   return await start({
     connection: 'email',

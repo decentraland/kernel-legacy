@@ -4,20 +4,20 @@ import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
 
-import { default as Auth } from './components/auth'
-import { default as Home } from './components/home'
+import { default as Auth } from 'components/auth/index'
+import { default as Home } from 'components/home'
 
-import { history, configureStore } from './store'
+import { history, configureStore } from 'store'
 
 const store = configureStore()
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
         <>
           <Switch>
-            <Route exact path="/login" render={() => Auth(store.getState().auth)} />
+            <Route exact path="/login" component={Auth} />
             <Route exact path="/" render={() => Home(store.getState())} />
           </Switch>
         </>

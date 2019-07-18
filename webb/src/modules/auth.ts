@@ -1,10 +1,11 @@
-import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
-import * as AuthLib from '@dcl/client/auth/lib'
-import { Middleware, Store } from 'redux'
+import { AuthState as AuthStateLib } from '@dcl/client/dist/client/auth/types'
+import * as AuthLib from '@dcl/client/dist/client/auth/lib'
+import { Middleware, Store, AnyAction } from 'redux'
 import { RootState } from '../store'
 
 export type AuthStatusSummary =
   | 'Not initialized'
+  | 'Loading...'
   | 'Not logged in'
   | 'No access to Beta'
   | 'Expired credentials'
@@ -22,6 +23,7 @@ export type AuthState = AuthStateLib & {
 
 export type AuthActionTemplates = [
   { type: 'Auth initializing'; payload?: string },
+  { type: 'Not logged in'; payload?: string },
   { type: 'Set email'; payload: string },
   { type: 'Set verification'; payload: string },
   { type: 'Login successful'; payload: any },
@@ -38,19 +40,23 @@ const EMPTY_AUTH_STATE: AuthState = {
   userWentBack: false
 }
 
-export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction) {
+export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyAction) {
   if (!action) return state
   if (!state || state === EMPTY_AUTH_STATE) return state
   switch (action.type) {
     case 'Auth initializing':
-      return { ...state, summary: 'Not logged in' }
+      return { ...state, summary: 'Loading...' } as AuthState
+    case 'Not logged in':
+      return { ...state, summary: 'Not logged in' } as AuthState
   }
   return state
 }
 
 export function initializeAuth(store: Store<RootState>) {
   store.dispatch({ type: 'Auth initialized' })
-  checkSession()
+  const session = AuthLib.checkSession()
+  if (session) {
+  }
 }
 
 export const authMiddleware = (store: Store<RootState>) => (next: Middleware) => (action: any) => {
