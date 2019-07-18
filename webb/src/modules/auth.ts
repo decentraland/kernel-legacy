@@ -1,5 +1,6 @@
-import { AuthState as AuthStateLib } from '@dcl/client/dist/client/auth/types'
-import * as AuthLib from '@dcl/client/dist/client/auth/lib'
+import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
+import * as AuthLib from '@dcl/client/auth/lib'
+
 import { Middleware, Store, AnyAction } from 'redux'
 import { RootState } from '../store'
 
@@ -35,7 +36,7 @@ function ReturnAuthActionMap(x: AuthActionTemplates, t: number) {
 export type AuthAction = ReturnType<typeof ReturnAuthActionMap>
 
 const EMPTY_AUTH_STATE: AuthState = {
-  summary: 'Not logged in',
+  summary: 'Not initialized',
   isAuthenticated: false,
   userWentBack: false
 }
@@ -52,15 +53,14 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
   return state
 }
 
-export function initializeAuth(store: Store<RootState>) {
-  store.dispatch({ type: 'Auth initialized' })
-  const session = AuthLib.checkSession()
-  if (session) {
-  }
+export async function initializeAuth(store: Store<RootState>) {
+  const session = await AuthLib.checkSession()
+  debugger
 }
 
 export const authMiddleware = (store: Store<RootState>) => (next: Middleware) => (action: any) => {
-  if (store.getState().auth.summary === 'Not initialized') {
+  if (store.getState().auth.summary === 'Not initialized' && action.type !== 'Auth initialized') {
+    store.dispatch({ type: 'Auth initialized' })
     initializeAuth(store)
   }
   switch (action.type) {

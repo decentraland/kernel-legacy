@@ -22,7 +22,6 @@
     "moduleResolution": "node"
   },
   "include": [
-    ".",
-    "../../client/**.ts"
+    "."
   ]
 }

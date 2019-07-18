@@ -4,7 +4,7 @@ export * from './Logger'
 
 export * from './Observable'
 
-export * from './parametrization'
+export * from './Parametrization'
 
 export * from './SafeLocalStorage'
 

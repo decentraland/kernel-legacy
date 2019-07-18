@@ -1,4 +1,4 @@
-import { parcelLimits } from '../parametrization'
+import { parcelLimits } from '../Parametrization'
 import { Vector3, Vector2 } from '../Vector'
 import { isEqual } from '../pure/vectorHelpers'
 

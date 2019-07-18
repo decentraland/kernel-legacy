@@ -1,4 +1,4 @@
-import { parcelLimits } from '../parametrization'
+import { parcelLimits } from '../Parametrization'
 
 export type IParcelSceneLimits = {
   triangles: number

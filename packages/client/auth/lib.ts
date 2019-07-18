@@ -1,7 +1,7 @@
-import { promisify } from 'util'
-import { WebAuth, Auth0UserProfile } from 'auth0-js'
+import { future } from 'fp-future'
+import { WebAuth } from 'auth0-js'
 
-import { getConfiguration } from '../../utils/src/parametrization'
+import { getConfiguration } from '@dcl/utils/src/Parametrization'
 import { AuthInfo } from './types'
 
 const webAuth = new WebAuth({
@@ -12,58 +12,67 @@ const webAuth = new WebAuth({
   scope: 'openid email'
 })
 
-export async function checkSession(): Promise<void> {
-  const start = promisify(webAuth.checkSession as Function)
-  const result = await start()
-  debugger
-  return result
-}
-
-export async function getVerificationCode(email: string): Promise<void> {
-  const start = promisify(webAuth.passwordlessStart as Function)
-  return await start({
-    connection: 'email',
-    send: 'code',
-    email
-  })
-}
-
-export async function doAuth(email: string, verificationCode: string) {
-  const start = promisify(webAuth.passwordlessLogin as Function)
-  const authResult = await start({
-    connection: 'email',
-    email,
-    verificationCode
-  })
-  if (authResult && authResult.accessToken && authResult.idToken) {
-    const getUserInfo = promisify(webAuth.client.userInfo as Function)
-    const user: Auth0UserProfile = await getUserInfo(authResult.accessToken)
-    return {
-      email: user.email!,
-      sub: user.sub,
+export async function checkSession(): Promise<AuthInfo> {
+  const promise = future<AuthInfo>()
+  webAuth.checkSession({}, (err: any, authResult: any) => {
+    if (err) return promise.reject(err)
+    return promise.resolve({
+      email: authResult.idTokenPayload.email,
+      sub: authResult.idTokenPayload.sub,
       expiresAt: authResult.expiresIn! * 1000 + new Date().getTime(),
       accessToken: authResult.accessToken!,
       idToken: authResult.idToken!
-    } as AuthInfo
-  } else {
-    throw new Error('Could not login: unexpected result' + JSON.stringify(authResult))
-  }
+    })
+  })
+  return promise
 }
 
-export async function renewToken(): Promise<AuthInfo> {
-  const check = promisify(webAuth.checkSession) as any
-  const authResult = await check({})
-  return {
-    email: authResult.idTokenPayload.email,
-    sub: authResult.idTokenPayload.sub,
-    expiresAt: authResult.expiresIn! * 1000 + new Date().getTime(),
-    accessToken: authResult.accessToken!,
-    idToken: authResult.idToken!
-  } as AuthInfo
+export async function getVerificationCode(email: string) {
+  const promise = future<void>()
+  webAuth.passwordlessStart(
+    {
+      connection: 'email',
+      send: 'code',
+      email
+    },
+    (err: any, res: any) => {
+      if (err) return promise.reject(err)
+      return promise.resolve(res)
+    }
+  )
+  return promise
 }
 
-export function logout(): Promise<void> {
-  return (promisify(webAuth.logout) as any)({ returnTo: window.location.origin })
+export async function doAuth(email: string, verificationCode: string): Promise<AuthInfo> {
+  const result = future<any>()
+  webAuth.passwordlessLogin(
+    {
+      connection: 'email',
+      email,
+      verificationCode
+    },
+    (err, authResult) => {
+      if (err) return result.reject(new Error(err as any))
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        webAuth.client.userInfo(authResult.accessToken, (err2, user) => {
+          return result.resolve({
+            email: user.email!,
+            sub: user.sub,
+            expiresAt: authResult.expiresIn! * 1000 + new Date().getTime(),
+            accessToken: authResult.accessToken!,
+            idToken: authResult.idToken!
+          } as AuthInfo)
+        })
+      } else {
+        return result.reject(new Error('Could not login: unexpected result' + JSON.stringify(authResult)))
+      }
+    }
+  )
+  return result
+}
+
+export function logout() {
+  return webAuth.logout({ returnTo: window.location.origin })
 }
 
 export function isTokenExpired(expiresAt: number) {

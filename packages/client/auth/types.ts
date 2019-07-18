@@ -1,6 +1,5 @@
 export type AuthInfo = {
   email: string
-  verificationCode: string
   sub: string
   idToken: string
   accessToken: string

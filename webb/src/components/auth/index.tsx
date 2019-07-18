@@ -8,7 +8,10 @@ export default connect(
     summary: state.auth.summary
   }),
   {
-    setEmail: (email: string) => ({ type: 'Set email', payload: email }),
+    setEmail: (email: string) => {
+      debugger
+      return { type: 'Set email', payload: email }
+    },
     setVerificationCode: (code: string) => ({ type: 'Set verification', payload: code }),
     back: () => ({
       type: 'User went back'

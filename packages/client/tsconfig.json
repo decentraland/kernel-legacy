@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@dcl/utils/*": ["../utils/src/*"],
-      "@dcl/config/*": ["../config/*"]
-    }
+    "baseUrl": "."
   },
   "extends": "../../tsconfig.json",
-  "include": ["./auth/**.ts", "./config/**.ts", "../config/*.ts"]
+  "include": ["./auth/**.ts", "./config/**.ts"]
 }
