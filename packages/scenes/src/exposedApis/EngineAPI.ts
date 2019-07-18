@@ -2,7 +2,7 @@ import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host
 
 import { ExposableAPI } from './ExposableAPI'
 import { EntityAction } from '../types'
-import { ParcelSceneAPI } from 'scenes/src/worker/SceneWorker'
+import { ParcelSceneAPI } from 'scenes/src/scene-worker/worker'
 import {
   IEventNames,
   IEvents

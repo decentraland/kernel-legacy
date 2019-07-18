@@ -11,18 +11,19 @@ import {
   ComponentCreatedPayload,
   ComponentDisposedPayload,
   ComponentUpdatedPayload
-} from 'explorer/scene-runner/node_modules/shared/types'
-import { DecentralandInterface } from 'explorer/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types'
-import { defaultLogger } from 'explorer/scene-runner/node_modules/shared/logger'
+} from 'scene-runner/src/node_modules/@dcl/utils/index'
+
+import { DecentralandInterface } from 'scene-runner/src/node_modules/@dcl/scene-api/engine/Types'
+import { defaultLogger } from 'scene-runner/src/node_modules/explorer/scene-runner/node_modules/shared/logger'
 
 import { customEval, getES5Context } from './worker/sandbox'
 import { DevToolsAdapter } from './worker/DevToolsAdapter'
 
 // tslint:disable-next-line:whitespace
-type IEngineAPI = import('explorer/scene-runner/node_modules/shared/apis/EngineAPI').IEngineAPI
+type IEngineAPI = import('scene-runner/src/node_modules/explorer/scene-runner/node_modules/shared/apis/EngineAPI').IEngineAPI
 
 // tslint:disable-next-line:whitespace
-type EnvironmentAPI = import('explorer/scene-runner/node_modules/shared/apis/EnvironmentAPI').EnvironmentAPI
+type EnvironmentAPI = import('scene-runner/src/node_modules/explorer/scene-runner/node_modules/shared/apis/EnvironmentAPI').EnvironmentAPI
 
 const FPS = 30
 const UPDATE_INTERVAL = 1000 / FPS

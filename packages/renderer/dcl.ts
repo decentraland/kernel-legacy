@@ -31,7 +31,7 @@ import {
   stopParcelSceneWorker,
   loadParcelScene
 } from '../scene-lifecycle/src/system/sceneManager'
-import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../scenes/src/worker/SceneWorker'
+import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../scenes/src/scene-worker/worker'
 import { ensureUiApis } from '../system-scenes/src/uiSceneInitializer'
 import { ParcelIdentity } from '../scene-lifecycle/src/handler/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
