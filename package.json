@@ -18,7 +18,6 @@
     "@microsoft/api-extractor": "^7.3.2",
     "@types/google-protobuf": "^3.7.1",
     "@types/semver": "^6.0.1",
-    "blink-diff": "^1.0.13",
     "dcl-tslint-config-standard": "^2.0.0",
     "git-rev-sync": "^1.12.0",
     "husky": "^3.0.0",
@@ -28,6 +27,8 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
+    "@types/auth0-js": "^9.10.2",
+    "auth0-js": "^9.11.2",
     "decentraland-auth": "^0.12.0",
     "decentraland-rpc": "^3.1.8",
     "devtools-protocol": "0.0.678025",

@@ -2,7 +2,7 @@ import { promisify } from 'util'
 import { WebAuth, Auth0UserProfile } from 'auth0-js'
 
 import { AuthInfo } from './types'
-import { getConfiguration } from 'config/env'
+import { getConfiguration } from '@dcl/utils/'
 
 export const webAuth = new WebAuth({
   clientID: getConfiguration('AUTH0_CLIENT_ID'),
@@ -13,7 +13,7 @@ export const webAuth = new WebAuth({
 })
 
 export async function getCode(email: string): Promise<void> {
-  const start = promisify(webAuth.passwordlessStart as Function);
+  const start = promisify(webAuth.passwordlessStart as Function)
   return await start({
     connection: 'email',
     send: 'code',

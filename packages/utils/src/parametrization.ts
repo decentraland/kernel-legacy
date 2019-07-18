@@ -1,5 +1,13 @@
 export const NETWORK_HZ = 10
 
+export const AUTH = {
+  AUTH_API_URL: '',
+
+  AUTH0_CLIENT_ID: '',
+  AUTH0_DOMAIN: '',
+  AUTH0_REDIRECT: ''
+}
+
 export namespace parcelLimits {
   // Maximum numbers for parcelScenes to prevent performance problems
   // Note that more limitations may be added to this with time
@@ -59,4 +67,12 @@ export namespace visualConfigurations {
 
   export const near = 0.08
   export const far = farDistance
+}
+
+const configuration = {
+  ...AUTH
+}
+
+export function getConfiguration(key: keyof typeof AUTH, defaultValue?: any) {
+  return configuration[key] || defaultValue
 }

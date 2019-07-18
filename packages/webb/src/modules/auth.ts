@@ -1,5 +1,7 @@
 import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
 import * as AuthLib from '@dcl/client/auth/lib'
+import { Middleware, Store } from 'redux'
+import { RootState } from '../store'
 
 export type AuthStatusSummary =
   | 'Not initialized'
@@ -19,6 +21,7 @@ export type AuthState = AuthStateLib & {
 }
 
 export type AuthActionTemplates = [
+  { type: 'Auth initializing'; payload?: string },
   { type: 'Set email'; payload: string },
   { type: 'Set verification'; payload: string },
   { type: 'Login successful'; payload: any },
@@ -36,5 +39,25 @@ const EMPTY_AUTH_STATE: AuthState = {
 }
 
 export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction) {
+  if (!action) return state
+  if (!state || state === EMPTY_AUTH_STATE) return state
+  switch (action.type) {
+    case 'Auth initializing':
+      return { ...state, summary: 'Not logged in' }
+  }
   return state
+}
+
+export function initializeAuth(store: Store<RootState>) {
+  store.dispatch({ type: 'Auth initialized' })
+  checkSession()
+}
+
+export const authMiddleware = (store: Store<RootState>) => (next: Middleware) => (action: any) => {
+  if (store.getState().auth.summary === 'Not initialized') {
+    initializeAuth(store)
+  }
+  switch (action.type) {
+  }
+  return next(action)
 }

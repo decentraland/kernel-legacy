@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "../../dist/client",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@dcl/utils/*": ["../utils/src/*"],
+      "@dcl/config": ["../config"]
+    }
   },
   "extends": "../../tsconfig.json"
 }
