@@ -1,5 +1,8 @@
 import React from 'react'
-import { Segment, Field, Button, InputOnChangeData } from 'decentraland-ui'
+
+import { Segment, Field, Button, InputOnChangeData, Form, Modal } from 'decentraland-ui'
+
+import { FOCUS_CLASS_NAME, focusByClassName } from 'misc/focus'
 
 export type SingleFieldSubmitFormProps = {
   title: string
@@ -11,11 +14,10 @@ export type SingleFieldSubmitFormProps = {
   action?: (value: string) => any
 }
 export class SingleFieldSubmitForm extends React.PureComponent<SingleFieldSubmitFormProps, { value: string }> {
-  input: React.RefObject<any>
+  input?: HTMLInputElement
 
   constructor(props: SingleFieldSubmitFormProps) {
     super(props)
-    this.input = React.createRef()
     this.state = {
       value: ''
     }
@@ -29,26 +31,35 @@ export class SingleFieldSubmitForm extends React.PureComponent<SingleFieldSubmit
     return this.setState({ value: ev.value })
   }
 
+  componentDidMount() {
+    focusByClassName()
+  }
+
   render() {
     return (
       <>
-        <Segment>
+        <Modal open={true}>
+          <Segment>
           <h1>{this.props.title}</h1>
           {this.props.subtitle && <h3>{this.props.subtitle}</h3>}
-          <Field
-            disabled={this.props.loading}
-            message={this.props.error || this.props.message}
-            warning={this.props.warning}
-            error={!!this.props.error}
-            value={this.state.value}
-            onAction={this.submit}
-            onChange={this.change}
-            ref={this.input}
-          />
-          <Button primary disabled={this.props.loading} onClick={this.submit}>
-            {this.props.loading ? 'Loading...' : 'Continue'}
-          </Button>
-        </Segment>
+          <Form onSubmit={this.submit}>
+            <Field
+              disabled={this.props.loading}
+              message={this.props.error || this.props.message}
+              warning={this.props.warning}
+              error={!!this.props.error}
+              focus={true}
+              className={FOCUS_CLASS_NAME}
+              value={this.state.value}
+              onAction={this.submit}
+              onChange={this.change}
+              ref={(input: Field | null) => this.input = input as any}
+            />
+            <Button primary type='submit' disabled={this.props.loading} onClick={this.submit}>
+              {this.props.loading ? 'Loading...' : 'Continue'}
+            </Button>
+          </Form></Segment>
+        </Modal>
       </>
     )
   }

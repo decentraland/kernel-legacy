@@ -46,7 +46,7 @@ const EMPTY_AUTH_STATE: AuthState = {
 export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyAction) {
   if (!action) return state
   switch (action.type) {
-    case 'Auth initializing':
+    case 'Auth initialized':
       return { ...state, summary: 'Loading...' } as AuthState
     case 'Not logged in':
       return { ...state, summary: 'Not logged in' } as AuthState
@@ -57,7 +57,7 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
     case 'Set verification':
       return { ...state, summary: 'Checking verification code' } as AuthState
     case 'Login successful':
-      return { ...state, summary: 'Logged in' } as AuthState
+      return { ...state, summary: 'Logged in', ...(action as any).payload } as AuthState
     case 'Login error':
       return { ...state, summary: 'Not logged in' } as AuthState
   }
