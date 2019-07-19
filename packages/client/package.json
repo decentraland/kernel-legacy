@@ -11,7 +11,8 @@
     "lint:fix": "prettier --write ./**/*.ts && tslint --fix ../../tslint.json"
   },
   "files": [
-    "dist", "README.md"
+    "dist",
+    "README.md"
   ],
   "prettier": {
     "semi": false,
@@ -32,6 +33,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
+    "@dcl/utils": "file:manual-dep/dcl-utils-0.0.0.tgz",
     "@types/auth0-js": "^9.10.2",
     "auth0-js": "^9.11.2",
     "decentraland-auth": "^0.12.0",

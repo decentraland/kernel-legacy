@@ -12,6 +12,10 @@
   "author": "The Decentraland Team <hello@decentraland.org",
   "license": "Apache-2.0",
   "dependencies": {
+    "@types/node": "^12.6.8",
     "fp-future": "^1.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.3"
   }
 }

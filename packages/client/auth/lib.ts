@@ -1,7 +1,7 @@
 import { future } from 'fp-future'
 import { WebAuth } from 'auth0-js'
 
-import { getConfiguration } from '@dcl/utils/src/Parametrization'
+import { getConfiguration } from '@dcl/utils/dist/parametrization'
 import { AuthInfo } from './types'
 
 const webAuth = new WebAuth({
