@@ -1,5 +1,5 @@
-import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
-import * as AuthLib from '@dcl/client/auth/lib'
+import { AuthState as AuthStateLib } from '@dcl/client/dist/auth/types'
+import * as AuthLib from '@dcl/client/dist/auth/lib'
 
 import { Middleware, Store, AnyAction } from 'redux'
 import { RootState } from '../store'
@@ -23,12 +23,12 @@ export type AuthState = AuthStateLib & {
 }
 
 export type AuthActionTemplates = [
-  { type: 'Auth initializing'; payload?: string },
-  { type: 'Not logged in'; payload?: string },
+  { type: 'Auth initializing' },
+  { type: 'Not logged in' },
   { type: 'Set email'; payload: string },
   { type: 'Set verification'; payload: string },
-  { type: 'Login successful'; payload: any },
-  { type: 'Login error'; payload: any }
+  { type: 'Login successful' },
+  { type: 'Login error' }
 ]
 function ReturnAuthActionMap(x: AuthActionTemplates, t: number) {
   return x[t]!

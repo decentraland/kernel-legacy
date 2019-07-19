@@ -3,6 +3,7 @@ npm-debug.log
 .DS_Store
 .decentraland
 *.tgz
+*.sw[a-z]
 
 **/.decentraland
 

@@ -6,6 +6,8 @@ export const AUTH = {
   AUTH0_REDIRECT: 'http://localhost:3000/callback'
 }
 
+export const parcelSize = 16
+
 export const parcelLimits = {
   // Maximum numbers for parcelScenes to prevent performance problems
   // Note that more limitations may be added to this with time
@@ -24,8 +26,8 @@ export const parcelLimits = {
   height: 20,
   geometries: 200,
 
-  parcelSize: 16 /* meters */,
-  halfParcelSize: this.parcelSize / 2 /* meters */,
+  parcelSize,
+  halfParcelSize: parcelSize / 2,
   centimeter: 0.01,
 
   visibleRadius: 4,
@@ -58,13 +60,15 @@ export const playerConfigurations = {
   // The mouse sensibility (lower is most sensible)
   angularSensibility: 500
 }
+export const farDistance = parcelLimits.visibleRadius * parcelLimits.parcelSize
 
 export const visualConfigurations = {
   fieldOfView: 75,
-  farDistance: parcelLimits.visibleRadius * parcelLimits.parcelSize,
+
+  farDistance,
 
   near: 0.08,
-  far: this.farDistance
+  far: farDistance
 }
 
 const configuration = {

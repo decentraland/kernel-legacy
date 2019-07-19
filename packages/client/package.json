@@ -32,8 +32,11 @@
     "typescript": "^3.5.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
+  "peerDependencies": {
+    "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz"
+  },
   "dependencies": {
-    "@dcl/utils": "file:manual-dep/dcl-utils-0.0.0.tgz",
+    "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz",
     "@types/auth0-js": "^9.10.2",
     "auth0-js": "^9.11.2",
     "decentraland-auth": "^0.12.0",
