@@ -3,6 +3,7 @@ import * as AuthLib from '@dcl/client/dist/auth/lib'
 
 import { Middleware, Store, AnyAction } from 'redux'
 import { RootState } from '../store'
+import { push } from 'connected-react-router';
 
 export type AuthStatusSummary =
   | 'Not initialized'
@@ -69,6 +70,9 @@ export const authMiddleware = (store: Store<RootState>) => (next: Middleware) =>
     store.dispatch({ type: 'Auth initialized' })
     AuthLib.checkSession().then((result) => {
       store.dispatch({ type: 'Login successful', payload: result })
+      if (store.getState().router.location.pathname === '/login') {
+        store.dispatch(push('/'))
+      }
     }).catch(e => {
       store.dispatch({ type: 'Not logged in' })
     })
@@ -86,6 +90,9 @@ export const authMiddleware = (store: Store<RootState>) => (next: Middleware) =>
       store.dispatch({ type: 'Checking verification code' })
       AuthLib.doAuth(store.getState().auth.email!, action.payload).then((result) => {
         store.dispatch({ type: 'Login successful', payload: result })
+        if (store.getState().router.location.pathname === '/login') {
+          store.dispatch(push('/'))
+        }
       }).catch(() => {
         store.dispatch({ type: 'Invalid verification code'})
       })
