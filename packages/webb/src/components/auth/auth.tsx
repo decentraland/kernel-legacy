@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Segment } from 'decentraland-ui'
+import { Segment, Button } from 'decentraland-ui'
 
 import { AuthStatusSummary } from 'modules/auth'
 import { EnterCode } from './EnterCode'
@@ -11,6 +11,7 @@ export default function renderAuth(props: {
   setEmail: (email: string) => any
   setVerificationCode: (code: string) => any
   back: () => any
+  logout: any
 }): JSX.Element {
   switch (props.summary) {
     case 'Not initialized':
@@ -33,6 +34,6 @@ export default function renderAuth(props: {
       return <Segment>Please ask for access to the whitelist</Segment>
 
     case 'Logged in':
-      return <Segment>Connected!</Segment>
+      return <Segment><h2>Connected!</h2><Button onClick={props.logout}>Logout</Button></Segment>
   }
 }

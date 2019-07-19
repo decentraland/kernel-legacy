@@ -26,8 +26,10 @@ export type AuthActionTemplates = [
   { type: 'Auth initializing' },
   { type: 'Not logged in' },
   { type: 'Set email'; payload: string },
+  { type: 'Need verification'; payload: string },
   { type: 'Set verification'; payload: string },
   { type: 'Login successful' },
+  { type: 'Logout requested' },
   { type: 'Login error' }
 ]
 function ReturnAuthActionMap(x: AuthActionTemplates, t: number) {
@@ -43,27 +45,53 @@ const EMPTY_AUTH_STATE: AuthState = {
 
 export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyAction) {
   if (!action) return state
-  if (!state || state === EMPTY_AUTH_STATE) return state
   switch (action.type) {
     case 'Auth initializing':
       return { ...state, summary: 'Loading...' } as AuthState
     case 'Not logged in':
       return { ...state, summary: 'Not logged in' } as AuthState
+    case 'Set email':
+      return { ...state, summary: 'Checking email', email: (action as any).payload } as AuthState
+    case 'Awaiting verification':
+      return { ...state, summary: 'Awaiting verification' } as AuthState
+    case 'Set verification':
+      return { ...state, summary: 'Checking verification code' } as AuthState
+    case 'Login successful':
+      return { ...state, summary: 'Logged in' } as AuthState
+    case 'Login error':
+      return { ...state, summary: 'Not logged in' } as AuthState
   }
   return state
 }
 
-export async function initializeAuth(store: Store<RootState>) {
-  const session = await AuthLib.checkSession()
-  debugger
-}
-
 export const authMiddleware = (store: Store<RootState>) => (next: Middleware) => (action: any) => {
-  if (store.getState().auth.summary === 'Not initialized' && action.type !== 'Auth initialized') {
+  if (store.getState().auth.summary === 'Not initialized' && action.type !== 'Auth initialized' && action.type.startsWith('@')) {
     store.dispatch({ type: 'Auth initialized' })
-    initializeAuth(store)
+    AuthLib.checkSession().then((result) => {
+      store.dispatch({ type: 'Login successful', payload: result })
+    }).catch(e => {
+      store.dispatch({ type: 'Not logged in' })
+    })
   }
   switch (action.type) {
+    case 'Set email':
+      store.dispatch({ type: 'Checking email' })
+      AuthLib.getVerificationCode(action.payload).then(() => {
+        store.dispatch({ type: 'Awaiting verification'})
+      }).catch(() => {
+        store.dispatch({ type: 'Invalid email'})
+      })
+      break;
+    case 'Set verification':
+      store.dispatch({ type: 'Checking verification code' })
+      AuthLib.doAuth(store.getState().auth.email!, action.payload).then((result) => {
+        store.dispatch({ type: 'Login successful', payload: result })
+      }).catch(() => {
+        store.dispatch({ type: 'Invalid verification code'})
+      })
+      break;
+    case 'Logout requested':
+      AuthLib.logout()
   }
   return next(action)
 }

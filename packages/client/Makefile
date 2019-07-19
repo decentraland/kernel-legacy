@@ -1,6 +1,9 @@
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
+.PHONY: first
+first: build
+
 .PHONY: build
 # clean install update-utils
 
@@ -10,8 +13,6 @@ clean:
 
 manual/dcl-utils-0.0.0.tgz: ../utils/dcl-utils-0.0.0.tgz
 	cp ../utils/dcl-utils-0.0.0.tgz manual/
-
-update-utils: manual/dcl-utils-0.0.0.tgz
 	npm install ./manual/dcl-utils-0.0.0.tgz
 
 install: manual/dcl-utils-0.0.0.tgz
