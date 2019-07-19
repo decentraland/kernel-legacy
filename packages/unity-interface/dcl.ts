@@ -38,7 +38,7 @@ import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
+import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, EDITOR, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 
@@ -369,6 +369,10 @@ export function loadBuilderScene(sceneData: ILand) {
 
   unityInterface.LoadParcelScenes([target])
   return parcelScene
+}
+
+export function readyBuilderScene() {
+  unityInterface.sendBuilderMessage('SetReady')
 }
 
 export function updateBuilderScene(sceneData: ILand) {

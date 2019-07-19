@@ -20,7 +20,8 @@ import {
   getCameraTargetBuilder,
   setPlayModeBuilder,
   loadBuilderScene,
-  updateBuilderScene
+  updateBuilderScene,
+  readyBuilderScene
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 
@@ -44,7 +45,7 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
     await sleep(10)
   }
 
-  console['log']('REsADYY!!')
+  readyBuilderScene()
   evtEmitter.emit('ready', {})
 }
 
@@ -104,7 +105,7 @@ function bindSceneEvents() {
     } else if (type === 'gizmoDragEnded') {
       evtEmitter.emit('transform', {
         entityId: event.payload.entityId,
-        transform: event.payload.transform
+        transform: JSON.parse(event.payload.transform)
       })
     }
   })
@@ -166,8 +167,6 @@ namespace editor {
     return new Set(loadedSceneWorkers.values())
   }
   export async function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
-    debugger
-    console.log('LPM ' + action)
     if (unityScene) {
       const { worker } = unityScene
       if (action.payload.mappings) {
