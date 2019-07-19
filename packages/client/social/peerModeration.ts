@@ -1,6 +1,6 @@
-import { Observable } from 'decentraland-ecs/src'
-import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from './types'
-import { getFromLocalStorage, saveToLocalStorage } from 'atomicHelpers/localStorage'
+import { Observable } from '@dcl/utils/dist/Observable'
+import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from '../comms/types'
+import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils/dist/SafeLocalStorage'
 
 export const getUserProfile = () => getFromLocalStorage('dcl-profile') || {}
 export const getBlockedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-blocked-users') || [])
@@ -21,33 +21,6 @@ export function findPeerByName(displayName: string): UserInformation | null {
   return null
 }
 
-/**
- * @param uuid the UUID used by the communication engine
- */
-export function setLocalProfile(uuid: UUID, user: UserInformation = {}) {
-  if (typeof (uuid as any) !== 'string') throw new Error('Did not receive a valid UUID')
-
-  if (localProfileUUID) {
-    removeById(localProfileUUID)
-  }
-
-  const profile = {
-    uuid,
-    user,
-    flags: {}
-  }
-
-  peerMap.set(uuid, profile)
-
-  localProfileUUID = uuid
-
-  avatarMessageObservable.notifyObservers({
-    type: AvatarMessageType.SET_LOCAL_UUID,
-    uuid
-  })
-
-  return profile
-}
 
 /**
  * Removes both the peer information and the Avatar from the world.

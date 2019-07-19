@@ -1,4 +1,4 @@
-import { Observable } from '../../decentraland-ecs/src/ecs/Observable'
+import { Observable } from '@dcl/utils/dist/Observable'
 import { Stats } from './debug'
 
 export type BrokerMessage = {

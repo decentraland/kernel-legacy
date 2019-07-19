@@ -5,6 +5,7 @@ import { Navbar as UINavbar, Menu, Button } from 'decentraland-ui'
 export type NavbarProps = {
   currentPage: string
   isLoggedIn: boolean
+  isLoggingIn: boolean
   profileLoaded: boolean
   login: (...args: any) => any
   userId?: string
@@ -34,7 +35,9 @@ export class Navbar extends React.PureComponent<NavbarProps> {
       <>
         { this.props.isLoggedIn
           ? <Picture userId={this.props.userId!} />
-          : this.props.currentPage === '/login' ? '' : <Button size='small' primary onClick={this.props.login}>Log in</Button>
+          : this.props.currentPage === '/login' ? ''
+            : this.props.isLoggingIn ? <span>Loading...</span>
+              : <Button size='small' primary onClick={this.props.login}>Log in</Button>
         }
       </>
     }/>

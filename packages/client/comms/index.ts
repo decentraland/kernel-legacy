@@ -1,11 +1,15 @@
 import 'webrtc-adapter'
 
-import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
+import { parcelLimits } from '@dcl/utils/dist/Parametrization'
+ ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
 
-import { defaultLogger } from 'shared/logger'
-import { saveToLocalStorage } from 'atomicHelpers/localStorage'
-import { positionObservable, PositionReport } from 'shared/world/positionThings'
+import { defaultLogger } from '@dcl/utils/dist/Logger'
+import { saveToLocalStorage } from '@dcl/utils/dist/SafeLocalStorage'
+
+import { positionObservable, PositionReport } from '../worldMap/userPosition'
+
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
+
 import { Stats } from './debug'
 import { Auth } from 'decentraland-auth'
 
@@ -21,7 +25,7 @@ import {
   receiveUserPose,
   getUserProfile,
   getPeer
-} from './peers'
+} from './peerModeration'
 
 import { ChatData, PositionData, ProfileData } from './proto/comms'
 import { chatObservable, ChatEvent } from './chat'
@@ -54,13 +58,10 @@ export class Context {
 
   public currentPosition: Position | null = null
 
-  public network: ETHEREUM_NETWORK | null
-
   public worldInstanceConnection: WorldInstanceConnection | null = null
 
-  constructor(userProfile: UserInformation, network?: ETHEREUM_NETWORK) {
+  constructor(userProfile: UserInformation) {
     this.userProfile = userProfile
-    this.network = network || null
 
     this.commRadius = commConfigurations.commRadius
   }
@@ -118,29 +119,6 @@ export function processParcelSceneCommsMessage(context: Context, fromAlias: stri
   }
 }
 
-export function persistCurrentUser(changes: Partial<UserInformation>): Readonly<UserInformation> {
-  const peer = getCurrentPeer()
-
-  if (!peer || !localProfileUUID) throw new Error('cannotGetCurrentPeer')
-  if (!peer.user) throw new Error('cannotGetCurrentPeer.user')
-
-  Object.assign(peer.user, changes)
-
-  saveToLocalStorage('dcl-profile', peer.user)
-
-  receiveUserData(localProfileUUID, peer.user)
-
-  const user = peer.user
-  if (!context) {
-    throw new Error('persistCurrentUser before initialization')
-  }
-  if (user) {
-    context.userProfile = user
-  }
-
-  return peer.user
-}
-
 function ensurePeerTrackingInfo(context: Context, alias: string): PeerTrackingInfo {
   let peerTrackingInfo = context.peerData.get(alias)
 
@@ -170,27 +148,6 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
       }
       chatObservable.notifyObservers({ type: ChatEvent.MESSAGE_RECEIVED, messageEntry: entry })
     }
-  }
-}
-
-export function processProfileMessage(context: Context, fromAlias: string, data: ProfileData) {
-  const msgTimestamp = data.getTime()
-
-  const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
-
-  if (msgTimestamp > peerTrackingInfo.lastProfileUpdate) {
-    const publicKey = data.getPublicKey()
-    const avatarType = data.getAvatarType()
-    const displayName = data.getDisplayName()
-
-    peerTrackingInfo.profile = {
-      displayName,
-      publicKey,
-      avatarType
-    }
-
-    peerTrackingInfo.lastProfileUpdate = msgTimestamp
-    peerTrackingInfo.lastUpdate = Date.now()
   }
 }
 
@@ -394,9 +351,6 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
   connection.positionHandler = (alias: string, data: PositionData) => {
     processPositionMessage(context!, alias, data)
   }
-  connection.profileHandler = (alias: string, data: ProfileData) => {
-    processProfileMessage(context!, alias, data)
-  }
   connection.chatHandler = (alias: string, data: ChatData) => {
     processChatMessage(context!, alias, data)
   }
@@ -404,7 +358,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     processParcelSceneCommsMessage(context!, alias, data)
   }
 
-  context = new Context(userProfile, network)
+  context = new Context(userProfile)
   context.worldInstanceConnection = connection
 
   if (commConfigurations.debug) {
