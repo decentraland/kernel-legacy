@@ -1,6 +1,9 @@
-import React from 'react';
-import { AuthStatusSummary } from 'modules/auth';
-import { SingleFieldSubmitForm } from "./SingleFieldSubmitForm";
+import React from 'react'
+
+import { AuthStatusSummary } from 'modules/auth'
+
+import { SingleFieldSubmitForm } from "./SingleFieldSubmitForm"
+
 export function EnterCode(props: {
   summary: AuthStatusSummary;
   setVerificationCode: (code: string) => any;

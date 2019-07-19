@@ -6,9 +6,13 @@
   "module": "dist/index.js",
   "scripts": {
     "clean": "rm -rf dist/*",
+    "build": "tsc",
     "lint": "prettier --write ./**/*.ts && tslint ../../tslint.json",
     "lint:fix": "prettier --write ./**/*.ts && tslint --fix ../../tslint.json"
   },
+  "files": [
+    "dist", "README.md"
+  ],
   "prettier": {
     "semi": false,
     "singleQuote": true,

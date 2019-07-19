@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "target": "es5",
     "baseUrl": "."
   },
   "extends": "../../tsconfig.json",
