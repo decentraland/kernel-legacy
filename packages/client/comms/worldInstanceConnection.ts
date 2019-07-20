@@ -1,6 +1,10 @@
 /// <reference lib="dom" />
 
 import { Message } from 'google-protobuf'
+
+import { parcelLimits } from '@dcl/utils/dist/Parametrization'
+import { createLogger } from '@dcl/utils/dist/Logger'
+
 import { Category, ChatData, PositionData, ProfileData, DataHeader } from './proto/comms'
 import {
   MessageType,
@@ -14,10 +18,8 @@ import {
 
 import { Position, position2parcel } from './utils'
 import { UserInformation } from './types'
-import { parcelLimits } from '@dcl/utils/dist/Parametrization'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { Stats } from './Reporter'
-import { createLogger } from '@dcl/utils/dist/Logger'
 
 export enum SocketReadyState {
   CONNECTING,

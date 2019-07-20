@@ -1,4 +1,4 @@
-import { parcelLimits } from '../Parametrization'
+import { parcelLimits } from '@dcl/config/dist/World'
 
 export type IParcelSceneLimits = {
   triangles: number

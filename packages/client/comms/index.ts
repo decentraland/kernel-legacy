@@ -1,42 +1,25 @@
 import 'webrtc-adapter'
 
+import { USE_LOCAL_COMMS } from '@dcl/config/dist/Environment'
 import { parcelLimits } from '@dcl/utils/dist/Parametrization'
-
-import { USE_LOCAL_COMMS } from '../config'
- ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
-
 import { defaultLogger } from '@dcl/utils/dist/Logger'
 
-import { positionObservable, PositionReport } from '../worldMap/userPosition'
+import { positionObservable, PositionReport } from '../presence/mine'
 
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
 
 import { Stats } from './Reporter'
-import { Auth } from 'decentraland-auth'
-
-import {
-  getCurrentPeer,
-  localProfileUUID,
-  getUser,
-  removeById,
-  setLocalProfile,
-  getCurrentUser,
-  receiveUserData,
-  receiveUserVisible,
-  receiveUserPose,
-  getUserProfile,
-  getPeer
-} from './peerModeration'
+import { AuthProvider } from 'decentraland-auth-protocol'
 
 import { ChatData, PositionData, ProfileData } from './proto/comms'
 import { chatObservable, ChatEvent } from './chat'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 import { BrokerConnection } from './BrokerConnection'
 import { UserInformation, Pose } from './types'
-import { CommunicationsController } from 'shared/apis/CommunicationsController'
 import { CliBrokerConnection } from './CliBrokerConnection'
 import { MessageEntry } from '@dcl/utils/dist/Comms'
 import { IBrokerConnection } from './IBrokerConnection'
+import { Communications } from '@dcl/config'
 
 type Timestamp = number
 type PeerAlias = string
@@ -64,7 +47,7 @@ export class Context {
   constructor(userProfile: UserInformation) {
     this.userProfile = userProfile
 
-    this.commRadius = commConfigurations.commRadius
+    this.commRadius = Communications.commRadius
   }
 }
 

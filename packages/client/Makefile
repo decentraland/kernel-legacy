@@ -20,7 +20,10 @@ manual/dcl-utils-0.0.0.tgz : ../utils/dcl-utils-0.0.0.tgz
 manual/dcl-config-0.0.0.tgz : ../config/dcl-config-0.0.0.tgz
 	update-manual config
 
+manual/dcl-rpc-0.0.0.tgz : ../rpc/dcl-rpc-0.0.0.tgz
+	update-manual rpc
+
 package-lock.json: package.json
 	npm install
 
-install: manual/dcl-utils-0.0.0.tgz manual/dcl-config-0.0.0.tgz package-lock.json
+install: manual/dcl-utils-0.0.0.tgz manual/dcl-config-0.0.0.tgz manual/dcl-rpc-0.0.0.tgz package-lock.json

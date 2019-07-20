@@ -4,8 +4,6 @@ export * from './Logger'
 
 export * from './Observable'
 
-export * from './Parametrization'
-
 export * from './SafeLocalStorage'
 
 export { sleep } from './sleep'

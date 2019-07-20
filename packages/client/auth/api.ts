@@ -1,3 +1,5 @@
+import { MessageInput } from 'decentraland-auth-protocol'
+
 export function createHeaders(idToken: string) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

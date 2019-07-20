@@ -5,5 +5,5 @@
     "baseUrl": "."
   },
   "extends": "../../tsconfig.json",
-  "include": ["./auth/**.ts", "./config/**.ts"]
+  "include": ["./auth/**.ts", "./config/**.ts", "./comms/**.ts"]
 }

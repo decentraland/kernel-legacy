@@ -1,6 +1,8 @@
-import { parcelLimits } from '../Parametrization'
+import { parcelLimits } from '@dcl/config/dist/World'
+
 import { Vector3, Vector2 } from '../Vector'
 import { isEqual } from '../pure/vectorHelpers'
+import { MVector2 } from '../math'
 
 let auxVec3: Vector3 = { x: 0, y: 0, z: 0 }
 
@@ -21,7 +23,7 @@ export function gridToWorld(x: number, y: number, target: Vector3) {
 /**
  * Transforms a world position into a grid position
  */
-export function worldToGrid(vector: Vector3, target: Vector2): void {
+export function worldToGrid(vector: Vector3, target: MVector2): void {
   target.x = Math.floor(vector.x / parcelLimits.parcelSize)
   target.y = Math.floor(vector.z / parcelLimits.parcelSize)
 }

@@ -1,6 +1,11 @@
 import { future } from 'fp-future'
 import { Message } from 'google-protobuf'
 
+import { Communications } from '@dcl/config'
+import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
+import { Observable } from '@dcl/utils/dist/Observable'
+import { AuthProvider } from 'decentraland-auth-protocol'
+
 import {
   MessageType,
   CoordinatorMessage,
@@ -13,12 +18,8 @@ import {
 
 import { AuthData } from './proto/comms'
 import { SocketReadyState } from './worldInstanceConnection'
-import { commConfigurations } from 'config'
 import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-
-import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
-import { Observable } from '@dcl/utils/dist/Observable'
 
 export class BrokerConnection implements IBrokerConnection {
   public alias: string | null = null
@@ -32,6 +33,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   public stats: Stats | null = null
 
+  public auth = new AuthProvider(au)
   public logger: ILogger = createLogger('Broker: ')
 
   public onMessageObservable = new Observable<BrokerMessage>()
@@ -66,7 +68,7 @@ export class BrokerConnection implements IBrokerConnection {
     setTimeout(() => {
       if (this.reliableFuture.isPending) {
         this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
-        this.stats && this.stats.printDebugInformation()
+        this.stats && this.stats.emitDebugInformation()
       }
     }, 60000)
   }
@@ -237,7 +239,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private connectRTC() {
     this.webRtcConn = new RTCPeerConnection({
-      iceServers: commConfigurations.iceServers
+      iceServers: Communications.iceServers
     })
 
     this.webRtcConn.onsignalingstatechange = (e: Event) => {

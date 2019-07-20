@@ -1,6 +1,6 @@
 import { Quaternion } from '../math/Quaternion'
 import { MVector3 } from '../math/MVector3'
-import { RAD2DEG } from 'src/math'
+import { RAD2DEG } from '../math'
 
 export function quaternionToRotation(x: number, y: number, z: number, w: number) {
   const roll = Math.atan2(2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z) * RAD2DEG

@@ -1,0 +1,16 @@
+{
+  "name": "@dcl/rpc",
+  "version": "0.0.0",
+  "description": "A package to make RPC calls",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": ["README.md", "lib/**/*.js", "lib/**/*.d.ts"],
+  "author": "The Decentraland Team <hello@decentraland.org",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "typescript": "^3.5.3"
+  }
+}
