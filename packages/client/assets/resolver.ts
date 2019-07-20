@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL } from 'url'
 
 export function fetchAssetDescription(assetURI: string) {
   const url = new URL(assetURI)
@@ -6,3 +6,5 @@ export function fetchAssetDescription(assetURI: string) {
   url.hostname
   url.pathname
 }
+
+// Should be: import { Assets } from '@dcl/config/Assets'

@@ -8,6 +8,7 @@ export type NavbarProps = {
   isLoggingIn: boolean
   profileLoaded: boolean
   login: (...args: any) => any
+  pushLocation: (link: string) => any
   userId?: string
   profile?: {
     name: string
@@ -23,13 +24,16 @@ export class Picture extends React.PureComponent<{ userId: string }> {
 
 export class Navbar extends React.PureComponent<NavbarProps> {
 
+  links: Record<string, any> = new Map<string, any>()
+
+  goTo = (key: string) => !this.links.has(key) ? this.links.set(key, (...args: any) => this.props.pushLocation(key)) && this.links.get(key) : this.links.get(key)
+
   render() {
     return <UINavbar isFullscreen leftMenu={
       <>
-        <Menu.Item>Profile</Menu.Item>
-        <Menu.Item>World</Menu.Item>
-        <Menu.Item>Communications</Menu.Item>
-        <Menu.Item>Assets</Menu.Item>
+        <Menu.Item link={true} onClick={this.goTo('/')} active={this.props.currentPage === '/'}>Status</Menu.Item>
+        <Menu.Item link={true} onClick={this.goTo('/map')} active={this.props.currentPage === '/map'}>World</Menu.Item>
+        <Menu.Item link={true} onClick={this.goTo('/assets')} active={this.props.currentPage === '/assets'}>Assets</Menu.Item>
       </>
     } rightMenu={
       <>

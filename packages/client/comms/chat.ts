@@ -1,5 +1,5 @@
-import { Observable } from 'decentraland-ecs/src'
-import { MessageEntry } from 'shared/types'
+import { Observable } from '@dcl/utils/dist/Observable'
+import { MessageEntry } from '@dcl/utils/dist/Comms'
 
 export enum ChatEvent {
   MESSAGE_RECEIVED = 'MESSAGE_RECEIVED',

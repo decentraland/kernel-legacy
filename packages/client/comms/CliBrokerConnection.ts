@@ -2,9 +2,9 @@ import { future, IFuture } from 'fp-future'
 
 import { MessageType, CoordinatorMessage, WelcomeMessage, ConnectMessage } from './proto/broker'
 import { SocketReadyState } from './worldInstanceConnection'
-import { Stats } from './debug'
+import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import { ILogger, createLogger } from 'shared/logger'
+import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
 import { Observable } from '../../decentraland-ecs/src/ecs/Observable'
 
 export class CliBrokerConnection implements IBrokerConnection {

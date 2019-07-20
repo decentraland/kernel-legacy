@@ -16,6 +16,7 @@
     "decentraland-ui": "^2.6.0",
     "history": "^4.9.0",
     "react": "^16.8.6",
+    "react-console-emulator": "^3.0.2",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
     "react-router": "^5.0.1",

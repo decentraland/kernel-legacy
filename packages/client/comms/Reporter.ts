@@ -1,6 +1,9 @@
-import { defaultLogger } from 'shared/logger'
 import { Context } from './index'
 import { PositionData } from './proto/comms'
+import { EventEmitter } from 'events'
+
+export class Reporter extends EventEmitter {}
+const reporter = new Reporter()
 
 export class TrackAvgDuration {
   public durationsMs: number[] = []
@@ -110,60 +113,47 @@ export class Stats {
 
   constructor(private context: Context) {}
 
-  public printDebugInformation() {
+  public emitDebugInformation() {
     const reportDuration = (name: string, duration: TrackAvgDuration) => {
       const durationsMs = duration.durationsMs
       if (durationsMs.length > 0) {
         const avg = durationsMs.reduce((total, d) => total + d) / durationsMs.length
-        defaultLogger.info(`${name} took an avg of ${avg} ms`)
+        reporter.emit(name, `took an avg of ${avg} ms`)
       }
       duration.clear()
     }
 
     const reportPkgStats = (name: string, stats: PkgStats) => {
-      const sent = `${stats.sent}x${stats.sentBytes} bytes in this period`
-      const sentTotal = `${stats.sentTotal}x${stats.sentTotalBytes} bytes in this period`
-      const recv = `${stats.recv}x${stats.recvBytes} bytes in this period`
-      const recvTotal = `${stats.recvTotal}x${stats.recvTotalBytes} bytes total`
-      defaultLogger.info(`${name}: sent: ${sent} (${sentTotal}), recv: ${recv} (${recvTotal})`)
+      reporter.emit(name, { ...stats, time: new Date().getTime() })
       stats.reset()
     }
 
-    defaultLogger.info(`------- ${new Date()}: `)
     reportDuration('collectInfo', this.collectInfoDuration)
     reportDuration('dispatchTopic', this.dispatchTopicDuration)
-    defaultLogger.info(`tracking peers: ${this.trackingPeersCount}, visible peers: ${this.visiblePeersCount}`)
-
-    defaultLogger.info('World instance: ')
+    reporter.emit('peers', { trackingPeers: this.trackingPeersCount, visiblePeers: this.visiblePeersCount })
 
     const connection = this.context.worldInstanceConnection!
     connection.connection.printDebugInformation()
 
-    if (connection.ping >= 0) {
-      defaultLogger.info(`  ping: ${connection.ping} ms`)
-    } else {
-      defaultLogger.info(`  ping: ? ms`)
-    }
+    reporter.emit('ping', `${connection.ping >= 0 ? connection.ping : '?'} ms`)
 
-    reportPkgStats('  topic (total)', this.topic)
-    reportPkgStats('    - position', this.position)
-    reportPkgStats('    - profile', this.profile)
-    reportPkgStats('    - sceneComms', this.sceneComms)
-    reportPkgStats('    - chat', this.chat)
-    reportPkgStats('  ping', this.ping)
-    reportPkgStats('  webrtc session', this.webRtcSession)
-    reportPkgStats('  others', this.others)
+    reportPkgStats('topic', this.topic)
+    reportPkgStats('topic$position', this.position)
+    reportPkgStats('topic$profile', this.profile)
+    reportPkgStats('topic$sceneComms', this.sceneComms)
+    reportPkgStats('topic$chat', this.chat)
+    reportPkgStats('ping', this.ping)
+    reportPkgStats('webrtc', this.webRtcSession)
+    reportPkgStats('others', this.others)
 
     this.peers.forEach((stat, alias) => {
       const positionAvgFreq = stat.positionAvgFrequency
       if (positionAvgFreq.samples > 1) {
         const samples = positionAvgFreq.samples
         const avg = positionAvgFreq.avg()
-        defaultLogger.info(`${alias} avg duration between position messages ${avg}ms, from ${samples} samples`)
+        reporter.emit(alias, { avgInterval: avg, samples })
       }
     })
-
-    defaultLogger.info('-------')
   }
 
   public onPositionMessage(fromAlias: string, data: PositionData) {

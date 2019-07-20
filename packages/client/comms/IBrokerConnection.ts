@@ -1,5 +1,5 @@
 import { Observable } from '@dcl/utils/dist/Observable'
-import { Stats } from './debug'
+import { Stats } from './Reporter'
 
 export type BrokerMessage = {
   data: Uint8Array

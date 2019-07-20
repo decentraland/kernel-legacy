@@ -67,13 +67,17 @@ export async function doAuth(email: string, verificationCode: string): Promise<A
         try {
           webAuth.client.userInfo(authResult.accessToken, (err2, user) => {
             if (err2) return result.reject(err2 as any)
-            return result.resolve({
-              email: user.email!,
-              sub: user.sub,
-              expiresAt: authResult.expiresIn! * 1000 + new Date().getTime(),
-              accessToken: authResult.accessToken!,
-              idToken: authResult.idToken!
-            } as AuthInfo)
+            try {
+              return result.resolve({
+                email: user.email!,
+                sub: user.sub,
+                expiresAt: authResult.expiresIn! * 1000 + new Date().getTime(),
+                accessToken: authResult.accessToken!,
+                idToken: authResult.idToken!
+              } as AuthInfo)
+            } catch (e) {
+              return result.reject(e)
+            }
           })
         } catch (e) {
           result.reject(e)

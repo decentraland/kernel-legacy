@@ -1,5 +1,4 @@
 import { future } from 'fp-future'
-import { Auth } from 'decentraland-auth'
 import { Message } from 'google-protobuf'
 
 import {
@@ -15,10 +14,11 @@ import {
 import { AuthData } from './proto/comms'
 import { SocketReadyState } from './worldInstanceConnection'
 import { commConfigurations } from 'config'
-import { ILogger, createLogger } from 'shared/logger'
-import { Stats } from './debug'
+import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import { Observable } from 'decentraland-ecs/src/ecs/Observable'
+
+import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
+import { Observable } from '@dcl/utils/dist/Observable'
 
 export class BrokerConnection implements IBrokerConnection {
   public alias: string | null = null
@@ -57,7 +57,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(private auth: Auth, public url: string) {
+  constructor(public url: string) {
     this.connectRTC()
     this.connectWS()
 

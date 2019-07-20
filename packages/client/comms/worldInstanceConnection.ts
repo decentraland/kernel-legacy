@@ -11,12 +11,13 @@ import {
   TopicSubscriptionMessage,
   MessageHeader
 } from './proto/broker'
+
 import { Position, position2parcel } from './utils'
 import { UserInformation } from './types'
-import { parcelLimits } from 'config'
+import { parcelLimits } from '@dcl/utils/dist/Parametrization'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import { Stats } from './debug'
-import { createLogger } from 'shared/logger'
+import { Stats } from './Reporter'
+import { createLogger } from '@dcl/utils/dist/Logger'
 
 export enum SocketReadyState {
   CONNECTING,

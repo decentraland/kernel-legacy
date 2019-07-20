@@ -20,7 +20,6 @@ export default function renderAuth(props: {
   summary: AuthStatusSummary
   setEmail: (email: string) => any
   setVerificationCode: (code: string) => any
-  back: () => any
   goHome: () => any
   logout: any
 }): JSX.Element {
@@ -31,8 +30,6 @@ export default function renderAuth(props: {
 
     case 'Not logged in':
     case 'Logged out':
-    case 'User went back':
-    case 'Expired credentials':
     case 'Checking email':
       return <EnterEmail {...props} />
 

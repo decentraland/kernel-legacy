@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
-import { RootState } from 'store'
 import { push } from 'connected-react-router'
 
-import { Navbar } from './Navbar';
+import { Navbar } from './Navbar'
+import { RootState } from 'store'
 
 function mapState(state: RootState) {
   const isLoggedIn = state.auth.summary === 'Logged in'
@@ -15,4 +15,4 @@ function mapState(state: RootState) {
   }
 }
 
-export default connect(mapState, { login: () => push('/login') })(Navbar)
+export default connect(mapState, { login: () => push('/login'), pushLocation: (key: string) => push(key) })(Navbar)

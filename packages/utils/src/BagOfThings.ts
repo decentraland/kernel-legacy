@@ -24,19 +24,6 @@ export type UserData = {
   publicKey: string
 }
 
-export type MessageEntry = {
-  id: string
-  sender: string
-  message: string
-  isCommand?: boolean
-}
-
-export interface IChatCommand {
-  name: string
-  description: string
-  run: (message: string) => MessageEntry
-}
-
 export type RPCSendableMessage = {
   jsonrpc: '2.0'
   id: number

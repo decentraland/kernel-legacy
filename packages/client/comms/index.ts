@@ -1,16 +1,17 @@
 import 'webrtc-adapter'
 
 import { parcelLimits } from '@dcl/utils/dist/Parametrization'
+
+import { USE_LOCAL_COMMS } from '../config'
  ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
 
 import { defaultLogger } from '@dcl/utils/dist/Logger'
-import { saveToLocalStorage } from '@dcl/utils/dist/SafeLocalStorage'
 
 import { positionObservable, PositionReport } from '../worldMap/userPosition'
 
 import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
 
-import { Stats } from './debug'
+import { Stats } from './Reporter'
 import { Auth } from 'decentraland-auth'
 
 import {
@@ -34,7 +35,7 @@ import { BrokerConnection } from './BrokerConnection'
 import { UserInformation, Pose } from './types'
 import { CommunicationsController } from 'shared/apis/CommunicationsController'
 import { CliBrokerConnection } from './CliBrokerConnection'
-import { MessageEntry } from 'shared/types'
+import { MessageEntry } from '@dcl/utils/dist/Comms'
 import { IBrokerConnection } from './IBrokerConnection'
 
 type Timestamp = number
@@ -301,7 +302,7 @@ function collectInfo(context: Context) {
   }
 }
 
-export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: Auth, ethAddress?: string) {
+export async function connect(userId: string, auth: Auth, ethAddress?: string) {
   setLocalProfile(userId, {
     ...getUserProfile(),
     publicKey: ethAddress || null

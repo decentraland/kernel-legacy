@@ -12,8 +12,7 @@ export enum AvatarMessageType {
   USER_BLOCKED = 'USER_BLOCKED',
   USER_UNBLOCKED = 'USER_UNBLOCKED',
 
-  ADD_FRIEND = 'ADD_FRIEND',
-  SHOW_WINDOW = 'SHOW_WINDOW'
+  SHOW_WINDOW = 'SHOW_WINDOW' // Wtf does this do?
 }
 
 export type ReceiveUserDataMessage = {
