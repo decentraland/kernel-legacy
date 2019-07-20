@@ -4,24 +4,23 @@ MAKEFLAGS += --no-builtin-rules
 .PHONY: first
 first: build
 
-.PHONY: build
-# clean install update-utils
+.PHONY: build first clean install update-utils
+
+build: install
+	tsc
+	npm pack
 
 clean:
 	rm dcl-client-0.0.0.tgz
 	rm -rf dist
 
-manual/dcl-utils-0.0.0.tgz: ../utils/dcl-utils-0.0.0.tgz
-	cp ../utils/dcl-utils-0.0.0.tgz manual/
-	npm install ./manual/dcl-utils-0.0.0.tgz
+manual/dcl-utils-0.0.0.tgz : ../utils/dcl-utils-0.0.0.tgz
+	update-manual utils
 
-install: manual/dcl-utils-0.0.0.tgz
-	npm install
-	npm install ./manual/dcl-utils-0.0.0.tgz
+manual/dcl-config-0.0.0.tgz : ../config/dcl-config-0.0.0.tgz
+	update-manual config
 
 package-lock.json: package.json
 	npm install
 
-build: manual/dcl-utils-0.0.0.tgz package-lock.json
-	tsc
-	npm pack
+install: manual/dcl-utils-0.0.0.tgz manual/dcl-config-0.0.0.tgz package-lock.json

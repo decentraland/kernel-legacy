@@ -1,40 +1,20 @@
-manual/dcl-client-0.0.0.tgz: ../client/dcl-client-0.0.0.tgz
-	cp ../client/dcl-client-0.0.0.tgz manual/
-	npm update ./manual/dcl-client-0.0.0.tgz
-
-manual/dcl-utils-0.0.0.tgz: ../utils/dcl-utils-0.0.0.tgz
-	cp ../utils/dcl-utils-0.0.0.tgz manual/
-	npm update ./manual/dcl-utils-0.0.0.tgz
-
-.PHONY: update-deps
-update-deps: manual/dcl-utils-0.0.0.tgz manual/dcl-client-0.0.0.tgz
+.PHONY: watch
+watch: update-deps
+	npm start
 
 .PHONY: build
 build: update-deps
 	npm run build
 
-.PHONY: watch
-watch: update
-	npm start
+manual/dcl-client-0.0.0.tgz: ../client/dcl-client-0.0.0.tgz
+	update-manual client
 
-.PHONY: update-utils
-update-utils: ../utils/dcl-utils-0.0.0.tgz
-	cp ../utils/dcl-utils-0.0.0.tgz manual/dcl-utils-0.0.0.tgz
-	cp node_modules/@dcl/utils/package.json node_modules/@dcl/utils/package.back 
-	tar xzf manual/dcl-utils-0.0.0.tgz
-	cp -r package/* node_modules/@dcl/utils/
-	cp node_modules/@dcl/utils/package.back node_modules/@dcl/utils/package.lock 
-	rm -rf package
+manual/dcl-utils-0.0.0.tgz: ../utils/dcl-utils-0.0.0.tgz
+	update-manual utils
 
-.PHONY: update-client
-update-client: ../client/dcl-client-0.0.0.tgz
-	cp ../client/dcl-client-0.0.0.tgz manual/dcl-client-0.0.0.tgz
-	cp node_modules/@dcl/client/package.json node_modules/@dcl/client/package.back 
-	tar xzf manual/dcl-client-0.0.0.tgz
-	cp -r package/* node_modules/@dcl/client/
-	cp node_modules/@dcl/client/package.back node_modules/@dcl/client/package.lock 
-	rm -rf package
+manual/dcl-config-0.0.0.tgz: ../config/dcl-config-0.0.0.tgz
+	update-manual config
 
+.PHONY: update-deps
+update-deps: manual/dcl-utils-0.0.0.tgz manual/dcl-client-0.0.0.tgz manual/dcl-config-0.0.0.tgz
 
-update: update-utils update-client
-	touch src/App.tsx

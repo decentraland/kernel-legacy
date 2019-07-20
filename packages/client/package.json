@@ -36,6 +36,7 @@
     "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz"
   },
   "dependencies": {
+    "@dcl/config": "file:manual/dcl-config-0.0.0.tgz",
     "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz",
     "@types/auth0-js": "^9.10.2",
     "auth0-js": "^9.11.2",
