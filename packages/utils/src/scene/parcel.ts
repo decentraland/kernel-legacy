@@ -1,7 +1,7 @@
 import { parcelLimits } from '@dcl/config/dist/World'
 
 import { Vector3, Vector2 } from '../Vector'
-import { isEqual } from '../pure/vectorHelpers'
+import { isEqual2 } from '../pure/vectorHelpers'
 import { MVector2 } from '../math'
 
 let auxVec3: Vector3 = { x: 0, y: 0, z: 0 }
@@ -121,7 +121,7 @@ export function areConnected(parcels: Vector2[]): boolean {
 }
 
 function visitParcel(parcel: Vector2, allParcels: Vector2[] = [parcel], visited: Vector2[] = []): Vector2[] {
-  let isVisited = visited.some(visitedParcel => isEqual(visitedParcel, parcel))
+  let isVisited = visited.some(visitedParcel => isEqual2(visitedParcel, parcel))
   if (!isVisited) {
     visited.push(parcel)
     let neighbours = getNeighbours(parcel.x, parcel.y, allParcels)

@@ -8,10 +8,9 @@ export function createHeaders(idToken: string) {
   return headers
 }
 
-export async function legacyGetMessageCredentials(message: string | null) {
+export async function getMessageCredentials(message: string | null, accessToken: string) {
   const msg = message === null ? null : Buffer.from(message)
   const input = MessageInput.fromMessage(msg)
-  const accessToken = await this.getAccessToken()
 
   const credentials = this.getEphemeralKey().makeMessageCredentials(input, accessToken)
 

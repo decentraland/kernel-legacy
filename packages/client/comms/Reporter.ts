@@ -1,6 +1,7 @@
-import { Context } from './index'
-import { PositionData } from './proto/comms'
 import { EventEmitter } from 'events'
+
+import { PositionData } from './proto/comms'
+import { WorldInstanceConnection } from 'comms/worldInstanceConnection'
 
 export class Reporter extends EventEmitter {}
 const reporter = new Reporter()
@@ -111,7 +112,7 @@ export class Stats {
 
   private reportInterval: any
 
-  constructor(private context: Context) {}
+  constructor(private connection: WorldInstanceConnection) {}
 
   public emitDebugInformation() {
     const reportDuration = (name: string, duration: TrackAvgDuration) => {
@@ -132,10 +133,7 @@ export class Stats {
     reportDuration('dispatchTopic', this.dispatchTopicDuration)
     reporter.emit('peers', { trackingPeers: this.trackingPeersCount, visiblePeers: this.visiblePeersCount })
 
-    const connection = this.context.worldInstanceConnection!
-    connection.connection.printDebugInformation()
-
-    reporter.emit('ping', `${connection.ping >= 0 ? connection.ping : '?'} ms`)
+    reporter.emit('ping', `${this.connection.ping >= 0 ? this.connection.ping : '?'} ms`)
 
     reportPkgStats('topic', this.topic)
     reportPkgStats('topic$position', this.position)

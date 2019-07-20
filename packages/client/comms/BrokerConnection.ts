@@ -4,7 +4,6 @@ import { Message } from 'google-protobuf'
 import { Communications } from '@dcl/config'
 import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
 import { Observable } from '@dcl/utils/dist/Observable'
-import { AuthProvider } from 'decentraland-auth-protocol'
 
 import {
   MessageType,
@@ -33,7 +32,6 @@ export class BrokerConnection implements IBrokerConnection {
 
   public stats: Stats | null = null
 
-  public auth = new AuthProvider(au)
   public logger: ILogger = createLogger('Broker: ')
 
   public onMessageObservable = new Observable<BrokerMessage>()
@@ -59,7 +57,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string) {
+  constructor(public url: string, public credentialsProvider: (message: string) => AuthData.AsObject) {
     this.connectRTC()
     this.connectWS()
 
@@ -301,7 +299,7 @@ export class BrokerConnection implements IBrokerConnection {
       if (label === 'reliable') {
         this.reliableDataChannel = dc
         const authData = new AuthData()
-        const credentials = await this.auth.getMessageCredentials('')
+        const credentials = await this.credentialsProvider('')
         authData.setSignature(credentials['x-signature'])
         authData.setIdentity(credentials['x-identity'])
         authData.setTimestamp(credentials['x-timestamp'])

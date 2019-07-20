@@ -1,5 +1,5 @@
-import { push, RouterRootState } from 'connected-react-router'
 import { Middleware, Store, AnyAction } from 'redux'
+import { push, RouterRootState } from 'connected-react-router'
 
 import { AuthState as AuthStateLib } from '@dcl/client/dist/auth/types'
 import * as AuthLib from '@dcl/client/dist/auth/lib'
