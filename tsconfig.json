@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
+    "module": "commonjs",
+    "target": "es5",
+    "esModuleInterop": true,
     "diagnostics": false,
     "inlineSourceMap": false,
     "inlineSources": false,
