@@ -3,6 +3,8 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createBrowserHistory } from 'history'
 
 import { AuthState, authMiddleware } from 'modules/auth'
+import { commsMiddleware, CommsState } from 'modules/comms'
+
 import { createReducer } from 'reducers'
 
 export const history = createBrowserHistory()
@@ -10,6 +12,7 @@ export const history = createBrowserHistory()
 export type RootState = {
   router: RouterState
   auth: AuthState
+  comms: CommsState
 }
 
 declare var window: any
@@ -24,7 +27,7 @@ export const configureStore = (state?: RootState) => {
   const store = createStore(
     createReducer(history),
     state,
-    enhance(applyMiddleware(routerMiddleware(history), authMiddleware as any))
+    enhance(applyMiddleware(routerMiddleware(history), authMiddleware as any, commsMiddleware as any))
   )
   return store
 }

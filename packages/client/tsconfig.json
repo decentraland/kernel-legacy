@@ -2,8 +2,9 @@
   "compilerOptions": {
     "outDir": "./dist",
     "target": "es5",
+    "module": "commonjs",
     "baseUrl": "."
   },
   "extends": "../../tsconfig.json",
-  "include": ["./auth/**.ts", "./config/**.ts", "./comms/**.ts"]
+  "include": ["./auth/**.ts", "./config/**.ts", "./comms/**.ts", "./comms/**/*.proto"]
 }

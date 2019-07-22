@@ -10,7 +10,7 @@ import { CliBrokerConnection } from './CliBrokerConnection'
 import { IBrokerConnection } from './IBrokerConnection'
 import { AuthData } from './proto/comms'
 
-export async function connect(credentialsProvider: (message: string) => AuthData.AsObject) {
+export async function connect(credentialsProvider: (message: string) => Promise<AuthData.AsObject>) {
   let commsBroker: IBrokerConnection
 
   if (USE_LOCAL_COMMS) {

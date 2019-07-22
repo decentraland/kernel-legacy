@@ -8,6 +8,8 @@ first: build
 
 build: install
 	tsc
+	mkdir -p dist/comms/proto
+	cp comms/proto/* dist/comms/proto/
 	npm pack
 
 clean:

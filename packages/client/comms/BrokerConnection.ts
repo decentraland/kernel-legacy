@@ -57,7 +57,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string, public credentialsProvider: (message: string) => AuthData.AsObject) {
+  constructor(public url: string, public credentialsProvider: (message: string) => Promise<AuthData.AsObject>) {
     this.connectRTC()
     this.connectWS()
 
