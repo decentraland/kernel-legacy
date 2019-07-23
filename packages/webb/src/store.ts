@@ -6,6 +6,7 @@ import { AuthState, authMiddleware } from 'modules/auth'
 import { commsMiddleware, CommsState } from 'modules/comms'
 import { passportsMiddleware } from 'modules/passports'
 import { assetsMiddleware, AssetsState } from 'modules/assets'
+import { worldMiddleware, WorldState } from 'modules/world'
 
 import { createReducer } from 'reducers'
 
@@ -16,6 +17,7 @@ export type RootState = {
   auth: AuthState
   assets: AssetsState
   comms: CommsState
+  world: WorldState
 }
 
 declare var window: any
@@ -35,6 +37,7 @@ export const configureStore = (state?: RootState) => {
       authMiddleware as any,
       commsMiddleware as any,
       assetsMiddleware as any,
+      worldMiddleware as any,
       passportsMiddleware as any)
     )
   )

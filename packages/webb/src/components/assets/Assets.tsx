@@ -1,5 +1,5 @@
 import React from 'react'
-import { Page, Grid, Tabs, Segment } from 'decentraland-ui'
+import { Page, Grid, Tabs, Segment, Hero, Center } from 'decentraland-ui'
 import { AssetsState } from 'modules/assets'
 
 export type ToggleStatus = {
@@ -8,6 +8,34 @@ export type ToggleStatus = {
   currentAsset: string
 }
 
+function humanize(key: string, object?: any): string {
+  if (object && object.i18n) {
+    return object.i18n.en
+  }
+  return ({
+    body_shape: 'Body shape',
+    earring: 'Earrings',
+    eyebrows: 'Eyebrows',
+    eyes: 'Eyes',
+    eye_wear: 'Eye wear',
+    facial_hair: 'Facial hair',
+    feet: 'Feet',
+    hair: 'Hair',
+    lower_body: 'Lower body clothing',
+    mouth: 'Mouth',
+    tiara: 'Tiaras',
+    upper_body: 'Upper body cloting',
+    decorations: 'Decorations',
+    furniture: 'Furniture',
+    structures: 'Structures',
+    female_body: 'Base female body type',
+    male_body: 'Base male body type',
+    nature: 'Nature',
+    ground: 'Ground',
+    tiles: 'Tiles',
+    'year of the pig': 'All YotP assets'
+  } as any)[key] || key
+}
 export class Assets extends React.PureComponent<AssetsState & { switch: any }, ToggleStatus> {
   constructor(props: any) {
     super(props)
@@ -49,27 +77,32 @@ export class Assets extends React.PureComponent<AssetsState & { switch: any }, T
   getPacks() {
     return Object.keys(this.props.packs).filter(this.currentTab).map(key => ({
       id: key,
-      title: key,
+      title: this.props.packs[key].title,
       action: this.setCurrentPack(key)
     }))
   }
   getCategories() {
     return Object.keys(this.props.contents[this.state.currentPack]).map(key => ({
       id: key,
-      title: key,
+      title: humanize(key, this.props.contents[key]),
       action: this.setCurrentCategory(key)
     }))
   }
   getItems() {
     return this.props.contents[this.state.currentPack][this.state.currentCategory].map(asset => ({
       id: asset.id,
-      title: asset.name,
+      title: humanize(asset.name, asset),
       action: this.setCurrentAsset(asset.id)
     }))
   }
 
   render() {
     return <Page>
+      <Hero>
+        <Center>
+          <h1>Assets</h1>
+        </Center>
+      </Hero>
       <Tabs>
         <Tabs.Tab active={!this.currentPlaceable} onClick={() => this.props.switch('wearable')}>Wearables</Tabs.Tab>
         <Tabs.Tab active={this.currentPlaceable} onClick={() => this.props.switch('placeable')}>Placeables</Tabs.Tab>
@@ -115,7 +148,8 @@ type ExpandingProps = {
   selectedChild?: string
   list: {
     id: string
-    title: string
+    title?: string
+    name?: string
     action: Function
   }[]
 }
@@ -126,7 +160,7 @@ class ExpandingList extends React.Component<ExpandingProps> {
       { this.props.list.map(item => <Segment key={item.id} onClick={this.props.selectedChild
           ? this.props.selectedChild === item.id ? () => ({}) : item.action : item.action
         }>
-        {item.title}
+        {item.name || item.title}
         {item.id === this.props.selectedChild ? <div style={{ paddingTop: '20px' }}>{this.props.children}</div> : <></> }
       </Segment>)}
     </Grid.Column>
