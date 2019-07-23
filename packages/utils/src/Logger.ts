@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events'
+
 // tslint:disable:no-console
 export type ILogger = {
   error(message: string, ...args: any[]): void
@@ -11,7 +13,28 @@ export type ILogger = {
 declare var console: any
 declare var dcl: any
 
+export const overridenLoggers: { [key: string]: EventEmitter } = {}
+export const proxyLogger: { [key: string]: ILogger } = {}
+
+export function createFakeLogger(events: EventEmitter): ILogger {
+  const result: { [key: string]: Function } = {}
+  for (let key of ['debug', 'error', 'log', 'warn', 'info', 'debug', 'trace']) {
+    result[key] = (message: string, ...args: any[]) => events.emit(key, message, ...args)
+  }
+  return result as any
+}
+
+export function intersectLogger(prefix: string): EventEmitter {
+  const events = new EventEmitter()
+  overridenLoggers[prefix] = events
+  proxyLogger[prefix] = createFakeLogger(events)
+  return events
+}
+
 export function createLogger(prefix: string): ILogger {
+  if (overridenLoggers[prefix]) {
+    return proxyLogger[prefix]
+  }
   return {
     error(message: string | Error, ...args: any[]): void {
       const target = typeof dcl === 'undefined' ? console.error : dcl.error

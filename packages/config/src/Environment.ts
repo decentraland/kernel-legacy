@@ -30,7 +30,7 @@ export const knownTLDs = ['zone', 'org', 'today']
 function getDefaultTLD() {
   const TLD = getTLD()
   if (!TLD || !knownTLDs.includes(TLD)) {
-    return network === ETHEREUM_NETWORK.ROPSTEN ? 'zone' : 'org'
+    return 'zone'
   }
   return TLD
 }
@@ -52,8 +52,6 @@ export enum ETHEREUM_NETWORK {
   MAINNET = 'mainnet',
   ROPSTEN = 'ropsten'
 }
-
-let network: ETHEREUM_NETWORK | null = null
 
 export const EthereumEnvironments = {
   mainnet: {

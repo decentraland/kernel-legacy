@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "lib": ["esnext", "dom"],
     "baseUrl": "./"
   },
   "include": ["./src/**.ts"],

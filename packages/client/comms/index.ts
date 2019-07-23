@@ -22,14 +22,13 @@ export async function connect(credentialsProvider: (message: string) => Promise<
     const credentials = await credentialsProvider(body)
 
     const qs = new URLSearchParams({
-      signature: credentials.get('x-signature'),
-      identity: credentials.get('x-identity'),
-      timestamp: credentials.get('x-timestamp'),
-      'access-token': credentials.get('x-access-token')
+      signature: credentials['x-signature'],
+      identity: credentials['x-identity'],
+      timestamp: credentials['x-timestamp'],
+      'access-token': credentials['x-access-token']
     })
 
     const url = new URL(coordinatorURL)
-    defaultLogger.log('Using Remote comms: ' + url)
 
     url.search = qs.toString()
 

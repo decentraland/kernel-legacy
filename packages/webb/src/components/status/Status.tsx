@@ -3,6 +3,7 @@ import React from 'react'
 import { Page, Center, Logo, Grid, Segment, Hero, Atlas } from 'decentraland-ui'
 
 import { RootState } from 'store'
+import { default as CommsStatus } from './CommsStatus/index'
 
 export default (_: RootState) => <Page>
   <Hero>
@@ -13,12 +14,7 @@ export default (_: RootState) => <Page>
   <Grid>
     <Grid.Row>
       <Grid.Column width={5}>
-        <Segment>
-          <h3>Communications</h3>
-          <h4>Status:</h4>
-          <h4>Rooms:</h4>
-          <h4>Users:</h4>
-        </Segment>
+        <CommsStatus />
         <Segment>
           <h3>Chat</h3>
         </Segment>

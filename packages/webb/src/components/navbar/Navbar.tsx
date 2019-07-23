@@ -18,7 +18,7 @@ export type NavbarProps = {
 
 export class Picture extends React.PureComponent<{ userId: string }> {
   render() {
-    return <img src={`https://s3.amazonaws.com/avatars-storage.decentraland.org/${this.props.userId}/face.png`} alt="Face" style={{ width: '48px', height: '48px', borderRadius: '40px' }} />
+    return <img src={`https://s3.amazonaws.com/nico.decentraland.zone/${this.props.userId}/face.png`} alt="Face" style={{ width: '48px', height: '48px', borderRadius: '40px' }} />
   }
 }
 

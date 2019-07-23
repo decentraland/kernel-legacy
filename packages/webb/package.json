@@ -16,6 +16,7 @@
     "@types/react-router": "^5.0.3",
     "auth0-js": "^9.11.2",
     "connected-react-router": "^6.5.2",
+    "decentraland-auth": "^0.12.0",
     "decentraland-auth-protocol": "^0.3.2",
     "decentraland-ui": "^2.6.0",
     "google-protobuf": "^3.9.0",
