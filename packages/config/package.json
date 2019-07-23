@@ -7,7 +7,11 @@
   "scripts": {
     "build": "tsc"
   },
-  "files": ["README.md", "*.js", "*.d.ts"],
+  "files": [
+    "README.md",
+    "*.js",
+    "*.d.ts"
+  ],
   "author": "The Decentraland Team <hello@decentraland.org",
   "license": "Apache-2.0",
   "dependencies": {

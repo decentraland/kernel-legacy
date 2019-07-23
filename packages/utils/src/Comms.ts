@@ -1,4 +1,5 @@
 export type MessageEntry = {
+  nfig
   id: string
   sender: string
   message: string

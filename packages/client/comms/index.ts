@@ -8,9 +8,8 @@ import { WorldInstanceConnection } from './worldInstanceConnection'
 import { BrokerConnection } from './BrokerConnection'
 import { CliBrokerConnection } from './CliBrokerConnection'
 import { IBrokerConnection } from './IBrokerConnection'
-import { AuthData } from './proto/comms'
 
-export async function connect(credentialsProvider: (message: string) => Promise<AuthData.AsObject>) {
+export async function connect(credentialsProvider: (message: string) => Promise<any>) {
   let commsBroker: IBrokerConnection
 
   if (USE_LOCAL_COMMS) {
@@ -23,10 +22,10 @@ export async function connect(credentialsProvider: (message: string) => Promise<
     const credentials = await credentialsProvider(body)
 
     const qs = new URLSearchParams({
-      signature: credentials['x-signature'],
-      identity: credentials['x-identity'],
-      timestamp: credentials['x-timestamp'],
-      'access-token': credentials['x-access-token']
+      signature: credentials.get('x-signature'),
+      identity: credentials.get('x-identity'),
+      timestamp: credentials.get('x-timestamp'),
+      'access-token': credentials.get('x-access-token')
     })
 
     const url = new URL(coordinatorURL)

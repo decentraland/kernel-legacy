@@ -1,6 +1,5 @@
 import { MessageInput, EphemeralKey, BasicEphemeralKey } from 'decentraland-auth-protocol'
 import { Communications } from '@dcl/config'
-import { AuthData } from 'comms/proto/comms'
 
 export function createHeaders(idToken: string) {
   const headers: Record<string, string> = {
@@ -10,25 +9,14 @@ export function createHeaders(idToken: string) {
   return headers
 }
 
-export async function getMessageCredentials(
-  accessToken: string,
-  message: string | null,
-  previousEphemeral: EphemeralKey
-) {
-  const msg = message === null ? null : Buffer.from(message)
+export async function getMessageCredentials(accessToken: string, message?: string, previousEphemeral?: EphemeralKey) {
+  const msg = !message ? Buffer.from('') : Buffer.from(message!)
   const input = MessageInput.fromMessage(msg)
 
   const ephemeralKey = previousEphemeral
     ? previousEphemeral
     : BasicEphemeralKey.generateNewKey(Communications.ephemeralKeyTTL)
-  const credentials = ephemeralKey.makeMessageCredentials(input, accessToken) as any
-  let result: Record<string, string> = {}
-
-  for (const [key, value] of credentials.entries()) {
-    result[key] = value
-  }
-
-  return result
+  return ephemeralKey.makeMessageCredentials(input, accessToken) as any
 }
 
 async function request(path: string, params: object): Promise<object> {

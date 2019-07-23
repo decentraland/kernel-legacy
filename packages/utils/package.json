@@ -13,10 +13,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@dcl/config": "file:manual/dcl-config-0.0.0.tgz",
-    "@types/node": "^12.6.8",
     "fp-future": "^1.0.1"
   },
   "devDependencies": {
+    "@types/node": "^12.6.8",
     "typescript": "^3.5.3"
   }
 }

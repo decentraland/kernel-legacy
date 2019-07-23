@@ -61,7 +61,7 @@ export const commsMiddleware = (store: Store<CommsRootState & AuthRootState>) =>
     case 'Login successful':
       if (needsInitialization(store, action)) {
         dispatch('Connecting')
-        startConnecting(store.getState().auth.accessToken!, dispatch)
+        startConnecting(action.payload.accessToken, dispatch)
       }
       break
   }
@@ -74,9 +74,7 @@ export function needsInitialization(store: Store<CommsRootState>, action: AnyAct
 
 export async function startConnecting(accessToken: string, dispatch: any) {
   try {
-    debugger
-    const flow = await connect(message => getMessageCredentials(message, accessToken).then(e => e as any))
-    debugger
+    const flow = await connect(message => getMessageCredentials(accessToken, message).then(e => e as any))
     dispatch('Connected!', flow)
   } catch (e) {
     dispatch('Error', e)

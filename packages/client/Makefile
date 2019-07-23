@@ -1,8 +1,7 @@
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
-.PHONY: first
-first: build
+all: build
 
 .PHONY: build first clean install update-utils
 
@@ -28,4 +27,4 @@ manual/dcl-rpc-0.0.0.tgz : ../rpc/dcl-rpc-0.0.0.tgz
 package-lock.json: package.json
 	npm install
 
-install: manual/dcl-utils-0.0.0.tgz manual/dcl-config-0.0.0.tgz manual/dcl-rpc-0.0.0.tgz package-lock.json
+install: manual/dcl-config-0.0.0.tgz manual/dcl-rpc-0.0.0.tgz manual/dcl-utils-0.0.0.tgz package-lock.json

@@ -57,7 +57,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string, public credentialsProvider: (message: string) => Promise<AuthData.AsObject>) {
+  constructor(public url: string, public credentialsProvider: (message: string) => Promise<AuthData>) {
     this.connectRTC()
     this.connectWS()
 
@@ -262,11 +262,13 @@ export class BrokerConnection implements IBrokerConnection {
     this.ws.binaryType = 'arraybuffer'
 
     this.ws.onerror = event => {
+      console.log(event)
       this.logger.error('socket error', event)
       this.ws = null
     }
 
     this.ws.onmessage = event => {
+      console.log(event)
       this.onWsMessage(event).catch(err => {
         this.logger.error(err)
       })

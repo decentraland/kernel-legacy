@@ -88,8 +88,10 @@ export const authMiddleware = (store: Store<RouterRootState & AuthRootState>) =>
       fetchVerificationCode(dispatch, action)
       break
     case 'Set verification':
-      dispatch('Checking verification code')
-      checkVerificationCode(store, dispatch, action)
+      if (store.getState().auth.summary === 'Awaiting verification') {
+        dispatch('Checking verification code')
+        checkVerificationCode(store, dispatch, action)
+      }
       break
     case 'Logout requested':
       AuthLib.logout()
