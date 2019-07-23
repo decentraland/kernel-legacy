@@ -1,6 +1,6 @@
 import 'webrtc-adapter'
 
-import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
+import { parcelLimits, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
 
 import { defaultLogger } from 'shared/logger'
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
@@ -14,12 +14,10 @@ import {
   localProfileUUID,
   getUser,
   removeById,
-  setLocalProfile,
   getCurrentUser,
   receiveUserData,
   receiveUserVisible,
   receiveUserPose,
-  getUserProfile,
   getPeer
 } from './peers'
 
@@ -54,13 +52,10 @@ export class Context {
 
   public currentPosition: Position | null = null
 
-  public network: ETHEREUM_NETWORK | null
-
   public worldInstanceConnection: WorldInstanceConnection | null = null
 
-  constructor(userProfile: UserInformation, network?: ETHEREUM_NETWORK) {
+  constructor(userProfile: UserInformation) {
     this.userProfile = userProfile
-    this.network = network || null
 
     this.commRadius = commConfigurations.commRadius
   }
@@ -344,12 +339,7 @@ function collectInfo(context: Context) {
   }
 }
 
-export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: Auth, ethAddress?: string) {
-  setLocalProfile(userId, {
-    ...getUserProfile(),
-    publicKey: ethAddress || null
-  })
-
+export async function connect(userId: string, auth: Auth) {
   const user = getCurrentUser()
   if (!user) {
     return
@@ -404,7 +394,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     processParcelSceneCommsMessage(context!, alias, data)
   }
 
-  context = new Context(userProfile, network)
+  context = new Context(userProfile)
   context.worldInstanceConnection = connection
 
   if (commConfigurations.debug) {

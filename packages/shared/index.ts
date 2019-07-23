@@ -3,13 +3,13 @@ import { Auth } from 'decentraland-auth'
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3 } from '../config'
+import { ETHEREUM_NETWORK, getTLD, PREVIEW } from '../config'
 
 import { getUserAccount, getNetwork } from './ethereum/EthereumService'
 import { awaitWeb3Approval } from './ethereum/provider'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { connect } from './comms'
-import { initialize, queueTrackingEvent } from './analytics'
+import { initialize } from './analytics'
 import { defaultLogger } from './logger'
 
 // TODO fill with segment keys and integrate identity server
@@ -40,7 +40,7 @@ function getNetworkFromTLD(): ETHEREUM_NETWORK | null {
   return null
 }
 
-async function getAddress(): Promise<string | undefined> {
+export async function getAddress(): Promise<string | undefined> {
   try {
     await awaitWeb3Approval()
     return await getUserAccount()
@@ -49,7 +49,7 @@ async function getAddress(): Promise<string | undefined> {
   }
 }
 
-async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
+export async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
   const web3Network = await getNetwork()
   const web3net = web3Network === '1' ? ETHEREUM_NETWORK.MAINNET : ETHEREUM_NETWORK.ROPSTEN
   // TLD environment have priority
@@ -64,7 +64,7 @@ async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
   return net
 }
 
-export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
+export async function initShared(container: HTMLElement): Promise<void> {
   const auth = new Auth()
 
   let user_id: string
@@ -92,42 +92,27 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   console['groupEnd']()
 
-  console['group']('connect#ethereum')
-  const address = await getAddress()
+  // console['group']('connect#ethereum')
+  // const address = await getAddress()
 
-  if (address) {
-    defaultLogger.log(`Identifying address ${address}`)
-    queueTrackingEvent('Use web3 address', { address })
-  }
+  // if (address) {
+  //   defaultLogger.log(`Identifying address ${address}`)
+  //   queueTrackingEvent('Use web3 address', { address })
+  // }
 
-  const net = await getAppNetwork()
-  queueTrackingEvent('Use network', { net })
+  // const net = await getAppNetwork()
+  // queueTrackingEvent('Use network', { net })
 
-  // Load contracts from https://contracts.decentraland.org
-  await setNetwork(net)
-  console['groupEnd']()
+  // // Load contracts from https://contracts.decentraland.org
+  // await setNetwork(net)
+  // console['groupEnd']()
 
   console['group']('connect#comms')
   await connect(
     user_id,
-    net,
-    auth,
-    address
+    auth
   )
   console['groupEnd']()
 
   initializeUrlPositionObserver()
-
-  // Warn in case wallet is set in mainnet
-  if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
-    const style = document.createElement('style')
-    style.appendChild(
-      document.createTextNode(
-        `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
-      )
-    )
-    document.head.appendChild(style)
-  }
-
-  return net
 }
