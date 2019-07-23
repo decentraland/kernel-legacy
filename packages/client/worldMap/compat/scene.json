@@ -1,0 +1,30 @@
+{
+  "display": {
+    "title": "Road at 10,10 (open road OpenRoad_0)",
+    "favicon": "favicon_asset"
+  },
+  "contact": {
+    "name": "name",
+    "email": "email"
+  },
+  "owner": "",
+  "scene": {
+    "parcels": [
+        "10,10"
+    ],
+    "base": "10,10"
+  },
+  "communications": {
+    "type": "webrtc",
+    "signalling": "https://signalling-01.decentraland.org"
+  },
+  "policy": {
+    "contentRating": "E",
+    "fly": true,
+    "voiceEnabled": true,
+    "blacklist": [],
+    "teleportPosition": ""
+  },
+  "main": "game.js",
+  "tags": []
+}

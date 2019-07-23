@@ -4,10 +4,14 @@ import { History } from 'history'
 
 import { authReducer } from 'modules/auth'
 import { commsReducer } from 'modules/comms'
+import { passportsReducer } from 'modules/passports'
+import { assetsReducer } from 'modules/assets'
 
 export const createReducer = (history: History) =>
   combineReducers({
     router: connectRouter(history) as (state: any, action: AnyAction) => RouterState,
     auth: authReducer,
-    comms: commsReducer
+    assets: assetsReducer,
+    comms: commsReducer,
+    passports: passportsReducer
   })

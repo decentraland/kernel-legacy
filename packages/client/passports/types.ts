@@ -11,7 +11,7 @@ export type ResolvedWearable = {
   contentMappings: []
 }
 
-export type StoredProfile = {
+export type StoredPassport = {
   userId: string
   name: string
   bio: string

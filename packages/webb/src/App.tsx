@@ -22,7 +22,7 @@ const App = () => {
           <Switch>
             <Route exact path="/login" component={Auth} />
             <Route exact path="/assets" component={Assets} />
-            <Route exact path="/" render={() => Home(store.getState())} />
+            <Route exact path="/" component={Home} />
             <Redirect to="/" path="/callback" />
           </Switch>
         </>

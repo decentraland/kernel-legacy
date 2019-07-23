@@ -2,7 +2,6 @@ import { Observable } from '@dcl/utils/dist/Observable'
 import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from '../comms/types'
 import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils/dist/SafeLocalStorage'
 
-export const getUserProfile = () => getFromLocalStorage('dcl-profile') || {}
 export const getBlockedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-blocked-users') || [])
 export const getMutedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-muted-users') || [])
 export const isMuted = (name: string) => getMutedUsers().has(name)
@@ -20,7 +19,6 @@ export function findPeerByName(displayName: string): UserInformation | null {
   }
   return null
 }
-
 
 /**
  * Removes both the peer information and the Avatar from the world.

@@ -6,5 +6,5 @@
     "baseUrl": "."
   },
   "extends": "../../tsconfig.json",
-  "include": ["./auth/**.ts", "./config/**.ts", "./comms/**.ts", "./comms/**/*.proto"]
+  "include": ["./auth/**.ts", "./config/**.ts", "./comms/**.ts", "./comms/**/*.proto", "./passports/*.ts"]
 }

@@ -1,2 +1,2 @@
-import { Assets } from './Assets'
+import { default as Assets } from './Assets.container'
 export default Assets

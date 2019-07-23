@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "assets": [
+    { "name": "game.js", "hash": "QmckEXEBPNBgdDJoVfCnryayQjQYSEb7pSX8Sa4wVCLHZt" },
+    { "name": "OpenRoad_0.glb", "hash": "QmYPxKPkobQkE7sXD6Q8Xxv5ZJRqQf4q6dGEP7Rh3z2cXA" }
+  ],
+  "assetTags": [
+    { "name": "required", "assets": ["game.js", "OpenRoad_0.glb"] }
+  ],
+  "requiredTags": ["required"],
+  "main": "game.js",
+  "basePosition": {
+    "rotation": { "y": 0 },
+    "translation": { "x": 0, "y": 0, "z": 0 }
+  },
+  "parcels": ["10,10"],
+  "contact": {
+    "name": "name",
+    "email": "email"
+  },
+  "spawnPoints": [
+    {
+      "name": "defaultSpawn",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 0
+      },
+      "default": true
+    }
+  ],
+  "display": {
+    "title": "Road at 10,10 (open road OpenRoad_0)"
+  }
+}
