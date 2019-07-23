@@ -15,9 +15,10 @@ export default class MyTerminal extends React.Component {
   render () {
     return (
       <Terminal
+        style={{ background: '#ffffff'}}
+        inputStyle={{ color: '#2f2f2c', height: '25px' }}
         commands={commands}
-        welcomeMessage={'Welcome to the React terminal!'}
-        promptLabel={'me@React:~$'}
+        promptLabel={'$'}
       />
     )
   }

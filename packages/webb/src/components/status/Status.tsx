@@ -4,6 +4,7 @@ import { Page, Center, Logo, Grid, Segment, Hero, Atlas } from 'decentraland-ui'
 
 import { RootState } from 'store'
 import { default as CommsStatus } from './CommsStatus/index'
+import MyTerminal from './Console';
 
 export default (_: RootState) => <Page>
   <Hero>
@@ -13,13 +14,10 @@ export default (_: RootState) => <Page>
   </Hero>
   <Grid>
     <Grid.Row>
-      <Grid.Column width={5}>
+      <Grid.Column width={6}>
         <CommsStatus />
-        <Segment>
-          <h3>Chat</h3>
-        </Segment>
       </Grid.Column>
-      <Grid.Column width={5}>
+      <Grid.Column width={6}>
         <Segment>
           <h3>Passport</h3>
           <p>name: <strong>eordano</strong></p>
@@ -28,6 +26,8 @@ export default (_: RootState) => <Page>
           <p>joined: <strong>1 / Jul / 2019</strong></p>
           <p>avatar: <a href='/'><strong>see detail</strong></a></p>
         </Segment>
+      </Grid.Column>
+      <Grid.Column width={4}>
         <Segment>
           <h3>Presence</h3>
           <p>position: <strong>10,30</strong> (15, 65, 20)</p>
@@ -35,13 +35,12 @@ export default (_: RootState) => <Page>
           <p>current scene: <a href='/'><strong>10,82</strong></a></p>
         </Segment>
       </Grid.Column>
-      <Grid.Column width={6}>
+    </Grid.Row>
+    <Grid.Row>
+      <Grid.Column>
         <Segment>
-          <h3>Scenes</h3>
-          <p><strong>Position:</strong> 0,0</p>
-          <div style={{ height: '140px', paddingBottom: '10px' }}>
-            <Atlas x={10} y={10}/>
-          </div>
+          <h3>Console</h3>
+          <MyTerminal />
         </Segment>
       </Grid.Column>
     </Grid.Row>
