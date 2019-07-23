@@ -21,7 +21,8 @@ import {
   setPlayModeBuilder,
   loadBuilderScene,
   updateBuilderScene,
-  readyBuilderScene
+  readyBuilderScene,
+  getMouseWorldPositionBuilder
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 
@@ -204,13 +205,13 @@ namespace editor {
     resetCameraBuilder()
   }
   export function getMouseWorldPosition() {
-    console.log('getMouseWorldPosition')
+    return getMouseWorldPositionBuilder()
   }
   export function loadImage() {
     console.log('loadImage')
   }
-  export function preloadFile() {
-    console.log('preloadFile')
+  export function preloadFile(url: string) {
+    console.log('preloadFile ' + url)
   }
   export function setCameraRotation() {
     console.log('setCameraRotation')

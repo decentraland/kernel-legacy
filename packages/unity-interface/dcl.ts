@@ -48,15 +48,22 @@ const positionEvent = {
   position: Vector3.Zero(),
   quaternion: Quaternion.Identity,
   rotation: Vector3.Zero(),
-  playerHeight: playerConfigurations.height
+  playerHeight: playerConfigurations.height,
+  mousePosition: Vector3.Zero()
 }
 
 /////////////////////////////////// HANDLERS ///////////////////////////////////
 
 const browserInterface = {
   /** Triggered when the camera moves */
-  ReportPosition(data: { position: ReadOnlyVector3; rotation: ReadOnlyQuaternion; playerHeight?: number }) {
+  ReportPosition(data: {
+    position: ReadOnlyVector3
+    rotation: ReadOnlyQuaternion
+    playerHeight?: number
+    mousePosition: ReadOnlyVector3
+  }) {
     positionEvent.position.set(data.position.x, data.position.y, data.position.z)
+    positionEvent.mousePosition.set(data.mousePosition.x, data.mousePosition.y, data.mousePosition.z)
     positionEvent.quaternion.set(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w)
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
     positionEvent.playerHeight = data.playerHeight || playerConfigurations.height
@@ -303,8 +310,7 @@ export function setCameraZoomDeltaBuilder(delta: number) {
 }
 
 export function getCameraTargetBuilder() {
-  return { x: 0, y: 0, z: 0 }
-  //unityInterface.sendBuilderMessage('GetCameraTarget')
+  return positionEvent.position
 }
 
 export function resetCameraBuilder() {
@@ -313,6 +319,10 @@ export function resetCameraBuilder() {
 
 export function setPlayModeBuilder(on: string) {
   unityInterface.sendBuilderMessage('SetPlayMode', on)
+}
+
+export function getMouseWorldPositionBuilder() {
+  return positionEvent.mousePosition
 }
 
 let currentLoadedScene: SceneWorker
