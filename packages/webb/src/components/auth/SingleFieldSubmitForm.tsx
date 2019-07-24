@@ -52,7 +52,6 @@ export class SingleFieldSubmitForm extends React.PureComponent<SingleFieldSubmit
                 focus={true}
                 className={FOCUS_CLASS_NAME}
                 value={this.state.value}
-                onAction={this.submit}
                 onChange={this.change}
                 ref={(input: Field | null) => this.input = input as any}
               />

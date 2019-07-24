@@ -96,6 +96,8 @@ export class Assets extends React.PureComponent<AssetsState & { switch: any }, T
     }))
   }
 
+  clearSelection = () => this.setState({ currentPack: '', currentAsset: '', currentCategory: ''})
+
   render() {
     return <Page>
       <Hero>
@@ -104,8 +106,8 @@ export class Assets extends React.PureComponent<AssetsState & { switch: any }, T
         </Center>
       </Hero>
       <Tabs>
-        <Tabs.Tab active={!this.currentPlaceable} onClick={() => this.props.switch('wearable')}>Wearables</Tabs.Tab>
-        <Tabs.Tab active={this.currentPlaceable} onClick={() => this.props.switch('placeable')}>Placeables</Tabs.Tab>
+        <Tabs.Tab active={!this.currentPlaceable} onClick={() => this.props.switch('wearable') && this.clearSelection()}>Wearables</Tabs.Tab>
+        <Tabs.Tab active={this.currentPlaceable} onClick={() => this.props.switch('placeable') && this.clearSelection()}>Placeables</Tabs.Tab>
       </Tabs>
       <Grid>
           {

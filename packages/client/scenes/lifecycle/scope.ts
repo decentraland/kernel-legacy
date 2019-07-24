@@ -1,4 +1,4 @@
-import { Vector2 } from 'atomicHelpers/landHelpers'
+import { Vector2 } from '@dcl/utils/dist/Vector'
 
 export interface ParcelConfigurationOptions {
   lineOfSightRadius: number

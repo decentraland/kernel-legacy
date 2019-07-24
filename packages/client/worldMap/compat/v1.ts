@@ -1,7 +1,23 @@
 export function upgradeToV2(scene: any, mappings: any) {
+  if (!mappings.data || !mappings.data[0] || !mappings.data[0].content || !mappings.data[0].content.contents) {
+    throw new Error('Invalid mappings: key `data[0].content.contents` not found')
+  }
+  if (!Array.isArray(mappings.data[0].content.contents)) {
+    throw new Error('Invalid mappings: key `data[0].content.contents` must be an array')
+  }
+  const sceneJson = mappings.data[0].content.contents.filter((f: any) => f.file === 'scene.json')
+  if (!sceneJson || !sceneJson.length) {
+    throw new Error('Invalid mappings: file `scene.json` not found')
+  }
+  const allContainFileAndHash = mappings.data[0].content.contents.filter((f: any) => !(f.file && f.hash))
+  if (!allContainFileAndHash) {
+    throw new Error('Invalid mappings: all files must have a `file` and `hash` value')
+  }
   return {
     version: 2,
-    assets: mappings.data[0].content.contents.filter((f: any) => f.file !== 'scene.json').map((value: any) => ({ name: value.file, hash: value.hash })),
+    assets: mappings.data[0].content.contents
+      .filter((f: any) => f.file !== 'scene.json')
+      .map((value: any) => ({ name: value.file, hash: value.hash })),
     assetTags: [
       {
         name: 'required',

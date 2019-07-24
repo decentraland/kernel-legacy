@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "../../dist/renderer",
-    "baseUrl": "."
-  },
-  "extends": "../../tsconfig.json"
-}

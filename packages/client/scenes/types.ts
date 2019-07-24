@@ -1,4 +1,31 @@
 import { Vector3 } from '@dcl/utils/dist/Vector'
+
+export interface SceneManifest {
+  version: number
+  assets: AssetDefinition[]
+  assetTags: AssetTagDefinition[]
+  requiredAssets: AssetDefinition[]
+  main: string
+  referenceSystem: ReferenceSystem
+  parcels: NonEmptyCoordinateArray
+  spawnPoints: SpawnPoint[]
+  title: string
+  screenshot: string
+}
+
+export interface UnsanitizedSceneManifest {
+  version: number
+  assets: AssetDefinition[]
+  assetTags?: AssetTagDefinition[]
+  requiredTags?: string[]
+  main: string
+  referenceSystem?: ReferenceSystem
+  parcels: NonEmptyCoordinateDefinitionArray
+  contact?: Record<string, string>
+  spawnPoints?: [SpawnPoint, ...SpawnPoint[]]
+  display?: DisplayDefinition
+}
+
 export type NamedAsset = { name: string; hash: string }
 export type URIAsset = { name: string; uri: string }
 
@@ -58,29 +85,3 @@ export type SpawnPoint = {
 
 export type NonEmptyCoordinateDefinitionArray = [CoordinateDefinition, ...CoordinateDefinition[]]
 export type NonEmptyCoordinateArray = [Coordinate, ...Coordinate[]]
-
-export interface SceneJson {
-  version: number
-  assets: AssetDefinition[]
-  assetTags?: AssetTagDefinition[]
-  requiredTags?: string[]
-  main: string
-  referenceSystem?: ReferenceSystem
-  parcels: NonEmptyCoordinateDefinitionArray
-  contact?: Record<string, string>
-  spawnPoints?: [SpawnPoint, ...SpawnPoint[]]
-  display?: DisplayDefinition
-}
-
-export interface WellDefinedScene {
-  version: number
-  assets: AssetDefinition[]
-  assetTags: AssetTagDefinition[]
-  requiredAssets: AssetDefinition[]
-  main: string
-  referenceSystem: ReferenceSystem
-  parcels: NonEmptyCoordinateArray
-  spawnPoints: SpawnPoint[]
-  title: string
-  screenshot: string
-}
