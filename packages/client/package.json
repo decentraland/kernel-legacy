@@ -33,9 +33,6 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
-    "@dcl/config": "file:manual/dcl-config-0.0.0.tgz",
-    "@dcl/rpc": "file:manual/dcl-rpc-0.0.0.tgz",
-    "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz",
     "@types/auth0-js": "^9.10.2",
     "auth0-js": "^9.11.2",
     "decentraland-auth-protocol": "^0.3.2",
