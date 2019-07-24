@@ -32,7 +32,7 @@ export class Navbar extends React.PureComponent<NavbarProps> {
     return <UINavbar isFullscreen leftMenu={
       <>
         <Menu.Item link={true} onClick={this.goTo('/')} active={this.props.currentPage === '/'}>Status</Menu.Item>
-        <Menu.Item link={true} onClick={this.goTo('/map')} active={this.props.currentPage === '/map'}>World</Menu.Item>
+        <Menu.Item link={true} onClick={this.goTo('/map')} active={this.props.currentPage === '/map' || this.props.currentPage.startsWith('/parcel')}>World</Menu.Item>
         <Menu.Item link={true} onClick={this.goTo('/assets')} active={this.props.currentPage === '/assets'}>Assets</Menu.Item>
       </>
     } rightMenu={
