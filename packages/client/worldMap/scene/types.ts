@@ -1,4 +1,4 @@
-import { Vector3, Vector2, Quaternion, QuaternionRange, Coordinate } from '@dcl/utils/dist/Vector'
+import { Vector3 } from '@dcl/utils/dist/Vector'
 export type NamedAsset = { name: string; hash: string }
 export type URIAsset = { name: string; uri: string }
 

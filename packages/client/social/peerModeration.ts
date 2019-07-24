@@ -38,39 +38,6 @@ export function removeById(uuid: UUID) {
 }
 
 /**
- * This function is used to get the current user's information. The result is read-only.
- */
-export function getCurrentPeer(): Readonly<PeerInformation> | null {
-  if (!localProfileUUID) return null
-  return peerMap.get(localProfileUUID) || null
-}
-
-/**
- * This function is used to get the current user's information. The result is read-only.
- */
-export function getCurrentUser(): Readonly<UserInformation> | null {
-  const user = getUserProfile()
-  return user || null
-}
-
-/**
- * This function is used to get the current user's information. The result is read-only.
- */
-export function getPeer(uuid: UUID): Readonly<PeerInformation> | null {
-  if (!uuid) return null
-  return peerMap.get(uuid) || null
-}
-
-/**
- * This function is used to get the current user's information. The result is read-only.
- */
-export function getUser(uuid: UUID): Readonly<UserInformation> | null {
-  const peer = getPeer(uuid)
-  if (!peer) return null
-  return peer.user || null
-}
-
-/**
  * If not exist, sets up a new avatar and profile object
  * @param uuid
  */

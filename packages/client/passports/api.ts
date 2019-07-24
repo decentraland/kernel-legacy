@@ -1,7 +1,7 @@
 import { get } from '../auth/api'
 
 export function getStoredPassportForUser(accessToken: string /*, userId: string */) {
-  return get(`https://avatars-api.decentraland.today/api/profile`, accessToken)
+  return get(`https://avatars-api.decentraland.org/api/profile`, accessToken)
   // this should actualy be return fetch(`https://avatars-api.decentraland.today/api/profile/${userId}`, createHeaders(accessToken))
 }
 

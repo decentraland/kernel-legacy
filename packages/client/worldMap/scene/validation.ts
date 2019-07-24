@@ -4,7 +4,6 @@ import {
   AssetDefinition,
   AssetTagDefinition,
   ReferenceSystem,
-  Vector3,
   CoordinateDefinition,
   Coordinate,
   SpawnPoint,
@@ -13,6 +12,7 @@ import {
   Range2,
   YRotation
 } from './types'
+import { Vector3 } from '@dcl/utils/dist/Vector'
 
 export function getInvalidReason(arg: any) {
   if (!hasValidVersion(arg)) {
