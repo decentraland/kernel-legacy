@@ -35,7 +35,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
-  private gotCandidatesFuture = future<RTCSessionDescription>()
+  public gotCandidatesFuture = future<RTCSessionDescription>()
   private unreliableFuture = future<void>()
   private reliableFuture = future<void>()
 
