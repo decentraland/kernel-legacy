@@ -1,4 +1,4 @@
-import { Vector3 } from '@dcl/utils/dist/Vector'
+import { Vector3 } from '../Vector'
 
 export interface SceneManifest {
   version: number

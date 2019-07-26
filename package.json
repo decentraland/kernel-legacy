@@ -1,19 +1,36 @@
 {
   "dependencies": {
+    "@microsoft/api-documenter": "^7.3.8",
+    "@microsoft/api-extractor": "^7.3.2",
+    "@types/google-protobuf": "^3.7.1",
+    "@types/semver": "^6.0.1",
+    "dcl-tslint-config-standard": "^2.0.0",
+    "git-rev-sync": "^1.12.0",
+    "prettier": "^1.18.2",
+    "typescript-tslint-plugin": "^0.5.4",
     "@babel/runtime": "^7.2.0",
     "@bazel/ibazel": "^0.9.1",
     "@bazel/typescript": "^0.32.2",
+    "@types/auth0-js": "^9.10.2",
+    "@types/yargs": "^13.0.0",
+    "auth0-js": "^9.11.2",
     "chalk": "^2.4.2",
+    "decentraland-auth-protocol": "^0.3.2",
+    "devtools-protocol": "^0.0.681005",
     "escodegen": "^1.11.1",
     "espree": "^6.0.0",
     "estraverse": "^4.2.0",
+    "fp-future": "^1.0.1",
     "glob": "^7.1.4",
+    "google-protobuf": "^3.9.0",
     "jsdoc": "^3.6.3",
     "minimist": "^1.2.0",
     "tmp": "^0.1.0",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3",
     "uglify-es": "^3.3.9",
-    "uglify-js": "^3.6.0"
+    "uglify-js": "^3.6.0",
+    "webrtc-adapter": "^7.2.8",
+    "yargs": "^13.3.0"
   }
 }

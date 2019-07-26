@@ -1,7 +1,7 @@
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
 load("//:version.bzl", "DCL_VERSION")
 
-def dataform_npm_package(name, deps, srcs = [], package_layers = []):
+def dcl_npm_package(name, deps, srcs = [], package_layers = []):
     native.genrule(
         name = name + "_gen_package_json",
         srcs = package_layers,

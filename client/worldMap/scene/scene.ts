@@ -9,7 +9,7 @@ import {
   AssetTagDefinition,
   ReferenceSystem,
   SpawnPoint
-} from './types'
+} from '@dcl/utils/scene'
 import { createHash } from 'crypto'
 
 export function parseCoordinate(coord: CoordinateDefinition) {
@@ -93,9 +93,7 @@ export class Scene implements WellDefinedScene {
 
   get requiredAssets(): AssetDefinition[] {
     if (!this._requiredAssets) {
-      const filteredTags = this.assetTags.filter(
-        assetTag => this.requiredTags.includes(assetTag.name)
-      )
+      const filteredTags = this.assetTags.filter(assetTag => this.requiredTags.includes(assetTag.name))
       const mappedTags = filteredTags.map(assetTag => assetTag.assets as string[])
       const reducedTags = mappedTags.reduce((a, b) => a.concat(b), [])
       const requiredAssetNames = reducedTags.concat([this.main])

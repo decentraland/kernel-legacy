@@ -1,6 +1,6 @@
 import { Dictionary } from '../common/core/EventDispatcher'
 import { TransportBasedServer } from './TransportBasedServer'
-import { APIClass, API, APIOptions } from './API'
+import { APIClass, API, APIOptions } from '../common/API'
 import { ScriptingTransport } from '../common/json-rpc/types'
 import { hasOwnSymbol } from '../common/core/SymbolShim'
 

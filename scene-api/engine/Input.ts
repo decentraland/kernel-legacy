@@ -2,7 +2,7 @@
 // tslint:disable:ter-indent
 
 import { DecentralandInterface, PointerEvent } from './Types'
-import { MVector3 } from '../../../utils/src/math'
+import { MVector3 } from '../../utils/math'
 import { Component, DisposableComponent } from '../ecs/Component'
 
 declare let dcl: DecentralandInterface | void

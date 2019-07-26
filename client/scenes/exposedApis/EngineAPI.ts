@@ -1,12 +1,8 @@
-import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host'
+import { registerAPI, exposeMethod, APIOptions } from '@dcl/rpc/host'
 
 import { ExposableAPI } from './ExposableAPI'
-import { EntityAction } from '../types'
-import { ParcelSceneAPI } from 'scenes/src/scene-worker/worker'
-import {
-  IEventNames,
-  IEvents
-} from 'scene-lifecycle/src/handler/node_modules/scene-runner/node_modules/decentraland-ecs/src/decentraland/Types'
+import { EntityAction } from '@dcl/utils/BagOfThings'
+import { IEventNames, IEvents } from './'
 
 export interface IEngineAPI {
   /**

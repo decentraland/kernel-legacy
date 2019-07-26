@@ -1,4 +1,4 @@
-import { registerAPI, exposeMethod, API } from 'decentraland-rpc/lib/host'
+import { registerAPI, exposeMethod, API } from '@dcl/rpc/host'
 
 // THIS INTERFACE MOCKS THE chromedevtools API
 import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'

@@ -1,5 +1,7 @@
 {
   "name": "@dcl/utils",
   "dependencies": {
+    "fp-future": "*",
+    "@dcl/config": "$DCL_VERSION"
   }
 }

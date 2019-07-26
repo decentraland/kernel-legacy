@@ -3,13 +3,20 @@ package(default_visibility = ["//visibility:public"])
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
-    name = "utils",
+    name = "client",
     srcs = glob(["**/*.ts"]),
-    module_name = "@dcl/utils",
+    module_name = "@dcl/client",
     deps = [
         "//config",
+        "//utils",
         "@npm//@types",
+        "@npm//@types/auth0-js",
+        "@npm//auth0-js",
+        "@npm//decentraland-auth-protocol",
+        "@npm//devtools-protocol",
         "@npm//fp-future",
+        "@npm//google-protobuf",
+        "@npm//webrtc-adapter",
     ],
 )
 
@@ -20,9 +27,9 @@ dcl_npm_package(
     package_layers = [
         "//:common.package.json",
         "//:tslib.package.json",
-        "utils.package.json",
+        "client.package.json",
     ],
-    deps = [":utils"],
+    deps = [":client"],
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")

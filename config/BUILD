@@ -3,13 +3,11 @@ package(default_visibility = ["//visibility:public"])
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
-    name = "utils",
+    name = "config",
     srcs = glob(["**/*.ts"]),
-    module_name = "@dcl/utils",
+    module_name = "@dcl/config",
     deps = [
-        "//config",
         "@npm//@types",
-        "@npm//fp-future",
     ],
 )
 
@@ -19,10 +17,9 @@ dcl_npm_package(
     name = "package",
     package_layers = [
         "//:common.package.json",
-        "//:tslib.package.json",
-        "utils.package.json",
+        "//:tslib.package.json"
     ],
-    deps = [":utils"],
+    deps = [":config"],
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")

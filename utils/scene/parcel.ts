@@ -1,4 +1,4 @@
-import { parcelLimits } from '@dcl/config/dist/World'
+import { parcelLimits } from '@dcl/config/World'
 
 import { Vector3, Vector2 } from '../Vector'
 import { isEqual2 } from '../pure/vectorHelpers'

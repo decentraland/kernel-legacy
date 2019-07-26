@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./packages",
+    "baseUrl": ".",
     "paths": {
       "dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"],
       "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "stripInternal": true,
     "inlineSourceMap": false,
+    "downlevelIteration": true,
     "inlineSources": false,
     "esModuleInterop": true,
     "noImplicitAny": false,
@@ -26,5 +27,5 @@
     "jsx": "react",
     "lib": ["esnext", "dom"]
   },
-  "exclude": ["bazel-*", "node_modules"]
+  "exclude": ["bazel-*", "node_modules", "**/node_modules/*"]
 }

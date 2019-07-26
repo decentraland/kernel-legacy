@@ -3,17 +3,6 @@
   "version": "0.0.0",
   "description": "Client libraries for Decentraland",
   "repository": "https://github.com/decentraland/explorer",
-  "module": "dist/index.js",
-  "scripts": {
-    "clean": "rm -rf dist/*",
-    "build": "tsc",
-    "lint": "prettier --write ./**/*.ts && tslint ../../tslint.json",
-    "lint:fix": "prettier --write ./**/*.ts && tslint --fix ../../tslint.json"
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "prettier": {
     "semi": false,
     "singleQuote": true,
@@ -26,7 +15,6 @@
     "@types/semver": "^6.0.1",
     "dcl-tslint-config-standard": "^2.0.0",
     "git-rev-sync": "^1.12.0",
-    "husky": "^3.0.0",
     "prettier": "^1.18.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3",
