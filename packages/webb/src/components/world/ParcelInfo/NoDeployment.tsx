@@ -5,8 +5,8 @@ export function NoDeployment() {
   return <Segment>
     <HeaderMenu>
       <HeaderMenu.Left>
-        <Header>No deployment found for this scene</Header>
+        <Header>No deployment found for this parcel</Header>
       </HeaderMenu.Left>
     </HeaderMenu>
-  </Segment>;
+  </Segment>
 }

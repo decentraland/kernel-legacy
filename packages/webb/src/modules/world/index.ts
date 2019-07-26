@@ -15,7 +15,7 @@ export type WorldActions = [
 
 export type ParcelData = { x: number, y: number, owner: string, district_id?: string, estate_id?: string, update_operator?: string, operator?: string }
 
-export type Loading = { loading: boolean }
+export type Loading = { loading: boolean, empty?: boolean }
 
 export type StringOrLoading = string | Loading
 
@@ -68,6 +68,8 @@ export function worldReducer(state?: WorldState, action?: AnyAction): WorldState
       return { ...state, parcelData: {...state.parcelData, [`${action.payload.x}.${action.payload.y}`]: { loading: true } } }
     case 'Loading parcel to scene mapping':
       return { ...state, coordinateToScene: { ...state.coordinateToScene, [`${action.payload.parcel.x}.${action.payload.parcel.y}`]: { loading: true } } }
+    case 'Empty scene data':
+      return { ...state, coordinateToScene: { ...state.coordinateToScene, [`${action.payload.parcel.x}.${action.payload.parcel.y}`]: { loading: false, empty: true } } }
     case 'Loading scene file mappings':
       return { ...state, mappings: { ...state.mappings, [action.payload.scene]: { loading: true } }}
     case 'Loading scene json data':
@@ -132,10 +134,14 @@ export async function fetchParcelToSceneMapping(store: Store<WorldRootState>, pa
   const dispatch = (type: any, payload?: any) => typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
   const { parcel } = payload
   const apiData = await jsonFetch(`https://content.decentraland.org/scenes?x1=${parcel.x}&x2=${parcel.x}&y1=${parcel.y}&y2=${parcel.y}`)
+  let thisScene = ''
   for (let value of apiData.data) {
     const [ dx, dy ] = value.parcel_id.split(',').map((_: string) => parseInt(_, 10))
-    const thisScene = value.scene_cid
+    thisScene = value.scene_cid
     dispatch({ type: 'Set coordinate to scene data', payload: { x: dx, y: dy, scene: thisScene } })
+  }
+  if (!thisScene) {
+    dispatch({ type: 'Empty scene data', payload: { parcel } })
   }
 }
 export async function fetchSceneMappings(store: Store<WorldRootState>, payload: { x: number, y: number, scene: string }) {

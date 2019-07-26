@@ -17,7 +17,8 @@ export class SceneInfo extends React.Component<any> {
     if (loading) {
       return LoadingSceneInfo();
     }
-    if (!this.props.coordinateToScene[coordinate]) {
+    const empty = this.props.coordinateToScene[coordinate].empty
+    if (empty || !this.props.coordinateToScene[coordinate]) {
       return NoDeployment();
     }
     const scene = this.props.coordinateToScene[coordinate];
@@ -41,7 +42,8 @@ export class SceneInfo extends React.Component<any> {
           </Header>
         </HeaderMenu.Right>
       </HeaderMenu>
-      <p>Full id: <pre>{scene}</pre></p>
+      <p>Full id: </p>
+      <pre>{scene}</pre>
       <TabbedSceneInfo {...{sceneJson, mappings }} />
     </Segment>
   }
@@ -62,7 +64,7 @@ export class TabbedSceneInfo extends React.Component<any, any> {
     return <>
       { tabs.map(
           ({ name, title }) => {
-            return <Tabs.Tab active={this.state.tab === name} onClick={this.setTab(name)}>
+            return <Tabs.Tab key={name} active={this.state.tab === name} onClick={this.setTab(name)}>
               {title}
             </Tabs.Tab>
           }

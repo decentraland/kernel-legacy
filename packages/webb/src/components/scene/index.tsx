@@ -11,16 +11,16 @@ export default class Scene extends React.Component {
       <Grid>
         <Grid.Column width={6}>
           <Segment>
-                  <HeaderMenu>
-                    <HeaderMenu.Left>
-                      <Header>Scene Status</Header>
-                    </HeaderMenu.Left>
-                    <HeaderMenu.Right>
-                      <Header>
-                        <Button basic>Reload &nbsp; <Icon name="refresh" /></Button>
-                      </Header>
-                    </HeaderMenu.Right>
-                  </HeaderMenu>
+            <HeaderMenu>
+              <HeaderMenu.Left>
+                <Header>Scene Status</Header>
+              </HeaderMenu.Left>
+              <HeaderMenu.Right>
+                <Header>
+                  <Button basic>Reload &nbsp; <Icon name="refresh" /></Button>
+                </Header>
+              </HeaderMenu.Right>
+            </HeaderMenu>
             <p>Initialized</p>
             <p>Downloaded assets</p>
             <p>Current limits</p>
@@ -89,44 +89,6 @@ export default class Scene extends React.Component {
               <li>OnClick</li>
               <li>Ethereum</li>
             </ul>
-          </Segment>
-        </Grid.Column>
-        <Grid.Column width={16}>
-          <Segment>
-            <Header>Source Code</Header>
-            <pre>{`// Create a group to track all entities with a Transform component
-const myGroup = engine.getComponentGroup(Transform)
-
-// Define a System
-export class RotatorSystem implements ISystem {
-  // The update function runs on every frame of the game loop
-  update() {
-    // The function iterates over all the entities in myGroup
-    for (let entity of myGroup.entities) {
-      const transform = entity.getComponent(Transform)
-      transform.rotate(Vector3.Left(), 0.1)
-    }
-  }
-}
-
-// Add the system to the engine
-engine.addSystem(new RotatorSystem())
-
-// Create an entity
-const cube = new Entity()
-
-// Give the entity a transform component
-cube.addComponent(new Transform({
-  position: new Vector3(5, 1, 5)
-}))
-
-// Give the entity a box shape
-cube.addComponent(new BoxShape())
-
-// Add the entity to the engine
-engine.addEntity(cube)
-            `}
-            </pre>
           </Segment>
         </Grid.Column>
       </Grid>

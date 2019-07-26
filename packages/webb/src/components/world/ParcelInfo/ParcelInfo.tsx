@@ -1,33 +1,12 @@
 import React from 'react'
 
-import { Atlas, Center, Grid, Hero, Layer, Page } from 'decentraland-ui'
+import { Center, Grid, Hero, Page } from 'decentraland-ui'
 
 import { OwnershipInfo } from './OwnershipInfo'
 import { SceneInfo } from './SceneInfo'
+import { MapPreview } from './MapPreview'
 
 export default class ParcelInfo extends React.Component<any> {
-
-  isHighlighted = (x: number, y: number) => this.props.parcel.x === x && this.props.parcel.y === y
-
-  hoverFillLayer: Layer = (x, y) => {
-    if (this.isHighlighted(x, y)) {
-      return {
-        color: '#99ff90',
-        scale: 1.2,
-      };
-    }
-    return null;
-  }
-
-  hoverStrokeLayer: Layer = (x, y) => {
-    if (this.isHighlighted(x, y)) {
-      return {
-        color: '#44ff00',
-        scale: 1.5,
-      };
-    }
-    return null;
-  }
 
   render() {
     return <Page>
@@ -40,7 +19,7 @@ export default class ParcelInfo extends React.Component<any> {
       <Grid>
         <Grid.Row>
           <Grid.Column width={4} style={{ maxHeight: '600px' }}>
-            <Atlas x={this.props.parcel.x} y={this.props.parcel.y} layers={[this.hoverStrokeLayer, this.hoverFillLayer]} isDraggable={false} />
+            <MapPreview x={parseInt(this.props.parcel.x, 10)} y={parseInt(this.props.parcel.y, 10)} {...this.props}/>
           </Grid.Column>
           <Grid.Column width={12}>
             <Grid>
