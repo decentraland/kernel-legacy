@@ -1,34 +1,30 @@
 {
   "compilerOptions": {
+    "baseUrl": "./packages",
+    "paths": {
+      "dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"],
+      "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
+    },
     "module": "commonjs",
-    "target": "es5",
-    "esModuleInterop": true,
     "diagnostics": false,
-    "inlineSourceMap": false,
-    "inlineSources": false,
-    "sourceMap": true,
     "moduleResolution": "node",
     "stripInternal": true,
-    "strictNullChecks": true,
-    "pretty": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo",
-    "emitDecoratorMetadata": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
     "noUnusedLocals": true,
     "declaration": true,
-    "outDir": "./dist",
-    "plugins": [
-      {
-        "name": "tslint-language-service"
-      }
-    ]
+    "preserveConstEnums": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "removeComments": true,
+    "target": "es5",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "lib": ["esnext", "dom"]
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "public"
-  ]
+  "exclude": ["bazel-*", "node_modules"]
 }

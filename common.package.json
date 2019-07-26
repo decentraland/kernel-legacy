@@ -1,0 +1,13 @@
+{
+  "version": "$DCL_VERSION",
+  "homepage": "https://github.com/decentraland",
+  "license": "MIT",
+  "keywords": [
+    "decentraland",
+    "dcl",
+    "virtual world"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@babel/runtime": "^7.2.0",
+    "@bazel/ibazel": "^0.9.1",
+    "@bazel/typescript": "^0.32.2",
+    "chalk": "^2.4.2",
+    "escodegen": "^1.11.1",
+    "espree": "^6.0.0",
+    "estraverse": "^4.2.0",
+    "glob": "^7.1.4",
+    "jsdoc": "^3.6.3",
+    "minimist": "^1.2.0",
+    "tmp": "^0.1.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
+    "uglify-es": "^3.3.9",
+    "uglify-js": "^3.6.0"
+  }
+}

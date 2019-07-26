@@ -15,11 +15,11 @@ export class SceneInfo extends React.Component<any> {
       || !this.props.coordinateToScene[coordinate]
       || this.props.coordinateToScene[coordinate].loading;
     if (loading) {
-      return LoadingSceneInfo();
+      return LoadingSceneInfo()
     }
     const empty = this.props.coordinateToScene[coordinate].empty
     if (empty || !this.props.coordinateToScene[coordinate]) {
-      return NoDeployment();
+      return NoDeployment()
     }
     const scene = this.props.coordinateToScene[coordinate];
     const loadingMapping = !this.props.mappings[scene]
@@ -27,7 +27,7 @@ export class SceneInfo extends React.Component<any> {
       || !this.props.sceneJson[scene]
       || this.props.sceneJson[scene].loading;
     if (loadingMapping) {
-      return LoadingSceneInfo();
+      return LoadingSceneInfo()
     }
     const mappings = this.props.mappings[scene];
     const sceneJson = this.props.sceneJson[scene];
