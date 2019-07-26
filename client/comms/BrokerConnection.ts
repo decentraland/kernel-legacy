@@ -2,8 +2,8 @@ import { future } from 'fp-future'
 import { Message } from 'google-protobuf'
 
 import { Communications } from '@dcl/config'
-import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
-import { Observable } from '@dcl/utils/dist/Observable'
+import { ILogger, createLogger } from '@dcl/utils/Logger'
+import { Observable } from '@dcl/utils/Observable'
 
 import {
   MessageType,

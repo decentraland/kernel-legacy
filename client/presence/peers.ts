@@ -1,5 +1,5 @@
-import { Vector3 } from '@dcl/utils/dist/Vector'
-import { Quaternion } from '@dcl/utils/dist/math/Quaternion'
+import { Vector3 } from '@dcl/utils/Vector'
+import { Quaternion } from '@dcl/utils/math/Quaternion'
 
 /**
  * This class

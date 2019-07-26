@@ -1,9 +1,9 @@
-import { isValidSceneObject } from './validation'
+import { isValidSceneInput } from './validation'
 import {
-  WellDefinedScene,
+  UnsanitizedSceneManifest,
   CoordinateDefinition,
   Coordinate,
-  SceneJson,
+  SceneManifest,
   NonEmptyCoordinateArray,
   AssetDefinition,
   AssetTagDefinition,
@@ -24,8 +24,8 @@ export function getMinimum(coords: Coordinate[]) {
   return coords.sort((a, b) => (a.x > b.x ? 1 : a.x === b.x ? a.y - b.y : -1))[0]
 }
 
-export class Scene implements WellDefinedScene {
-  raw: SceneJson
+export class Scene implements SceneManifest {
+  raw: UnsanitizedSceneManifest
 
   private _requiredAssets?: AssetDefinition[]
   private _referenceSystem?: ReferenceSystem
@@ -37,7 +37,7 @@ export class Scene implements WellDefinedScene {
   private _cannonicalCID?: string
 
   constructor(raw: any) {
-    if (!isValidSceneObject(raw)) {
+    if (!isValidSceneInput(raw)) {
       throw new Error('Invalid input')
     }
     this.raw = raw

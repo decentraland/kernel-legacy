@@ -4,7 +4,7 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
     name = "client",
-    srcs = glob(["**/*.ts"]),
+    srcs = glob(["auth/**/*.ts", "comms/**/*.ts", "config/**/*.ts", "passports/**/*.ts", "presence/**/*.ts", "social/**/*.ts", "worldMap/**/*.ts"]),
     module_name = "@dcl/client",
     deps = [
         "//config",

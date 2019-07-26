@@ -1,6 +1,7 @@
-import { Observable } from '@dcl/utils/dist/Observable'
+import { Observable } from '@dcl/utils/Observable'
+import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils/SafeLocalStorage'
+
 import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from '../comms/types'
-import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils/dist/SafeLocalStorage'
 
 export const getBlockedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-blocked-users') || [])
 export const getMutedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-muted-users') || [])

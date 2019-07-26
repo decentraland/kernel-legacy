@@ -1,6 +1,6 @@
-import { Color3 } from '@dcl/utils/dist/math/Color3'
-import { Vector3 } from '@dcl/utils/dist/Vector'
-import { Quaternion } from '@dcl/utils/dist/math/Quaternion'
+import { Color3 } from '@dcl/utils/math/Color3'
+import { Vector3 } from '@dcl/utils/Vector'
+import { Quaternion } from '@dcl/utils/math/Quaternion'
 
 export type AssetNameAndHash = { name: string; hash: string }
 

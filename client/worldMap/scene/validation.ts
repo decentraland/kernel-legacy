@@ -1,6 +1,5 @@
 import { isArray, isNumber } from 'util'
 import {
-  SceneJson,
   AssetDefinition,
   AssetTagDefinition,
   ReferenceSystem,
@@ -10,9 +9,10 @@ import {
   Vector3Range,
   NumberOrRange,
   Range2,
-  YRotation
-} from './types'
-import { Vector3 } from '@dcl/utils/dist/Vector'
+  YRotation,
+  UnsanitizedSceneManifest
+} from '@dcl/utils/scene/types'
+import { Vector3 } from '@dcl/utils/Vector'
 
 export function getInvalidReason(arg: any) {
   if (!hasValidVersion(arg)) {
@@ -47,7 +47,7 @@ export function getInvalidReason(arg: any) {
   }
 }
 
-export function isValidSceneObject(arg: any): arg is SceneJson {
+export function isValidSceneInput(arg: any): arg is UnsanitizedSceneManifest {
   return typeof arg === 'object' && getInvalidReason(arg) === undefined
 }
 

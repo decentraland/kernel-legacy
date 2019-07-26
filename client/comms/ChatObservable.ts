@@ -1,5 +1,5 @@
-import { Observable } from '@dcl/utils/dist/Observable'
-import { MessageEntry } from '@dcl/utils/dist/Comms'
+import { Observable } from '@dcl/utils/Observable'
+import { MessageEntry } from '@dcl/utils/Comms'
 
 export enum ChatEvent {
   MESSAGE_RECEIVED = 'MESSAGE_RECEIVED',

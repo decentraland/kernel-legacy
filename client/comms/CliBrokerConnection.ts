@@ -1,7 +1,7 @@
 import { future, IFuture } from 'fp-future'
 
-import { ILogger, createLogger } from '@dcl/utils/dist/Logger'
-import { Observable } from '@dcl/utils/dist/Observable'
+import { ILogger, createLogger } from '@dcl/utils/Logger'
+import { Observable } from '@dcl/utils/Observable'
 
 import { MessageType, CoordinatorMessage, WelcomeMessage, ConnectMessage } from './proto/broker'
 import { SocketReadyState } from './worldInstanceConnection'

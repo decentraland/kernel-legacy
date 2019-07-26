@@ -1,7 +1,7 @@
 import 'webrtc-adapter'
 
 import { USE_LOCAL_COMMS, getServerConfigurations } from '@dcl/config'
-import { defaultLogger } from '@dcl/utils/dist/Logger'
+import { defaultLogger } from '@dcl/utils/Logger'
 
 import { WorldInstanceConnection } from './worldInstanceConnection'
 

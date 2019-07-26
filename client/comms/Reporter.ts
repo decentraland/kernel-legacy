@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
 import { PositionData } from './proto/comms'
-import { WorldInstanceConnection } from 'comms/worldInstanceConnection'
+import { WorldInstanceConnection } from './worldInstanceConnection'
 
 export class Reporter extends EventEmitter {}
 const reporter = new Reporter()
