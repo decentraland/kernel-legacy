@@ -1,5 +1,5 @@
 import { DEBUG_MESSAGES } from '../config'
-import { initShared } from '../shared'
+import { initShared, initWeb3 } from '../shared'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
 import future from 'fp-future'
@@ -46,6 +46,7 @@ export async function initializeUnity(container: HTMLElement): Promise<Initializ
   _container = container
 
   await initShared(container)
+  await initWeb3()
 
   const qs = queryString.parse(document.location.search)
 
