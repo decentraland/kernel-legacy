@@ -9,7 +9,7 @@ import { initializeUrlPositionObserver } from './world/positionThings'
 import { connect } from './comms'
 import { initialize, queueTrackingEvent } from './analytics'
 import { defaultLogger } from './logger'
-import { initWeb3, getNetworkFromTLD } from './web3'
+import { initWeb3, getNetworkFromTLD, getAppNetwork } from './web3'
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -56,11 +56,15 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   console['group']('connect#ethereum')
 
+  let net
+
   if (ENABLE_WEB3) {
     await initWeb3()
+    net = await getAppNetwork()
+  } else {
+    net = (await getNetworkFromTLD()) || ETHEREUM_NETWORK.MAINNET
   }
 
-  const net = (await getNetworkFromTLD()) || ETHEREUM_NETWORK.MAINNET
   queueTrackingEvent('Use network', { net })
 
   // Load contracts from https://contracts.decentraland.org
