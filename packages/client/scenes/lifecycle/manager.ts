@@ -1,9 +1,9 @@
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
 import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
-import { worldToGrid } from 'scenes/src/lifecycle/lib/node_modules/atomicHelpers/parcelScenePositions'
+import { worldToGrid } from 'client/scenes/lifecycle/node_modules/atomicHelpers/parcelScenePositions'
 
 import { positionObservable, teleportObservable } from '../../../shared/world/positionThings'
-import { SceneWorker, ParcelSceneAPI } from '../scene-worker/worker'
+import { SceneWorker, ParcelSceneAPI } from '../../../scenes/src/scene-worker/worker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../../../shared/types'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 
