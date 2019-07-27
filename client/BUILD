@@ -7,6 +7,7 @@ ts_library(
     srcs = glob(["auth/**/*.ts", "comms/**/*.ts", "config/**/*.ts", "passports/**/*.ts", "presence/**/*.ts", "social/**/*.ts", "worldMap/**/*.ts"]),
     module_name = "@dcl/client",
     deps = [
+        "//protos",
         "//config",
         "//utils",
         "@npm//@types",

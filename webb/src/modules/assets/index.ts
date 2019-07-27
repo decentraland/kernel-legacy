@@ -1,5 +1,5 @@
 import { Middleware, Store, AnyAction } from 'redux'
-import { jsonFetch } from '@dcl/utils/dist/network/jsonFetch'
+import { jsonFetch } from '@dcl/utils/network/jsonFetch'
 
 export type AssetAction = {
   type: 'Add Asset Pack Definition'

@@ -1,7 +1,7 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { StoredPassport } from '@dcl/client/dist/passports/types'
-import { getStoredPassportForUser } from '@dcl/client/dist/passports/api'
+import { StoredPassport } from '@dcl/client/passports/types'
+import { getStoredPassportForUser } from '@dcl/client/passports/api'
 
 import { AuthRootState } from 'modules/auth'
 

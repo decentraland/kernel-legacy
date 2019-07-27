@@ -1,14 +1,15 @@
 def _run_pbjs(actions, executable, output_name, proto_files, suffix = ".js", wrap = "commonjs"):
     js_file = actions.declare_file(output_name + suffix)
+    proto_paths = [f.path for f in proto_files.to_list()]
 
     # Reference of arguments:
     # https://github.com/dcodeIO/ProtoBuf.js/#pbjs-for-javascript
     args = actions.args()
-    args.add(["--target", "static-module"])
-    args.add(["--wrap", wrap])
+    args.add_all(["--target", "static"])
+    args.add_all(["--wrap", wrap])
     args.add("--strict-long")  # Force usage of Long type with int64 fields
-    args.add(["--out", js_file.path])
-    args.add([f.path for f in proto_files])
+    args.add_all(["--out", js_file.path])
+    args.add_all(proto_paths)
 
     actions.run(
         executable = executable._pbjs,
@@ -25,7 +26,7 @@ def _run_pbts(actions, executable, js_file):
     # Reference of arguments:
     # https://github.com/dcodeIO/ProtoBuf.js/#pbts-for-typescript
     args = actions.args()
-    args.add(["--out", ts_file.path])
+    args.add_all(["--out", ts_file.path])
     args.add(js_file.path)
 
     actions.run(

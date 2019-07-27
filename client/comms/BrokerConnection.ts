@@ -5,17 +5,8 @@ import { Communications } from '@dcl/config'
 import { ILogger, createLogger } from '@dcl/utils/Logger'
 import { Observable } from '@dcl/utils/Observable'
 
-import {
-  MessageType,
-  CoordinatorMessage,
-  WelcomeMessage,
-  ConnectMessage,
-  WebRtcMessage,
-  AuthMessage,
-  Role
-} from './proto/broker'
+import { protocol } from '@dcl/protos'
 
-import { AuthData } from './proto/comms'
 import { SocketReadyState } from './worldInstanceConnection'
 import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
@@ -57,7 +48,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string, public credentialsProvider: (message: string) => Promise<AuthData>) {
+  constructor(public url: string, public credentialsProvider: (message: string) => Promise<protocol.AuthData>) {
     this.connectRTC()
     this.connectWS()
 
@@ -117,24 +108,24 @@ export class BrokerConnection implements IBrokerConnection {
     const msg = new Uint8Array(data)
     const msgSize = msg.length
 
-    const msgType = CoordinatorMessage.deserializeBinary(data).getType()
+    const msgType = protocol.CoordinatorMessage.deserializeBinary(data).getType()
 
     switch (msgType) {
-      case MessageType.UNKNOWN_MESSAGE_TYPE: {
+      case protocol.MessageType.UNKNOWN_MESSAGE_TYPE: {
         if (this.stats) {
           this.stats.others.incrementRecv(msgSize)
         }
         this.logger.log('unsopported message')
         break
       }
-      case MessageType.WELCOME: {
+      case protocol.MessageType.WELCOME: {
         if (this.stats) {
           this.stats.others.incrementRecv(msgSize)
         }
 
-        let message: WelcomeMessage
+        let message: protocol.WelcomeMessage
         try {
-          message = WelcomeMessage.deserializeBinary(msg)
+          message = protocol.WelcomeMessage.deserializeBinary(msg)
         } catch (e) {
           this.logger.error('cannot deserialize welcome client message', e, msg)
           break
@@ -152,22 +143,22 @@ export class BrokerConnection implements IBrokerConnection {
         this.alias = alias
         this.logger.info('my alias is', alias)
 
-        const connectMessage = new ConnectMessage()
-        connectMessage.setType(MessageType.CONNECT)
+        const connectMessage = new protocol.ConnectMessage()
+        connectMessage.setType(protocol.MessageType.CONNECT)
         connectMessage.setToAlias(serverAlias)
         this.sendCoordinatorMessage(connectMessage)
         break
       }
-      case MessageType.WEBRTC_ICE_CANDIDATE:
-      case MessageType.WEBRTC_OFFER:
-      case MessageType.WEBRTC_ANSWER: {
+      case protocol.MessageType.WEBRTC_ICE_CANDIDATE:
+      case protocol.MessageType.WEBRTC_OFFER:
+      case protocol.MessageType.WEBRTC_ANSWER: {
         if (this.stats) {
           this.stats.webRtcSession.incrementRecv(msgSize)
         }
 
-        let message: WebRtcMessage
+        let message: protocol.WebRtcMessage
         try {
-          message = WebRtcMessage.deserializeBinary(msg)
+          message = protocol.WebRtcMessage.deserializeBinary(msg)
         } catch (e) {
           this.logger.error('cannot deserialize webrtc ice candidate message', e, msg)
           break
@@ -180,29 +171,29 @@ export class BrokerConnection implements IBrokerConnection {
           break
         }
 
-        if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
+        if (msgType === protocol.MessageType.WEBRTC_ICE_CANDIDATE) {
           try {
             await this.webRtcConn!.addIceCandidate({ candidate: sdp })
           } catch (err) {
             this.logger.error(err)
           }
-        } else if (msgType === MessageType.WEBRTC_OFFER) {
+        } else if (msgType === protocol.MessageType.WEBRTC_OFFER) {
           try {
             await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }))
             const desc = await this.webRtcConn!.createAnswer()
             await this.webRtcConn!.setLocalDescription(desc)
 
             if (desc.sdp) {
-              const msg = new WebRtcMessage()
+              const msg = new protocol.WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
-              msg.setType(MessageType.WEBRTC_ANSWER)
+              msg.setType(protocol.MessageType.WEBRTC_ANSWER)
               msg.setSdp(desc.sdp)
               this.sendCoordinatorMessage(msg)
             }
           } catch (err) {
             this.logger.error(err)
           }
-        } else if (msgType === MessageType.WEBRTC_ANSWER) {
+        } else if (msgType === protocol.MessageType.WEBRTC_ANSWER) {
           try {
             await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp }))
           } catch (err) {
@@ -275,8 +266,8 @@ export class BrokerConnection implements IBrokerConnection {
 
   private onIceCandidate = (event: RTCPeerConnectionIceEvent) => {
     if (event.candidate !== null) {
-      const msg = new WebRtcMessage()
-      msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
+      const msg = new protocol.WebRtcMessage()
+      msg.setType(protocol.MessageType.WEBRTC_ICE_CANDIDATE)
       // TODO: Ensure commServerAlias, it may be null
       msg.setToAlias(this.commServerAlias!)
       msg.setSdp(event.candidate.candidate)
@@ -298,15 +289,15 @@ export class BrokerConnection implements IBrokerConnection {
 
       if (label === 'reliable') {
         this.reliableDataChannel = dc
-        const authData = new AuthData()
+        const authData = new protocol.AuthData()
         const credentials = await this.credentialsProvider('')
         authData.setSignature(credentials['x-signature'])
         authData.setIdentity(credentials['x-identity'])
         authData.setTimestamp(credentials['x-timestamp'])
         authData.setAccessToken(credentials['x-access-token'])
-        const authMessage = new AuthMessage()
-        authMessage.setType(MessageType.AUTH)
-        authMessage.setRole(Role.CLIENT)
+        const authMessage = new protocol.AuthMessage()
+        authMessage.setType(protocol.MessageType.AUTH)
+        authMessage.setRole(protocol.Role.CLIENT)
         authMessage.setBody(authData.serializeBinary())
         const bytes = authMessage.serializeBinary()
 

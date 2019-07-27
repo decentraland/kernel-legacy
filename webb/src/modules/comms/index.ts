@@ -1,8 +1,8 @@
 import { AnyAction, Middleware, Store } from 'redux'
 import { Auth } from 'decentraland-auth'
 
-import { connect } from '@dcl/client/dist/comms'
-import { intersectLogger } from '@dcl/utils/dist/Logger'
+import { connect } from '@dcl/client/comms'
+import { intersectLogger } from '@dcl/utils/Logger'
 
 import { AuthRootState } from 'modules/auth'
 
