@@ -5,11 +5,17 @@ import defaultLogger from '../logger'
 import { Auth } from 'decentraland-auth'
 
 export async function resolveProfile(uuid: string): Promise<Profile> {
-  const response = await fetchProfile(uuid)
+  let response
+  try {
+    response = await fetchProfile(uuid)
+  } catch (e) {
+    defaultLogger.error(`failed to fetch profile for user id ${uuid}`)
+    defaultLogger.error(e)
+  }
 
   let spec: ProfileSpec
   // FIXME - forcing random generation until profile migration is finished - moliva - 29/07/2019
-  if (false && response.ok) {
+  if (false && response && response.ok) {
     // @ts-ignore
     spec = (await response.json()) as ProfileSpec
   } else {
