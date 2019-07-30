@@ -10,9 +10,9 @@ import {
   WelcomeMessage,
   AuthMessage,
   TopicMessage,
-  DataMessage,
+  TopicFWMessage,
   PingMessage,
-  TopicSubscriptionMessage,
+  SubscriptionMessage,
   MessageType,
   Role,
   Format
@@ -159,7 +159,7 @@ describe('Communications', function() {
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
         msg.setFromAlias(1)
-        msg.setSdp(sdp)
+        msg.setData(sdp)
 
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
 
@@ -179,7 +179,7 @@ describe('Communications', function() {
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_OFFER)
         msg.setFromAlias(1)
-        msg.setSdp('sdp')
+        msg.setData('sdp')
 
         connection.gotCandidatesFuture.resolve(answer as any)
 
@@ -200,7 +200,7 @@ describe('Communications', function() {
         expect(webSocket.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ANSWER)
-          expect(msg.getSdp()).to.equal(answer.sdp)
+          expect(msg.getData()).to.equal(answer.sdp)
           expect(msg.getToAlias()).to.equal(1)
           return true
         })
@@ -211,7 +211,7 @@ describe('Communications', function() {
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ANSWER)
         msg.setFromAlias(1)
-        msg.setSdp('sdp')
+        msg.setData('sdp')
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
         await connection.onWsMessage(event)
         expect(connection.webRtcConn!.setRemoteDescription).to.have.been.calledWithMatch(
@@ -236,7 +236,7 @@ describe('Communications', function() {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ICE_CANDIDATE)
           expect(msg.getToAlias()).to.equal(1)
-          expect(msg.getSdp()).to.equal(sdp)
+          expect(msg.getData()).to.equal(sdp)
           return true
         })
       })
@@ -283,8 +283,8 @@ describe('Communications', function() {
 
           const bodyEncoded = body.serializeBinary()
 
-          const msg = new DataMessage()
-          msg.setType(MessageType.DATA)
+          const msg = new TopicFWMessage()
+          msg.setType(MessageType.TOPIC_FW)
           msg.setFromAlias(1)
           msg.setBody(bodyEncoded)
 
@@ -302,8 +302,8 @@ describe('Communications', function() {
 
           const bodyEncoded = body.serializeBinary()
 
-          const msg = new DataMessage()
-          msg.setType(MessageType.DATA)
+          const msg = new TopicFWMessage()
+          msg.setType(MessageType.TOPIC_FW)
           msg.setFromAlias(1)
           msg.setBody(bodyEncoded)
 
@@ -321,8 +321,8 @@ describe('Communications', function() {
 
           const bodyEncoded = body.serializeBinary()
 
-          const msg = new DataMessage()
-          msg.setType(MessageType.DATA)
+          const msg = new TopicFWMessage()
+          msg.setType(MessageType.TOPIC_FW)
           msg.setFromAlias(1)
           msg.setBody(bodyEncoded)
 
@@ -373,8 +373,8 @@ describe('Communications', function() {
         it('topic subscriptions', () => {
           worldConn.updateSubscriptions('topic1 topic2')
           expect(connection.reliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
-            const msg = TopicSubscriptionMessage.deserializeBinary(bytes)
-            expect(msg.getType()).to.equal(MessageType.TOPIC_SUBSCRIPTION)
+            const msg = SubscriptionMessage.deserializeBinary(bytes)
+            expect(msg.getType()).to.equal(MessageType.SUBSCRIPTION)
             expect(msg.getFormat()).to.equal(Format.PLAIN)
             expect(Buffer.from(msg.getTopics()).toString('utf8')).to.equal('topic1 topic2')
             return true

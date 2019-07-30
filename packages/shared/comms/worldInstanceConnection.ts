@@ -6,9 +6,9 @@ import {
   MessageType,
   PingMessage,
   TopicMessage,
-  DataMessage,
+  TopicFWMessage,
   Format,
-  TopicSubscriptionMessage,
+  SubscriptionMessage,
   MessageHeader
 } from './proto/broker'
 import { Position, position2parcel } from './utils'
@@ -168,8 +168,8 @@ export class WorldInstanceConnection {
     if (!this.connection.hasReliableChannel) {
       throw new Error('trying to send topic subscription message but reliable channel is not ready')
     }
-    const subscriptionMessage = new TopicSubscriptionMessage()
-    subscriptionMessage.setType(MessageType.TOPIC_SUBSCRIPTION)
+    const subscriptionMessage = new SubscriptionMessage()
+    subscriptionMessage.setType(MessageType.SUBSCRIPTION)
     subscriptionMessage.setFormat(Format.PLAIN)
     // TODO: use TextDecoder instead of Buffer, it is a native browser API, works faster
     subscriptionMessage.setTopics(Buffer.from(rawTopics, 'utf8'))
@@ -203,13 +203,13 @@ export class WorldInstanceConnection {
         this.logger.log('unsupported message')
         break
       }
-      case MessageType.DATA: {
+      case MessageType.TOPIC_FW: {
         if (this.stats) {
           this.stats.topic.incrementRecv(msgSize)
         }
-        let dataMessage: DataMessage
+        let dataMessage: TopicFWMessage
         try {
-          dataMessage = DataMessage.deserializeBinary(message.data)
+          dataMessage = TopicFWMessage.deserializeBinary(message.data)
         } catch (e) {
           this.logger.error('cannot process topic message', e)
           break

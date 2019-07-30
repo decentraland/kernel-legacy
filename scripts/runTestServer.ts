@@ -68,12 +68,12 @@ wss.on('connection', function connection(ws) {
 
       const topic = topicMessage.getTopic()
 
-      const dataMessage = new proto.DataMessage()
-      dataMessage.setType(proto.MessageType.DATA)
-      dataMessage.setFromAlias(alias)
-      dataMessage.setBody(topicMessage.getBody_asU8())
+      const topicFwMessage = new proto.TopicFWMessage()
+      topicFwMessage.setType(proto.MessageType.TOPIC_FW)
+      topicFwMessage.setFromAlias(alias)
+      topicFwMessage.setBody(topicMessage.getBody_asU8())
 
-      const topicData = dataMessage.serializeBinary()
+      const topicData = topicFwMessage.serializeBinary()
 
       // Reliable/unreliable data
       connections.forEach($ => {
@@ -83,8 +83,8 @@ wss.on('connection', function connection(ws) {
           }
         }
       })
-    } else if (msgType === proto.MessageType.TOPIC_SUBSCRIPTION) {
-      const topicMessage = proto.TopicSubscriptionMessage.deserializeBinary(data)
+    } else if (msgType === proto.MessageType.SUBSCRIPTION) {
+      const topicMessage = proto.SubscriptionMessage.deserializeBinary(data)
       const rawTopics = topicMessage.getTopics()
       const topics = Buffer.from(rawTopics).toString('utf8')
       const set = getTopicList(ws)
