@@ -41,8 +41,11 @@ import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../dec
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, EDITOR, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
+import { IFuture } from 'fp-future'
 
 let gameInstance!: GameInstance
+
+export let futures: Record<string, IFuture<any>> = {}
 
 const positionEvent = {
   position: Vector3.Zero(),
@@ -56,18 +59,19 @@ const positionEvent = {
 
 const browserInterface = {
   /** Triggered when the camera moves */
-  ReportPosition(data: {
-    position: ReadOnlyVector3
-    rotation: ReadOnlyQuaternion
-    playerHeight?: number
-    mousePosition: ReadOnlyVector3
-  }) {
+  ReportPosition(data: { position: ReadOnlyVector3; rotation: ReadOnlyQuaternion; playerHeight?: number }) {
     positionEvent.position.set(data.position.x, data.position.y, data.position.z)
-    positionEvent.mousePosition.set(data.mousePosition.x, data.mousePosition.y, data.mousePosition.z)
     positionEvent.quaternion.set(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w)
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
     positionEvent.playerHeight = data.playerHeight || playerConfigurations.height
     positionObservable.notifyObservers(positionEvent)
+  },
+
+  ReportMousePosition(data: { id: string; mousePosition: ReadOnlyVector3 }) {
+    console.log('ReportMousePosition:' + data.mousePosition)
+    positionEvent.mousePosition.set(data.mousePosition.x, data.mousePosition.y, data.mousePosition.z)
+    positionObservable.notifyObservers(positionEvent)
+    futures[data.id].resolve(data.mousePosition)
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
@@ -323,6 +327,14 @@ export function setPlayModeBuilder(on: string) {
 
 export function getMouseWorldPositionBuilder() {
   return positionEvent.mousePosition
+}
+
+export function preloadFileBuilder(url: string) {
+  unityInterface.sendBuilderMessage('PreloadFile', url)
+}
+
+export function getMousePositionBuilder(x: string, y: string, id: string) {
+  unityInterface.sendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
 }
 
 let currentLoadedScene: SceneWorker

@@ -5,7 +5,7 @@ declare var window: Window & { isEditor: boolean }
 global.isEditor = window.isEditor = true
 
 import { EventEmitter } from 'events'
-import future from 'fp-future'
+import future, { IFuture } from 'fp-future'
 
 import { sleep } from '../atomicHelpers/sleep'
 import { loadedSceneWorkers } from '../shared/world/parcelSceneManager'
@@ -22,9 +22,13 @@ import {
   loadBuilderScene,
   updateBuilderScene,
   readyBuilderScene,
-  getMouseWorldPositionBuilder
+  preloadFileBuilder,
+  getMousePositionBuilder,
+  futures
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
+import { uuid } from '../decentraland-ecs/src/ecs/helpers'
+import { Vector3 } from '../decentraland-ecs/src/decentraland/math'
 
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
@@ -204,14 +208,30 @@ namespace editor {
   export function resetCameraZoom() {
     resetCameraBuilder()
   }
-  export function getMouseWorldPosition() {
-    return getMouseWorldPositionBuilder()
+
+  export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
+    //getMousePositionBuilder({ x: 50, y: 50, z: 0 })
+
+    //return getMouseWorldPositionBuilder()
+
+    // donde T depende de que estes devolviendo
+    const id = uuid()
+    futures[id] = future()
+    console.log('getMouseWorldPosition en EXPLORER x:' + x + ' -  y:' + y + ' . id' + id)
+    getMousePositionBuilder(x.toString(), y.toString(), id) // posiblemente haya que mandar mas args en algun caso?
+    return futures[id]
+  }
+
+  export function handleUnitySomeVale(id: string, value: Vector3) {
+    futures[id].resolve(value)
+    // delete futures[id]
   }
   export function loadImage() {
     console.log('loadImage')
   }
   export function preloadFile(url: string) {
     console.log('preloadFile ' + url)
+    preloadFileBuilder(url)
   }
   export function setCameraRotation() {
     console.log('setCameraRotation')
