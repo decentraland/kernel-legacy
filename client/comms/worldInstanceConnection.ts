@@ -3,7 +3,7 @@ import { Message } from 'google-protobuf'
 import { createLogger } from '@dcl/utils/Logger'
 import { parcelLimits } from '@dcl/config'
 
-import { Category, ChatData, PositionData, ProfileData, DataHeader } from './proto/comms'
+import { Category, ChatData, PositionData, ProfileData, DataHeader } from '@dcl/protos'
 import {
   MessageType,
   PingMessage,
@@ -12,7 +12,7 @@ import {
   Format,
   TopicSubscriptionMessage,
   MessageHeader
-} from './proto/broker'
+} from '@dcl/protos'
 
 import { Position, position2parcel } from './utils'
 import { UserInformation } from './types'
@@ -27,7 +27,7 @@ export enum SocketReadyState {
 }
 
 class SendResult {
-  constructor(public bytesSize: number) {}
+  constructor(public bytesSize: number) { }
 }
 
 export function positionHash(p: Position) {
@@ -188,7 +188,7 @@ export class WorldInstanceConnection {
   private handleMessage(message: BrokerMessage) {
     const msgSize = message.data.length
 
-    let msgType = MessageType.UNKNOWN_MESSAGE_TYPE
+    let msgType: number = MessageType.UNKNOWN_MESSAGE_TYPE
     try {
       msgType = MessageHeader.deserializeBinary(message.data).getType()
     } catch (err) {

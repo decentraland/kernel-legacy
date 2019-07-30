@@ -29,20 +29,6 @@ PROTOBUF_DEPS = [
 ]
 
 nodejs_binary(
-    name = "pbjs",
-    data = PROTOBUF_DEPS,
-    entry_point = "@npm//:node_modules/protobufjs/bin/pbjs",
-    install_source_map_support = False,
-)
-
-nodejs_binary(
-    name = "pbts",
-    data = PROTOBUF_DEPS,
-    entry_point = "@npm//:node_modules/protobufjs/bin/pbts",
-    install_source_map_support = False,
-)
-
-nodejs_binary(
     name = "tslint",
     data = [
         "@npm//tslint",

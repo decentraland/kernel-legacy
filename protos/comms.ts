@@ -1,1 +1,1 @@
-export * from '@dcl/protos/comms_lib'
+export * from "./comms_pb";

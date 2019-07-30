@@ -1,37 +1,26 @@
 package(default_visibility = ["//visibility:public"])
 
-proto_library(
-    name = "broker_protolib",
-    srcs = ["broker.proto"],
-)
-proto_library(
-    name = "comms_protolib",
-    srcs = ["comms.proto"],
-)
-
-load("//tools:ts_proto_library.bzl", "ts_proto_library")
-
-ts_proto_library(
-    name = "broker_tslib",
-    deps = [":broker_protolib"],
-    output_name = "broker"
-)
-
-ts_proto_library(
-    name = "comms_tslib",
-    deps = [":comms_protolib"],
-    output_name = "comms"
-)
-
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@ts_protoc_gen//:defs.bzl", "typescript_proto_library")
+ 
+proto_library(
+  name = "protos_lib",
+  srcs = ["broker.proto", "comms.proto"],
+)
+ 
+typescript_proto_library(
+  name = "ts_protos",
+  proto = ":protos_lib",
+)
 
 ts_library(
-    name = "broker",
-    srcs = glob(["broker.ts", "comms.ts"]),
+    name = "protos",
+    srcs = ["broker.ts", "comms.ts", "index.ts"],
     module_name = "@dcl/protos",
+    tsconfig = ":tsconfig.json",
     deps = [
-        ":broker_tslib",
-        ":comms_tslib",
+        "//protos:ts_protos",
+        "@npm//@bazel/typescript",
         "@npm//@types/node",
         "@npm//protobufjs",
     ],
@@ -40,11 +29,11 @@ ts_library(
 load("//tools/npm:package.bzl", "dcl_npm_package")
 
 dcl_npm_package(
-    name = "protos",
-    srcs = glob(["**/*.proto"]),
+    name = "protospackage",
+    srcs = ["broker.proto", "comms.proto"],
     package_layers = [
         "//:common.package.json",
         "protos.package.json",
     ],
-    deps = [":comms_tslib", ":broker_tslib"],
+    deps = [":protos"],
 )

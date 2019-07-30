@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events'
 
-import { PositionData } from './proto/comms'
+import { PositionData } from '@dcl/protos'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 
-export class Reporter extends EventEmitter {}
+export class Reporter extends EventEmitter { }
 const reporter = new Reporter()
 
 export class TrackAvgDuration {
@@ -112,7 +112,7 @@ export class Stats {
 
   private reportInterval: any
 
-  constructor(private connection: WorldInstanceConnection) {}
+  constructor(private connection: WorldInstanceConnection) { }
 
   public emitDebugInformation() {
     const reportDuration = (name: string, duration: TrackAvgDuration) => {

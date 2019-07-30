@@ -1,1 +1,1 @@
-export * from '@dcl/protos/broker_protolib'
+export * from "./broker_pb";

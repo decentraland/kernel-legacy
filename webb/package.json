@@ -4,10 +4,6 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.4.3",
-    "@dcl/client": "file:manual/dcl-client-0.0.0.tgz",
-    "@dcl/config": "file:manual/dcl-config-0.0.0.tgz",
-    "@dcl/rpc": "file:manual/dcl-rpc-0.0.0.tgz",
-    "@dcl/utils": "file:manual/dcl-utils-0.0.0.tgz",
     "@svgr/webpack": "4.1.0",
     "@types/history": "^4.7.2",
     "@types/jest": "24.0.15",
