@@ -194,14 +194,14 @@ export class BrokerConnection implements IBrokerConnection {
             const desc = await this.webRtcConn!.createAnswer({})
             await this.webRtcConn!.setLocalDescription(desc)
 
-            let offer = this.webRtcConn!.localDescription
+            let answer = this.webRtcConn!.localDescription
 
-            if (offer && offer.sdp) {
+            if (answer && answer.sdp) {
               const msg = new WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
               msg.setType(MessageType.WEBRTC_ANSWER)
               const encoder = new TextEncoder()
-              const data = encoder.encode(JSON.stringify(offer))
+              const data = encoder.encode(JSON.stringify(answer))
               msg.setData(data)
               this.sendCoordinatorMessage(msg)
             }

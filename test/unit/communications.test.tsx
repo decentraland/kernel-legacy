@@ -155,11 +155,15 @@ describe('Communications', function() {
 
       it('webrtc ice candidate', async () => {
         connection.commServerAlias = 1
-        const sdp = 'candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8'
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
         msg.setFromAlias(1)
-        msg.setData(sdp)
+        const candidate = {
+          candidate: 'candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8'
+        }
+
+        const encoder = new TextEncoder()
+        msg.setData(encoder.encode(JSON.stringify(candidate)))
 
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
 
@@ -167,7 +171,7 @@ describe('Communications', function() {
 
         await connection.onWsMessage(event)
 
-        expect(connection.webRtcConn!.addIceCandidate).to.have.been.calledWith({ candidate: sdp })
+        expect(connection.webRtcConn!.addIceCandidate).to.have.been.calledWith(candidate)
       })
 
       it('webrtc offer', async () => {
@@ -176,11 +180,14 @@ describe('Communications', function() {
         const answer = { sdp: 'answer-sdp', type: 'answer' }
         ;(connection.webRtcConn!.createAnswer as any).resolves(answer)
 
+        const offer = { sdp: 'offer-sdp', type: 'offer' }
+
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_OFFER)
         msg.setFromAlias(1)
-        msg.setData('sdp')
-
+        const encoder = new TextEncoder()
+        msg.setData(encoder.encode(JSON.stringify(offer)))
+        ;(connection.webRtcConn! as any)['localDescription'] = answer
         connection.gotCandidatesFuture.resolve(answer as any)
 
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
@@ -189,7 +196,7 @@ describe('Communications', function() {
         expect(connection.webRtcConn!.setRemoteDescription).to.have.been.calledWithMatch(
           (desc: RTCSessionDescription) => {
             expect(desc.type).to.be.equal('offer')
-            expect(desc.sdp).to.be.equal('sdp')
+            expect(desc.sdp).to.be.equal('offer-sdp')
             return true
           }
         )
@@ -200,24 +207,33 @@ describe('Communications', function() {
         expect(webSocket.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ANSWER)
-          expect(msg.getData()).to.equal(answer.sdp)
           expect(msg.getToAlias()).to.equal(1)
+
+          const decoder = new TextDecoder('utf8')
+          const r = JSON.parse(decoder.decode(msg.getData() as ArrayBuffer))
+          expect(r.sdp).to.be.equal(answer.sdp)
+          expect(r.type).to.be.equal(answer.type)
           return true
         })
       })
 
       it('webrtc answer', async () => {
+        const answer = { sdp: 'answer-sdp', type: 'answer' }
+
         connection.commServerAlias = 1
         const msg = new WebRtcMessage()
         msg.setType(MessageType.WEBRTC_ANSWER)
         msg.setFromAlias(1)
-        msg.setData('sdp')
+        const encoder = new TextEncoder()
+        msg.setData(encoder.encode(JSON.stringify(answer)))
+
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
         await connection.onWsMessage(event)
+
         expect(connection.webRtcConn!.setRemoteDescription).to.have.been.calledWithMatch(
           (desc: RTCSessionDescription) => {
             expect(desc.type).to.be.equal('answer')
-            expect(desc.sdp).to.be.equal('sdp')
+            expect(desc.sdp).to.be.equal('answer-sdp')
             return true
           }
         )
@@ -236,7 +252,9 @@ describe('Communications', function() {
           const msg = WebRtcMessage.deserializeBinary(bytes)
           expect(msg.getType()).to.equal(MessageType.WEBRTC_ICE_CANDIDATE)
           expect(msg.getToAlias()).to.equal(1)
-          expect(msg.getData()).to.equal(sdp)
+          const decoder = new TextDecoder('utf8')
+          const r = JSON.parse(decoder.decode(msg.getData() as ArrayBuffer))
+          expect(r.candidate).to.be.equal(candidate.candidate)
           return true
         })
       })
