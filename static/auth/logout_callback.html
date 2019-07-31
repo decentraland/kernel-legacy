@@ -1,0 +1,18 @@
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="https://ui.decentraland.org/styles.css" />
+</head>
+
+<body>
+  <script>
+    var REDIRECT_URL = {{ .redirectUrl }}
+  </script>
+  <script src="./auth0.js"></script>
+  <script src="./logout_callback.js"></script>
+  <div class="ui dimmer active">
+    <div class="ui loader"></div>
+  </div>
+</body>
+
+</html>

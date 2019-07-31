@@ -1,0 +1,22 @@
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="https://ui.decentraland.org/styles.css" />
+</head>
+
+<body>
+  <script>
+    var AUTH0_DOMAIN = 'https://dcl-test.auth0.com'
+    var AUTH0_CLIENT_ID = 'lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx'
+    var AUTH0_REDIRECT = 'http://localhost:8080/auth/login_callback.html'
+    // var REDIRECT_BASE_URL = {{ .redirectUrl }}
+    // var APP_DOMAIN = {{ .appDomain }}
+  </script>
+  <script src="./auth0.js"></script>
+  <script src="./login_callback.js"></script>
+  <div class="ui dimmer active">
+    <div class="ui loader"></div>
+  </div>
+</body>
+
+</html>

@@ -9,7 +9,7 @@ export const webAuth = new auth0.WebAuth({
   // redirectUri: env.get('REACT_APP_AUTH0_REDIRECT'),
   clientID: 'lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx',
   domain: 'https://dcl-test.auth0.com',
-  redirectUri: 'http://localhost:8080/callback',
+  redirectUri: 'http://localhost:8080/auth/login_callback.html',
   responseType: 'token id_token',
   scope: 'openid email'
 })
