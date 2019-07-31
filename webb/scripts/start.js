@@ -78,6 +78,10 @@ checkBrowsers(paths.appPath, isInteractive)
       return;
     }
     const config = configFactory('development');
+    config.resolve.plugins = [];
+    config.resolve.symlinks = false;
+    config.resolve.alias = {
+    };
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     const appName = require(paths.appPackageJson).name;
     const useTypeScript = fs.existsSync(paths.appTsConfig);
@@ -110,7 +114,7 @@ checkBrowsers(paths.appPath, isInteractive)
     // Launch WebpackDevServer.
     devServer.listen(port, HOST, err => {
       if (err) {
-        return console.log(err);
+        return console.log(err, err.stack);
       }
       if (isInteractive) {
         clearConsole();
@@ -132,16 +136,16 @@ checkBrowsers(paths.appPath, isInteractive)
       openBrowser(urls.localUrlForBrowser);
     });
 
-    ['SIGINT', 'SIGTERM'].forEach(function(sig) {
-      process.on(sig, function() {
+    ['SIGINT', 'SIGTERM'].forEach(function (sig) {
+      process.on(sig, function () {
         devServer.close();
         process.exit();
       });
     });
   })
   .catch(err => {
-    if (err && err.message) {
-      console.log(err.message);
+    if (err) {
+      console.log(err);
     }
     process.exit(1);
   });
