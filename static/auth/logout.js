@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
     responseType: 'token id_token',
     scope: 'openid',
     leeway: 60,
-    audience: 'decentraland.org'
+    audience: AUDIENCE
   })
 
   webAuth.logout({
