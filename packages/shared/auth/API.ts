@@ -2,15 +2,11 @@ import { getAuthURL } from './env'
 
 export type APIOptions = {
   baseURL?: string
-  loginCallback?: string
-  logoutCallback?: string
 }
 
 export class API {
   static defaultOptions: APIOptions = {
-    baseURL: getAuthURL(),
-    loginCallback: '/callback',
-    logoutCallback: '/'
+    baseURL: getAuthURL()
   }
 
   options: APIOptions
@@ -26,10 +22,10 @@ export class API {
     return this.options.baseURL + path
   }
 
-  async auth() {
+  auth() {
     return {
-      loginURL: 'http://localhost:8080/auth/login.html',
-      logoutURL: 'http://localhost:8080/auth/logout.html'
+      loginURL: '/auth/login.html',
+      logoutURL: '/auth/logout.html'
     }
   }
 

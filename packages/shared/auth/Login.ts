@@ -31,7 +31,7 @@ export class Login {
 
   async fromIFrame(target: HTMLElement) {
     this.injectStyles()
-    const { loginURL } = await this.api.auth()
+    const { loginURL } = this.api.auth()
     const iframe = document.createElement('iframe')
     iframe.id = LOGIN_IFRAME_ID
     iframe.src = loginURL
@@ -50,7 +50,7 @@ export class Login {
   }
 
   async fromPopup(title = 'Login', width = 400, height = 600) {
-    const { loginURL } = await this.api.auth()
+    const { loginURL } = this.api.auth()
 
     // center popup on screen
     const dualScreenLeft = (window.screenLeft as any) !== undefined ? window.screenLeft : window.screenX
@@ -89,7 +89,7 @@ export class Login {
   async logout() {
     if (!document.getElementById(LOGOUT_IFRAME_ID)) {
       this.injectStyles()
-      const { logoutURL } = await this.api.auth()
+      const { logoutURL } = this.api.auth()
       const iframe = document.createElement('iframe')
       iframe.id = LOGOUT_IFRAME_ID
       iframe.src = logoutURL
@@ -158,7 +158,7 @@ export class Login {
           // refresh iframe
           const loginIFrame = document.getElementById(LOGIN_IFRAME_ID) as HTMLIFrameElement
           if (loginIFrame) {
-            const { loginURL } = await this.api.auth()
+            const { loginURL } = this.api.auth()
             const waitForPage = new Promise(resolve => (loginIFrame.onload = resolve))
             loginIFrame.src = loginURL
             await waitForPage
