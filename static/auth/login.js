@@ -1,13 +1,14 @@
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
   var webAuth = new auth0.WebAuth({
     domain: DOMAIN,
-    clientID: EXTERNAL_ID,
-    redirectUri: CALLBACK_URL,
+    clientID: CLIENT_ID,
+    redirectUri: LOGIN_REDIRECT,
     responseType: 'token id_token',
     scope: 'openid',
-    leeway: 60
-  });
+    leeway: 60,
+    audience: 'decentraland.org'
+  })
 
-  webAuth.authorize();
+  webAuth.authorize()
 })

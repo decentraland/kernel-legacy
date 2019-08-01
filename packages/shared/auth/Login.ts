@@ -1,13 +1,11 @@
 import { future, IFuture } from 'fp-future'
 
-import { Event, Message, UserTokenMessage, LoginType, ErrorMessage } from './Types'
+import { API } from './API'
+import { Event, Message, UserTokenMessage, LoginType, ErrorMessage } from './types'
 
 export const IFRAME_STYLE_ID = 'decentraland-auth-iframe-style'
 export const LOGIN_IFRAME_ID = 'decentraland-auth-login-iframe'
 export const LOGOUT_IFRAME_ID = 'decentraland-auth-logout-iframe'
-
-const LOGIN_URL = 'http://localhost:808/auth/login.html'
-const LOGOUT_URL = 'http://localhost:808/auth/logout.html'
 
 export const IFRAME_CSS = `#${LOGIN_IFRAME_ID} {
   width: 100%;
@@ -22,18 +20,21 @@ export const IFRAME_CSS = `#${LOGIN_IFRAME_ID} {
 `
 
 export class Login {
+  api: API
   loginFuture: IFuture<string> = future()
   logoutFuture: IFuture<void> = future()
 
-  constructor() {
+  constructor(api: API = new API()) {
+    this.api = api
     window.addEventListener('message', this.handleMessage)
   }
 
   async fromIFrame(target: HTMLElement) {
     this.injectStyles()
+    const { loginURL } = await this.api.auth()
     const iframe = document.createElement('iframe')
     iframe.id = LOGIN_IFRAME_ID
-    iframe.src = LOGIN_URL
+    iframe.src = loginURL
     // remove everything inside the target
     while (target.firstChild) {
       target.removeChild(target.firstChild)
@@ -48,12 +49,50 @@ export class Login {
     return this.loginFuture
   }
 
+  async fromPopup(title = 'Login', width = 400, height = 600) {
+    const { loginURL } = await this.api.auth()
+
+    // center popup on screen
+    const dualScreenLeft = (window.screenLeft as any) !== undefined ? window.screenLeft : window.screenX
+    const dualScreenTop = (window.screenTop as any) !== undefined ? window.screenTop : window.screenY
+
+    const windowWidth = window.innerWidth
+      ? window.innerWidth
+      : document.documentElement.clientWidth
+      ? document.documentElement.clientWidth
+      : screen.width
+    const windowHeight = window.innerHeight
+      ? window.innerHeight
+      : document.documentElement.clientHeight
+      ? document.documentElement.clientHeight
+      : screen.height
+
+    const systemZoom = windowWidth / window.screen.availWidth
+    const left = (windowWidth - width) / 2 / systemZoom + dualScreenLeft
+    const top = (windowHeight - height) / 2 / systemZoom + dualScreenTop
+
+    // open popup
+    const newWindow = window.open(
+      loginURL,
+      title,
+      `scrollbars=yes, width=${width / systemZoom}, height=${height / systemZoom}, top=${top}, left=${left}`
+    )
+
+    // puts focus on the newWindow
+    if (newWindow && newWindow.focus) newWindow.focus()
+
+    this.rejectOnClose(newWindow!)
+
+    return this.loginFuture
+  }
+
   async logout() {
     if (!document.getElementById(LOGOUT_IFRAME_ID)) {
       this.injectStyles()
+      const { logoutURL } = await this.api.auth()
       const iframe = document.createElement('iframe')
       iframe.id = LOGOUT_IFRAME_ID
-      iframe.src = LOGOUT_URL
+      iframe.src = logoutURL
       document.body.appendChild(iframe)
     }
     return this.logoutFuture
@@ -119,8 +158,9 @@ export class Login {
           // refresh iframe
           const loginIFrame = document.getElementById(LOGIN_IFRAME_ID) as HTMLIFrameElement
           if (loginIFrame) {
+            const { loginURL } = await this.api.auth()
             const waitForPage = new Promise(resolve => (loginIFrame.onload = resolve))
-            loginIFrame.src = LOGIN_URL
+            loginIFrame.src = loginURL
             await waitForPage
           }
         }

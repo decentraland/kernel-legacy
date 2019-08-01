@@ -1,45 +1,33 @@
-// import { LoadingState } from 'decentraland-dapps/dist/modules/loading/reducer'
-
-export type AuthState = {
-  // loading: LoadingState
-  data: AuthData | null
-  error: string | null
+export enum Event {
+  USER_TOKEN = 'DECENTRALAND_USER_TOKEN',
+  LOGOUT = 'DECENTRALAND_LOGOUT',
+  ERROR = 'DECENTRALAND_ERROR'
 }
 
-export type AuthData = {
-  email: string
-  sub: string
-  idToken: string
-  accessToken: string
-  expiresAt: number
-  user?: User
+export enum LoginType {
+  IFRAME = 'IFRAME',
+  POPUP = 'POPUP'
 }
 
-export type User = {
-  email: string
-  profile: {
-    avatar: {
-      bodyShape: string
-      eyes: { color: Color }
-      hair: { color: Color }
-      skin: { color: Color }
-      version: number
-      wearables: string[]
-    }
-    created_at: number
-    description: string
-    name: string
+export type LogoutMessage = {
+  type: Event.LOGOUT
+  from: LoginType
+}
+
+export type UserTokenMessage = {
+  type: Event.USER_TOKEN
+  from: LoginType
+  token: string
+}
+
+export type ErrorMessage = {
+  type: Event.ERROR
+  from: LoginType
+  error: {
+    error: string
+    errorDescription: string
+    state: string
   }
-  snapshots: {
-    body: string
-    face: string
-  }
-  updatedAt: number
-  userId: string
 }
 
-export type Color = {
-  r: number
-  g: number
-  b: number
-}
+export type Message = LogoutMessage | UserTokenMessage | ErrorMessage

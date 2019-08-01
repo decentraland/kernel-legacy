@@ -1,6 +1,15 @@
-import * as jwt from 'jsonwebtoken'
+import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
 
+import { createLogger } from 'shared/logger'
 import { Login } from './Login'
+import { API, APIOptions } from './API'
+
+const jwt = require('jsonwebtoken')
+
+type AuthOptions = {
+  ephemeralKeyTTL: number
+  api?: APIOptions
+}
 
 type AccessToken = {
   ephemeral_key: string
@@ -11,28 +20,39 @@ type AccessToken = {
 
 const LOCAL_STORAGE_KEY = 'decentraland-auth-user-token'
 
+const logger = createLogger('auth: ')
+
 export class Auth {
+  static defaultOptions: AuthOptions = {
+    ephemeralKeyTTL: 60 * 60 * 2 // TTL for the ephemeral key
+  }
+
+  private options: AuthOptions
+  private api: API
   private userToken: string | null = null
   private accessToken: string | null = null
+  private serverPublicKey: string | null = null
+  private ephemeralKey: BasicEphemeralKey | null = null
   private loginManager: Login
 
   constructor(options: Partial<AuthOptions> = {}) {
-    // this.options = {
-    //   ...Auth.defaultOptions,
-    //   ...options
-    // }
-    // this.api = new API(this.options.api)
-    this.loginManager = new Login()
+    this.options = {
+      ...Auth.defaultOptions,
+      ...options
+    }
+    this.api = new API(this.options.api)
+    this.loginManager = new Login(this.api)
     this.userToken = localStorage.getItem(LOCAL_STORAGE_KEY) || null
-    // this.ephemeralKey = BasicEphemeralKey.generateNewKey(
-    //   this.options.ephemeralKeyTTL
-    // )
+    this.ephemeralKey = BasicEphemeralKey.generateNewKey(this.options.ephemeralKeyTTL)
   }
 
   // returns a user token
   async login(target?: HTMLElement) {
     if (this.userToken === null) {
-      const [userToken] = await Promise.all([this.loginManager.fromIFrame(target), this.getServerPublicKey()])
+      const [userToken] = await Promise.all([
+        target ? this.loginManager.fromIFrame(target) : this.loginManager.fromPopup(),
+        this.getServerPublicKey()
+      ])
       this.userToken = userToken
       localStorage.setItem(LOCAL_STORAGE_KEY, this.userToken)
       return this.userToken
@@ -53,6 +73,13 @@ export class Auth {
 
   isLoggedIn() {
     return this.userToken !== null
+  }
+
+  getEphemeralKey() {
+    if (!this.ephemeralKey || this.ephemeralKey.hasExpired()) {
+      this.ephemeralKey = BasicEphemeralKey.generateNewKey(this.options.ephemeralKeyTTL)
+    }
+    return this.ephemeralKey
   }
 
   /**
@@ -88,7 +115,7 @@ export class Auth {
       this.accessToken = token
       return token
     } catch (e) {
-      console.error(e.message)
+      logger.error(e.message)
       await this.logout()
       throw e
     }

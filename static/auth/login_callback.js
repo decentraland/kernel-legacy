@@ -1,11 +1,12 @@
 window.addEventListener('load', function () {
   var webAuth = new auth0.WebAuth({
-    domain: AUTH0_DOMAIN,
-    clientID: AUTH0_CLIENT_ID,
-    redirectUri: AUTH0_REDIRECT,
+    domain: DOMAIN,
+    clientID: CLIENT_ID,
+    redirectUri: LOGIN_REDIRECT,
     responseType: 'token id_token',
     scope: 'openid email',
-    leeway: 60
+    leeway: 60,
+    audience: 'decentraland.org'
   })
 
   webAuth.parseHash(function (err, authResult) {

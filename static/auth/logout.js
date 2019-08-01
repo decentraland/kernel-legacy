@@ -1,15 +1,15 @@
 
 window.addEventListener('load', function () {
-
   var webAuth = new auth0.WebAuth({
-    domain: AUTH0_DOMAIN,
-    clientID: AUTH0_CLIENT_ID,
+    domain: DOMAIN,
+    clientID: CLIENT_ID,
     responseType: 'token id_token',
     scope: 'openid',
-    leeway: 60
-  });
+    leeway: 60,
+    audience: 'decentraland.org'
+  })
 
   webAuth.logout({
-    returnTo: AUTH0_REDIRECT
-  });
+    returnTo: LOGOUT_REDIRECT
+  })
 })
