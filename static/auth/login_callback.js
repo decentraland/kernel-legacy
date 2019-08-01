@@ -4,7 +4,7 @@ window.addEventListener('load', function () {
     clientID: CLIENT_ID,
     redirectUri: LOGIN_REDIRECT,
     responseType: 'token id_token',
-    scope: 'openid email',
+    scope: 'openid',
     leeway: 60,
     audience: 'decentraland.org'
   })
