@@ -1,6 +1,6 @@
 import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
 
-import { createLogger } from 'shared/logger'
+import { defaultLogger } from 'shared/logger'
 import { Login } from './Login'
 import { API, APIOptions } from './API'
 
@@ -19,8 +19,6 @@ type AccessToken = {
 }
 
 const LOCAL_STORAGE_KEY = 'decentraland-auth-user-token'
-
-const logger = createLogger('auth: ')
 
 export class Auth {
   static defaultOptions: AuthOptions = {
@@ -115,7 +113,7 @@ export class Auth {
       this.accessToken = token
       return token
     } catch (e) {
-      logger.error(e.message)
+      defaultLogger.error(e.message)
       await this.logout()
       throw e
     }
