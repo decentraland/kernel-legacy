@@ -6,9 +6,9 @@ window.addEventListener('load', function () {
         type: 'DECENTRALAND_LOGOUT'
       },
       '*'
-    )
+    );
   } else {
     // Not an iframe nor a popup, then redirect to callback url
-    document.location.href = REDIRECT_BASE_URL
+    document.location.href = REDIRECT_BASE_URL;
   }
-})
+});

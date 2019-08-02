@@ -6,9 +6,9 @@ window.addEventListener('load', function () {
     scope: 'openid',
     leeway: 60,
     audience: AUDIENCE
-  })
+  });
 
   webAuth.logout({
     returnTo: LOGOUT_REDIRECT
-  })
-})
+  });
+});

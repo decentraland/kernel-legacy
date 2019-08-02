@@ -7,19 +7,19 @@ window.addEventListener('load', function () {
     scope: 'openid',
     leeway: 60,
     audience: AUDIENCE
-  })
+  });
 
   webAuth.parseHash(function (err, authResult) {
     if (authResult && authResult.accessToken && authResult.idToken) {
-      send(authResult.accessToken)
+      send(authResult.accessToken);
     } else if (err) {
-      console.log(err)
+      console.log(err);
     }
-  })
-})
+  });
+});
 
 function send(token) {
-  const origin = APP_DOMAIN
+  var origin = APP_DOMAIN;
   if (window.self !== window.top) {
     // Is within an Iframe
     window.parent.postMessage(
@@ -29,7 +29,7 @@ function send(token) {
         from: 'IFRAME',
       },
       origin
-    )
+    );
   } else if (window.opener && window.opener !== window) {
     // Is within a Popup
     window.opener.postMessage(
@@ -39,9 +39,9 @@ function send(token) {
         from: 'POPUP'
       },
       origin
-    )
+    );
   } else {
     // Not an iframe nor a popup, then redirect to callback url
-    document.location.href = REDIRECT_BASE_URL + '?user_token=' + token
+    document.location.href = REDIRECT_BASE_URL + '?user_token=' + token;
   }
 }
