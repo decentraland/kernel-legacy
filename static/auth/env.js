@@ -1,12 +1,12 @@
 var config = {
   "org": {
-    "domain": "dcl-test.auth0.com",
-    "client_id": "lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx",
+    "domain": "decentraland.auth0.com",
+    "client_id": "yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG",
     "audience": "decentraland.org"
   },
   "today": {
-    "domain": "dcl-test.auth0.com",
-    "client_id": "lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx",
+    "domain": "dcl-stg.auth0.com",
+    "client_id": "0UB0I7w6QA3AgSvbXh9rGvDuhKrJV1C0",
     "audience": "decentraland.org"
   },
   "zone": {
