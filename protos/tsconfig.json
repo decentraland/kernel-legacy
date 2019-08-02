@@ -12,9 +12,6 @@
     "strictNullChecks": true,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": true,
-    "types": [
-      "jasmine"
-    ]
+    "noEmitOnError": true
   }
 }

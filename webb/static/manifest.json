@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Webb Client",
+  "name": "Webb: Experimental Decentraland Client - For Science",
   "icons": [
     {
       "src": "favicon.ico",

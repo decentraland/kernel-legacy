@@ -4,7 +4,7 @@ import { Page, Center, Grid, Segment, Hero } from 'decentraland-ui'
 
 import { RootState } from 'store'
 import { default as CommsStatus } from './CommsStatus/index'
-import MyTerminal from './Console';
+import { MyTerminal } from './Console'
 
 export default (_: RootState) => <Page>
   <Hero>

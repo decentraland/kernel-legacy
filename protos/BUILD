@@ -2,20 +2,25 @@ package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@ts_protoc_gen//:defs.bzl", "typescript_proto_library")
- 
+
 proto_library(
-  name = "protos_lib",
-  srcs = ["broker.proto", "comms.proto"],
+    name = "protos_lib",
+    srcs = [
+        "broker.proto",
+        "comms.proto",
+    ],
 )
- 
+
 typescript_proto_library(
-  name = "ts_protos",
-  proto = ":protos_lib",
+    name = "ts_protos",
+    proto = ":protos_lib",
 )
 
 ts_library(
     name = "protos",
-    srcs = ["broker.ts", "comms.ts", "index.ts"],
+    srcs = glob([
+        "**/*.ts",
+    ]),
     module_name = "@dcl/protos",
     tsconfig = ":tsconfig.json",
     deps = [
@@ -30,10 +35,15 @@ load("//tools/npm:package.bzl", "dcl_npm_package")
 
 dcl_npm_package(
     name = "protospackage",
-    srcs = ["broker.proto", "comms.proto"],
+    srcs = [
+        "broker.proto",
+        "comms.proto",
+    ],
     package_layers = [
         "//:common.package.json",
         "protos.package.json",
     ],
     deps = [":protos"],
 )
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "rollup_bundle")

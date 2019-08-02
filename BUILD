@@ -2,12 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")
 
-exports_files([
-    "tsconfig.json",
-    "package.json",
-    "tslib.package.json",
-    "common.package.json",
-])
+exports_files(
+    [
+        "tsconfig.json",
+        "package.json",
+        "tslib.package.json",
+        "common.package.json",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 PROTOBUF_DEPS = [
     "@npm//protobufjs",
@@ -42,4 +45,9 @@ load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
 
 buildifier(
     name = "buildifier",
+)
+
+filegroup(
+    name = "global-tsconfig",
+    srcs = ["tsconfig.json"],
 )

@@ -11,4 +11,5 @@ npm-debug.log
 coverage
 .tsbuildinfo
 
+bazel-*
 dist

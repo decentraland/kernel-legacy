@@ -2,13 +2,13 @@ import { RouterState, routerMiddleware } from 'connected-react-router'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createBrowserHistory } from 'history'
 
-import { AuthState, authMiddleware } from 'modules/auth'
-import { commsMiddleware, CommsState } from 'modules/comms'
-import { passportsMiddleware } from 'modules/passports'
-import { assetsMiddleware, AssetsState } from 'modules/assets'
-import { worldMiddleware, WorldState } from 'modules/world'
+import { AuthState, authMiddleware } from '~/modules/auth'
+import { commsMiddleware, CommsState } from '~/modules/comms'
+import { passportsMiddleware } from '~/modules/passports'
+import { assetsMiddleware, AssetsState } from '~/modules/assets'
+import { worldMiddleware, WorldState } from '~/modules/world'
 
-import { createReducer } from 'reducers'
+import { createReducer } from '~/reducers'
 
 export const history = createBrowserHistory()
 
@@ -32,13 +32,15 @@ export const configureStore = (state?: RootState) => {
   const store = createStore(
     createReducer(history),
     state,
-    enhance(applyMiddleware(
-      routerMiddleware(history),
-      authMiddleware as any,
-      commsMiddleware as any,
-      assetsMiddleware as any,
-      worldMiddleware as any,
-      passportsMiddleware as any)
+    enhance(
+      applyMiddleware(
+        routerMiddleware(history),
+        authMiddleware as any,
+        commsMiddleware as any,
+        assetsMiddleware as any,
+        worldMiddleware as any,
+        passportsMiddleware as any
+      )
     )
   )
   return store

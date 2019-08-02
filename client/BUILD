@@ -4,11 +4,20 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
     name = "client",
-    srcs = glob(["auth/**/*.ts", "comms/**/*.ts", "config/**/*.ts", "passports/**/*.ts", "presence/**/*.ts", "social/**/*.ts", "worldMap/**/*.ts"]),
+    srcs = glob([
+        "index.ts",
+        "auth/**/*.ts",
+        "comms/**/*.ts",
+        "config/**/*.ts",
+        "passports/**/*.ts",
+        "presence/**/*.ts",
+        "social/**/*.ts",
+        "worldMap/**/*.ts",
+    ]),
     module_name = "@dcl/client",
     deps = [
-        "//protos",
         "//config",
+        "//protos",
         "//utils",
         "@npm//@types",
         "@npm//@types/auth0-js",
@@ -32,5 +41,3 @@ dcl_npm_package(
     ],
     deps = [":client"],
 )
-
-load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")
