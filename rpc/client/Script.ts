@@ -1,8 +1,8 @@
-import { Client } from '@dcl/rpc/common/json-rpc/Client'
-import { getApi } from '@dcl/rpc/common/json-rpc/API'
-import { ILogOpts, ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-import { isPromiseLike } from '@dcl/rpc/common/core/isPromiseLike'
-import { hasOwnSymbol } from '@dcl/rpc/common/core/SymbolShim'
+import { Client } from 'dclrpc/common/json-rpc/Client'
+import { getApi } from 'dclrpc/common/json-rpc/API'
+import { ILogOpts, ScriptingTransport } from 'dclrpc/common/json-rpc/types'
+import { isPromiseLike } from 'dclrpc/common/core/isPromiseLike'
+import { hasOwnSymbol } from 'dclrpc/common/core/SymbolShim'
 
 /** this is defined in the constructor ScriptingHost() */
 const loadAPIsNotificationName = 'LoadComponents'

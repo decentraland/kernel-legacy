@@ -12,25 +12,6 @@ exports_files(
     visibility = ["//visibility:public"],
 )
 
-PROTOBUF_DEPS = [
-    "@npm//protobufjs",
-    # these deps are needed even though they are not automatic transitive deps of
-    # protobufjs since if they are not in the runfiles then protobufjs attempts to
-    # run `npm install` at runtime to get thhem which fails as it tries to access
-    # the npm cache outside of the sandbox
-    "@npm//semver",
-    "@npm//chalk",
-    "@npm//glob",
-    "@npm//jsdoc",
-    "@npm//minimist",
-    "@npm//tmp",
-    "@npm//uglify-js",
-    "@npm//uglify-es",
-    "@npm//espree",
-    "@npm//escodegen",
-    "@npm//estraverse",
-]
-
 nodejs_binary(
     name = "tslint",
     data = [

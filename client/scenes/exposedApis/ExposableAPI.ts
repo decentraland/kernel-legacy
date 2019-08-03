@@ -1,4 +1,4 @@
-import { API, exposeMethod, getExposedMethods } from '@dcl/rpc/lib/host'
+import { API, exposeMethod, getExposedMethods } from 'dclrpc/lib/host'
 
 export class ExposableAPI extends API {
   @exposeMethod

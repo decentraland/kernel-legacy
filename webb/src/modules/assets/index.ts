@@ -1,8 +1,9 @@
 import { Middleware, Store, AnyAction } from 'redux'
-import { jsonFetch } from '@dcl/utils/network/jsonFetch'
+import { jsonFetch } from 'dcl/utils/network/jsonFetch'
 
 export type AssetAction = {
-  type: 'Add Asset Pack Definition'
+  type:
+    | 'Add Asset Pack Definition'
     | 'Add Asset Pack Contents'
     | 'Initialized'
     | 'Switch tab'
@@ -50,7 +51,10 @@ export const EMPTY_ASSETS = {
   info: {}
 }
 
-export function assetsReducer(state = EMPTY_ASSETS, action?: AssetAction | AnyAction) {
+export function assetsReducer(
+  state = EMPTY_ASSETS,
+  action?: AssetAction | AnyAction
+) {
   if (!action) return state
 
   switch (action.type) {
@@ -59,14 +63,21 @@ export function assetsReducer(state = EMPTY_ASSETS, action?: AssetAction | AnyAc
     case 'Switch tab':
       return { ...state, currentTab: action.payload }
     case 'Add Asset Pack Definition':
-      return { ...state, packs: { ...state.packs, [action.payload.id]: action.payload } }
+      return {
+        ...state,
+        packs: { ...state.packs, [action.payload.id]: action.payload }
+      }
     case 'Add Asset Pack Contents':
       const byCategories: any = {}
       for (let assetDefinition of action.payload.contents) {
-        byCategories[assetDefinition.category] = byCategories[assetDefinition.category] || []
+        byCategories[assetDefinition.category] =
+          byCategories[assetDefinition.category] || []
         byCategories[assetDefinition.category].push(assetDefinition)
       }
-      return { ...state, contents: { ...state.contents, [action.payload.id]: byCategories } }
+      return {
+        ...state,
+        contents: { ...state.contents, [action.payload.id]: byCategories }
+      }
   }
   return state
 }
@@ -74,8 +85,13 @@ export function assetsReducer(state = EMPTY_ASSETS, action?: AssetAction | AnyAc
 /**
  * State transitions that require side-effects
  */
-export const assetsMiddleware = (store: Store<AssetsState>) => (next: Middleware) => (action: any) => {
-  const dispatch = (type: any, payload?: any) => typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
+export const assetsMiddleware: any = (store: Store<AssetsState>) => (
+  next: Middleware
+) => (action: any) => {
+  const dispatch = (type: any, payload?: any) =>
+    typeof type === 'string'
+      ? store.dispatch({ type, payload })
+      : store.dispatch(type)
 
   switch (action.type) {
     case '@@router/LOCATION_CHANGE':
@@ -98,15 +114,23 @@ export async function fetchAvatarAssets(store: any, dispatch: any) {
     placeable: false,
     id: 'dcl://base-avatars/',
     title: 'Base Avatars',
-    thumbnail: 'https://avatars.decentraland.org/static/media/image-customize.83614e82.png',
+    thumbnail:
+      'https://avatars.decentraland.org/static/media/image-customize.83614e82.png',
     url: 'https://avatar-assets.now.sh'
   })
   dispatch('Add Asset Pack Contents', {
     id: 'dcl://base-avatars/',
-    contents: assets.data.map((t: any) => ({ ...t, thumbnail: t.thumbnail.replace('content', 'content-service')}))
+    contents: assets.data.map((t: any) => ({
+      ...t,
+      thumbnail: t.thumbnail.replace('content', 'content-service')
+    }))
   })
 }
-export async function fetchBuilderAssetPack(store: any, dispatch: any, url: string) {
+export async function fetchBuilderAssetPack(
+  store: any,
+  dispatch: any,
+  url: string
+) {
   const assets = await jsonFetch(url)
   const idParts = url.split('/')
   const id = idParts[idParts.length - 1].split('.')[0]
@@ -121,6 +145,9 @@ export async function fetchBuilderAssets(store: any, dispatch: any) {
   }
 }
 
-export async function needsInitialization(store: Store<AssetsState>, action: any) {
-  return (store.getState().status === 'Not initialized' && action.type !== 'Initialized')
+export function needsInitialization(store: Store<AssetsState>, action: any) {
+  return (
+    store.getState().status === 'Not initialized' &&
+    action.type !== 'Initialized'
+  )
 }

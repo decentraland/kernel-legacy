@@ -2,15 +2,15 @@ import { RouterState, routerMiddleware } from 'connected-react-router'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createBrowserHistory } from 'history'
 
-import { AuthState, authMiddleware } from '~/modules/auth'
-import { commsMiddleware, CommsState } from '~/modules/comms'
-import { passportsMiddleware } from '~/modules/passports'
-import { assetsMiddleware, AssetsState } from '~/modules/assets'
-import { worldMiddleware, WorldState } from '~/modules/world'
+import { AuthState, authMiddleware } from 'dcl/webb/src/modules/auth'
+import { commsMiddleware, CommsState } from 'dcl/webb/src/modules/comms'
+import { passportsMiddleware } from 'dcl/webb/src/modules/passports'
+import { assetsMiddleware, AssetsState } from 'dcl/webb/src/modules/assets'
+import { worldMiddleware, WorldState } from 'dcl/webb/src/modules/world'
 
-import { createReducer } from '~/reducers'
+import { createReducer } from 'dcl/webb/src/reducers'
 
-export const history = createBrowserHistory()
+export const history: any = createBrowserHistory()
 
 export type RootState = {
   router: RouterState
@@ -28,7 +28,7 @@ const enhance =
       })
     : compose
 
-export const configureStore = (state?: RootState) => {
+export const configureStore: any = (state?: RootState) => {
   const store = createStore(
     createReducer(history),
     state,

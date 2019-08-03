@@ -1,4 +1,4 @@
-import { log } from '@dcl/utils/Logger'
+import { log } from 'dcl/utils/Logger'
 
 import { getComponentName, ComponentConstructor, getComponentClassId, ComponentLike } from './Component'
 import { IECSEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'

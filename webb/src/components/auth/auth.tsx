@@ -2,18 +2,18 @@ import React from 'react'
 
 import { Segment, Page, Center } from 'decentraland-ui'
 
-import { AuthStatusSummary } from 'modules/auth'
+import { AuthStatusSummary } from 'dcl/webb/src/modules/auth'
 import { EnterCode } from './EnterCode'
 import { EnterEmail } from './EnterEmail'
 
 export function wrap(element: any) {
-  return <>
-    <Page>
-      <Center>
-        { element }
-      </Center>
-    </Page>
-  </>
+  return (
+    <>
+      <Page>
+        <Center>{element}</Center>
+      </Page>
+    </>
+  )
 }
 
 export default function renderAuth(props: {
@@ -42,6 +42,13 @@ export default function renderAuth(props: {
       return wrap(<Segment>Please ask for access to the whitelist</Segment>)
 
     case 'Logged in':
-      return wrap(<Segment><div style={{ textAlign: 'center' }}><h2>Connected!</h2><h4>Redirecting you to the home screen...</h4></div></Segment>)
+      return wrap(
+        <Segment>
+          <div style={{ textAlign: 'center' }}>
+            <h2>Connected!</h2>
+            <h4>Redirecting you to the home screen...</h4>
+          </div>
+        </Segment>
+      )
   }
 }

@@ -1,9 +1,9 @@
 const qs: any = require('query-string')
 
-import { MVector3, ReadOnlyVector3, ReadOnlyQuaternion, MVector2, ReadOnlyVector2 } from '@dcl/utils/math'
-import { worldToGrid, gridToWorld, parseParcelPosition } from '@dcl/utils/scene/parcel'
-import { Observable } from '@dcl/utils/Observable'
-import { ILand } from '@dcl/utils/BagOfThings'
+import { MVector3, ReadOnlyVector3, ReadOnlyQuaternion, MVector2, ReadOnlyVector2 } from 'dcl/utils/math'
+import { worldToGrid, gridToWorld, parseParcelPosition } from 'dcl/utils/scene/parcel'
+import { Observable } from 'dcl/utils/Observable'
+import { ILand } from 'dcl/utils/BagOfThings'
 
 declare var location: any
 declare var history: any

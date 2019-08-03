@@ -1,8 +1,8 @@
 import { Middleware, Store, AnyAction } from 'redux'
 import { push, RouterRootState } from 'connected-react-router'
 
-import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
-import * as AuthLib from '@dcl/client/auth/lib'
+import { AuthState as AuthStateLib } from 'dcl/client/auth/types'
+import * as AuthLib from 'dcl/client/auth/lib'
 
 export type AuthStatusSummary =
   | 'Not initialized'
@@ -48,7 +48,10 @@ const EMPTY_AUTH_STATE: AuthState = {
 /**
  * State transitions without side-effects
  */
-export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyAction) {
+export function authReducer(
+  state = EMPTY_AUTH_STATE,
+  action?: AuthAction | AnyAction
+) {
   if (!action) return state
 
   switch (action.type) {
@@ -57,13 +60,21 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
     case 'Not logged in':
       return { ...state, summary: 'Not logged in' } as AuthState
     case 'Set email':
-      return { ...state, summary: 'Checking email', email: (action as any).payload } as AuthState
+      return {
+        ...state,
+        summary: 'Checking email',
+        email: (action as any).payload
+      } as AuthState
     case 'Awaiting verification':
       return { ...state, summary: 'Awaiting verification' } as AuthState
     case 'Set verification':
       return { ...state, summary: 'Checking verification code' } as AuthState
     case 'Login successful':
-      return { ...state, summary: 'Logged in', ...(action as any).payload } as AuthState
+      return {
+        ...state,
+        summary: 'Logged in',
+        ...(action as any).payload
+      } as AuthState
     case 'Login error':
       return { ...state, summary: 'Not logged in' } as AuthState
   }
@@ -73,8 +84,13 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
 /**
  * State transitions that require side-effects
  */
-export const authMiddleware = (store: Store<RouterRootState & AuthRootState>) => (next: Middleware) => (action: any) => {
-  const dispatch = (type: any, payload?: any) => typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
+export const authMiddleware: any = (
+  store: Store<RouterRootState & AuthRootState>
+) => (next: Middleware) => (action: any) => {
+  const dispatch = (type: any, payload?: any) =>
+    typeof type === 'string'
+      ? store.dispatch({ type, payload })
+      : store.dispatch(type)
 
   switch (action.type) {
     case '@@router/LOCATION_CHANGE':
@@ -100,27 +116,39 @@ export const authMiddleware = (store: Store<RouterRootState & AuthRootState>) =>
   return next(action)
 }
 
-export function needsInitialization(store: Store<AuthRootState>, action: AnyAction) {
-  return store.getState().auth.summary === 'Not initialized' && action.type !== 'Auth initialized'
+export function needsInitialization(
+  store: Store<AuthRootState>,
+  action: AnyAction
+) {
+  return (
+    store.getState().auth.summary === 'Not initialized' &&
+    action.type !== 'Auth initialized'
+  )
 }
 
-export async function checkSessionAndRedirectToHome(store: Store<RouterRootState>, dispatch: (type: any, payload?: any) => any ) {
+export async function checkSessionAndRedirectToHome(
+  store: Store<RouterRootState>,
+  dispatch: (type: any, payload?: any) => any
+) {
   try {
     const result = await AuthLib.checkSession()
     dispatch('Login successful', result)
     if (store.getState().router.location.pathname === '/login') {
       store.dispatch(push('/'))
     }
-  } catch(e) {
+  } catch (e) {
     dispatch('Not logged in', e)
   }
 }
 
-export async function fetchVerificationCode(dispatch: (type: string, payload?: any) => any, action: AnyAction) {
+export async function fetchVerificationCode(
+  dispatch: (type: string, payload?: any) => any,
+  action: AnyAction
+) {
   try {
     await AuthLib.getVerificationCode(action.payload)
     dispatch('Awaiting verification')
-  } catch(e) {
+  } catch (e) {
     dispatch('Invalid email', e)
   }
 }
@@ -131,7 +159,10 @@ export async function checkVerificationCode(
   action: AnyAction
 ) {
   try {
-    const result = await AuthLib.doAuth(store.getState().auth.email!, action.payload)
+    const result = await AuthLib.doAuth(
+      store.getState().auth.email!,
+      action.payload
+    )
     dispatch('Login successful', result)
     if (currentLocation(store) === '/login') {
       dispatch(push('/'))

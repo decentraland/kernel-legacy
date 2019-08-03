@@ -1,161 +1,172 @@
-import { future, IFuture } from 'fp-future'
+import { future, IFuture } from "fp-future";
 
-import { ILogger, createLogger } from '@dcl/utils/Logger'
-import { Observable } from '@dcl/utils/Observable'
+import { ILogger, createLogger } from "dcl/utils/Logger";
+import { Observable } from "dcl/utils/Observable";
 
-import { MessageType, CoordinatorMessage, WelcomeMessage, ConnectMessage } from '@dcl/protos'
-import { SocketReadyState } from './worldInstanceConnection'
-import { Stats } from './Reporter'
-import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
+import {
+  MessageType,
+  CoordinatorMessage,
+  WelcomeMessage,
+  ConnectMessage
+} from "dcl/protos";
+import { SocketReadyState } from "./worldInstanceConnection";
+import { Stats } from "./Reporter";
+import { IBrokerConnection, BrokerMessage } from "./IBrokerConnection";
 
 export class CliBrokerConnection implements IBrokerConnection {
-  public alias: number | null = null
+  public alias: number | null = null;
 
-  public stats: Stats | null = null
+  public stats: Stats | null = null;
 
-  public logger: ILogger = createLogger('Broker: ')
+  public logger: ILogger = createLogger("Broker: ");
 
-  public onMessageObservable = new Observable<BrokerMessage>()
+  public onMessageObservable = new Observable<BrokerMessage>();
 
-  private connected = future<void>()
+  private connected = future<void>();
 
   get isAuthenticated() {
-    return !!this.alias
+    return !!this.alias;
   }
 
   get isConnected(): IFuture<void> {
-    return this.connected
+    return this.connected;
   }
 
   get hasUnreliableChannel() {
-    return (this.ws && this.ws.readyState === WebSocket.OPEN) || false
+    return (this.ws && this.ws.readyState === WebSocket.OPEN) || false;
   }
 
   get hasReliableChannel() {
-    return (this.ws && this.ws.readyState === WebSocket.OPEN) || false
+    return (this.ws && this.ws.readyState === WebSocket.OPEN) || false;
   }
 
-  private ws: WebSocket | null = null
+  private ws: WebSocket | null = null;
 
   constructor(public url: string) {
-    this.connectWS()
+    this.connectWS();
   }
 
   printDebugInformation(): void {
     if (this.ws && this.ws.readyState === SocketReadyState.OPEN) {
-      const state = (this.alias ? 'authenticated' : 'not authenticated') + ` my alias is ${this.alias}`
-      this.logger.log(state)
+      const state =
+        (this.alias ? "authenticated" : "not authenticated") +
+        ` my alias is ${this.alias}`;
+      this.logger.log(state);
     } else {
-      this.logger.log(`non active coordinator connection to ${this.url}`)
+      this.logger.log(`non active coordinator connection to ${this.url}`);
     }
   }
 
   sendReliable(data: Uint8Array) {
     if (!this.hasReliableChannel) {
-      throw new Error('trying to message using null reliable channel')
+      throw new Error("trying to message using null reliable channel");
     }
-    this.sendCoordinatorMessage(data)
+    this.sendCoordinatorMessage(data);
   }
 
   sendUnreliable(data: Uint8Array) {
     if (!this.hasUnreliableChannel) {
-      throw new Error('trying to message using null unreliable channel')
+      throw new Error("trying to message using null unreliable channel");
     }
-    this.sendCoordinatorMessage(data)
+    this.sendCoordinatorMessage(data);
   }
 
   close() {
     if (this.ws) {
-      this.ws.onmessage = null
-      this.ws.onerror = null
-      this.ws.onclose = null
-      this.ws.close()
+      this.ws.onmessage = null;
+      this.ws.onerror = null;
+      this.ws.onclose = null;
+      this.ws.close();
     }
   }
 
   async onWsMessage(event: MessageEvent) {
-    const data = event.data
-    const msg = new Uint8Array(data)
-    const msgSize = msg.length
+    const data = event.data;
+    const msg = new Uint8Array(data);
+    const msgSize = msg.length;
 
-    const msgType = CoordinatorMessage.deserializeBinary(data).getType()
+    const msgType = CoordinatorMessage.deserializeBinary(data).getType();
 
     switch (msgType) {
       case MessageType.WELCOME: {
         if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
+          this.stats.others.incrementRecv(msgSize);
         }
 
-        let message: WelcomeMessage
+        let message: WelcomeMessage;
         try {
-          message = WelcomeMessage.deserializeBinary(msg)
+          message = WelcomeMessage.deserializeBinary(msg);
         } catch (e) {
-          this.logger.error('cannot deserialize welcome client message', e, msg)
-          break
+          this.logger.error(
+            "cannot deserialize welcome client message",
+            e,
+            msg
+          );
+          break;
         }
 
-        this.alias = message.getAlias()
-        this.logger.info('my alias is', this.alias)
+        this.alias = message.getAlias();
+        this.logger.info("my alias is", this.alias);
 
-        const connectMessage = new ConnectMessage()
-        connectMessage.setType(MessageType.CONNECT)
-        connectMessage.setToAlias(0)
-        connectMessage.setFromAlias(this.alias)
-        this.sendCoordinatorMessage(connectMessage.serializeBinary())
+        const connectMessage = new ConnectMessage();
+        connectMessage.setType(MessageType.CONNECT);
+        connectMessage.setToAlias(0);
+        connectMessage.setFromAlias(this.alias);
+        this.sendCoordinatorMessage(connectMessage.serializeBinary());
 
-        this.connected.resolve()
+        this.connected.resolve();
 
-        break
+        break;
       }
       case MessageType.DATA:
       case MessageType.PING: {
         if (this.stats) {
-          this.stats.dispatchTopicDuration.start()
+          this.stats.dispatchTopicDuration.start();
         }
 
         this.onMessageObservable.notifyObservers({
-          channel: 'ws',
+          channel: "ws",
           data: msg
-        })
+        });
 
-        break
+        break;
       }
       default: {
         if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
+          this.stats.others.incrementRecv(msgSize);
         }
-        this.logger.warn('Ignoring message type', msgType)
-        break
+        this.logger.warn("Ignoring message type", msgType);
+        break;
       }
     }
   }
 
   private sendCoordinatorMessage = (msg: Uint8Array) => {
     if (!this.ws || this.ws.readyState !== SocketReadyState.OPEN) {
-      throw new Error('try to send answer to a non ready ws')
+      throw new Error("try to send answer to a non ready ws");
     }
 
-    this.ws.send(msg)
-  }
+    this.ws.send(msg);
+  };
 
   private connectWS() {
     if (this.ws) {
-      this.ws.close()
-      this.ws = null
+      this.ws.close();
+      this.ws = null;
     }
 
-    this.ws = new WebSocket(this.url, 'comms')
-    this.ws.binaryType = 'arraybuffer'
+    this.ws = new WebSocket(this.url, "comms");
+    this.ws.binaryType = "arraybuffer";
 
     this.ws.onerror = event => {
-      this.logger.error('socket error', event)
-      this.ws = null
-    }
+      this.logger.error("socket error", event);
+      this.ws = null;
+    };
 
     this.ws.onmessage = event => {
       this.onWsMessage(event).catch(err => {
-        this.logger.error(err)
-      })
-    }
+        this.logger.error(err);
+      });
+    };
   }
 }

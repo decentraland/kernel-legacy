@@ -1,6 +1,6 @@
 const Webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
-const webpackConfig = require('../webpack.config')
+const webpackConfig = require('dcl/webb/webpack.config')
 
 const compiler = Webpack(webpackConfig)
 const devServerOptions = Object.assign({}, webpackConfig.devServer, {

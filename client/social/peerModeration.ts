@@ -1,5 +1,5 @@
-import { Observable } from '@dcl/utils/Observable'
-import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils/SafeLocalStorage'
+import { Observable } from 'dcl/utils/Observable'
+import { getFromLocalStorage, saveToLocalStorage } from 'dcl/utils/SafeLocalStorage'
 
 import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from '../comms/types'
 

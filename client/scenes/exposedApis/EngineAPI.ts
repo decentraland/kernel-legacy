@@ -1,7 +1,7 @@
-import { registerAPI, exposeMethod, APIOptions } from '@dcl/rpc/host'
+import { registerAPI, exposeMethod, APIOptions } from 'dclrpc/host'
 
 import { ExposableAPI } from './ExposableAPI'
-import { EntityAction } from '@dcl/utils/BagOfThings'
+import { EntityAction } from 'dcl/utils/BagOfThings'
 import { IEventNames, IEvents } from './'
 
 export interface IEngineAPI {

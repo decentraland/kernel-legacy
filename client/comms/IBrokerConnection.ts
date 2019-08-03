@@ -1,4 +1,4 @@
-import { Observable } from '@dcl/utils/Observable'
+import { Observable } from 'dcl/utils/Observable'
 
 import { Stats } from './Reporter'
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { default as Config } from '@dcl/config'
+import { default as Config } from 'dcl/config'
 
 export function show() {
   ReactDOM.render(
@@ -12,3 +12,5 @@ export function show() {
     document.querySelector('body')
   )
 }
+
+show()

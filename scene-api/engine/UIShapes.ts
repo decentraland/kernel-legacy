@@ -1,4 +1,4 @@
-import { Color4 } from '@dcl/utils/math'
+import { Color4 } from 'dcl/utils/math'
 
 import { CLASS_ID, OnUUIDEvent, Texture } from './Components'
 import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'

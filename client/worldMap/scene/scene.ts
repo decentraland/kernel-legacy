@@ -9,7 +9,7 @@ import {
   AssetTagDefinition,
   ReferenceSystem,
   SpawnPoint
-} from '@dcl/utils/scene'
+} from 'dcl/utils/scene'
 import { createHash } from 'crypto'
 
 export function parseCoordinate(coord: CoordinateDefinition) {
