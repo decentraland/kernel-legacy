@@ -1,4 +1,9 @@
 {
+  "prettier": {
+    "jsxSingleQuote": true,
+    "singleQuote": true,
+    "semi": false
+  },
   "dependencies": {
     "@bazel/ibazel": "^0.9.1",
     "@bazel/typescript": "^0.32.2",

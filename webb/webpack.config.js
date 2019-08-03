@@ -1,10 +1,31 @@
 var path = require('path')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin')
+var package = require('./package.json')
 
 module.exports = {
   resolve: {
     extensions: ['.js']
   },
+  entry: {
+    app: path.join(process.cwd(), 'webb/src/index.js'),
+    vendor: Object.keys(package)
+  },
+  plugins: [
+    new CommonsChunkPlugin({
+      name: 'shared',
+      minChunks: 2
+    }),
+    new HtmlWebpackPlugin({
+      hash: true,
+      title: 'webb - Experimental Decentraland Client & Information System',
+      myPageHeader: 'webb',
+      template: './static/index.html',
+      chunks: ['vendor', 'app'],
+      path: path.join(process.cwd(), 'webb/dist/'),
+      filename: 'index.html'
+    })
+  ],
   module: {
     rules: [
       {
@@ -13,9 +34,8 @@ module.exports = {
       }
     ]
   },
-  entry: path.join(process.cwd(), 'webb/src/index.js'),
   output: {
-    filename: 'bundle.js',
+    filename: '[name].bundle.js',
     path: path.join(process.cwd(), 'webb/static/'),
     publicPath: '/static/'
   },
