@@ -6,15 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <link rel="manifest" href="/manifest.json" />
-    <script
-      crossorigin
-      src="https://unpkg.com/react@16/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
-    ></script>
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>webb: Experimental Decentraland Client</title>
+    <script src="/node_modules/requirejs/require.js"></script>
+    <script>
+      requirejs.config({
+        paths: {
+          react: '/node_modules/react/umd/react.development.js',
+          'react-dom': '/node_modules/react-dom/umd/react-dom.development'
+        }
+      })
+    </script>
+    <script src="/bundle.js"></script>
   </head>
 
   <body>
