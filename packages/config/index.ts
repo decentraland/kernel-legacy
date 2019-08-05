@@ -144,6 +144,7 @@ export const knownTLDs = ['zone', 'org', 'today']
 
 function getDefaultTLD() {
   const TLD = getTLD()
+  if (TLD === 'localhost') return 'zone' // web3 is now disabled by default
   if (!TLD || !knownTLDs.includes(TLD)) {
     return network === ETHEREUM_NETWORK.ROPSTEN ? 'zone' : 'org'
   }
