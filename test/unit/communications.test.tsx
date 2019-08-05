@@ -15,7 +15,8 @@ import {
   SubscriptionMessage,
   MessageType,
   Role,
-  Format
+  Format,
+  TopicIdentityMessage
 } from '../../packages/shared/comms/proto/broker'
 import { AuthData } from '../../packages/shared/comms/proto/comms'
 import { PositionData, ProfileData, ChatData, Category } from '../../packages/shared/comms/proto/comms'
@@ -32,6 +33,7 @@ import {
 import { BrokerConnection } from 'shared/comms/BrokerConnection'
 import { IBrokerConnection, BrokerMessage } from 'shared/comms/IBrokerConnection'
 import { Observable } from 'decentraland-ecs/src'
+import { TopicIdentityFWMessage } from '../../packages/shared/comms/proto/broker'
 
 chai.use(sinonChai)
 
@@ -320,14 +322,15 @@ describe('Communications', function() {
 
           const bodyEncoded = body.serializeBinary()
 
-          const msg = new TopicFWMessage()
-          msg.setType(MessageType.TOPIC_FW)
+          const msg = new TopicIdentityFWMessage()
+          msg.setType(MessageType.TOPIC_IDENTITY_FW)
           msg.setFromAlias(1)
+          msg.setIdentity(btoa('id'))
           msg.setBody(bodyEncoded)
 
           const e = { data: msg.serializeBinary() }
           channel.onmessage(e)
-          expect(worldConn.profileHandler).to.have.been.calledWith('1', body)
+          expect(worldConn.profileHandler).to.have.been.calledWith('1', 'id', body)
         })
 
         it('receive chat data message', () => {
@@ -424,21 +427,17 @@ describe('Communications', function() {
         it('profile', () => {
           const p = [20, 20, 20, 20, 20, 20, 20] as Position
           const profile = {
-            displayName: 'testname',
-            publicKey: 'pubkey',
-            avatarType: 'fox'
+            version: 'version'
           }
           worldConn.sendProfileMessage(p, profile)
 
           expect(connection.reliableDataChannel!.send).to.have.been.calledWithMatch((bytes: Uint8Array) => {
-            const msg = TopicMessage.deserializeBinary(bytes)
-            expect(msg.getType()).to.equal(MessageType.TOPIC)
+            const msg = TopicIdentityMessage.deserializeBinary(bytes)
+            expect(msg.getType()).to.equal(MessageType.TOPIC_IDENTITY)
             expect(msg.getTopic()).to.equal('37:37')
 
             const data = ProfileData.deserializeBinary(msg.getBody() as Uint8Array)
-            expect(data.getAvatarType()).to.equal('fox')
-            expect(data.getDisplayName()).to.equal('testname')
-            expect(data.getPublicKey()).to.equal('pubkey')
+            expect(data.getProfileVersion()).to.equal('version')
             return true
           })
         })
@@ -527,45 +526,40 @@ describe('Communications', function() {
 
         const profileData = new ProfileData()
         profileData.setTime(Date.now())
-        profileData.setDisplayName('testname')
-        profileData.setPublicKey('pubkey')
-        profileData.setAvatarType('fox')
+        profileData.setProfileVersion('version')
 
-        processProfileMessage(context, 'client2', profileData)
+        const info = new PeerTrackingInfo()
+        sinon.spy(info, 'loadProfileIfNecessary')
+        context.peerData.set('client2', info)
+
+        processProfileMessage(context, 'client2', 'userId1', profileData)
 
         expect(context.peerData).to.have.key('client2')
         const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
-        expect(trackingInfo.profile).to.deep.equal({
-          displayName: 'testname',
-          publicKey: 'pubkey',
-          avatarType: 'fox'
+        expect(trackingInfo.identity).to.equal('userId1')
+        expect(trackingInfo.userInfo).to.deep.equal({
+          identity: 'userId1'
         })
+        expect(trackingInfo.loadProfileIfNecessary).to.have.been.calledWith('version')
       })
 
       it('old profile message', () => {
-        const profile = {
-          displayName: 'testname1',
-          publicKey: 'pubkey1',
-          avatarType: 'fox1'
-        }
-
         const context = new Context({})
         const info = new PeerTrackingInfo()
         info.lastProfileUpdate = Date.now()
-        info.profile = profile
+        info.identity = 'identity2'
+        sinon.spy(info, 'loadProfileIfNecessary')
         context.peerData.set('client2', info)
 
         const profileData = new ProfileData()
         profileData.setTime(new Date(2008).getTime())
-        profileData.setDisplayName('testname')
-        profileData.setPublicKey('pubkey')
-        profileData.setAvatarType('fox')
+        profileData.setProfileVersion('version1')
 
-        processProfileMessage(context, 'client2', profileData)
+        processProfileMessage(context, 'client2', 'identity2', profileData)
 
         expect(context.peerData).to.have.key('client2')
         const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
-        expect(trackingInfo.profile).to.equal(profile)
+        expect(trackingInfo.loadProfileIfNecessary).to.not.have.been.calledWith('version1')
       })
     })
   })
