@@ -1,4 +1,4 @@
-import { getAuthURL } from './env'
+import { getServerConfigurations } from 'config'
 
 export type APIOptions = {
   baseURL?: string
@@ -6,7 +6,7 @@ export type APIOptions = {
 
 export class API {
   static defaultOptions: APIOptions = {
-    baseURL: getAuthURL()
+    baseURL: getServerConfigurations().auth
   }
 
   options: APIOptions

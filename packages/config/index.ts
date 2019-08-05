@@ -153,6 +153,7 @@ function getDefaultTLD() {
 export function getServerConfigurations() {
   const TLDDefault = getDefaultTLD()
   return {
+    auth: `https://auth.decentraland.${TLDDefault}/api/v1`,
     landApi: `https://api.decentraland.${TLDDefault}/v1`,
     content: `https://content.decentraland.${TLDDefault}`,
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
