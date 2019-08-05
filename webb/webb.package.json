@@ -13,7 +13,7 @@
     "@types/react": "^16.8.24",
     "@types/react-dom": "16.8.4",
     "@types/react-redux": "^7.1.1",
-    "@types/react-router": "^5.0.3",
+    "@types/react-router": "^5.0.3"
   },
   "dependencies": {
     "auth0-js": "^9.11.2",

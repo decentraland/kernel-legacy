@@ -10,7 +10,7 @@ import {
   Loader,
   Segment
 } from 'decentraland-ui'
-import { ParcelData } from 'dcl/webb/src/modules/world'
+import { ParcelData } from '@dcl/webb/src/modules/world'
 import { LinkReactComponent } from './LinkReactComponent'
 
 function marketplaceEstateUrl(estateId: string) {

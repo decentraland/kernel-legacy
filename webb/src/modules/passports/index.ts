@@ -1,9 +1,9 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { StoredPassport } from 'dcl/client/passports/types'
-import { getStoredPassportForUser } from 'dcl/client/passports/api'
+import { StoredPassport } from '@dcl/client/passports/types'
+import { getStoredPassportForUser } from '@dcl/client/passports/api'
 
-import { AuthRootState } from 'dcl/webb/src/modules/auth'
+import { AuthRootState } from '@dcl/webb/src/modules/auth'
 
 export type PassportActions = [
   { type: 'Request passport'; payload: string },

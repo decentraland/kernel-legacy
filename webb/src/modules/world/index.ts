@@ -1,8 +1,8 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { jsonFetch } from 'dcl/utils/network/jsonFetch'
+import { jsonFetch } from '@dcl/utils/network/jsonFetch'
 
-import { AuthRootState } from 'dcl/webb/src/modules/auth'
+import { AuthRootState } from '@dcl/webb/src/modules/auth'
 
 export type WorldActions = [
   { type: 'Set selected world parcel'; payload: { x: number; y: number } },

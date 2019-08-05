@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"],
-      "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
-    },
-    "module": "es6",
+    "target": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "module": "esnext",
+    "jsx": "react",
     "diagnostics": false,
     "moduleResolution": "node",
     "stripInternal": true,
@@ -20,12 +22,14 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     "removeComments": true,
-    "target": "esnext",
     "sourceMap": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "jsx": "react",
-    "lib": ["esnext", "dom"]
-  },
-  "exclude": ["bazel-*", "node_modules", "**/node_modules/*"]
+    "baseUrl": "./webb/src",
+    "paths": {
+      "~/*": ["*"],
+      "dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"],
+      "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
+    },
+  }
 }

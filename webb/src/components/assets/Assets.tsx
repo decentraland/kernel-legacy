@@ -1,6 +1,6 @@
 import React from 'react'
 import { Page, Grid, Tabs, Segment, Hero, Center } from 'decentraland-ui'
-import { AssetsState } from 'dcl/webb/src/modules/assets'
+import { AssetsState } from '@dcl/webb/src/modules/assets'
 
 export type ToggleStatus = {
   currentPack: string

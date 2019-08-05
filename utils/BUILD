@@ -24,5 +24,3 @@ dcl_npm_package(
     ],
     deps = [":utils"],
 )
-
-load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")

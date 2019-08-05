@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { RootState } from 'dcl/webb/src/store'
+import { RootState } from '@dcl/webb/src/store'
 import { push } from 'connected-react-router'
 
 import { default as ParcelInfo } from './ParcelInfo'

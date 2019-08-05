@@ -17,9 +17,7 @@ dcl_npm_package(
     name = "package",
     package_layers = [
         "//:common.package.json",
-        "//:tslib.package.json"
+        "//:tslib.package.json",
     ],
     deps = [":config"],
 )
-
-load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")

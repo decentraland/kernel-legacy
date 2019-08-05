@@ -12,7 +12,7 @@ import {
 import { NoDeployment } from './NoDeployment'
 import { LoadingSceneInfo } from './LoadingSceneInfo'
 
-import { scene as sceneUrl } from 'dcl/webb/src/locations'
+import { scene as sceneUrl } from '@dcl/webb/src/locations'
 
 export class SceneInfo extends React.Component<any> {
   render() {

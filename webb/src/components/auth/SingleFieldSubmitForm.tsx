@@ -10,7 +10,7 @@ import {
   Modal
 } from 'decentraland-ui'
 
-import { FOCUS_CLASS_NAME, focusByClassName } from 'dcl/webb/src/misc/focus'
+import { FOCUS_CLASS_NAME, focusByClassName } from '@dcl/webb/src/misc/focus'
 
 export type SingleFieldSubmitFormProps = {
   title: string
