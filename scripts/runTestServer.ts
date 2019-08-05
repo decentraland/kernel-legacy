@@ -83,6 +83,28 @@ wss.on('connection', function connection(ws) {
           }
         }
       })
+    } else if (msgType === proto.MessageType.TOPIC_IDENTITY) {
+      const topicMessage = proto.TopicIdentityMessage.deserializeBinary(data)
+
+      const topic = topicMessage.getTopic()
+
+      const topicFwMessage = new proto.TopicIdentityFWMessage()
+      topicFwMessage.setType(proto.MessageType.TOPIC_IDENTITY_FW)
+      topicFwMessage.setFromAlias(alias)
+      topicFwMessage.setIdentity(topicMessage.getIdentity_asB64())
+      topicFwMessage.setRole(topicMessage.getRole())
+      topicFwMessage.setBody(topicMessage.getBody_asU8())
+
+      const topicData = topicFwMessage.serializeBinary()
+
+      // Reliable/unreliable data
+      connections.forEach($ => {
+        if (ws !== $) {
+          if (getTopicList($).has(topic)) {
+            $.send(topicData)
+          }
+        }
+      })
     } else if (msgType === proto.MessageType.SUBSCRIPTION) {
       const topicMessage = proto.SubscriptionMessage.deserializeBinary(data)
       const rawTopics = topicMessage.getTopics()
