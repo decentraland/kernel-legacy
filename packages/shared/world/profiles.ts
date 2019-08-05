@@ -21,15 +21,13 @@ export async function resolveProfile(uuid: string = ''): Promise<Profile> {
     // @ts-ignore
     spec = (await response.json()) as ProfileSpec
   } else {
-    spec = {
-      description: '',
-      updated_at: 1,
-      created_at: 1,
-      version: '0',
-      avatar: await generateRandomAvatarSpec()
-    }
+    spec = await createStubProfileSpec()
   }
 
+  return resolveProfileSpec(uuid, spec)
+}
+
+export async function resolveProfileSpec(uuid: string, spec: ProfileSpec): Promise<Profile> {
   const avatar = await mapAvatarToShape(spec.avatar)
 
   // TODO - fetch name from claim server - moliva - 22/07/2019
@@ -44,6 +42,16 @@ export async function resolveProfile(uuid: string = ''): Promise<Profile> {
     updated_at: spec.updated_at,
     version: spec.version,
     avatar
+  }
+}
+
+export async function createStubProfileSpec(): Promise<ProfileSpec> {
+  return {
+    description: '',
+    updated_at: 1,
+    created_at: 1,
+    version: '0',
+    avatar: await generateRandomAvatarSpec()
   }
 }
 
