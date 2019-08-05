@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { RootState } from '@dcl/webb/src/store'
+import { RootState } from 'dcl/webb/src/store'
 import { push } from 'connected-react-router'
 import * as locations from '../../locations'
 import World from './World'

@@ -1,10 +1,10 @@
 import { AnyAction, Middleware, Store } from 'redux'
 import { Auth } from 'decentraland-auth'
 
-import { connect } from '@dcl/client/comms'
-import { intersectLogger } from '@dcl/utils/Logger'
+import { connect } from 'dcl/client/comms'
+import { intersectLogger } from 'dcl/utils/Logger'
 
-import { AuthRootState } from '@dcl/webb/src/modules/auth'
+import { AuthRootState } from 'dcl/webb/src/modules/auth'
 
 export type CommsStateSummary =
   | 'Not initialized'
