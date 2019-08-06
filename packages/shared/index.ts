@@ -124,7 +124,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
     const profile = await resolveProfileSpec(localProfileUUID!, spec)
 
-    persistCurrentUser({ identity: localProfileUUID!, version: profile.version, profile })
+    persistCurrentUser({ userId: localProfileUUID!, version: profile.version, profile })
   }
   console['groupEnd']()
 

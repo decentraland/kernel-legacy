@@ -20,7 +20,6 @@ import { parcelLimits } from 'config'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { Stats } from './debug'
 import { createLogger } from 'shared/logger'
-import { localProfileUUID } from './peers'
 
 export enum SocketReadyState {
   CONNECTING,
@@ -149,14 +148,12 @@ export class WorldInstanceConnection {
 
   sendTopicIdentityMessage(reliable: boolean, topic: string, body: Message): SendResult {
     const encodedBody = body.serializeBinary()
-    const encodedUuid = btoa(localProfileUUID!)
 
     const message = new TopicIdentityMessage()
     message.setType(MessageType.TOPIC_IDENTITY)
     message.setTopic(topic)
     message.setBody(encodedBody)
 
-    message.setIdentity(encodedUuid)
     message.setRole(Role.CLIENT)
 
     return this.sendMessage(reliable, message)

@@ -54,10 +54,10 @@ export class PeerTrackingInfo {
 
   public loadProfileIfNecessary(profileVersion: string) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
-      if (!this.userInfo || !this.userInfo.identity) {
+      if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
           ...(this.userInfo || {}),
-          identity: this.identity
+          userId: this.identity
         }
       }
       this.profilePromise = {
@@ -387,8 +387,15 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
 
   if (USE_LOCAL_COMMS) {
     const commsUrl = document.location.toString().replace(/^http/, 'ws')
-    defaultLogger.log('Using WebSocket comms: ' + commsUrl)
-    commsBroker = new CliBrokerConnection(commsUrl)
+
+    const url = new URL(commsUrl)
+    const qs = new URLSearchParams({
+      identity: userId
+    })
+    url.search = qs.toString()
+
+    defaultLogger.log('Using WebSocket comms: ' + url.href)
+    commsBroker = new CliBrokerConnection(url.href)
   } else {
     const coordinatorURL = getServerConfigurations().worldInstanceUrl
     const body = `GET:${coordinatorURL}`

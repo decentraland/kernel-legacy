@@ -13,6 +13,8 @@ import WebSocket = require('ws')
 import http = require('http')
 import proto = require('../packages/shared/comms/proto/broker')
 
+const url = require('url')
+
 // defines if we should run headless tests and exit (true) or keep the server on (false)
 const singleRun = !(process.env.SINGLE_RUN === 'true')
 
@@ -42,6 +44,7 @@ const wss = new WebSocket.Server({ server })
 
 const connections = new Set<WebSocket>()
 const topicsPerConnection = new WeakMap<WebSocket, Set<string>>()
+const aliasToUserId = new Map<number, string>()
 let connectionCounter = 0
 
 function getTopicList(socket: WebSocket): Set<string> {
@@ -53,9 +56,13 @@ function getTopicList(socket: WebSocket): Set<string> {
   return set
 }
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws, req) {
   connections.add(ws)
   const alias = ++connectionCounter
+
+  const query = url.parse(req.url, true).query
+  const userId = query['identity']
+  aliasToUserId.set(alias, userId)
 
   ws.on('message', message => {
     const data = message as Buffer
@@ -91,7 +98,7 @@ wss.on('connection', function connection(ws) {
       const topicFwMessage = new proto.TopicIdentityFWMessage()
       topicFwMessage.setType(proto.MessageType.TOPIC_IDENTITY_FW)
       topicFwMessage.setFromAlias(alias)
-      topicFwMessage.setIdentity(topicMessage.getIdentity_asB64())
+      topicFwMessage.setIdentity(aliasToUserId.get(alias))
       topicFwMessage.setRole(topicMessage.getRole())
       topicFwMessage.setBody(topicMessage.getBody_asU8())
 
@@ -116,7 +123,10 @@ wss.on('connection', function connection(ws) {
     }
   })
 
-  ws.on('close', () => connections.delete(ws))
+  ws.on('close', () => {
+    connections.delete(ws)
+    aliasToUserId.delete(alias)
+  })
 
   setTimeout(() => {
     const welcome = new proto.WelcomeMessage()

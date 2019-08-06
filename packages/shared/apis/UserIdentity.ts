@@ -22,7 +22,7 @@ export class UserIdentity extends ExposableAPI implements IUserIdentity {
     const user = getCurrentUser()
     if (!user) return null
 
-    return user.identity!
+    return user.userId!
   }
 
   @exposeMethod
@@ -33,7 +33,7 @@ export class UserIdentity extends ExposableAPI implements IUserIdentity {
 
     return {
       displayName: user.profile!.name,
-      publicKey: user.identity!
+      publicKey: user.userId!
     }
   }
 }

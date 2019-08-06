@@ -77,7 +77,7 @@ export type PeerInformation = {
 }
 
 export type UserInformation = {
-  identity?: string
+  userId?: string
   version?: string
   status?: string
   pose?: Pose

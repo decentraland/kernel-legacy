@@ -76,7 +76,7 @@ export class ChatController extends ExposableAPI implements IChatController {
       const newEntry = (entry = {
         id: uuid(),
         isCommand: false,
-        sender: currentUser.profile.name || currentUser.identity || 'unknown',
+        sender: currentUser.profile.name || currentUser.userId || 'unknown',
         message
       })
 
@@ -183,14 +183,14 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.identity) {
+      if (user && user.userId) {
         // Cannot block yourself
-        if (user.identity === currentUser.identity) {
+        if (user.userId === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot block yourself.` }
         }
 
-        addToBlockedUsers(user.identity)
-        addToMutedUsers(user.identity)
+        addToBlockedUsers(user.userId)
+        addToMutedUsers(user.userId)
 
         return {
           id: uuid(),
@@ -213,10 +213,10 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.identity) {
-        removeFromBlockedUsers(user.identity)
+      if (user && user.userId) {
+        removeFromBlockedUsers(user.userId)
         // TODO: Remove this literal mute, muting shold happen automatticaly with block
-        removeFromMutedUsers(user.identity)
+        removeFromMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You unblocked user ${username}.` }
       } else {
@@ -259,13 +259,13 @@ export class ChatController extends ExposableAPI implements IChatController {
       if (!currentUser) throw new Error('cannotGetCurrentUser')
 
       const user = findPeerByName(username)
-      if (user && user.identity) {
+      if (user && user.userId) {
         // Cannot mute yourself
-        if (username === currentUser.identity) {
+        if (username === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot mute yourself.` }
         }
 
-        addToMutedUsers(user.identity)
+        addToMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You muted user ${username}.` }
       } else {
@@ -285,13 +285,13 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.identity) {
+      if (user && user.userId) {
         // Cannot unmute or mute yourself
-        if (username === currentUser.identity) {
+        if (username === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot mute or unmute yourself.` }
         }
 
-        removeFromMutedUsers(user.identity)
+        removeFromMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You unmuted user ${username}.` }
       } else {
