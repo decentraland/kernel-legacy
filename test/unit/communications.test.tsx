@@ -538,7 +538,7 @@ describe('Communications', function() {
         const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
         expect(trackingInfo.identity).to.equal('userId1')
         expect(trackingInfo.userInfo).to.deep.equal({
-          identity: 'userId1'
+          userId: 'userId1'
         })
         expect(trackingInfo.loadProfileIfNecessary).to.have.been.calledWith('version')
       })
