@@ -390,7 +390,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
 
     const url = new URL(commsUrl)
     const qs = new URLSearchParams({
-      identity: userId
+      identity: btoa(userId)
     })
     url.search = qs.toString()
 
