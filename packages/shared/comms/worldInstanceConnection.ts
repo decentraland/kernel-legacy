@@ -11,7 +11,6 @@ import {
   SubscriptionMessage,
   MessageHeader,
   TopicIdentityMessage,
-  Role,
   TopicIdentityFWMessage
 } from './proto/broker'
 import { Position, position2parcel } from './utils'
@@ -153,8 +152,6 @@ export class WorldInstanceConnection {
     message.setType(MessageType.TOPIC_IDENTITY)
     message.setTopic(topic)
     message.setBody(encodedBody)
-
-    message.setRole(Role.CLIENT)
 
     return this.sendMessage(reliable, message)
   }

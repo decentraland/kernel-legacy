@@ -8,6 +8,7 @@ import path = require('path')
 import fs = require('fs')
 import mkdirp = require('mkdirp')
 import * as BlinkDiff from 'blink-diff'
+import { Role } from '../packages/shared/comms/proto/broker'
 import titere = require('titere')
 import WebSocket = require('ws')
 import http = require('http')
@@ -99,7 +100,7 @@ wss.on('connection', function connection(ws, req) {
       topicFwMessage.setType(proto.MessageType.TOPIC_IDENTITY_FW)
       topicFwMessage.setFromAlias(alias)
       topicFwMessage.setIdentity(aliasToUserId.get(alias))
-      topicFwMessage.setRole(topicMessage.getRole())
+      topicFwMessage.setRole(Role.CLIENT)
       topicFwMessage.setBody(topicMessage.getBody_asU8())
 
       const topicData = topicFwMessage.serializeBinary()
