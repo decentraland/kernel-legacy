@@ -28,7 +28,7 @@ export async function resolveProfile(uuid: string = ''): Promise<Profile> {
 }
 
 export async function resolveProfileSpec(uuid: string, spec: ProfileSpec): Promise<Profile> {
-  const avatar = await mapAvatarToShape(spec.avatar)
+  const avatar = await mapSpecToAvatar(spec.avatar)
 
   // TODO - fetch name from claim server - moliva - 22/07/2019
   const name = `Guest_${uuid.replace('email|', '').slice(0, 7)}` // strip email| from auth0 uuid
@@ -79,10 +79,12 @@ const DEFAULT_ASSETS: { [base: string]: Array<DclAssetUrl> } = {}
 DEFAULT_ASSETS[toDclAssertUrl('BaseMale')] = ['eyes_00', 'eyebrows_00', 'mouth_00'].map($ => toDclAssertUrl($))
 DEFAULT_ASSETS[toDclAssertUrl('BaseFemale')] = ['f_eyes_00', 'f_eyebrows_00', 'f_mouth_00'].map($ => toDclAssertUrl($))
 
-async function mapAvatarToShape(avatar: AvatarSpec): Promise<Avatar> {
+async function mapSpecToAvatar(avatar: AvatarSpec): Promise<Avatar> {
   const shape: any = {}
 
   const avatarCatalog = await fetchAvatarCatalog()
+
+  shape.snapshots = avatar.snapshots
 
   shape.skin = fromColored(avatar.skin)
   shape.hair = fromColored(avatar.hair)
