@@ -13,7 +13,8 @@ import {
   ILandToLoadableParcelScene,
   IScene,
   MappingsResponse,
-  ILand
+  ILand,
+  Profile
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -39,7 +40,6 @@ import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../dec
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
-import { Profile } from '../shared/types'
 import { getUserProfile } from '../shared/comms/peers'
 
 let gameInstance!: GameInstance
@@ -76,6 +76,26 @@ const browserInterface = {
 
   PreloadFinished(data: { sceneId: string }) {
     // stub. there is no code about this in unity side yet
+  },
+
+  ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
+    // TODO - delegate to lifecycle manager - moliva - 08/08/2019
+    switch (eventType) {
+      case 'SceneReady': {
+        const { sceneId } = payload
+        defaultLogger.info(`SceneReady ${sceneId}`)
+        // TODO - check and wait for the other scene ready message and finally send loading screen message - moliva - 08/08/2019
+        break
+      }
+      case 'ActivateRenderingACK': {
+        // TODO - remove loading screen effectively - moliva - 08/08/2019
+        break
+      }
+      default: {
+        defaultLogger.warn(`Unknown event type ${eventType}, ignoring`)
+        break
+      }
+    }
   }
 }
 
