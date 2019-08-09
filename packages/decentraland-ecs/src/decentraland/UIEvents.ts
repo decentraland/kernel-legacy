@@ -109,7 +109,7 @@ export class OnChanged extends OnUUIDEvent<'onChange'> {
 /**
  * @public
  */
-@Component('engine.onPointerDown', CLASS_ID.UUID_CALLBACK)
+@Component('engine.pointerDown', CLASS_ID.UUID_CALLBACK)
 export class OnPointerDown extends OnUUIDEvent<'pointerDown'> {
   @ObservableComponent.readonly
   readonly type: string = 'pointerDown'
@@ -127,7 +127,7 @@ export class OnPointerDown extends OnUUIDEvent<'pointerDown'> {
 /**
  * @public
  */
-@Component('engine.onPointerUp', CLASS_ID.UUID_CALLBACK)
+@Component('engine.pointerUp', CLASS_ID.UUID_CALLBACK)
 export class OnPointerUp extends OnUUIDEvent<'pointerUp'> {
   @ObservableComponent.readonly
   readonly type: string = 'pointerUp'
