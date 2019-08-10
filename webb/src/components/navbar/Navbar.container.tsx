@@ -15,4 +15,7 @@ function mapState(state: RootState) {
   }
 }
 
-export default connect(mapState, { login: () => push('/login'), pushLocation: (key: string) => push(key) })(Navbar)
+export default connect(
+  mapState,
+  { login: () => push('/login'), pushLocation: (key: string) => push(key) }
+)(Navbar)

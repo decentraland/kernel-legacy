@@ -23,13 +23,13 @@ const App = () => {
         <>
           <Navbar />
           <Switch>
-            <Route exact path="/login" component={Auth} />
-            <Route exact path="/assets" component={Assets} />
-            <Route exact path="/map" component={World} />
-            <Route path="/scene/:scene" component={Scene} />
-            <Route path="/parcel/:coordinate" component={ParcelInfo} />
-            <Route exact path="/" component={Home} />
-            <Redirect to="/" path="/callback" />
+            <Route exact path='/login' component={Auth} />
+            <Route exact path='/assets' component={Assets} />
+            <Route exact path='/map' component={World} />
+            <Route path='/scene/:scene' component={Scene} />
+            <Route path='/parcel/:coordinate' component={ParcelInfo} />
+            <Route exact path='/' component={Home} />
+            <Redirect to='/' path='/callback' />
           </Switch>
         </>
       </ConnectedRouter>

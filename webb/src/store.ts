@@ -10,7 +10,7 @@ import { worldMiddleware, WorldState } from 'modules/world'
 
 import { createReducer } from 'reducers'
 
-export const history = createBrowserHistory()
+export const history: any = createBrowserHistory()
 
 export type RootState = {
   router: RouterState
@@ -28,17 +28,19 @@ const enhance =
       })
     : compose
 
-export const configureStore = (state?: RootState) => {
+export const configureStore: any = (state?: RootState) => {
   const store = createStore(
     createReducer(history),
     state,
-    enhance(applyMiddleware(
-      routerMiddleware(history),
-      authMiddleware as any,
-      commsMiddleware as any,
-      assetsMiddleware as any,
-      worldMiddleware as any,
-      passportsMiddleware as any)
+    enhance(
+      applyMiddleware(
+        routerMiddleware(history),
+        authMiddleware as any,
+        commsMiddleware as any,
+        assetsMiddleware as any,
+        worldMiddleware as any,
+        passportsMiddleware as any
+      )
     )
   )
   return store

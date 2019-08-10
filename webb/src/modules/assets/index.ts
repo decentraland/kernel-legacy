@@ -85,7 +85,7 @@ export function assetsReducer(
 /**
  * State transitions that require side-effects
  */
-export const assetsMiddleware = (store: Store<AssetsState>) => (
+export const assetsMiddleware: any = (store: Store<AssetsState>) => (
   next: Middleware
 ) => (action: any) => {
   const dispatch = (type: any, payload?: any) =>
@@ -145,10 +145,7 @@ export async function fetchBuilderAssets(store: any, dispatch: any) {
   }
 }
 
-export async function needsInitialization(
-  store: Store<AssetsState>,
-  action: any
-) {
+export function needsInitialization(store: Store<AssetsState>, action: any) {
   return (
     store.getState().status === 'Not initialized' &&
     action.type !== 'Initialized'

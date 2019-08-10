@@ -79,7 +79,7 @@ export const overridenEvents = intersectLogger('Broker: ')
 /**
  * State transitions that require side-effects
  */
-export const commsMiddleware = (
+export const commsMiddleware: any = (
   store: Store<CommsRootState & AuthRootState>
 ) => {
   for (let key of ['debug', 'error', 'log', 'warn', 'info', 'debug', 'trace']) {

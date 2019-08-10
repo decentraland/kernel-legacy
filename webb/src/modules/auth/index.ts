@@ -84,7 +84,7 @@ export function authReducer(
 /**
  * State transitions that require side-effects
  */
-export const authMiddleware = (
+export const authMiddleware: any = (
   store: Store<RouterRootState & AuthRootState>
 ) => (next: Middleware) => (action: any) => {
   const dispatch = (type: any, payload?: any) =>

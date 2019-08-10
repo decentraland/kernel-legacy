@@ -68,7 +68,7 @@ export function passportsReducer(
 /**
  * State transitions that require side-effects
  */
-export const passportsMiddleware = (
+export const passportsMiddleware: any = (
   store: Store<PassportRootState & AuthRootState>
 ) => (next: Middleware) => (action: any) => {
   const dispatch = (type: any, payload?: any) =>
