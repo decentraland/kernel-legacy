@@ -4,7 +4,7 @@
     "paths": {
       "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
     },
-    "module": "commonjs",
+    "module": "esnext",
     "diagnostics": false,
     "moduleResolution": "node",
     "stripInternal": true,
@@ -19,7 +19,7 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     "removeComments": true,
-    "target": "es5",
+    "target": "esnext",
     "sourceMap": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,

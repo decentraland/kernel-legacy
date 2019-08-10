@@ -1,10 +1,10 @@
 import { AnyAction, Middleware, Store } from 'redux'
 import { Auth } from 'decentraland-auth'
 
-import { connect } from 'dcl/client/comms'
-import { intersectLogger } from 'dcl/utils/Logger'
+import { connect } from '@dcl/client/comms'
+import { intersectLogger } from '@dcl/utils/Logger'
 
-import { AuthRootState } from 'dcl/webb/src/modules/auth'
+import { AuthRootState } from 'modules/auth'
 
 export type CommsStateSummary =
   | 'Not initialized'
@@ -79,7 +79,7 @@ export const overridenEvents = intersectLogger('Broker: ')
 /**
  * State transitions that require side-effects
  */
-export const commsMiddleware: any = (
+export const commsMiddleware = (
   store: Store<CommsRootState & AuthRootState>
 ) => {
   for (let key of ['debug', 'error', 'log', 'warn', 'info', 'debug', 'trace']) {

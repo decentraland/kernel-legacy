@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 
 import { CommsStatus } from './CommsStatus'
-import { RootState } from 'dcl/webb/src/store'
+import { RootState } from 'store'
 
 function mapState(state: RootState) {
   return {

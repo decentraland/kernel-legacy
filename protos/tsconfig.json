@@ -1,4 +1,7 @@
 {
+  "bazelOptions": {
+    "devmodeTargetOverride": "esnext"
+  },
   "compilerOptions": {
     "alwaysStrict": true,
     "sourceMap": true,

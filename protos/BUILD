@@ -34,7 +34,7 @@ ts_library(
 load("//tools/npm:package.bzl", "dcl_npm_package")
 
 dcl_npm_package(
-    name = "protospackage",
+    name = "package",
     srcs = [
         "broker.proto",
         "comms.proto",

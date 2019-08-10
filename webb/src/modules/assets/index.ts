@@ -1,5 +1,5 @@
 import { Middleware, Store, AnyAction } from 'redux'
-import { jsonFetch } from 'dcl/utils/network/jsonFetch'
+import { jsonFetch } from '@dcl/utils/network/jsonFetch'
 
 export type AssetAction = {
   type:
@@ -85,7 +85,7 @@ export function assetsReducer(
 /**
  * State transitions that require side-effects
  */
-export const assetsMiddleware: any = (store: Store<AssetsState>) => (
+export const assetsMiddleware = (store: Store<AssetsState>) => (
   next: Middleware
 ) => (action: any) => {
   const dispatch = (type: any, payload?: any) =>
@@ -145,7 +145,10 @@ export async function fetchBuilderAssets(store: any, dispatch: any) {
   }
 }
 
-export function needsInitialization(store: Store<AssetsState>, action: any) {
+export async function needsInitialization(
+  store: Store<AssetsState>,
+  action: any
+) {
   return (
     store.getState().status === 'Not initialized' &&
     action.type !== 'Initialized'

@@ -66,9 +66,9 @@ buildifier_dependencies()
 
 http_archive(
     name = "ts_protoc_gen",
-    sha256 = "ad5d54a4e2028e2bbf90ac4208e06cc806dbbeae222f503f250bdf98bf62f00e",
-    strip_prefix = "ts-protoc-gen-42d7e1f35b2cd7bf2919d9b15c618fe9861ab481",
-    urls = ["https://github.com/Dig-Doug/ts-protoc-gen/archive/42d7e1f35b2cd7bf2919d9b15c618fe9861ab481.zip"],
+    sha256 = "bcba3fc4e5bea89c534367ad3ca86e384662c0c48491173ffbfaca540cf7caa7",
+    strip_prefix = "ts-protoc-gen-8b902e1eb03e40deaec6805922b5e92c1b216b29",
+    urls = ["https://github.com/Dig-Doug/ts-protoc-gen/archive/8b902e1eb03e40deaec6805922b5e92c1b216b29.zip"],
 )
 
 load("@ts_protoc_gen//:defs.bzl", "typescript_proto_dependencies")

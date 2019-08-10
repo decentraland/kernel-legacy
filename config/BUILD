@@ -4,7 +4,7 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
     name = "config",
-    srcs = glob(["**/*.ts"]),
+    srcs = glob(include = ["**/*.ts"], exclude = ["node_modules/**/*"]),
     module_name = "@dcl/config",
     deps = [
         "@npm//@types",
@@ -18,6 +18,7 @@ dcl_npm_package(
     package_layers = [
         "//:common.package.json",
         "//:tslib.package.json",
+        "config.package.json",
     ],
     deps = [":config"],
 )

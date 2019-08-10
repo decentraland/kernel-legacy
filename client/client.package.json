@@ -24,7 +24,6 @@
   "dependencies": {
     "auth0-js": "^9.11.2",
     "decentraland-auth-protocol": "^0.3.2",
-    "decentraland-rpc": "^3.1.8",
     "devtools-protocol": "0.0.678025",
     "fp-future": "^1.0.1",
     "google-protobuf": "^3.9.0",

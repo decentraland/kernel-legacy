@@ -1,0 +1,52 @@
+{
+  "name": "webb",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@dcl/client": "file:external/client.tar.gz",
+    "@dcl/config": "file:external/config.tar.gz",
+    "@dcl/protos": "file:external/protos.tar.gz",
+    "@dcl/utils": "file:external/utils.tar.gz",
+    "@types/history": "^4.7.2",
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.8",
+    "@types/react": "16.8.23",
+    "@types/react-dom": "16.8.4",
+    "@types/react-redux": "^7.1.1",
+    "@types/react-router": "^5.0.3",
+    "auth0-js": "^9.11.2",
+    "connected-react-router": "^6.5.2",
+    "decentraland-auth": "^0.12.0",
+    "decentraland-auth-protocol": "^0.3.2",
+    "decentraland-ui": "^2.6.0",
+    "google-protobuf": "^3.9.0",
+    "history": "^4.9.0",
+    "react": "^16.8.6",
+    "react-console-emulator": "^3.0.2",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.1.0",
+    "react-router": "^5.0.1",
+    "react-scripts": "3.0.1",
+    "redux": "^4.0.4",
+    "typesafe-actions": "^4.4.2",
+    "typescript": "3.5.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -1,9 +1,9 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { StoredPassport } from 'dcl/client/passports/types'
-import { getStoredPassportForUser } from 'dcl/client/passports/api'
+import { StoredPassport } from '@dcl/client/passports/types'
+import { getStoredPassportForUser } from '@dcl/client/passports/api'
 
-import { AuthRootState } from 'dcl/webb/src/modules/auth'
+import { AuthRootState } from 'modules/auth'
 
 export type PassportActions = [
   { type: 'Request passport'; payload: string },
@@ -68,7 +68,7 @@ export function passportsReducer(
 /**
  * State transitions that require side-effects
  */
-export const passportsMiddleware: any = (
+export const passportsMiddleware = (
   store: Store<PassportRootState & AuthRootState>
 ) => (next: Middleware) => (action: any) => {
   const dispatch = (type: any, payload?: any) =>

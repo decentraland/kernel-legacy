@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { Navbar } from './Navbar'
-import { RootState } from 'dcl/webb/src/store'
+import { RootState } from 'store'
 
 function mapState(state: RootState) {
   const isLoggedIn = state.auth.summary === 'Logged in'
@@ -15,7 +15,4 @@ function mapState(state: RootState) {
   }
 }
 
-export default connect(
-  mapState,
-  { login: () => push('/login'), pushLocation: (key: string) => push(key) }
-)(Navbar)
+export default connect(mapState, { login: () => push('/login'), pushLocation: (key: string) => push(key) })(Navbar)

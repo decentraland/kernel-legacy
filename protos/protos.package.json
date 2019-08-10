@@ -1,4 +1,5 @@
 {
+  "name": "@dcl/protos",
   "dependencies": {
     "protobufjs": "^6.8.8"
   }

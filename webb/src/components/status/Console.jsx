@@ -1,5 +1,5 @@
 import React from 'react'
-const Terminal = require('react-console-emulator')
+import Terminal from 'react-console-emulator'
 
 const commands = {
   echo: {
@@ -11,11 +11,11 @@ const commands = {
   }
 }
 
-export class MyTerminal extends React.Component {
-  render() {
+export default class MyTerminal extends React.Component {
+  render () {
     return (
       <Terminal
-        style={{ background: '#ffffff' }}
+        style={{ background: '#ffffff'}}
         inputStyle={{ color: '#2f2f2c', height: '25px' }}
         commands={commands}
         promptLabel={'$'}
