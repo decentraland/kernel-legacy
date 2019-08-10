@@ -361,6 +361,11 @@ module.exports = function(webpackEnv) {
                 compact: isEnvProduction
               }
             },
+            // Process @dcl modules with an UMD-Compat-Loader
+            {
+              test: /node_modules\/@dcl\/.+\.js$/,
+              use: [{ loader: require.resolve('umd-compat-loader') }]
+            },
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
             {
@@ -540,11 +545,6 @@ module.exports = function(webpackEnv) {
           filename: 'static/css/[name].[contenthash:8].css',
           chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
         }),
-      // Ignore `@dcl` module warnings
-      new webpack.ContextReplacementPlugin(/\/@dcl\//, data => {
-        delete data.dependencies[0].critical
-        return data
-      }),
       // Generate a manifest file which contains a mapping of all asset filenames
       // to their corresponding output file so that tools can pick it up without
       // having to parse `index.html`.

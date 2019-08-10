@@ -1,8 +1,8 @@
 import { Middleware, Store, AnyAction } from 'redux'
 import { push, RouterRootState } from 'connected-react-router'
 
-import { AuthState as AuthStateLib } from '@dcl/client/auth/types'
-import * as AuthLib from '@dcl/client/auth/lib'
+import { AuthLib } from '@dcl/client'
+import { AuthTypes } from '@dcl/client'
 
 export type AuthStatusSummary =
   | 'Not initialized'
@@ -16,7 +16,7 @@ export type AuthStatusSummary =
   | 'Logged in'
   | 'Logged out'
 
-export type AuthState = AuthStateLib & {
+export type AuthState = AuthTypes.AuthState & {
   summary: AuthStatusSummary
 }
 

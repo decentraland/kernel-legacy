@@ -6,9 +6,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"],
       "@dcl/*": ["*", "bazel-bin/*", "bazel-genfiles/*"]
     },
-    "module": "esnext",
+    "module": "commonjs",
     "diagnostics": false,
     "moduleResolution": "node",
     "stripInternal": true,
@@ -23,7 +24,7 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     "removeComments": true,
-    "target": "esnext",
+    "target": "es6",
     "sourceMap": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,

@@ -1,11 +1,11 @@
 import React from 'react'
-const Terminal = require('react-console-emulator')
+const Terminal = require('react-console-emulator').default
 
 const commands = {
   echo: {
     description: 'Echo a passed string.',
     usage: 'echo <string>',
-    fn: function () {
+    fn: function() {
       return `${Array.from(arguments).join(' ')}`
     }
   }
