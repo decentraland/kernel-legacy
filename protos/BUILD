@@ -46,4 +46,3 @@ dcl_npm_package(
     deps = [":protos"],
 )
 
-load("@build_bazel_rules_nodejs//:defs.bzl", "rollup_bundle")

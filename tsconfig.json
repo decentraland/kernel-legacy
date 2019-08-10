@@ -1,4 +1,8 @@
 {
+  "bazelOpts": {
+    "es5Mode": false,
+    "devmodeTargetOverride": "esnext"
+  },
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

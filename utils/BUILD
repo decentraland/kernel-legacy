@@ -5,10 +5,10 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 ts_library(
     name = "utils",
     srcs = glob(["**/*.ts"]),
-    tsconfig = "//:global-tsconfig",
     module_name = "@dcl/utils",
+    tsconfig = "//:global-tsconfig",
     deps = [
-        "//config",
+        "//config:config",
         "@npm//@types",
         "@npm//fp-future",
     ],
@@ -23,5 +23,7 @@ dcl_npm_package(
         "//:tslib.package.json",
         "utils.package.json",
     ],
-    deps = [":utils"],
+    deps = [":utils",
+        "@npm//fp-future",
+            ]
 )
