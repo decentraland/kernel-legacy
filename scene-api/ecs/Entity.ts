@@ -1,4 +1,4 @@
-import { log } from 'dcl/utils/Logger'
+import { log } from '@dcl/utils/Logger'
 
 import { getComponentName, ComponentConstructor, getComponentClassId, ComponentLike } from './Component'
 import { IECSEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'
@@ -245,7 +245,9 @@ export class Entity implements IEntity {
         return
       } else {
         log(
-          `Entity Warning: Trying to remove wrong (by constructor) component "${componentName}" from entity "${this.identifier}"`
+          `Entity Warning: Trying to remove wrong (by constructor) component "${componentName}" from entity "${
+            this.identifier
+          }"`
         )
         return
       }
@@ -299,7 +301,9 @@ export class Entity implements IEntity {
 
     if (circularAncestor) {
       throw new Error(
-        `Failed to set parent for entity "${this.identifier}": Circular parent references are not allowed (See entity "${circularAncestor}")`
+        `Failed to set parent for entity "${
+          this.identifier
+        }": Circular parent references are not allowed (See entity "${circularAncestor}")`
       )
     }
 

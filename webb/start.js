@@ -39,6 +39,7 @@ const fuse = FuseBox.init({
 })
 fuse.dev({ port: 3000 }) // launch http server
 fuse.bundle('vendor').instructions('~ index.tsx')
+fuse.bundle('dclclient').instructions('~ dclclient/**/*.ts')
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')

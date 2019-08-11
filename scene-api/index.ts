@@ -3,6 +3,9 @@ export * from '@dcl/utils/Task'
 export * from '@dcl/utils/Logger'
 export * from '@dcl/utils/Observable'
 
+// Library
+export * from './lib/DevTools'
+
 // CORE DEPENDENCIES
 export * from './ecs/ECSEngine'
 export * from './ecs/Component'

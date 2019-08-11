@@ -1,4 +1,4 @@
-import { isValidSceneInput } from './validation'
+import { createHash } from 'crypto'
 import {
   UnsanitizedSceneManifest,
   CoordinateDefinition,
@@ -9,8 +9,11 @@ import {
   AssetTagDefinition,
   ReferenceSystem,
   SpawnPoint
-} from 'dcl/utils/scene'
-import { createHash } from 'crypto'
+} from '@dcl/utils/scene'
+
+import { stableStringify } from './stableStringify'
+
+import { isValidSceneInput } from './validation'
 
 export function parseCoordinate(coord: CoordinateDefinition) {
   if (typeof coord === 'string') {
@@ -41,6 +44,10 @@ export class Scene implements SceneManifest {
       throw new Error('Invalid input')
     }
     this.raw = raw
+  }
+
+  get sceneCID(): string {
+    return this.cannonicalSerialization
   }
 
   get parcels(): NonEmptyCoordinateArray {
@@ -128,6 +135,19 @@ export class Scene implements SceneManifest {
     return this._referenceSystem
   }
 
+  get cannonicalSerialization(): string {
+    return stableStringify({
+      parcels: this.parcels,
+      version: this.version,
+      display: this.raw.display || {},
+      main: this.main,
+      assets: this.assets,
+      assetTags: this.assetTags,
+      spawnPoints: this.spawnPoints,
+      referenceSystem: this.referenceSystem
+    } as any)
+  }
+
   get cannonicalCID(): string {
     if (!this._cannonicalCID) {
       // TODO: `JSON.stringify(this)` should be remplazed by
@@ -135,7 +155,7 @@ export class Scene implements SceneManifest {
       // deterministic encoding of all our computed fields
       // AKA: Beware! JSON serialization is not deterministic
       this._cannonicalCID = createHash('sha256')
-        .update(JSON.stringify(this))
+        .update(this.cannonicalSerialization)
         .digest()
         // TODO: Use CIDv0 encoding
         .toString('hex')

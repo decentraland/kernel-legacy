@@ -76,5 +76,8 @@
         "webpack-dev-server": "^3.7.2",
         "webrtc-adapter": "^7.2.8",
         "yargs": "^13.3.0"
+    },
+    "devDependencies": {
+        "@types/events": "^3.0.0"
     }
 }

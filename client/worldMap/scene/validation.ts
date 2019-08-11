@@ -11,8 +11,8 @@ import {
   Range2,
   YRotation,
   UnsanitizedSceneManifest
-} from 'dcl/utils/scene/types'
-import { Vector3 } from 'dcl/utils/Vector'
+} from '@dcl/utils'
+import { Vector3 } from '@dcl/utils'
 
 export function getInvalidReason(arg: any) {
   if (!hasValidVersion(arg)) {

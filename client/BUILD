@@ -20,9 +20,13 @@ ts_library(
     deps = [
         "//config",
         "//protos",
+        "//rpc/client",
+        "//rpc/host",
+        "//scene-api",
         "//utils",
         "@npm//@types",
         "@npm//@types/auth0-js",
+        "@npm//@types/events",
         "@npm//auth0-js",
         "@npm//decentraland-auth-protocol",
         "@npm//devtools-protocol",

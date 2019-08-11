@@ -4,10 +4,14 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
     name = "config",
-    srcs = glob(include = ["**/*.ts"], exclude = ["node_modules/**/*"]),
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = ["node_modules/**/*"],
+    ),
     module_name = "@dcl/config",
     deps = [
-        "@npm//@types",
+        "@npm//@types/events",
+        "@npm//@types/node",
     ],
 )
 

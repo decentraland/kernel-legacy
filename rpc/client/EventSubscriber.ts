@@ -1,5 +1,5 @@
-import { EventDispatcher, EventDispatcherBinding } from 'dcl/rpc/common/core/EventDispatcher'
-import { ISubscribableAPI } from 'dcl/rpc/common/API'
+import { EventDispatcher, EventDispatcherBinding } from '@dcl/rpc-common/core/EventDispatcher'
+import { ISubscribableAPI } from '@dcl/rpc-common/API'
 
 export class EventSubscriber extends EventDispatcher {
   constructor(private component: ISubscribableAPI) {

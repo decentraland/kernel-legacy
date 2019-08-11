@@ -8,7 +8,6 @@ ts_library(
     module_name = "@dcl/utils",
     tsconfig = "//:global-tsconfig",
     deps = [
-        "//config:config",
         "@npm//@types",
         "@npm//fp-future",
     ],
@@ -23,7 +22,8 @@ dcl_npm_package(
         "//:tslib.package.json",
         "utils.package.json",
     ],
-    deps = [":utils",
+    deps = [
+        ":utils",
         "@npm//fp-future",
-            ]
+    ],
 )

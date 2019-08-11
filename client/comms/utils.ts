@@ -1,4 +1,4 @@
-import { parcelLimits } from '@dcl/config'
+import { parcelLimits } from '@dcl/utils'
 
 export type Position = [number, number, number, number, number, number, number]
 
@@ -8,10 +8,7 @@ export class Parcel {
 
 export function position2parcel(p: Position): Parcel {
   const parcelSize = parcelLimits.parcelSize
-  return new Parcel(
-    Math.trunc(p[0] / parcelSize),
-    Math.trunc(p[2] / parcelSize)
-  )
+  return new Parcel(Math.trunc(p[0] / parcelSize), Math.trunc(p[2] / parcelSize))
 }
 
 export function sameParcel(p1: Parcel | null, p2: Parcel | null) {
@@ -56,11 +53,7 @@ export class CommunicationArea {
     const parcel = position2parcel(p)
     const vMin = this.vMin
     const vMax = this.vMax
-    const contains =
-      parcel.x >= vMin.x &&
-      parcel.x <= vMax.x &&
-      parcel.z >= vMin.z &&
-      parcel.z <= vMax.z
+    const contains = parcel.x >= vMin.x && parcel.x <= vMax.x && parcel.z >= vMin.z && parcel.z <= vMax.z
     return contains
   }
 }

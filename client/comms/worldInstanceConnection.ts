@@ -1,7 +1,7 @@
 import { Message } from 'google-protobuf'
 
 import { createLogger } from '@dcl/utils/Logger'
-import { parcelLimits } from '@dcl/config'
+import { parcelLimits } from '@dcl/utils'
 
 import { Category, ChatData, PositionData, ProfileData, DataHeader } from '@dcl/protos'
 import {

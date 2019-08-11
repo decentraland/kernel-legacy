@@ -1,11 +1,10 @@
-import { registerAPI, exposeMethod, API } from 'dcl/rpc/host'
+import { registerAPI, exposeMethod, API } from '@dcl/rpc-host'
 
 // THIS INTERFACE MOCKS THE chromedevtools API
 import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'
 import Protocol from 'devtools-protocol'
 
-import { DEBUG } from 'dcl/config'
-import { ILogger, defaultLogger } from 'dcl/utils/Logger'
+import { ILogger, defaultLogger } from '@dcl/utils'
 
 export interface DevToolsServer {
   event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void>
@@ -17,18 +16,11 @@ export class DevTools extends API implements DevToolsServer {
 
   logger: ILogger = defaultLogger
 
-  // ONLY AVAILABLE IN DEBUG MODE
-  logs: Protocol.Runtime.ConsoleAPICalledEvent[] = []
-
   @exposeMethod
   async event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void> {
     switch (type) {
       case 'Runtime.consoleAPICalled': {
         let [event] = params as ProtocolMapping.Events['Runtime.consoleAPICalled']
-
-        if (DEBUG) {
-          this.logs.push(event)
-        }
 
         this.logger.log('', ...event.args.map($ => ('value' in $ ? $.value : $.unserializableValue)))
 

@@ -1,4 +1,4 @@
-import { hasOwnSymbol } from 'dcl/rpc/common/core/SymbolShim'
+import { hasOwnSymbol } from './core/SymbolShim'
 
 // http://gameprogrammingpatterns.com/component.html
 
