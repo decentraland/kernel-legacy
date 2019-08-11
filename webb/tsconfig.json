@@ -6,26 +6,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
-    "baseUrl": "./src",
-    "downlevelIteration": true,
     "module": "esnext",
-    "jsxFactory": "React.createElement",
-    "moduleResolution": "node"
-  },
-  "include": [
-    "."
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "moduleResolution": "node",
+    "noEmit": true,
+    "jsx": "react",
+    "baseUrl": "./src",
+    "downlevelIteration": true
+  }
 }

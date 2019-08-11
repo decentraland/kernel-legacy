@@ -10,6 +10,7 @@ import { InWorldAvatarSystem } from './impl/InWorldAvatars'
 import { WorldMapSystem } from './impl/WorldMap'
 import { SceneLoaderSystem } from './impl/SceneLoader'
 import { SceneRunnerSystem } from './impl/SceneRunner'
+import { MyPresence } from '../presence/mine/tracker'
 
 export type Subsystems =
   | 'Assets'
@@ -100,6 +101,8 @@ export class MainController {
     this.indexedSystems.set('WorldMap', worldMap)
     const sceneLoader = new SceneLoaderSystem('SceneLoader', [worldMap, inworldAvatars])
     this.indexedSystems.set('SceneLoader', sceneLoader)
+    const myPresence = new MyPresenceSystem('MyPresence', [comms, sceneLoader])
+    this.indexedSystems.set('MyPresence', myPresence)
     const sceneRunner = new SceneRunnerSystem('SceneRunner', [sceneLoader, inworldAvatars])
     this.indexedSystems.set('SceneRunner', sceneRunner)
     this.subsystems = [

@@ -4,18 +4,16 @@
 
 ## HTML Renderer & Debug Interface for the Decentraland Client
 
-> And so far as I'm concerned, I'm not going to run a program that's just a one-shot program.
+- Authentication
 
-* Authentication
+- Scene info
 
-* Scene info
+- Comms
 
-* Comms
+- Faking position & chat
 
-* Faking position & chat
+- Asset info
 
-* Asset info
+- Social info
 
-* Social info
-
-* Running scenes
+- Running scenes
