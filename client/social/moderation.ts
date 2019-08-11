@@ -3,10 +3,10 @@ import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils'
 
 export type ModerationEvent = {
   type: 'BlockedUser' | 'UnblockedUser' | 'MutedUser' | 'UnmutedUser'
-  userId
+  userId: string
 }
 
-export class PeerModerationFilter {
+export class SocialModeration {
   public blockedUsersMap: Map<string, boolean> = new Map<string, boolean>()
   public mutedUsersMap: Map<string, boolean> = new Map<string, boolean>()
 

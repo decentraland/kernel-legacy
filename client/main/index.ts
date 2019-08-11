@@ -1,5 +1,11 @@
 import { AssetSystem } from './impl/Assets'
 import { SubsystemController } from './subsystems'
+import { ConfigSystem } from './impl/Config'
+import { AuthSystem } from './impl/Auth'
+import { CommsSystem } from './impl/Comms'
+import { PassportSystem } from './impl/Passport'
+import { PeerPresenceSystem } from './impl/PeerPresence'
+import { SocialModerationSystem } from './impl/SocialModeration'
 
 export type Subsystems =
   | 'Assets'
@@ -7,7 +13,8 @@ export type Subsystems =
   | 'Comms'
   | 'Config'
   | 'Passports'
-  | 'Presence'
+  | 'PeerPresence'
+  | 'MyPresence'
   | 'SocialModeration'
   | 'InWorldAvatars'
   | 'WorldMap'
@@ -26,8 +33,8 @@ export class MainController {
     const assets = new AssetSystem('Assets', [config])
     const auth = new AuthSystem('Auth', [config])
     const comms = new CommsSystem('Comms', [auth])
-    const passports = new PassportsSystem('Passports', [assets, auth])
-    const presence = new PresenceSystem('Presence', [comms, passports])
+    const passports = new PassportSystem('Passports', [assets, auth])
+    const presence = new PeerPresenceSystem('PeerPresence', [comms, passports])
     const socialModeration = new SocialModerationSystem('SocialModeration', [
       passports
     ])

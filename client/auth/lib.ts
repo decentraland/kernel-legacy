@@ -20,7 +20,9 @@ export async function checkSession(): Promise<AuthInfo> {
   const promise = future<AuthInfo>()
   webAuth.checkSession(
     {
-      audience: 'decentraland.org'
+      audience: 'decentraland.org',
+      responseType: 'token id_token',
+      scope: 'openid email profile'
     },
     (err: any, authResult: any) => {
       if (err) return promise.reject(err)
