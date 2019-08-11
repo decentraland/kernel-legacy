@@ -1,8 +1,8 @@
 export const NETWORK_HZ = 10
 
 export const AUTH = {
-  AUTH0_CLIENT_ID: 'x8GUwBhYIE3t3YkjIzMmGmNK7KEd7KTI',
-  AUTH0_DOMAIN: 'dcl-test.auth0.com',
+  AUTH0_CLIENT_ID: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG',
+  AUTH0_DOMAIN: 'decentraland.auth0.com',
   AUTH0_REDIRECT: 'http://localhost:3000/callback'
 }
 

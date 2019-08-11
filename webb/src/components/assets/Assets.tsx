@@ -1,7 +1,7 @@
 import React from 'react'
 import { Page, Grid, Tabs, Segment, Hero, Center } from 'decentraland-ui'
 
-import { AssetsState } from 'modules/assets'
+import { AssetsState } from 'dcl/webb/src/modules/assets'
 
 export type ToggleStatus = {
   currentPack: string
@@ -39,10 +39,7 @@ function humanize(key: string, object?: any): string {
     } as any)[key] || key
   )
 }
-export class Assets extends React.PureComponent<
-  AssetsState & { switch: any },
-  ToggleStatus
-> {
+export class Assets extends React.PureComponent<AssetsState & { switch: any }, ToggleStatus> {
   constructor(props: any) {
     super(props)
     this.state = {
@@ -69,8 +66,7 @@ export class Assets extends React.PureComponent<
   }
   setCurrentCategory(key: string) {
     if (!this.categorySetters[key]) {
-      this.categorySetters[key] = () =>
-        this.setState({ currentCategory: key, currentAsset: '' })
+      this.categorySetters[key] = () => this.setState({ currentCategory: key, currentAsset: '' })
     }
     return this.categorySetters[key]
   }
@@ -84,8 +80,7 @@ export class Assets extends React.PureComponent<
   get currentPlaceable() {
     return this.props.currentTab === 'placeable'
   }
-  currentTab = (packId: string) =>
-    this.props.packs[packId].placeable === this.currentPlaceable
+  currentTab = (packId: string) => this.props.packs[packId].placeable === this.currentPlaceable
 
   getPacks() {
     return Object.keys(this.props.packs)
@@ -97,26 +92,21 @@ export class Assets extends React.PureComponent<
       }))
   }
   getCategories() {
-    return Object.keys(this.props.contents[this.state.currentPack]).map(
-      key => ({
-        id: key,
-        title: humanize(key, this.props.contents[key]),
-        action: this.setCurrentCategory(key)
-      })
-    )
+    return Object.keys(this.props.contents[this.state.currentPack]).map(key => ({
+      id: key,
+      title: humanize(key, this.props.contents[key]),
+      action: this.setCurrentCategory(key)
+    }))
   }
   getItems() {
-    return this.props.contents[this.state.currentPack][
-      this.state.currentCategory
-    ].map(asset => ({
+    return this.props.contents[this.state.currentPack][this.state.currentCategory].map(asset => ({
       id: asset.id,
       title: humanize(asset.name, asset),
       action: this.setCurrentAsset(asset.id)
     }))
   }
 
-  clearSelection = () =>
-    this.setState({ currentPack: '', currentAsset: '', currentCategory: '' })
+  clearSelection = () => this.setState({ currentPack: '', currentAsset: '', currentCategory: '' })
 
   render() {
     return (
@@ -129,17 +119,13 @@ export class Assets extends React.PureComponent<
         <Tabs>
           <Tabs.Tab
             active={!this.currentPlaceable}
-            onClick={() =>
-              this.props.switch('wearable') && this.clearSelection()
-            }
+            onClick={() => this.props.switch('wearable') && this.clearSelection()}
           >
             Wearables
           </Tabs.Tab>
           <Tabs.Tab
             active={this.currentPlaceable}
-            onClick={() =>
-              this.props.switch('placeable') && this.clearSelection()
-            }
+            onClick={() => this.props.switch('placeable') && this.clearSelection()}
           >
             Placeables
           </Tabs.Tab>
@@ -149,36 +135,22 @@ export class Assets extends React.PureComponent<
             <ExpandingList
               width={4}
               list={this.getPacks()}
-              children={
-                this.state.currentPack ? (
-                  <ExpandingList width={4} list={this.getCategories()} />
-                ) : (
-                  <></>
-                )
-              }
+              children={this.state.currentPack ? <ExpandingList width={4} list={this.getCategories()} /> : <></>}
               selectedChild={this.state.currentPack}
             />
           )}
-          {this.props.packs &&
-            this.state.currentPack &&
-            this.state.currentCategory && (
-              <ExpandingList width={4} list={this.getItems()} />
-            )}
+          {this.props.packs && this.state.currentPack && this.state.currentCategory && (
+            <ExpandingList width={4} list={this.getItems()} />
+          )}
           {this.state.currentAsset && (
             <Grid.Column width={8}>
-              {this.props.contents[this.state.currentPack][
-                this.state.currentCategory
-              ]
+              {this.props.contents[this.state.currentPack][this.state.currentCategory]
                 .filter(item => item.id === this.state.currentAsset)
                 .map(item => (
                   <Segment key={item.id}>
                     <h4>{item.name || item.title}</h4>
                     <p>
-                      <img
-                        width='100%'
-                        alt={item.name || item.title}
-                        src={item.thumbnail}
-                      />
+                      <img width='100%' alt={item.name || item.title} src={item.thumbnail} />
                     </p>
                     <pre>{JSON.stringify(item, null, 2)}</pre>
                   </Segment>
@@ -210,11 +182,7 @@ class ExpandingList extends React.Component<ExpandingProps> {
           <Segment
             key={item.id}
             onClick={
-              this.props.selectedChild
-                ? this.props.selectedChild === item.id
-                  ? () => ({})
-                  : item.action
-                : item.action
+              this.props.selectedChild ? (this.props.selectedChild === item.id ? () => ({}) : item.action) : item.action
             }
           >
             {item.name || item.title}

@@ -1,17 +1,9 @@
 import React from 'react'
 
 import { Push } from 'connected-react-router'
-import {
-  Address,
-  Button,
-  Header,
-  HeaderMenu,
-  Icon,
-  Loader,
-  Segment
-} from 'decentraland-ui'
+import { Address, Button, Header, HeaderMenu, Icon, Loader, Segment } from 'decentraland-ui'
 
-import { ParcelData } from 'modules/world'
+import { ParcelData } from 'dcl/webb/src/modules/world'
 
 import { LinkReactComponent } from './LinkReactComponent'
 
@@ -27,10 +19,7 @@ function marketplaceOwnerUrl(address: string) {
   return `https://market.decentraland.org/address/${address}/parcels`
 }
 
-export class AddressLink extends LinkReactComponent<
-  { value: string; push: Push },
-  any
-> {
+export class AddressLink extends LinkReactComponent<{ value: string; push: Push }, any> {
   render() {
     const link = marketplaceOwnerUrl(this.props.value)
     return (
@@ -60,12 +49,7 @@ export class OwnershipInfo extends LinkReactComponent<
             </HeaderMenu.Left>
             <HeaderMenu.Right>
               <Header>
-                <Button
-                  onClick={this.link(
-                    marketplaceParcelUrl(this.props.x, this.props.y)
-                  )}
-                  basic
-                >
+                <Button onClick={this.link(marketplaceParcelUrl(this.props.x, this.props.y))} basic>
                   See on Marketplace
                   <Icon name='chevron right' />
                 </Button>
@@ -78,9 +62,7 @@ export class OwnershipInfo extends LinkReactComponent<
                 <p>
                   Part of District{' '}
                   <a
-                    href={marketplaceEstateUrl(
-                      this.props.parcelData.estate_id!
-                    )}
+                    href={marketplaceEstateUrl(this.props.parcelData.estate_id!)}
                     rel='noopener noreferrer'
                     target='_blank'
                   >
@@ -90,8 +72,7 @@ export class OwnershipInfo extends LinkReactComponent<
               ) : (
                 ''
               )}
-              {!this.props.parcelData.district_id &&
-              this.props.parcelData.estate_id ? (
+              {!this.props.parcelData.district_id && this.props.parcelData.estate_id ? (
                 <p>
                   Part of Estate{' '}
                   <a
@@ -107,33 +88,21 @@ export class OwnershipInfo extends LinkReactComponent<
               )}
               {this.props.parcelData.owner ? (
                 <p>
-                  Owned by{' '}
-                  <AddressLink
-                    value={this.props.parcelData.owner}
-                    push={this.props.push}
-                  />
+                  Owned by <AddressLink value={this.props.parcelData.owner} push={this.props.push} />
                 </p>
               ) : (
                 ''
               )}
               {this.props.parcelData.operator ? (
                 <p>
-                  Operator:{' '}
-                  <AddressLink
-                    push={this.props.push}
-                    value={this.props.parcelData.operator}
-                  />
+                  Operator: <AddressLink push={this.props.push} value={this.props.parcelData.operator} />
                 </p>
               ) : (
                 ''
               )}
               {this.props.parcelData.update_operator ? (
                 <p>
-                  Update Operator:{' '}
-                  <AddressLink
-                    push={this.props.push}
-                    value={this.props.parcelData.update_operator}
-                  />
+                  Update Operator: <AddressLink push={this.props.push} value={this.props.parcelData.update_operator} />
                 </p>
               ) : (
                 ''

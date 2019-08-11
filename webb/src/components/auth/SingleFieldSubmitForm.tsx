@@ -1,16 +1,8 @@
 import React from 'react'
 
-import {
-  Segment,
-  Field,
-  Button,
-  Page,
-  InputOnChangeData,
-  Form,
-  Modal
-} from 'decentraland-ui'
+import { Segment, Field, Button, Page, InputOnChangeData, Form, Modal } from 'decentraland-ui'
 
-import { FOCUS_CLASS_NAME, focusByClassName } from 'misc/focus'
+import { FOCUS_CLASS_NAME, focusByClassName } from 'dcl/webb/src/misc/focus'
 
 export type SingleFieldSubmitFormProps = {
   title: string
@@ -21,10 +13,7 @@ export type SingleFieldSubmitFormProps = {
   loading?: boolean
   action?: (value: string) => any
 }
-export class SingleFieldSubmitForm extends React.PureComponent<
-  SingleFieldSubmitFormProps,
-  { value: string }
-> {
+export class SingleFieldSubmitForm extends React.PureComponent<SingleFieldSubmitFormProps, { value: string }> {
   input?: HTMLInputElement
 
   constructor(props: SingleFieldSubmitFormProps) {
@@ -66,12 +55,7 @@ export class SingleFieldSubmitForm extends React.PureComponent<
                   onChange={this.change}
                   ref={(input: Field | null) => (this.input = input as any)}
                 />
-                <Button
-                  primary
-                  type='submit'
-                  disabled={this.props.loading}
-                  onClick={this.submit}
-                >
+                <Button primary type='submit' disabled={this.props.loading} onClick={this.submit}>
                   {this.props.loading ? 'Loading...' : 'Continue'}
                 </Button>
               </Form>

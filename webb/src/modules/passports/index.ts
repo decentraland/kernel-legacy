@@ -72,12 +72,12 @@ export const passportsMiddleware: any = (store: Store<PassportRootState & AuthRo
     typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
   switch (action.type) {
     case 'Login successful':
-      dispatch('Request passport', action.payload.userId)
+      dispatch('Request passport', action.payload.sub)
       break
     case 'Request passport':
       setTimeout(() => {
         if (!(store.getState() as PassportRootState).passports.info[action.payload]) {
-          fetchProfile(store.getState()!.auth.idToken!, action.payload, dispatch)
+          fetchProfile((store.getState()!.auth as any).accessToken, action.payload, dispatch)
         }
       }, 100)
       break

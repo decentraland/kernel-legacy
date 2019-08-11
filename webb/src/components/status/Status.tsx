@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Page, Center, Grid, Segment, Hero } from 'decentraland-ui'
 
-import { RootState } from 'store'
+import { RootState } from 'dcl/webb/src/store'
 import { default as CommsStatus } from './CommsStatus/index'
 import { MyTerminal } from './Console'
 

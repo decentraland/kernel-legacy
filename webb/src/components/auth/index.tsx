@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import { RootState } from 'store'
+import { RootState } from 'dcl/webb/src/store'
 
 import renderAuth from './auth'
 

@@ -2,7 +2,7 @@ import { AnyAction, Middleware, Store } from 'redux'
 
 import { jsonFetch } from '@dcl/utils/network/jsonFetch'
 
-import { AuthRootState } from 'modules/auth'
+import { AuthRootState } from 'dcl/webb/src/modules/auth'
 
 export type WorldActions = [
   { type: 'Set selected world parcel'; payload: { x: number; y: number } },
@@ -62,10 +62,7 @@ export const INITIAL_STATE: WorldState = {
   sceneManifest: {}
 }
 
-export function worldReducer(
-  state?: WorldState,
-  action?: AnyAction
-): WorldState {
+export function worldReducer(state?: WorldState, action?: AnyAction): WorldState {
   if (!state) {
     return INITIAL_STATE
   }
@@ -80,8 +77,7 @@ export function worldReducer(
         ...state,
         parcelData: {
           ...state.parcelData,
-          [`${action.payload.parcel.x}.${action.payload.parcel.y}`]: action
-            .payload.data
+          [`${action.payload.parcel.x}.${action.payload.parcel.y}`]: action.payload.data
         }
       }
     case 'Set coordinate to scene data':
@@ -161,9 +157,9 @@ export function worldReducer(
 /**
  * State transitions that require side-effects
  */
-export const worldMiddleware: any = (
-  store: Store<WorldRootState & AuthRootState>
-) => (next: Middleware) => (action: any) => {
+export const worldMiddleware: any = (store: Store<WorldRootState & AuthRootState>) => (next: Middleware) => (
+  action: any
+) => {
   const nextState = next(action)
   switch (action.type) {
     case '@@router/LOCATION_CHANGE':
@@ -183,9 +179,7 @@ export const worldMiddleware: any = (
       }
       break
     case 'Set land api data':
-      let coordinateApi = `${action.payload.parcel.x}.${
-        action.payload.parcel.y
-      }`
+      let coordinateApi = `${action.payload.parcel.x}.${action.payload.parcel.y}`
       if (!store.getState().world.coordinateToScene[coordinateApi]) {
         store.dispatch({
           type: 'Loading parcel to scene mapping',
@@ -220,17 +214,10 @@ export const worldMiddleware: any = (
   return nextState
 }
 
-export async function fetchParcelInfo(
-  store: Store<WorldRootState>,
-  parcel: { x: number; y: number }
-) {
+export async function fetchParcelInfo(store: Store<WorldRootState>, parcel: { x: number; y: number }) {
   const dispatch = (type: any, payload?: any) =>
-    typeof type === 'string'
-      ? store.dispatch({ type, payload })
-      : store.dispatch(type)
-  const apiData = await jsonFetch(
-    `https://api.decentraland.org/v1/parcels/${parcel.x}/${parcel.y}/`
-  )
+    typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
+  const apiData = await jsonFetch(`https://api.decentraland.org/v1/parcels/${parcel.x}/${parcel.y}/`)
   dispatch({
     type: 'Set land api data',
     payload: { parcel, data: apiData.data }
@@ -241,20 +228,14 @@ export async function fetchParcelToSceneMapping(
   payload: { parcel: { x: number; y: number } }
 ) {
   const dispatch = (type: any, payload?: any) =>
-    typeof type === 'string'
-      ? store.dispatch({ type, payload })
-      : store.dispatch(type)
+    typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
   const { parcel } = payload
   const apiData = await jsonFetch(
-    `https://content.decentraland.org/scenes?x1=${parcel.x}&x2=${parcel.x}&y1=${
-      parcel.y
-    }&y2=${parcel.y}`
+    `https://content.decentraland.org/scenes?x1=${parcel.x}&x2=${parcel.x}&y1=${parcel.y}&y2=${parcel.y}`
   )
   let thisScene = ''
   for (let value of apiData.data) {
-    const [dx, dy] = value.parcel_id
-      .split(',')
-      .map((_: string) => parseInt(_, 10))
+    const [dx, dy] = value.parcel_id.split(',').map((_: string) => parseInt(_, 10))
     thisScene = value.scene_cid
     dispatch({
       type: 'Set coordinate to scene data',
@@ -270,34 +251,21 @@ export async function fetchSceneMappings(
   payload: { x: number; y: number; scene: string }
 ) {
   const dispatch = (type: any, payload?: any) =>
-    typeof type === 'string'
-      ? store.dispatch({ type, payload })
-      : store.dispatch(type)
+    typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
   const { scene } = payload
-  const result = await jsonFetch(
-    `https://content.decentraland.org/parcel_info?cids=${scene!}`
-  )
+  const result = await jsonFetch(`https://content.decentraland.org/parcel_info?cids=${scene!}`)
   dispatch({
     type: 'Set mappings data',
     payload: { scene: scene, data: result.data[0].content }
   })
 }
-export async function fetchSceneJson(
-  store: Store<WorldRootState>,
-  payload: { scene: string; data: any }
-) {
+export async function fetchSceneJson(store: Store<WorldRootState>, payload: { scene: string; data: any }) {
   const { scene, data } = payload
   const mappings = data
   const dispatch = (type: any, payload?: any) =>
-    typeof type === 'string'
-      ? store.dispatch({ type, payload })
-      : store.dispatch(type)
-  const sceneJsonCID = mappings.contents.filter(
-    (_: any) => _.file && _.file === 'scene.json'
-  )[0].hash
-  const sceneJson = await jsonFetch(
-    `https://content.decentraland.org/contents/${sceneJsonCID}`
-  )
+    typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
+  const sceneJsonCID = mappings.contents.filter((_: any) => _.file && _.file === 'scene.json')[0].hash
+  const sceneJson = await jsonFetch(`https://content.decentraland.org/contents/${sceneJsonCID}`)
   dispatch({
     type: 'Set scene json data',
     payload: { scene: scene!, data: sceneJson }

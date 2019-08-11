@@ -9,7 +9,8 @@
       "@dcl/rpc-common/*": ["bazel-bin/rpc/common/*", "bazel-genfiles/rpc/common/*"],
       "@dcl/rpc-client/*": ["bazel-bin/rpc/client/*", "bazel-genfiles/rpc/client/*"],
       "@dcl/rpc-host/*": ["bazel-bin/rpc/host/*", "bazel-genfiles/rpc/host/*"],
-      "@dcl/*": ["bazel-bin/*", "bazel-genfiles/*"]
+      "@dcl/*": ["bazel-bin/*", "bazel-genfiles/*"],
+      "dcl/*": ["bazel-bin/*", "bazel-genfiles/*"]
     },
     "module": "commonjs",
     "diagnostics": false,

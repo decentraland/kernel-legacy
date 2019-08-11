@@ -1,18 +1,10 @@
 import React from 'react'
 
-import {
-  Address,
-  Button,
-  Header,
-  HeaderMenu,
-  Icon,
-  Segment,
-  Tabs
-} from 'decentraland-ui'
+import { Address, Button, Header, HeaderMenu, Icon, Segment, Tabs } from 'decentraland-ui'
 import { NoDeployment } from './NoDeployment'
 import { LoadingSceneInfo } from './LoadingSceneInfo'
 
-import { scene as sceneUrl } from 'locations'
+import { scene as sceneUrl } from 'dcl/webb/src/locations'
 
 export class SceneInfo extends React.Component<any> {
   render() {
@@ -71,9 +63,7 @@ export class TabbedSceneInfo extends React.Component<any, any> {
   }
   _tab: { [key: string]: any } = {}
   setTab = (name: string) =>
-    this._tab[name]
-      ? this._tab[name]
-      : (this._tab[name] = () => this.setState({ tab: name }))
+    this._tab[name] ? this._tab[name] : (this._tab[name] = () => this.setState({ tab: name }))
   render() {
     const { sceneJson, mappings } = this.props
     const tabs = [
@@ -84,11 +74,7 @@ export class TabbedSceneInfo extends React.Component<any, any> {
       <>
         {tabs.map(({ name, title }) => {
           return (
-            <Tabs.Tab
-              key={name}
-              active={this.state.tab === name}
-              onClick={this.setTab(name)}
-            >
+            <Tabs.Tab key={name} active={this.state.tab === name} onClick={this.setTab(name)}>
               {title}
             </Tabs.Tab>
           )

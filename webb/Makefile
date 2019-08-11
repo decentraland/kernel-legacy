@@ -1,10 +1,6 @@
 .PHONY: watch
 watch: update-deps
-	npm start
-
-.PHONY: build
-build: update-deps
-	npm run build
+	node start.js
 
 update-deps: package-lock.json external/config.tgz external/utils.tgz external/protos.tgz external/client.tgz 
 	npm install ./external/*

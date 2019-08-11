@@ -4,7 +4,7 @@ import { Auth } from 'decentraland-auth'
 import { Comms } from '@dcl/client'
 import { intersectLogger } from '@dcl/utils'
 
-import { AuthRootState } from 'modules/auth'
+import { AuthRootState } from 'dcl/webb/src/modules/auth'
 
 const { connect } = Comms
 
@@ -45,10 +45,7 @@ export const INITIAL_COMMS: CommsState = {
   retries: 0
 }
 
-export function commsReducer(
-  state?: CommsState,
-  action?: AnyAction
-): CommsState {
+export function commsReducer(state?: CommsState, action?: AnyAction): CommsState {
   if (!state) {
     return INITIAL_COMMS
   }
@@ -81,9 +78,7 @@ export const overridenEvents = intersectLogger('Broker: ')
 /**
  * State transitions that require side-effects
  */
-export const commsMiddleware: any = (
-  store: Store<CommsRootState & AuthRootState>
-) => {
+export const commsMiddleware: any = (store: Store<CommsRootState & AuthRootState>) => {
   for (let key of ['debug', 'error', 'log', 'warn', 'info', 'debug', 'trace']) {
     overridenEvents.on(key, (...args) => {
       store.dispatch({ type: 'Comms log', payload: args })
@@ -100,9 +95,7 @@ export const commsMiddleware: any = (
   }
   return (next: Middleware) => (action: any) => {
     const dispatch = (type: any, payload?: any) =>
-      typeof type === 'string'
-        ? store.dispatch({ type, payload })
-        : store.dispatch(type)
+      typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
 
     switch (action.type) {
       case 'Login successful':
@@ -115,14 +108,8 @@ export const commsMiddleware: any = (
   }
 }
 
-export function needsInitialization(
-  store: Store<CommsRootState>,
-  action: AnyAction
-): boolean {
-  return (
-    store.getState().comms.summary === 'Not initialized' &&
-    action.type === 'Login successful'
-  )
+export function needsInitialization(store: Store<CommsRootState>, action: AnyAction): boolean {
+  return store.getState().comms.summary === 'Not initialized' && action.type === 'Login successful'
 }
 
 export async function startConnecting(dispatch: any) {

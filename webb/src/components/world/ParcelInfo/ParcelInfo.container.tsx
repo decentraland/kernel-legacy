@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { default as ParcelInfo } from './ParcelInfo'
-import { RootState } from 'store'
+import { RootState } from 'dcl/webb/src/store'
 
 function mapState(state: RootState, ownProps: any) {
   const location = ownProps.location.pathname

@@ -20,9 +20,7 @@ export async function checkSession(): Promise<AuthInfo> {
   const promise = future<AuthInfo>()
   webAuth.checkSession(
     {
-      audience: 'decentraland.org',
-      responseType: 'token id_token',
-      scope: 'openid email profile'
+      audience: 'decentraland.org'
     },
     (err: any, authResult: any) => {
       if (err) return promise.reject(err)
@@ -67,10 +65,7 @@ export async function getVerificationCode(email: string) {
  * @param email
  * @param verificationCode
  */
-export async function doAuth(
-  email: string,
-  verificationCode: string
-): Promise<AuthInfo> {
+export async function doAuth(email: string, verificationCode: string): Promise<AuthInfo> {
   const result = future<any>()
   webAuth.passwordlessLogin(
     {
@@ -100,11 +95,7 @@ export async function doAuth(
           result.reject(e)
         }
       } else {
-        return result.reject(
-          new Error(
-            'Could not login: unexpected result' + JSON.stringify(authResult)
-          )
-        )
+        return result.reject(new Error('Could not login: unexpected result' + JSON.stringify(authResult)))
       }
     }
   )
