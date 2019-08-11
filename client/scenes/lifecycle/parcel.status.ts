@@ -1,4 +1,4 @@
-import { parseParcelPosition } from 'atomicHelpers/parcelScenePositions'
+import { parseParcelPosition } from '@dcl/utils'
 
 export class ParcelLifeCycleStatus {
   x: number

@@ -3,13 +3,7 @@ import { Message } from 'google-protobuf'
 import { createLogger } from '@dcl/utils/Logger'
 import { parcelLimits } from '@dcl/config'
 
-import {
-  Category,
-  ChatData,
-  PositionData,
-  ProfileData,
-  DataHeader
-} from '@dcl/protos'
+import { Category, ChatData, PositionData, ProfileData, DataHeader } from '@dcl/protos'
 import {
   MessageType,
   PingMessage,
@@ -46,19 +40,11 @@ export function positionHash(p: Position) {
 }
 
 export class WorldInstanceConnection {
-  public positionHandler:
-    | ((fromAlias: string, positionData: PositionData) => void)
-    | null = null
-  public profileHandler:
-    | ((fromAlias: string, identity: string, profileData: ProfileData) => void)
-    | null = null
-  public chatHandler:
-    | ((fromAlias: string, chatData: ChatData) => void)
-    | null = null
+  public positionHandler: ((fromAlias: string, positionData: PositionData) => void) | null = null
+  public profileHandler: ((fromAlias: string, identity: string, profileData: ProfileData) => void) | null = null
+  public chatHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   // TODO: Once we have the correct class, change ChatData
-  public sceneMessageHandler:
-    | ((fromAlias: string, chatData: ChatData) => void)
-    | null = null
+  public sceneMessageHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   public ping: number = -1
 
   public stats: Stats | null = null
@@ -67,19 +53,21 @@ export class WorldInstanceConnection {
   private logger = createLogger('World: ')
 
   constructor(public connection: IBrokerConnection) {
-    this.pingInterval = setInterval(() => {
-      const msg = new PingMessage()
-      msg.setType(MessageType.PING)
-      msg.setTime(Date.now())
-      const bytes = msg.serializeBinary()
-
-      if (this.connection.hasUnreliableChannel) {
-        this.connection.sendUnreliable(bytes)
-      } else {
-        this.ping = -1
-      }
-    }, 10000)
+    this.pingInterval = setInterval(this.sendPing, 10000)
     this.connection.onMessageObservable.add(this.handleMessage.bind(this))
+  }
+
+  sendPing = () => {
+    const msg = new PingMessage()
+    msg.setType(MessageType.PING)
+    msg.setTime(Date.now())
+    const bytes = msg.serializeBinary()
+
+    if (this.connection.hasUnreliableChannel) {
+      this.connection.sendUnreliable(bytes)
+    } else {
+      this.ping = -1
+    }
   }
 
   sendPositionMessage(p: Position) {
@@ -149,11 +137,7 @@ export class WorldInstanceConnection {
     }
   }
 
-  sendTopicMessage(
-    reliable: boolean,
-    topic: string,
-    body: Message
-  ): SendResult {
+  sendTopicMessage(reliable: boolean, topic: string, body: Message): SendResult {
     const encodedBody = body.serializeBinary()
 
     const message = new TopicMessage()
@@ -164,11 +148,7 @@ export class WorldInstanceConnection {
     return this.sendMessage(reliable, (message as any) as Message)
   }
 
-  sendTopicIdentityMessage(
-    reliable: boolean,
-    topic: string,
-    body: Message
-  ): SendResult {
+  sendTopicIdentityMessage(reliable: boolean, topic: string, body: Message): SendResult {
     const encodedBody = body.serializeBinary()
 
     const message = new TopicIdentityMessage()
@@ -186,16 +166,12 @@ export class WorldInstanceConnection {
     }
     if (reliable) {
       if (!this.connection.hasReliableChannel) {
-        throw new Error(
-          'trying to send a topic message using null reliable channel'
-        )
+        throw new Error('trying to send a topic message using null reliable channel')
       }
       this.connection.sendReliable(bytes)
     } else {
       if (!this.connection.hasUnreliableChannel) {
-        throw new Error(
-          'trying to send a topic message using null unreliable channel'
-        )
+        throw new Error('trying to send a topic message using null unreliable channel')
       }
       this.connection.sendUnreliable(bytes)
     }
@@ -204,9 +180,7 @@ export class WorldInstanceConnection {
 
   updateSubscriptions(rawTopics: string) {
     if (!this.connection.hasReliableChannel) {
-      throw new Error(
-        'trying to send topic subscription message but reliable channel is not ready'
-      )
+      throw new Error('trying to send topic subscription message but reliable channel is not ready')
     }
     const subscriptionMessage = new SubscriptionMessage()
     subscriptionMessage.setType(MessageType.SUBSCRIPTION)
@@ -231,12 +205,7 @@ export class WorldInstanceConnection {
     try {
       msgType = MessageHeader.deserializeBinary(message.data).getType()
     } catch (err) {
-      this.logger.error(
-        'cannot deserialize worldcomm message header ' +
-          message.channel +
-          ' ' +
-          msgSize
-      )
+      this.logger.error('cannot deserialize worldcomm message header ' + message.channel + ' ' + msgSize)
       return
     }
 
@@ -304,8 +273,7 @@ export class WorldInstanceConnection {
               this.stats.sceneComms.incrementRecv(msgSize)
             }
 
-            this.sceneMessageHandler &&
-              this.sceneMessageHandler(alias, chatData)
+            this.sceneMessageHandler && this.sceneMessageHandler(alias, chatData)
             break
           }
           default: {
@@ -347,8 +315,7 @@ export class WorldInstanceConnection {
               this.stats.dispatchTopicDuration.stop()
               this.stats.profile.incrementRecv(msgSize)
             }
-            this.profileHandler &&
-              this.profileHandler(alias, userId, profileData)
+            this.profileHandler && this.profileHandler(alias, userId, profileData)
             break
           }
           default: {

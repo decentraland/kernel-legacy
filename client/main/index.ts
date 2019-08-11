@@ -27,10 +27,51 @@ export type Subsystems =
 
 export class MainController {
   subsystems: SubsystemController[] = []
-  indexedSystems: Map<string, SubsystemController> = new Map<
-    string,
-    SubsystemController
-  >()
+  indexedSystems: Map<string, SubsystemController> = new Map<string, SubsystemController>()
+
+  get config() {
+    return this.indexedSystems.get('Config')
+  }
+
+  get assets() {
+    return this.indexedSystems.get('Assets')
+  }
+
+  get auth() {
+    return this.indexedSystems.get('Auth')
+  }
+
+  get comms() {
+    return this.indexedSystems.get('Comms')
+  }
+
+  get passports() {
+    return this.indexedSystems.get('Passports')
+  }
+
+  get peerPresence() {
+    return this.indexedSystems.get('PeerPresence')
+  }
+
+  get socialModeration() {
+    return this.indexedSystems.get('SocialModeration')
+  }
+
+  get avatarPresence() {
+    return this.indexedSystems.get('InWorldAvatars')
+  }
+
+  get worldMap() {
+    return this.indexedSystems.get('WorldMap')
+  }
+
+  get sceneLoader() {
+    return this.indexedSystems.get('SceneLoader')
+  }
+
+  get sceneRunner() {
+    return this.indexedSystems.get('SceneRunner')
+  }
 
   constructor() {
     const config = new ConfigSystem('Config', [])
@@ -45,9 +86,7 @@ export class MainController {
     this.indexedSystems.set('Passports', passports)
     const presence = new PeerPresenceSystem('PeerPresence', [comms, passports])
     this.indexedSystems.set('PeerPresence', presence)
-    const socialModeration = new SocialModerationSystem('SocialModeration', [
-      passports
-    ])
+    const socialModeration = new SocialModerationSystem('SocialModeration', [passports])
     this.indexedSystems.set('SocialModeration', socialModeration)
     const inworldAvatars = new InWorldAvatarSystem('InWorldAvatars', [
       comms,
@@ -59,15 +98,9 @@ export class MainController {
     this.indexedSystems.set('InWorldAvatars', inworldAvatars)
     const worldMap = new WorldMapSystem('WorldMap', [config])
     this.indexedSystems.set('WorldMap', worldMap)
-    const sceneLoader = new SceneLoaderSystem('SceneLoader', [
-      worldMap,
-      inworldAvatars
-    ])
+    const sceneLoader = new SceneLoaderSystem('SceneLoader', [worldMap, inworldAvatars])
     this.indexedSystems.set('SceneLoader', sceneLoader)
-    const sceneRunner = new SceneRunnerSystem('SceneRunner', [
-      sceneLoader,
-      inworldAvatars
-    ])
+    const sceneRunner = new SceneRunnerSystem('SceneRunner', [sceneLoader, inworldAvatars])
     this.indexedSystems.set('SceneRunner', sceneRunner)
     this.subsystems = [
       assets,

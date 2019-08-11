@@ -1,4 +1,4 @@
-import { Vector2 } from 'dcl/utils/dist/Vector'
+import { Vector2 } from '@dcl/utils'
 
 export interface ParcelConfigurationOptions {
   lineOfSightRadius: number

@@ -1,4 +1,4 @@
-import { PeerPresenceManager } from './peerPresence'
+import { PeerPresenceManager } from './peers/peerPresence'
 import { ProfileStore } from '../passports/api'
 
 export class AvatarPresenceManager {

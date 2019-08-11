@@ -1,4 +1,4 @@
-import { ILand } from 'shared/types'
+import { ILand } from '@dcl/utils'
 
 export class SceneLifeCycleStatus {
   status: 'unloaded' | 'awake' | 'ready' = 'unloaded'
