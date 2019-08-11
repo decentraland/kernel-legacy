@@ -1,167 +1,127 @@
-import { Observable } from 'dcl/utils/Observable'
-import { getFromLocalStorage, saveToLocalStorage } from 'dcl/utils/SafeLocalStorage'
+import { Observable } from '@dcl/utils'
+import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils'
 
-import { UUID, PeerInformation, AvatarMessage, UserInformation, AvatarMessageType, Pose } from '../comms/types'
+export type ModerationEvent = {
+  type: 'BlockedUser' | 'UnblockedUser' | 'MutedUser' | 'UnmutedUser'
+  userId
+}
 
-export const getBlockedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-blocked-users') || [])
-export const getMutedUsers: () => Set<string> = () => new Set(getFromLocalStorage('dcl-muted-users') || [])
-export const isMuted = (name: string) => getMutedUsers().has(name)
+export class PeerModerationFilter {
+  public blockedUsersMap: Map<string, boolean> = new Map<string, boolean>()
+  public mutedUsersMap: Map<string, boolean> = new Map<string, boolean>()
 
-export const peerMap = new Map<UUID, PeerInformation>()
-export const avatarMessageObservable = new Observable<AvatarMessage>()
+  public peerModerationObservable: Observable<ModerationEvent> = new Observable<
+    ModerationEvent
+  >()
 
-export let localProfileUUID: UUID | null = null
+  constructor() {
+    const blocked: Set<string> = new Set(
+      getFromLocalStorage('dcl-blocked-users')
+    )
+    const muted: Set<string> = new Set(getFromLocalStorage('dcl-muted-users'))
 
-export function findPeerByName(displayName: string): UserInformation | null {
-  for (let [, peer] of peerMap) {
-    if (peer.user && peer.user.displayName === displayName) {
-      return peer.user
+    for (let userId of blocked) {
+      this.blockedUsersMap.set(userId, true)
+    }
+    for (let userId of muted) {
+      this.mutedUsersMap.set(userId, true)
     }
   }
-  return null
-}
 
-/**
- * Removes both the peer information and the Avatar from the world.
- * @param uuid
- */
-export function removeById(uuid: UUID) {
-  if (localProfileUUID === uuid) {
-    localProfileUUID = null
+  /**
+   * Returns true if the user is blocked
+   * @param userId the target userId
+   */
+  isUserBlocked(userId: string): boolean {
+    return this.blockedUsersMap.has(userId) && this.blockedUsersMap.get(userId)
   }
-
-  if (peerMap.delete(uuid)) {
-    avatarMessageObservable.notifyObservers({
-      type: AvatarMessageType.USER_REMOVED,
-      uuid
-    })
+  /**
+   * Returns true if the user is muted
+   * @param userId the target userId
+   */
+  isUserMuted(userId: string): boolean {
+    return this.mutedUsersMap.has(userId) && this.mutedUsersMap.get(userId)
   }
-}
-
-/**
- * If not exist, sets up a new avatar and profile object
- * @param uuid
- */
-export function setUpID(uuid: UUID): PeerInformation | null {
-  if (!uuid) return null
-  if (typeof (uuid as any) !== 'string') throw new Error('Did not receive a valid UUID')
-
-  let peer: PeerInformation
-
-  if (!peerMap.has(uuid)) {
-    peer = {
-      uuid,
-      flags: {}
-    }
-
-    peerMap.set(uuid, peer)
-  } else {
-    peer = peerMap.get(uuid) as PeerInformation
+  /**
+   * Return a list of all the blocked user Ids
+   */
+  getBlockedUserIds(): string[] {
+    return [...this.blockedUsersMap.keys()]
   }
-
-  return peer
-}
-
-export function receiveUserData(uuid: string, data: Partial<UserInformation>) {
-  const peerData = setUpID(uuid)
-  if (peerData) {
-    const userData = peerData.user || (peerData.user = peerData.user || {})
-
-    const profileChanged =
-      (data.displayName && userData.displayName !== data.displayName) ||
-      (data.publicKey && userData.publicKey !== data.publicKey) ||
-      (data.avatarType && userData.avatarType !== data.avatarType)
-
-    if (profileChanged) {
-      Object.assign(userData, data)
-
-      avatarMessageObservable.notifyObservers({
-        type: AvatarMessageType.USER_DATA,
-        uuid,
-        data
+  /**
+   * Return a list of all the muted user Ids
+   */
+  getMutedUserIds(): string[] {
+    return [...this.mutedUsersMap.keys()]
+  }
+  /**
+   * Blocks a user based on its userId
+   * @param userId the target userId
+   */
+  blockUser(userId: string) {
+    if (!this.blockedUsersMap.has(userId)) {
+      this.blockedUsersMap.set(userId, true)
+      saveToLocalStorage(
+        'dcl-blocked-users',
+        Array.from(this.blockedUsersMap.keys())
+      )
+      this.peerModerationObservable.notifyObservers({
+        type: 'BlockedUser',
+        userId
       })
     }
   }
-}
-
-export function receiveUserPose(uuid: string, pose: Pose) {
-  avatarMessageObservable.notifyObservers({
-    type: AvatarMessageType.USER_POSE,
-    uuid,
-    pose
-  })
-}
-
-/**
- * In some cases, like minimizing the window, the user will be invisible to the rest of the world.
- * This function handles those visible changes.
- */
-export function receiveUserVisible(uuid: string, visible: boolean) {
-  avatarMessageObservable.notifyObservers({
-    type: AvatarMessageType.USER_VISIBLE,
-    uuid,
-    visible
-  })
-}
-
-export function addToBlockedUsers(uuid: string): Set<string> {
-  const blockedUsers = getBlockedUsers()
-
-  if (!blockedUsers.has(uuid)) {
-    const updatedSet = blockedUsers.add(uuid)
-    saveToLocalStorage('dcl-blocked-users', Array.from(updatedSet))
-
-    avatarMessageObservable.notifyObservers({
-      type: AvatarMessageType.USER_BLOCKED,
-      uuid
-    })
-
-    return updatedSet
+  /**
+   * Unblocks a user, based on its userId
+   * @param userId the target userId
+   */
+  unblockUser(userId: string) {
+    if (this.blockedUsersMap.has(userId)) {
+      this.blockedUsersMap.delete(userId)
+      saveToLocalStorage(
+        'dcl-blocked-users',
+        Array.from(this.blockedUsersMap.keys())
+      )
+      this.peerModerationObservable.notifyObservers({
+        type: 'UnblockedUser',
+        userId
+      })
+    }
   }
 
-  return blockedUsers
-}
-
-export function removeFromBlockedUsers(uuid: string): Set<string> {
-  const blockedUsers = getBlockedUsers()
-  blockedUsers.delete(uuid)
-  saveToLocalStorage('dcl-blocked-users', Array.from(blockedUsers))
-
-  avatarMessageObservable.notifyObservers({
-    type: AvatarMessageType.USER_UNBLOCKED,
-    uuid
-  })
-
-  return blockedUsers
-}
-
-export function addToMutedUsers(uuid: string): Set<string> {
-  const mutedUsers = getMutedUsers()
-
-  if (!mutedUsers.has(uuid)) {
-    const updatedSet = mutedUsers.add(uuid)
-    saveToLocalStorage('dcl-muted-users', Array.from(updatedSet))
-
-    avatarMessageObservable.notifyObservers({
-      type: AvatarMessageType.USER_MUTED,
-      uuid
-    })
-
-    return updatedSet
+  /**
+   * Mute a user based on its userId
+   * @param userId the target userId
+   */
+  muteUser(userId: string) {
+    if (!this.mutedUsersMap.has(userId)) {
+      this.mutedUsersMap.set(userId, true)
+      saveToLocalStorage(
+        'dcl-muted-users',
+        Array.from(this.mutedUsersMap.keys())
+      )
+      this.peerModerationObservable.notifyObservers({
+        type: 'MutedUser',
+        userId
+      })
+    }
   }
 
-  return mutedUsers
-}
-
-export function removeFromMutedUsers(uuid: string): Set<string> {
-  const mutedUsers = getMutedUsers()
-  mutedUsers.delete(uuid)
-  saveToLocalStorage('dcl-muted-users', Array.from(mutedUsers))
-
-  avatarMessageObservable.notifyObservers({
-    type: AvatarMessageType.USER_UNMUTED,
-    uuid
-  })
-
-  return mutedUsers
+  /**
+   * Unmutes a user, based on its userId
+   * @param userId the target userId
+   */
+  unmuteUser(userId: string) {
+    if (this.mutedUsersMap.has(userId)) {
+      this.mutedUsersMap.delete(userId)
+      saveToLocalStorage(
+        'dcl-muted-users',
+        Array.from(this.mutedUsersMap.keys())
+      )
+      this.peerModerationObservable.notifyObservers({
+        type: 'UnmutedUser',
+        userId
+      })
+    }
+  }
 }

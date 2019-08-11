@@ -8,3 +8,13 @@ export function getStoredPassportForUser(accessToken: string /*, userId: string 
 export function resolveMappingsForStoredProfile(userId: string) {
   return `https://avatars-api.decentraland.today/api/profile`
 }
+
+export class ProfileStore {
+  constructor() {
+     
+  }
+
+  getProfile(userId: string, versionHint: number) {
+
+  }
+}

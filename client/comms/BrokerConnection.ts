@@ -14,15 +14,17 @@ import {
   MessageType,
   AuthMessage,
   Role
-} from 'dcl/protos'
+} from '@dcl/protos'
 
 import { SocketReadyState } from './worldInstanceConnection'
 import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
+import { getMessageCredentials } from '../auth/api'
 
 export class BrokerConnection implements IBrokerConnection {
   public alias: string | null = null
   public authenticated = false
+  public authData: any = null
 
   public commServerAlias: number | null = null
   public webRtcConn: RTCPeerConnection | null = null
@@ -36,6 +38,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
+  public gotCandidatesFuture = future<RTCSessionDescription>()
   private unreliableFuture = future<void>()
   private reliableFuture = future<void>()
 
@@ -67,12 +70,10 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(
-    public url: string,
-    public credentialsProvider: (message: string) => Promise<AuthData>
-  ) {
+  constructor(public url: string, auth: { accessToken: string }) {
     this.connectRTC()
     this.connectWS()
+    this.authData = auth
 
     // TODO: reconnect logic, handle disconnections
 
@@ -81,7 +82,6 @@ export class BrokerConnection implements IBrokerConnection {
         this.reliableFuture.reject(
           new Error('Communications link cannot be established (Timeout)')
         )
-        this.stats && this.stats.emitDebugInformation()
       }
     }, 60000)
   }
@@ -172,7 +172,7 @@ export class BrokerConnection implements IBrokerConnection {
         const connectMessage = new ConnectMessage()
         connectMessage.setType(MessageType.CONNECT)
         connectMessage.setToAlias(serverAlias)
-        this.sendCoordinatorMessage(connectMessage)
+        this.sendCoordinatorMessage((connectMessage as any) as Message)
         break
       }
       case MessageType.WEBRTC_ICE_CANDIDATE:
@@ -194,8 +194,6 @@ export class BrokerConnection implements IBrokerConnection {
           break
         }
 
-        const sdp = message.getSdp()
-
         if (message.getFromAlias() !== this.commServerAlias) {
           this.logger.log(
             'ignore webrtc message from unknown peer',
@@ -204,35 +202,39 @@ export class BrokerConnection implements IBrokerConnection {
           break
         }
 
+        const decoder = new TextDecoder('utf8')
+        const sessionData = decoder.decode(message.getData() as ArrayBuffer)
+
         if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
           try {
-            await this.webRtcConn!.addIceCandidate({ candidate: sdp })
+            const candidate = JSON.parse(sessionData)
+            await this.webRtcConn!.addIceCandidate(candidate)
           } catch (err) {
             this.logger.error(err)
           }
         } else if (msgType === MessageType.WEBRTC_OFFER) {
           try {
-            await this.webRtcConn!.setRemoteDescription(
-              new RTCSessionDescription({ type: 'offer', sdp })
-            )
-            const desc = await this.webRtcConn!.createAnswer()
+            await this.webRtcConn!.setRemoteDescription(JSON.parse(sessionData))
+            const desc = await this.webRtcConn!.createAnswer({})
             await this.webRtcConn!.setLocalDescription(desc)
 
-            if (desc.sdp) {
+            let answer = this.webRtcConn!.localDescription
+
+            if (answer && answer.sdp) {
               const msg = new WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
               msg.setType(MessageType.WEBRTC_ANSWER)
-              msg.setSdp(desc.sdp)
-              this.sendCoordinatorMessage(msg)
+              const encoder = new TextEncoder()
+              const data = encoder.encode(JSON.stringify(answer))
+              msg.setData(data)
+              this.sendCoordinatorMessage((msg as any) as Message)
             }
           } catch (err) {
             this.logger.error(err)
           }
         } else if (msgType === MessageType.WEBRTC_ANSWER) {
           try {
-            await this.webRtcConn!.setRemoteDescription(
-              new RTCSessionDescription({ type: 'answer', sdp })
-            )
+            await this.webRtcConn!.setRemoteDescription(JSON.parse(sessionData))
           } catch (err) {
             this.logger.error(err)
           }
@@ -309,9 +311,14 @@ export class BrokerConnection implements IBrokerConnection {
       msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
       // TODO: Ensure commServerAlias, it may be null
       msg.setToAlias(this.commServerAlias!)
-      msg.setSdp(event.candidate.candidate)
-      // TODO: add sdp fields
-      this.sendCoordinatorMessage(msg)
+
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(event.candidate.toJSON()))
+      msg.setData(data)
+
+      this.sendCoordinatorMessage((msg as any) as Message)
+    } else {
+      this.gotCandidatesFuture.resolve(this.webRtcConn!.localDescription!)
     }
   }
 
@@ -329,7 +336,9 @@ export class BrokerConnection implements IBrokerConnection {
       if (label === 'reliable') {
         this.reliableDataChannel = dc
         const authData = new AuthData()
-        const credentials = await this.credentialsProvider('')
+        const credentials = await getMessageCredentials(
+          this.authData.accessToken
+        )
         authData.setSignature(credentials['x-signature'])
         authData.setIdentity(credentials['x-identity'])
         authData.setTimestamp(credentials['x-timestamp'])
@@ -363,10 +372,7 @@ export class BrokerConnection implements IBrokerConnection {
       const data = e.data
       const msg = new Uint8Array(data)
 
-      this.onMessageObservable.notifyObservers({
-        data: msg,
-        channel: dc.label
-      })
+      this.onMessageObservable.notifyObservers({ data: msg, channel: dc.label })
     }
   }
 }

@@ -1,3 +1,5 @@
+import { Profile } from '../passports/types'
+
 export enum AvatarMessageType {
   // Networking related messages
   USER_DATA = 'USER_DATA',
@@ -12,7 +14,8 @@ export enum AvatarMessageType {
   USER_BLOCKED = 'USER_BLOCKED',
   USER_UNBLOCKED = 'USER_UNBLOCKED',
 
-  SHOW_WINDOW = 'SHOW_WINDOW' // Wtf does this do?
+  ADD_FRIEND = 'ADD_FRIEND',
+  SHOW_WINDOW = 'SHOW_WINDOW'
 }
 
 export type ReceiveUserDataMessage = {
@@ -75,14 +78,11 @@ export type PeerInformation = {
 }
 
 export type UserInformation = {
-  /**
-   * User's display name
-   */
-  displayName?: string
-  publicKey?: string
-  avatarType?: string
+  userId?: string
+  version?: string
   status?: string
   pose?: Pose
+  profile?: Profile
 }
 
 // The order is [X,Y,Z,Qx,Qy,Qz,Qw]

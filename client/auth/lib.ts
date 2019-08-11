@@ -13,6 +13,9 @@ const webAuth = new WebAuth({
   scope: 'openid email profile'
 })
 
+/**
+ * Retrieve `AuthInfo` credentials
+ */
 export async function checkSession(): Promise<AuthInfo> {
   const promise = future<AuthInfo>()
   webAuth.checkSession(
@@ -37,6 +40,10 @@ export async function checkSession(): Promise<AuthInfo> {
   return promise
 }
 
+/**
+ * Start a passwordless login
+ * @param email the user's email
+ */
 export async function getVerificationCode(email: string) {
   const promise = future<void>()
   webAuth.passwordlessStart(
@@ -53,6 +60,11 @@ export async function getVerificationCode(email: string) {
   return promise
 }
 
+/**
+ * Actually login with an email and authentication code
+ * @param email
+ * @param verificationCode
+ */
 export async function doAuth(
   email: string,
   verificationCode: string
