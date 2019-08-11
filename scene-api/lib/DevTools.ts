@@ -1,72 +1,53 @@
-import { registerAPI, exposeMethod, API } from "dclrpc/host";
+import { registerAPI, exposeMethod, API } from 'dcl/rpc/host'
 
 // THIS INTERFACE MOCKS THE chromedevtools API
-import { ProtocolMapping } from "devtools-protocol/types/protocol-mapping";
-import Protocol from "devtools-protocol";
+import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'
+import Protocol from 'devtools-protocol'
 
-import { DEBUG } from "dcl/config";
-import { ILogger, defaultLogger } from "dcl/utils/Logger";
+import { DEBUG } from 'dcl/config'
+import { ILogger, defaultLogger } from 'dcl/utils/Logger'
 
 export interface DevToolsServer {
-  event<T extends keyof ProtocolMapping.Events>(
-    type: T,
-    params: ProtocolMapping.Events[T]
-  ): Promise<void>;
+  event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void>
 }
 
-@registerAPI("DevTools")
+@registerAPI('DevTools')
 export class DevTools extends API implements DevToolsServer {
-  exceptions = new Map<number, Protocol.Runtime.ExceptionDetails>();
+  exceptions = new Map<number, Protocol.Runtime.ExceptionDetails>()
 
-  logger: ILogger = defaultLogger;
+  logger: ILogger = defaultLogger
 
   // ONLY AVAILABLE IN DEBUG MODE
-  logs: Protocol.Runtime.ConsoleAPICalledEvent[] = [];
+  logs: Protocol.Runtime.ConsoleAPICalledEvent[] = []
 
   @exposeMethod
-  async event<T extends keyof ProtocolMapping.Events>(
-    type: T,
-    params: ProtocolMapping.Events[T]
-  ): Promise<void> {
+  async event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void> {
     switch (type) {
-      case "Runtime.consoleAPICalled": {
-        let [
-          event
-        ] = params as ProtocolMapping.Events["Runtime.consoleAPICalled"];
+      case 'Runtime.consoleAPICalled': {
+        let [event] = params as ProtocolMapping.Events['Runtime.consoleAPICalled']
 
         if (DEBUG) {
-          this.logs.push(event);
+          this.logs.push(event)
         }
 
-        this.logger.log(
-          "",
-          ...event.args.map($ =>
-            "value" in $ ? $.value : $.unserializableValue
-          )
-        );
+        this.logger.log('', ...event.args.map($ => ('value' in $ ? $.value : $.unserializableValue)))
 
-        break;
+        break
       }
 
-      case "Runtime.exceptionThrown": {
-        let [
-          payload
-        ] = params as ProtocolMapping.Events["Runtime.exceptionThrown"];
-        this.exceptions.set(
-          payload.exceptionDetails.exceptionId,
-          payload.exceptionDetails
-        );
+      case 'Runtime.exceptionThrown': {
+        let [payload] = params as ProtocolMapping.Events['Runtime.exceptionThrown']
+        this.exceptions.set(payload.exceptionDetails.exceptionId, payload.exceptionDetails)
 
         if (payload.exceptionDetails.exception) {
           this.logger.error(
             payload.exceptionDetails.text,
-            payload.exceptionDetails.exception.value ||
-              payload.exceptionDetails.exception.unserializableValue
-          );
+            payload.exceptionDetails.exception.value || payload.exceptionDetails.exception.unserializableValue
+          )
         } else {
-          this.logger.error(payload.exceptionDetails.text);
+          this.logger.error(payload.exceptionDetails.text)
         }
-        break;
+        break
       }
     }
   }

@@ -3,6 +3,6 @@
 export * from './Script'
 export * from './EventSubscriber'
 
-export { WebWorkerTransport } from 'dclrpc/common/transports/WebWorker'
-export { WebSocketTransport } from 'dclrpc/common/transports/WebSocket'
-export { MemoryTransport } from 'dclrpc/common/transports/Memory'
+export { WebWorkerTransport } from 'dcl/rpc/common/transports/WebWorker'
+export { WebSocketTransport } from 'dcl/rpc/common/transports/WebSocket'
+export { MemoryTransport } from 'dcl/rpc/common/transports/Memory'

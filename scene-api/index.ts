@@ -1,7 +1,7 @@
 // UTILS
-export * from 'dcl/utils/Task'
-export * from 'dcl/utils/Logger'
-export * from 'dcl/utils/Observable'
+export * from '@dcl/utils/Task'
+export * from '@dcl/utils/Logger'
+export * from '@dcl/utils/Observable'
 
 // CORE DEPENDENCIES
 export * from './ecs/ECSEngine'
@@ -12,7 +12,7 @@ export * from './ecs/UIValue'
 export * from './ecs/EventManager'
 
 // DECENTRALAND DEPENDENCIES
-export * from 'dcl/utils/math'
+export * from '@dcl/utils/math'
 export * from './engine/Types'
 export * from './engine/Components'
 export * from './engine/Systems'
