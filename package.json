@@ -2,7 +2,8 @@
     "prettier": {
         "jsxSingleQuote": true,
         "singleQuote": true,
-        "semi": false
+        "semi": false,
+        "printWidth": 120
     },
     "dependencies": {
         "@babel/core": "^7.5.5",

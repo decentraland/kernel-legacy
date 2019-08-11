@@ -78,10 +78,10 @@ export type AvatarAsset = {
   tags: string[]
   category: string
   i18n: { [language: string]: string }
-  main: Array<{
+  main: {
     type: string
     model: string
-  }>
+  }
 }
 
 export type InWorldAvatar = {
