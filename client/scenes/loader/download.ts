@@ -58,7 +58,9 @@ export class SceneDataDownloadManager {
   setSceneRoots(contents: SceneMappingResponse) {
     for (let result of contents.data) {
       const sceneId = getSceneIdFromSceneMappingResponse(result)
-      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
+      const promised = this.positionToSceneId.has(result.parcel_id)
+        ? this.positionToSceneId.get(result.parcel_id)
+        : future<string | null>()
 
       if (promised.isPending) {
         promised.resolve(sceneId)
@@ -115,7 +117,9 @@ export class SceneDataDownloadManager {
       mappingsResponse: content.content
     }
 
-    const pendingSceneData = this.sceneIdToLandData.get(sceneId) || future<ILand | null>()
+    const pendingSceneData = this.sceneIdToLandData.has(sceneId)
+      ? this.sceneIdToLandData.get(sceneId)
+      : future<ILand | null>()
 
     if (pendingSceneData.isPending) {
       pendingSceneData.resolve(data)

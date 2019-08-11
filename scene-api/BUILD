@@ -10,7 +10,7 @@ ts_library(
         "index.ts",
     ]),
     deps = [
-        "//rpc:host",
+        "//rpc/host",
         "//utils",
         "@npm//@types/node",
         "@npm//devtools-protocol",

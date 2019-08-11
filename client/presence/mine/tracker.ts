@@ -25,15 +25,12 @@ export class MyPresence {
   lastTimeUpdatedUrl = 0
 
   updateUrlPosition = (cameraVector: Vector3) => {
-    if (performance.now() > this.lastTimeUpdatedUrl + 1000) {
-      worldToGrid(cameraVector, temporaryVector)
-      const positionInUrl = qs.parse(this.history.state.location.search)
-      if (positionInUrl.x !== temporaryVector.x || positionInUrl.y !== temporaryVector.y) {
-        positionInUrl.x = temporaryVector.x
-        positionInUrl.y = temporaryVector.y
-        this.history.replaceState({}, '', qs.stringify(positionInUrl))
-      }
-      this.lastTimeUpdatedUrl = performance.now()
+    worldToGrid(cameraVector, temporaryVector)
+    const positionInUrl = qs.parse(this.history.state.location.search)
+    if (positionInUrl.x !== temporaryVector.x || positionInUrl.y !== temporaryVector.y) {
+      positionInUrl.x = temporaryVector.x
+      positionInUrl.y = temporaryVector.y
+      this.history.replaceState({}, '', qs.stringify(positionInUrl))
     }
   }
 
@@ -41,7 +38,10 @@ export class MyPresence {
     this.lastPlayerPosition.copyFrom(event.position)
   }
   updateUrlPositionListener = event => {
-    this.updateUrlPosition(event.position)
+    if (performance.now() > this.lastTimeUpdatedUrl + 1000) {
+      this.updateUrlPosition(event.position)
+      this.lastTimeUpdatedUrl = performance.now()
+    }
   }
 
   constructor(history: History, initialPosition: Vector3) {

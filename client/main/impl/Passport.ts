@@ -1,6 +1,6 @@
 import { SubsystemController } from '../subsystems'
-import { ProfileStore } from 'dcl/client/passports/api'
-import { getBaseCatalog } from 'dcl/client/assets/wearables/base'
+import { ProfileStore } from '../../passports/api'
+import { getBaseCatalog } from '../../assets/wearables/base'
 
 export class PassportSystem extends SubsystemController {
   passports?: ProfileStore

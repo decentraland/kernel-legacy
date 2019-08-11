@@ -98,9 +98,12 @@ export class SceneLifeCycleController extends EventEmitter {
             this._positionToSceneId.set(pos, land.sceneId)
           }
 
-          const futurePosition = this.futureOfPositionToSceneId.get(pos)
-          if (futurePosition && futurePosition.isPending) {
-            futurePosition.resolve(land.sceneId)
+          const hasFuture = this.futureOfPositionToSceneId.has(pos)
+          if (hasFuture) {
+            const futurePosition = this.futureOfPositionToSceneId.get(pos)
+            if (futurePosition.isPending) {
+              futurePosition.resolve(land.sceneId)
+            }
           }
         }
       } catch (e) {

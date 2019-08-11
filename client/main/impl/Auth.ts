@@ -1,5 +1,5 @@
 import { SubsystemController } from '../subsystems'
-import { checkSession } from 'dcl/client/auth/lib'
+import { checkSession } from '../../auth/lib'
 
 export class AuthSystem extends SubsystemController {
   protected async onStart() {

@@ -1,5 +1,5 @@
 import { SubsystemController } from '../subsystems'
-import { SocialModeration } from 'dcl/client/social/moderation'
+import { SocialModeration } from '../../social/moderation'
 
 export class SocialModerationSystem extends SubsystemController {
   socialModeration: any

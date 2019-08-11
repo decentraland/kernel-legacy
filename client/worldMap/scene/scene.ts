@@ -14,6 +14,7 @@ import {
 import { stableStringify } from './stableStringify'
 
 import { isValidSceneInput } from './validation'
+import { NumberOrRange } from '@dcl/utils'
 
 export function parseCoordinate(coord: CoordinateDefinition) {
   if (typeof coord === 'string') {
@@ -125,6 +126,22 @@ export class Scene implements SceneManifest {
     return this._spawnPoints
   }
 
+  pickSpawnPoint() {
+    const allSpawnPoints = this.spawnPoints
+    const spawnArea = allSpawnPoints[Math.floor(Math.random() * allSpawnPoints.length)]
+    return {
+      ...spawnArea,
+      position: {
+        x: decideFloat(spawnArea.position.x),
+        y: decideFloat(spawnArea.position.y),
+        z: decideFloat(spawnArea.position.z)
+      },
+      camera: {
+        y: decideFloat(spawnArea.camera.y)
+      }
+    }
+  }
+
   get referenceSystem(): ReferenceSystem {
     if (!this._referenceSystem) {
       this._referenceSystem = {
@@ -161,5 +178,13 @@ export class Scene implements SceneManifest {
         .toString('hex')
     }
     return this._cannonicalCID
+  }
+}
+
+function decideFloat(x: NumberOrRange) {
+  if (typeof x === 'number') {
+    return x
+  } else {
+    return Math.random() * (x[1] - x[0]) + x[0]
   }
 }

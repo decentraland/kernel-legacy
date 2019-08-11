@@ -10,7 +10,7 @@ import { InWorldAvatarSystem } from './impl/InWorldAvatars'
 import { WorldMapSystem } from './impl/WorldMap'
 import { SceneLoaderSystem } from './impl/SceneLoader'
 import { SceneRunnerSystem } from './impl/SceneRunner'
-import { MyPresence } from '../presence/mine/tracker'
+import { MyPresenceSystem } from './impl/MyPresence'
 
 export type Subsystems =
   | 'Assets'

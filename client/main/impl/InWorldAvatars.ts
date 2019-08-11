@@ -1,5 +1,5 @@
 import { SubsystemController } from '../subsystems'
-import { AvatarPresenceManager } from 'dcl/client/presence/avatarPresence'
+import { AvatarPresenceManager } from '../../presence/avatarPresence'
 import { PeerPresenceSystem } from './PeerPresence'
 import { PassportSystem } from './Passport'
 

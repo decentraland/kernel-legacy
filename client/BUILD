@@ -13,6 +13,7 @@ ts_library(
         "main/**/*.ts",
         "passports/**/*.ts",
         "presence/**/*.ts",
+        "scenes/loader/**/*.ts",
         "social/**/*.ts",
         "worldMap/**/*.ts",
     ]),

@@ -1,7 +1,7 @@
 import { SubsystemController } from '../subsystems'
-import { connect } from 'dcl/client/comms'
-import { Auth } from 'dcl/client'
-import { WorldInstanceConnection } from 'dcl/client/comms/worldInstanceConnection'
+import { connect } from '../../comms'
+import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
+import { Auth } from '../../'
 
 export class CommsSystem extends SubsystemController {
   worldInstanceConnection?: WorldInstanceConnection
