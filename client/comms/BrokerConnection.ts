@@ -1,4 +1,4 @@
-import { future } from 'fp-future'
+import { future, IFuture } from 'fp-future'
 import { Message } from 'google-protobuf'
 
 import { Communications } from '@dcl/config'
@@ -38,14 +38,12 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
-  public gotCandidatesFuture = future<RTCSessionDescription>()
+  public gotCandidatesFuture: IFuture<RTCSessionDescription> = future<RTCSessionDescription>()
   private unreliableFuture = future<void>()
   private reliableFuture = future<void>()
 
   get isConnected(): Promise<void> {
-    return Promise.all([this.unreliableFuture, this.reliableFuture]) as Promise<
-      any
-    >
+    return Promise.all([this.unreliableFuture, this.reliableFuture]) as Promise<any>
   }
 
   get isAuthenticated() {
@@ -53,19 +51,11 @@ export class BrokerConnection implements IBrokerConnection {
   }
 
   get hasUnreliableChannel() {
-    return (
-      (this.unreliableDataChannel &&
-        this.unreliableDataChannel.readyState === 'open') ||
-      false
-    )
+    return (this.unreliableDataChannel && this.unreliableDataChannel.readyState === 'open') || false
   }
 
   get hasReliableChannel() {
-    return (
-      (this.reliableDataChannel &&
-        this.reliableDataChannel.readyState === 'open') ||
-      false
-    )
+    return (this.reliableDataChannel && this.reliableDataChannel.readyState === 'open') || false
   }
 
   private ws: WebSocket | null = null
@@ -79,18 +69,14 @@ export class BrokerConnection implements IBrokerConnection {
 
     setTimeout(() => {
       if (this.reliableFuture.isPending) {
-        this.reliableFuture.reject(
-          new Error('Communications link cannot be established (Timeout)')
-        )
+        this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
       }
     }, 60000)
   }
 
   printDebugInformation(): void {
     if (this.ws && this.ws.readyState === SocketReadyState.OPEN) {
-      const state =
-        (this.authenticated ? 'authenticated' : 'not authenticated') +
-        ` my alias is ${this.alias}`
+      const state = (this.authenticated ? 'authenticated' : 'not authenticated') + ` my alias is ${this.alias}`
       this.logger.log(state)
     } else {
       this.logger.log(`non active coordinator connection to ${this.url}`)
@@ -186,19 +172,12 @@ export class BrokerConnection implements IBrokerConnection {
         try {
           message = WebRtcMessage.deserializeBinary(msg)
         } catch (e) {
-          this.logger.error(
-            'cannot deserialize webrtc ice candidate message',
-            e,
-            msg
-          )
+          this.logger.error('cannot deserialize webrtc ice candidate message', e, msg)
           break
         }
 
         if (message.getFromAlias() !== this.commServerAlias) {
-          this.logger.log(
-            'ignore webrtc message from unknown peer',
-            message.getFromAlias()
-          )
+          this.logger.log('ignore webrtc message from unknown peer', message.getFromAlias())
           break
         }
 
@@ -275,9 +254,7 @@ export class BrokerConnection implements IBrokerConnection {
     }
 
     this.webRtcConn.oniceconnectionstatechange = (e: Event) => {
-      this.logger.log(
-        `ice connection state: ${this.webRtcConn!.iceConnectionState}`
-      )
+      this.logger.log(`ice connection state: ${this.webRtcConn!.iceConnectionState}`)
     }
 
     this.webRtcConn.onicecandidate = this.onIceCandidate
@@ -336,9 +313,7 @@ export class BrokerConnection implements IBrokerConnection {
       if (label === 'reliable') {
         this.reliableDataChannel = dc
         const authData = new AuthData()
-        const credentials = await getMessageCredentials(
-          this.authData.accessToken
-        )
+        const credentials = await getMessageCredentials(this.authData.accessToken)
         authData.setSignature(credentials['x-signature'])
         authData.setIdentity(credentials['x-identity'])
         authData.setTimestamp(credentials['x-timestamp'])
@@ -354,9 +329,7 @@ export class BrokerConnection implements IBrokerConnection {
           this.authenticated = true
           this.reliableFuture.resolve()
         } else {
-          this.logger.error(
-            'cannot send authentication, data channel is not ready'
-          )
+          this.logger.error('cannot send authentication, data channel is not ready')
         }
       } else if (label === 'unreliable') {
         this.unreliableFuture.resolve()

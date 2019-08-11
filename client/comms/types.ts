@@ -1,4 +1,4 @@
-import { Profile } from '../passports/types'
+import { StoredProfile } from '../passports/types'
 
 export enum AvatarMessageType {
   // Networking related messages
@@ -82,7 +82,7 @@ export type UserInformation = {
   version?: string
   status?: string
   pose?: Pose
-  profile?: Profile
+  profile?: StoredProfile
 }
 
 // The order is [X,Y,Z,Qx,Qy,Qz,Qw]

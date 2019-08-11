@@ -7,6 +7,7 @@ ts_library(
     srcs = glob([
         "index.ts",
         "auth/**/*.ts",
+        "assets/**/*.ts",
         "comms/**/*.ts",
         "config/**/*.ts",
         "passports/**/*.ts",
