@@ -20,6 +20,9 @@ export class ProfileStore {
     // First version: just store it as a JSON
     const values = getFromLocalStorage('dcl-profiles')
     const result = new Map<string, StoredProfile>()
+    if (!values) {
+      return result
+    }
     for (let value of values) {
       result.set(value.userId, value)
     }

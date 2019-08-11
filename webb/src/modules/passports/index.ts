@@ -1,9 +1,9 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { ProfileStore } from 'dcl/client/passports/api'
-import { getBaseCatalog } from 'dcl/client/assets/wearables/base'
+import { ProfileStore } from '@dcl/client/passports/api'
+import { getBaseCatalog } from '@dcl/client/assets/wearables/base'
 import { AuthRootState } from '../auth'
-import { StoredProfile } from 'dcl/client/passports/types'
+import { StoredProfile } from '@dcl/client/passports/types'
 
 var profile: ProfileStore | undefined
 
