@@ -5,7 +5,7 @@ export class AuthSystem extends SubsystemController {
   protected async onStart() {
     try {
       await checkSession()
-      this.onStart()
+      return this.onStart()
     } catch (e) {
       this.onError(e)
     }

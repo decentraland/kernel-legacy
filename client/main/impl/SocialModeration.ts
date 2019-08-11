@@ -6,6 +6,6 @@ export class SocialModerationSystem extends SubsystemController {
 
   protected async onStart() {
     this.socialModeration = new SocialModeration()
-    this.onStart()
+    return this.onStart()
   }
 }

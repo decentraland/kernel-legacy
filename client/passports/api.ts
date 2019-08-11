@@ -1,20 +1,18 @@
 import future from 'fp-future'
-import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from 'dcl/utils'
+import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from '@dcl/utils'
+import { getServerConfigurations } from '@dcl/config'
 
 import { get } from '../auth/api'
 import { StoredProfile, ResolvedProfile } from './types'
 import { Catalog } from '../assets/wearables/base'
-import { getServerConfigurations } from 'dcl/config/dist'
 
 export class ProfileStore {
-  public authToken: string
   public avatarCatalog: Catalog
   public profileMap: Map<string, StoredProfile>
   public resolvedMap: Map<string, ResolvedProfile> = new Map<string, ResolvedProfile>()
 
-  constructor(authToken: string, catalog: Catalog) {
+  constructor(catalog: Catalog) {
     this.profileMap = this.restoreProfileMapping()
-    this.authToken = authToken
     this.avatarCatalog = catalog
   }
 
@@ -28,14 +26,14 @@ export class ProfileStore {
     return result
   }
 
-  async getStoredProfile(userId: string, versionHint?: string): Promise<StoredProfile> {
+  async getStoredProfile(authToken: string, userId: string, versionHint?: string): Promise<StoredProfile> {
     const returnValue = future<StoredProfile>()
     if (this.profileMap.has(userId) && this.profileMap.get(userId)!.version === versionHint) {
       returnValue.resolve(this.profileMap.get(userId)!)
       return returnValue
     } else {
       try {
-        const profileResponse = await getStoredPassportForUser(this.authToken, userId)
+        const profileResponse = await getStoredPassportForUser(authToken, userId)
         if (!profileResponse['ok']) {
           throw new Error(`Profile not found for id ${userId}`)
         }

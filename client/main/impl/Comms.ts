@@ -10,6 +10,6 @@ export class CommsSystem extends SubsystemController {
     this.worldInstanceConnection = await connect((message: string) => {
       return Auth.getMessageCredentials(message)
     })
-    this.onStart()
+    return this.onStart()
   }
 }

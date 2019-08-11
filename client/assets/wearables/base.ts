@@ -1,5 +1,5 @@
 import { jsonFetch } from '@dcl/utils'
-import { AvatarAsset } from 'dcl/client/passports/types'
+import { AvatarAsset } from '@dcl/client/passports/types'
 
 export function getBaseWearables() {
   return jsonFetch('https://avatar-assets.now.sh')

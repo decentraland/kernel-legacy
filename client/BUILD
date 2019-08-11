@@ -10,6 +10,7 @@ ts_library(
         "assets/**/*.ts",
         "comms/**/*.ts",
         "config/**/*.ts",
+        "main/**/*.ts",
         "passports/**/*.ts",
         "presence/**/*.ts",
         "social/**/*.ts",

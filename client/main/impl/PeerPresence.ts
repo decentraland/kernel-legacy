@@ -6,6 +6,6 @@ export class PeerPresenceSystem extends SubsystemController {
 
   protected async onStart() {
     this.peerPresence = new PeerPresenceManager()
-    this.onStart()
+    return this.onStart()
   }
 }
