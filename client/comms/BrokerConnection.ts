@@ -19,12 +19,11 @@ import {
 import { SocketReadyState } from './worldInstanceConnection'
 import { Stats } from './Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import { getMessageCredentials } from '../auth/api'
+import Auth from '../auth'
 
 export class BrokerConnection implements IBrokerConnection {
   public alias: string | null = null
   public authenticated = false
-  public authData: any = null
 
   public commServerAlias: number | null = null
   public webRtcConn: RTCPeerConnection | null = null
@@ -60,10 +59,9 @@ export class BrokerConnection implements IBrokerConnection {
 
   private ws: WebSocket | null = null
 
-  constructor(public url: string, auth: { accessToken: string }) {
+  constructor(public url: string, public auth: Auth) {
     this.connectRTC()
     this.connectWS()
-    this.authData = auth
 
     // TODO: reconnect logic, handle disconnections
 
@@ -313,7 +311,7 @@ export class BrokerConnection implements IBrokerConnection {
       if (label === 'reliable') {
         this.reliableDataChannel = dc
         const authData = new AuthData()
-        const credentials = await getMessageCredentials(this.authData.accessToken)
+        const credentials = await this.auth.getMessageCredentials('')
         authData.setSignature(credentials['x-signature'])
         authData.setIdentity(credentials['x-identity'])
         authData.setTimestamp(credentials['x-timestamp'])

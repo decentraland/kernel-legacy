@@ -11,6 +11,6 @@ export class InWorldAvatarSystem extends SubsystemController {
       (this.deps.filter(dep => dep.name === 'PeerPresence')[0] as PeerPresenceSystem).peerPresence,
       (this.deps.filter(dep => dep.name === 'Passports')[0] as PassportSystem).passports!
     )
-    return this.onStart()
+    return this.onSuccess()
   }
 }

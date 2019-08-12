@@ -29,7 +29,7 @@ export class MyPresenceSystem extends SubsystemController {
       const initialPosition = upgradedScene.pickSpawnPoint().position
       this.myPresenceTracker = new MyPresence(history, initialPosition)
       this.myPresenceTracker.updateUrlPosition(initialPosition)
-      return this.onStart()
+      return this.onSuccess()
     } catch (e) {
       return this.onError(e)
     }

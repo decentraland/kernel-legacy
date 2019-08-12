@@ -1,71 +1,63 @@
-import {
-  MessageInput,
-  EphemeralKey,
-  BasicEphemeralKey
-} from 'decentraland-auth-protocol'
-import { Communications } from '@dcl/config'
+import { getServerConfigurations } from '@dcl/config'
 
-/**
- * Generate headers to send an authenticated request
- * @param authToken the authentication token to be used
- */
-export function createHeaders(authToken: string) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${authToken}`
+export type APIOptions = {
+  baseURL?: string
+}
+
+export class API {
+  static defaultOptions: APIOptions = {
+    baseURL: getServerConfigurations().auth
   }
-  return headers
-}
 
-/**
- * Get message credentials to send over the comms server
- *
- * @param accessToken The Auth0 Access Token
- * @param message Message to sign (defaults to the empty string '')
- * @param previousEphemeral Optional, the previous ephemeral key used
- */
-export async function getMessageCredentials(
-  accessToken: string,
-  message?: string,
-  previousEphemeral?: EphemeralKey
-) {
-  const msg = !message ? Buffer.from('') : Buffer.from(message!)
-  const input = MessageInput.fromMessage(msg)
+  options: APIOptions
 
-  const ephemeralKey = previousEphemeral
-    ? previousEphemeral
-    : BasicEphemeralKey.generateNewKey(Communications.ephemeralKeyTTL)
-  return ephemeralKey.makeMessageCredentials(input, accessToken) as any
-}
-
-/**
- * Build an authenticated request
- * @internal used by `get` and `post`
- * @param path the path to request
- * @param params params to the wwg `fetch` function
- */
-async function request(path: string, params: object): Promise<object> {
-  const url = path
-  const response = await fetch(url, params)
-  return response.json()
-}
-
-export async function get(path: string, idToken: string): Promise<object> {
-  const headers = createHeaders(idToken)
-  const params = { headers }
-  return request(path, params)
-}
-
-export async function post(
-  path: string,
-  idToken: string,
-  body: object = {}
-): Promise<object> {
-  const headers = createHeaders(idToken)
-  const params = {
-    headers,
-    method: 'POST',
-    body: JSON.stringify(body)
+  constructor(options: Partial<APIOptions> = {}) {
+    this.options = {
+      ...API.defaultOptions,
+      ...options
+    }
   }
-  return request(path, params)
+
+  getPath(path: string) {
+    return this.options.baseURL + path
+  }
+
+  auth() {
+    return {
+      loginURL: '/auth/login.html',
+      logoutURL: '/auth/logout.html'
+    }
+  }
+
+  async token(args: { userToken: string; pubKey: string }) {
+    const { userToken, pubKey } = args
+    const path = this.getPath('/token')
+    const body = JSON.stringify({
+      user_token: userToken,
+      pub_key: pubKey
+    })
+    const response = await fetch(path, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+    const json = await response.json()
+
+    if (!response.ok || json.error) {
+      throw new Error(json.error)
+    }
+
+    return {
+      token: json.access_token as string
+    }
+  }
+
+  async pubKey() {
+    const path = this.getPath('/public_key')
+    const response = await fetch(path)
+    const pubKey = await response.text()
+    return pubKey
+  }
 }

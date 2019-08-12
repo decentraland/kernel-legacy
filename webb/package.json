@@ -4,10 +4,6 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.5.5",
-    "@dcl/client": "file:external/client.tar.gz",
-    "@dcl/config": "file:external/config.tar.gz",
-    "@dcl/protos": "file:external/protos.tar.gz",
-    "@dcl/utils": "file:external/utils.tar.gz",
     "@types/history": "^4.7.2",
     "@types/node": "12.6.8",
     "@types/react": "16.8.23",

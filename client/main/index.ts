@@ -30,95 +30,40 @@ export class MainController {
   subsystems: SubsystemController[] = []
   indexedSystems: Map<string, SubsystemController> = new Map<string, SubsystemController>()
 
-  get config() {
-    return this.indexedSystems.get('Config')
-  }
-
-  get assets() {
-    return this.indexedSystems.get('Assets')
-  }
-
-  get auth() {
-    return this.indexedSystems.get('Auth')
-  }
-
-  get comms() {
-    return this.indexedSystems.get('Comms')
-  }
-
-  get passports() {
-    return this.indexedSystems.get('Passports')
-  }
-
-  get peerPresence() {
-    return this.indexedSystems.get('PeerPresence')
-  }
-
-  get socialModeration() {
-    return this.indexedSystems.get('SocialModeration')
-  }
-
-  get avatarPresence() {
-    return this.indexedSystems.get('InWorldAvatars')
-  }
-
-  get worldMap() {
-    return this.indexedSystems.get('WorldMap')
-  }
-
-  get sceneLoader() {
-    return this.indexedSystems.get('SceneLoader')
-  }
-
-  get sceneRunner() {
-    return this.indexedSystems.get('SceneRunner')
-  }
-
   constructor() {
-    const config = new ConfigSystem('Config', [])
-    this.indexedSystems.set('Config', config)
-    const assets = new AssetSystem('Assets', [config])
-    this.indexedSystems.set('Assets', assets)
-    const auth = new AuthSystem('Auth', [config])
-    this.indexedSystems.set('Auth', auth)
-    const comms = new CommsSystem('Comms', [auth])
-    this.indexedSystems.set('Comms', comms)
-    const passports = new PassportSystem('Passports', [assets, auth])
-    this.indexedSystems.set('Passports', passports)
-    const presence = new PeerPresenceSystem('PeerPresence', [comms, passports])
-    this.indexedSystems.set('PeerPresence', presence)
-    const socialModeration = new SocialModerationSystem('SocialModeration', [passports])
-    this.indexedSystems.set('SocialModeration', socialModeration)
-    const inworldAvatars = new InWorldAvatarSystem('InWorldAvatars', [
-      comms,
-      passports,
-      socialModeration,
-      presence,
-      assets
-    ])
-    this.indexedSystems.set('InWorldAvatars', inworldAvatars)
-    const worldMap = new WorldMapSystem('WorldMap', [config])
-    this.indexedSystems.set('WorldMap', worldMap)
-    const sceneLoader = new SceneLoaderSystem('SceneLoader', [worldMap, inworldAvatars])
-    this.indexedSystems.set('SceneLoader', sceneLoader)
-    const myPresence = new MyPresenceSystem('MyPresence', [comms, sceneLoader])
-    this.indexedSystems.set('MyPresence', myPresence)
-    const sceneRunner = new SceneRunnerSystem('SceneRunner', [sceneLoader, inworldAvatars])
-    this.indexedSystems.set('SceneRunner', sceneRunner)
-    this.subsystems = [
-      assets,
-      config,
-      auth,
-      comms,
-      passports,
-      presence,
-      socialModeration,
-      inworldAvatars,
-      worldMap,
-      sceneLoader,
-      sceneRunner
-    ]
+    const config = this.newSystem('Config', new ConfigSystem([]))
+    const assets = this.newSystem('Assets', new AssetSystem([]))
+    const auth = this.newSystem('Auth', new AuthSystem([config]))
+    const comms = this.newSystem('Comms', new CommsSystem([auth]))
+    const passports = this.newSystem('Passports', new PassportSystem([assets, auth]))
+    const presence = this.newSystem('PeerPresence', new PeerPresenceSystem([comms, passports]))
+    const socialModeration = this.newSystem('SocialModeration', new SocialModerationSystem([passports]))
+    const inworldAvatars = this.newSystem(
+      'InWorldAvatars',
+      new InWorldAvatarSystem([comms, passports, socialModeration, presence, assets])
+    )
+    const worldMap = this.newSystem('WorldMap', new WorldMapSystem([config]))
+    const sceneLoader = this.newSystem('SceneLoader', new SceneLoaderSystem([worldMap, inworldAvatars]))
+    this.newSystem('MyPresence', new MyPresenceSystem([comms, sceneLoader]))
+    this.newSystem('SceneRunner', new SceneRunnerSystem([sceneLoader, inworldAvatars]))
 
-    config.tryStart()
+    this.subsystems.forEach(subsystem => {
+      Object.defineProperty(this, subsystem.name, {
+        value: subsystem,
+        enumerable: true,
+        writable: false
+      })
+    })
+  }
+
+  start() {
+    this.indexedSystems.get('Config').tryStart()
+  }
+
+  newSystem(name: string, system: SubsystemController) {
+    system.name = name
+    this.indexedSystems.set(name, system)
+    this.subsystems.push(system)
+    return system
   }
 }

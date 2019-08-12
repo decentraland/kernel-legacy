@@ -2,9 +2,9 @@ import future from 'fp-future'
 import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from '@dcl/utils'
 import { getServerConfigurations } from '@dcl/config'
 
-import { get } from '../auth/api'
 import { StoredProfile, ResolvedProfile } from './types'
 import { Catalog } from '../assets/wearables/base'
+import Auth from '../auth'
 
 export class ProfileStore {
   public avatarCatalog: Catalog
@@ -29,14 +29,15 @@ export class ProfileStore {
     return result
   }
 
-  async getStoredProfile(authToken: string, userId: string, versionHint?: string): Promise<StoredProfile> {
+  async getStoredProfile(auth: Auth, userId: string, versionHint?: string): Promise<StoredProfile> {
     const returnValue = future<StoredProfile>()
     if (this.profileMap.has(userId) && this.profileMap.get(userId)!.version === versionHint) {
       returnValue.resolve(this.profileMap.get(userId)!)
       return returnValue
     } else {
       try {
-        const profileResponse = await getStoredPassportForUser(authToken, userId)
+        const profileRequest = await getStoredPassportForUser(auth, userId)
+        const profileResponse = await fetch(profileRequest).then(_ => _.json())
         if (!profileResponse['ok']) {
           throw new Error(`Profile not found for id ${userId}`)
         }
@@ -50,14 +51,14 @@ export class ProfileStore {
     }
   }
 
-  async getResolvedProfile(userId: string, versionHint: string): Promise<ResolvedProfile> {
+  async getResolvedProfile(auth: Auth, userId: string, versionHint: string): Promise<ResolvedProfile> {
     try {
       const returnValue = future<ResolvedProfile>()
       if (this.resolvedMap.has(userId) && this.resolvedMap.get(userId)!.version === versionHint) {
         returnValue.resolve(this.resolvedMap.get(userId)!)
         return returnValue
       } else {
-        const profile = await this.getStoredProfile(userId, versionHint)
+        const profile = await this.getStoredProfile(auth, userId, versionHint)
         const resolved = await this.resolve(profile)
         returnValue.resolve(resolved)
         return returnValue
@@ -147,8 +148,8 @@ function parseColorRGBObject(object: { color: { r: number; g: number; b: number 
   return new Color4(object.color.r, object.color.g, object.color.b)
 }
 
-function getStoredPassportForUser(accessToken: string, userId: string) {
-  return get(`https://avatars-api.decentraland.org/api/profile/${userId}`, accessToken)
+function getStoredPassportForUser(auth: Auth, userId: string) {
+  return auth.createRequest(`https://avatars-api.decentraland.org/api/profile/${userId}`)
 }
 
 const DCL_ASSET_BASE_URL = 'dcl://base-avatars/'

@@ -1,15 +1,19 @@
 import { SubsystemController } from '../subsystems'
 import { connect } from '../../comms'
 import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
-import { Auth } from '../../'
+import { AuthSystem } from '.'
 
 export class CommsSystem extends SubsystemController {
   worldInstanceConnection?: WorldInstanceConnection
 
   protected async onStart() {
+    const auth: AuthSystem = this.deps.filter(dep => dep.name === 'Auth')[0] as AuthSystem
+    if (!auth.auth.isLoggedIn) {
+      return this.onError(new Error('Tried to start comms without being logged in'))
+    }
     this.worldInstanceConnection = await connect((message: string) => {
-      return Auth.getMessageCredentials(message)
+      return auth.auth.getMessageCredentials(message)
     })
-    return this.onStart()
+    return this.onSuccess()
   }
 }

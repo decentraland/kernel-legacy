@@ -6,6 +6,6 @@ export class AssetSystem extends SubsystemController {
 
   protected async onStart() {
     this.assets = await getBaseWearables()
-    return this.onStart()
+    return this.onSuccess()
   }
 }

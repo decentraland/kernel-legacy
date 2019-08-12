@@ -10,10 +10,13 @@
     "module": "esnext",
     "moduleResolution": "node",
     "jsx": "react",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["./*", "./src/*"]
+      "~/*": ["./src/*"],
+      "@dcl/*": ["bazel-bin/*", "bazel-genfiles/*", "*"],
+      "dcl/*": ["bazel-bin/*", "bazel-genfiles/*", "*"]
     },
     "downlevelIteration": true
-  }
+  },
+  "extends": "../tsconfig.json"
 }

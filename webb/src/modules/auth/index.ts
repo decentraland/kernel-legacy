@@ -1,9 +1,6 @@
 import { Middleware, Store, AnyAction } from 'redux'
 import { push, RouterRootState } from 'connected-react-router'
 
-import { AuthLib } from '@dcl/client'
-import { AuthTypes } from '@dcl/client'
-
 export type AuthStatusSummary =
   | 'Not initialized'
   | 'Loading...'
@@ -16,8 +13,9 @@ export type AuthStatusSummary =
   | 'Logged in'
   | 'Logged out'
 
-export type AuthState = AuthTypes.AuthState & {
+export type AuthState = {
   summary: AuthStatusSummary
+  isAuthenticated: boolean
 }
 
 export type AuthRootState = {
@@ -41,8 +39,7 @@ export type AuthAction = ReturnType<typeof ReturnAuthActionMap>
 
 const EMPTY_AUTH_STATE: AuthState = {
   summary: 'Not initialized',
-  isAuthenticated: false,
-  userWentBack: false
+  isAuthenticated: false
 }
 
 /**

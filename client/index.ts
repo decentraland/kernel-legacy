@@ -1,5 +1,4 @@
 import * as Auth from './auth/api'
-import * as AuthLib from './auth/lib'
 import * as AuthTypes from './auth/types'
 import * as Comms from './comms'
 import * as Config from './config'
@@ -11,16 +10,4 @@ import * as WorldSceneV1 from './worldMap/compat/v1'
 import * as Systems from './main/impl/index'
 import * as MainController from './main/index'
 
-export {
-  Auth,
-  AuthLib,
-  AuthTypes,
-  Comms,
-  Config,
-  MainController,
-  PassportApi,
-  PassportTypes,
-  WorldScene,
-  WorldSceneV1,
-  Systems
-}
+export { Auth, AuthTypes, Comms, Config, MainController, PassportApi, PassportTypes, WorldScene, WorldSceneV1, Systems }

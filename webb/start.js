@@ -45,7 +45,10 @@ const fuse = FuseBox.init({
   ]
 })
 fuse.dev({ port: 3000 }) // launch http server
-fuse.bundle('vendor').instructions('~ index.tsx')
+fuse
+  .bundle('vendor')
+  .instructions('~ index.tsx')
+  .sourceMaps(true)
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')
@@ -56,11 +59,7 @@ const running = fuse.run()
 function watchStdin(action) {
   process.stdin.resume()
   process.stdin.on('data', async function(chunk) {
-    const data = chunk.toString()
-    if (data === 'IBAZEL_BUILD_COMPLETED SUCCESS') {
-      action()
-      fuse.sendPageReload()
-    }
+    fuse.sendPageReload()
   })
   process.stdin.on('end', function() {
     fuse.exit()

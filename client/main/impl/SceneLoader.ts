@@ -9,6 +9,6 @@ export class SceneLoaderSystem extends SubsystemController {
 
   protected async onStart() {
     this.sceneLoader = new SceneLoader(getServerConfigurations().content, parcelLimits.visibleRadius)
-    return this.onStart()
+    return this.onSuccess()
   }
 }

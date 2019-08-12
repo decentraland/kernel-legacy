@@ -5,7 +5,7 @@ import { createBrowserHistory } from 'history'
 import { AuthState, authMiddleware } from '~/modules/auth'
 import { commsMiddleware, CommsState } from '~/modules/comms'
 import { passportsMiddleware } from '~/modules/passports'
-import { assetsMiddleware, AssetsState } from '~/modules/assets'
+import { systemsMiddleware } from '~/modules/systems'
 import { worldMiddleware, WorldState } from '~/modules/world'
 
 import { createReducer } from '~/reducers'
@@ -15,7 +15,6 @@ export const history: any = createBrowserHistory()
 export type RootState = {
   router: RouterState
   auth: AuthState
-  assets: AssetsState
   comms: CommsState
   world: WorldState
 }
@@ -37,8 +36,8 @@ export const configureStore: any = (state?: RootState) => {
         routerMiddleware(history),
         authMiddleware as any,
         commsMiddleware as any,
-        assetsMiddleware as any,
         worldMiddleware as any,
+        systemsMiddleware as any,
         passportsMiddleware as any
       )
     )
