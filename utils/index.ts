@@ -21,3 +21,5 @@ export * from './network'
 export * from './pure'
 
 export * from './scene'
+
+export * from './sha256'

@@ -31,7 +31,9 @@ const fuse = FuseBox.init({
   },
   plugins: [
     WebIndexPlugin({
-      template: 'public/fuse.html'
+      title: 'webb - Experimental Decentraland Client',
+      template: 'public/index.html',
+      path: 'dist/index.html'
     }),
     JSONPlugin(),
     [
@@ -44,7 +46,7 @@ const fuse = FuseBox.init({
     ]
   ]
 })
-fuse.dev({ port: 3000 }) // launch http server
+fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http server
 fuse
   .bundle('vendor')
   .instructions('~ index.tsx')

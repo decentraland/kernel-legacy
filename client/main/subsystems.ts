@@ -1,6 +1,6 @@
 import { Observable } from '@dcl/utils'
 
-export type SubsystemStatus = 'Waiting' | 'Loading' | 'Errored' | 'Started' | 'Disabled'
+export type SubsystemStatus = 'UserWaiting' | 'Waiting' | 'Loading' | 'Errored' | 'Started' | 'Disabled'
 
 export abstract class SubsystemController {
   _status: SubsystemStatus

@@ -1,5 +1,6 @@
 import { Middleware, Store, AnyAction } from 'redux'
 import { push, RouterRootState } from 'connected-react-router'
+import { client } from '../systems'
 
 export type AuthStatusSummary =
   | 'Not initialized'
@@ -53,16 +54,6 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
       return { ...state, summary: 'Loading...' } as AuthState
     case 'Not logged in':
       return { ...state, summary: 'Not logged in' } as AuthState
-    case 'Set email':
-      return {
-        ...state,
-        summary: 'Checking email',
-        email: (action as any).payload
-      } as AuthState
-    case 'Awaiting verification':
-      return { ...state, summary: 'Awaiting verification' } as AuthState
-    case 'Set verification':
-      return { ...state, summary: 'Checking verification code' } as AuthState
     case 'Login successful':
       return {
         ...state,
@@ -91,18 +82,13 @@ export const authMiddleware: any = (store: Store<RouterRootState & AuthRootState
         checkSessionAndRedirectToHome(store, dispatch)
       }
       break
-    case 'Set email':
-      dispatch('Checking email')
-      fetchVerificationCode(dispatch, action)
-      break
-    case 'Set verification':
-      if (store.getState().auth.summary === 'Awaiting verification') {
-        dispatch('Checking verification code')
-        checkVerificationCode(store, dispatch, action)
+    case 'System state change':
+      if (action.payload.name === 'Auth' && action.payload.state === 'Loading') {
+        checkSessionAndRedirectToHome(store, dispatch)
       }
-      break
-    case 'Logout requested':
-      AuthLib.logout()
+      if (action.payload.name === 'Auth' && action.payload.state === 'UserWaiting') {
+        store.dispatch(push('/login'))
+      }
       break
   }
   return next(action)
@@ -117,38 +103,18 @@ export async function checkSessionAndRedirectToHome(
   dispatch: (type: any, payload?: any) => any
 ) {
   try {
-    const result = await AuthLib.checkSession()
-    dispatch('Login successful', result)
-    if (store.getState().router.location.pathname === '/login') {
-      store.dispatch(push('/'))
+    if (client.Auth && client.Auth.auth && client.Auth.auth.isLoggedIn) {
+      dispatch('Login successful', client.Auth.auth)
+      if (store.getState().router.location.pathname === '/login') {
+        store.dispatch(push('/'))
+      }
+    } else {
+      if (client.Auth.readyToLoad()) {
+        client.Auth.tryStart()
+      }
     }
   } catch (e) {
     dispatch('Not logged in', e)
-  }
-}
-
-export async function fetchVerificationCode(dispatch: (type: string, payload?: any) => any, action: AnyAction) {
-  try {
-    await AuthLib.getVerificationCode(action.payload)
-    dispatch('Awaiting verification')
-  } catch (e) {
-    dispatch('Invalid email', e)
-  }
-}
-
-export async function checkVerificationCode(
-  store: Store<RouterRootState & AuthRootState>,
-  dispatch: (type: any, payload?: any) => any,
-  action: AnyAction
-) {
-  try {
-    const result = await AuthLib.doAuth(store.getState().auth.email!, action.payload)
-    dispatch('Login successful', result)
-    if (currentLocation(store) === '/login') {
-      dispatch(push('/'))
-    }
-  } catch (e) {
-    dispatch('Invalid verification code')
   }
 }
 

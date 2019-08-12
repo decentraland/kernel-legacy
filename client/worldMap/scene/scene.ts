@@ -1,36 +1,26 @@
-import { createHash } from 'crypto'
 import {
   UnsanitizedSceneManifest,
-  CoordinateDefinition,
   Coordinate,
   SceneManifest,
   NonEmptyCoordinateArray,
   AssetDefinition,
   AssetTagDefinition,
   ReferenceSystem,
-  SpawnPoint
+  SpawnPoint,
+  decideFloat,
+  parseCoordinate,
+  getMinimum
 } from '@dcl/utils/scene'
 
-import { stableStringify } from './stableStringify'
+import { sha256 } from '@dcl/utils'
+import { stableStringify } from '@dcl/utils'
 
 import { isValidSceneInput } from './validation'
-import { NumberOrRange } from '@dcl/utils'
-
-export function parseCoordinate(coord: CoordinateDefinition) {
-  if (typeof coord === 'string') {
-    const [x, y] = coord.split(',').map(parseInt)
-    return { x, y }
-  }
-  return coord
-}
-
-export function getMinimum(coords: Coordinate[]) {
-  return coords.sort((a, b) => (a.x > b.x ? 1 : a.x === b.x ? a.y - b.y : -1))[0]
-}
 
 export class Scene implements SceneManifest {
   raw: UnsanitizedSceneManifest
 
+  private _cannonicalRepresentation?: string
   private _requiredAssets?: AssetDefinition[]
   private _referenceSystem?: ReferenceSystem
   private _requiredTags?: string[]
@@ -153,38 +143,26 @@ export class Scene implements SceneManifest {
   }
 
   get cannonicalSerialization(): string {
-    return stableStringify({
-      parcels: this.parcels,
-      version: this.version,
-      display: this.raw.display || {},
-      main: this.main,
-      assets: this.assets,
-      assetTags: this.assetTags,
-      spawnPoints: this.spawnPoints,
-      referenceSystem: this.referenceSystem
-    } as any)
+    if (!this._cannonicalRepresentation) {
+      this._cannonicalRepresentation = stableStringify({
+        parcels: this.parcels,
+        version: this.version,
+        display: this.raw.display || {},
+        main: this.main,
+        assets: this.assets,
+        assetTags: this.assetTags,
+        spawnPoints: this.spawnPoints,
+        referenceSystem: this.referenceSystem
+      } as any)
+    }
+    return this._cannonicalRepresentation
   }
 
   get cannonicalCID(): string {
     if (!this._cannonicalCID) {
-      // TODO: `JSON.stringify(this)` should be remplazed by
-      // `this.cannonicalSerialization`, which should hold a
-      // deterministic encoding of all our computed fields
-      // AKA: Beware! JSON serialization is not deterministic
-      this._cannonicalCID = createHash('sha256')
-        .update(this.cannonicalSerialization)
-        .digest()
-        // TODO: Use CIDv0 encoding
-        .toString('hex')
+      // TODO: Use CIDv0 encoding
+      this._cannonicalCID = sha256(this.cannonicalSerialization)
     }
     return this._cannonicalCID
-  }
-}
-
-function decideFloat(x: NumberOrRange) {
-  if (typeof x === 'number') {
-    return x
-  } else {
-    return Math.random() * (x[1] - x[0]) + x[0]
   }
 }

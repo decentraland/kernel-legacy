@@ -11,9 +11,7 @@ export class CommsSystem extends SubsystemController {
     if (!auth.auth.isLoggedIn) {
       return this.onError(new Error('Tried to start comms without being logged in'))
     }
-    this.worldInstanceConnection = await connect((message: string) => {
-      return auth.auth.getMessageCredentials(message)
-    })
+    this.worldInstanceConnection = await connect(auth.auth)
     return this.onSuccess()
   }
 }

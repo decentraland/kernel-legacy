@@ -2,7 +2,7 @@ import { MainController } from '@dcl/client'
 import { Observable } from '@dcl/utils'
 import { Store, Middleware } from 'redux'
 
-const client = new MainController.MainController()
+export const client = new MainController.MainController()
 
 export type SystemsState = {
   status: { [key: string]: string }

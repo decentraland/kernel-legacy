@@ -1,21 +1,42 @@
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import * as React from 'react'
+import { Page, Modal } from 'decentraland-ui'
+import { client } from '~/modules/systems'
 
-import { RootState } from '~/store'
-
-import renderAuth from './auth'
-
-export default connect(
-  (state: RootState) => ({
-    summary: state.auth.summary
-  }),
-  {
-    setEmail: (email: string) => ({ type: 'Set email', payload: email }),
-    setVerificationCode: (code: string) => ({
-      type: 'Set verification',
-      payload: code
-    }),
-    logout: (code: string) => ({ type: 'Logout requested' }),
-    goHome: () => push('/')
+export default class AuthConnect extends React.Component {
+  modal = React.createRef()
+  componentDidMount() {
+    if (!client.Auth.auth) {
+      client.Auth.statusObservable.add(event => {
+        if (event === 'UserWaiting') {
+          client.Auth.auth.login((this.modal.current as any).ref)
+        }
+      })
+      if (client.Config._status === 'Waiting') {
+        client.Config.tryStart()
+      }
+    } else {
+      if (client.Auth.auth.isLoggedIn()) {
+        client.Auth.auth.login((this.modal.current as any).ref).then(result => {
+          client.Auth.callback.resolve(true)
+        })
+      } else {
+        client.Auth.callback.resolve((this.modal.current as any).ref))
+      }
+    }
   }
-)(renderAuth)
+  render() {
+    return (
+      <>
+        <Page>
+          <Modal
+            size={'fullscreen'}
+            className='embed'
+            style={{ height: '100%', width: '100%' }}
+            ref={this.modal as any}
+            open={true}
+          ></Modal>
+        </Page>
+      </>
+    )
+  }
+}

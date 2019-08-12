@@ -1,4 +1,4 @@
-import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
+import { BasicEphemeralKey, MessageInput } from './Ephemeral'
 
 import { defaultLogger } from '@dcl/utils'
 import { Login } from './Login'
@@ -87,7 +87,7 @@ export class Auth {
     return jwt.decode(await this.getAccessToken()) as AccessToken
   }
 
-  async getAccessToken() {
+  async getAccessToken(target?: any) {
     const ephKey = this.getEphemeralKey()
     const pubKey = ephKey.key.publicKeyAsHexString()
 
@@ -103,7 +103,7 @@ export class Auth {
         // invalid token, generate a new one
       }
     }
-    const userToken = await this.login()
+    const userToken = await this.login(target)
 
     try {
       const { token } = await this.api.token({
@@ -138,7 +138,7 @@ export class Auth {
     const accessToken = await this.getAccessToken()
 
     // add required headers
-    const requiredHeaders = this.getEphemeralKey().makeMessageCredentials(input, accessToken)
+    const requiredHeaders = await this.getEphemeralKey().makeMessageCredentials(input, accessToken)
     for (const [key, value] of requiredHeaders.entries()) {
       headers[key] = value
     }
@@ -174,7 +174,7 @@ export class Auth {
     const input = MessageInput.fromMessage(msg)
     const accessToken = await this.getAccessToken()
 
-    const credentials = this.getEphemeralKey().makeMessageCredentials(input, accessToken)
+    const credentials = await this.getEphemeralKey().makeMessageCredentials(input, accessToken)
 
     let result: Record<string, string> = {}
 
