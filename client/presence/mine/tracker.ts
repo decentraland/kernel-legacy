@@ -26,7 +26,7 @@ export class MyPresence {
 
   updateUrlPosition = (cameraVector: Vector3) => {
     worldToGrid(cameraVector, temporaryVector)
-    const positionInUrl = qs.parse(this.history.state.location.search)
+    const positionInUrl = qs.parse(this.history.state && this.history.state.location && this.history.state.location.search || '')
     if (positionInUrl.x !== temporaryVector.x || positionInUrl.y !== temporaryVector.y) {
       positionInUrl.x = temporaryVector.x
       positionInUrl.y = temporaryVector.y

@@ -119,7 +119,7 @@ export function hasValidParcels(arg: any): arg is { parcels: CoordinateDefinitio
   )
 }
 
-export const CoordinateRegex = /^\d,\d$/
+export const CoordinateRegex = /^-?\d+,-?\d+$/
 
 export function isValidCoordinateDefinition(arg: any): arg is CoordinateDefinition {
   return (typeof arg === 'string' && CoordinateRegex.test(arg)) || (typeof arg === 'object' && isValidCoordinate(arg))

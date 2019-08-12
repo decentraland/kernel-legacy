@@ -25,7 +25,7 @@ export class MyPresenceSystem extends SubsystemController {
     }
     try {
       const scene = await sceneLoader.sceneLoader.getSceneForCoordinates(x, y)
-      const upgradedScene = new Scene(upgradeToV2(scene.scene, scene.mappingsResponse))
+      const upgradedScene = new Scene(upgradeToV2(scene.scene, { data: [{ content: scene.mappingsResponse }] }))
       const initialPosition = upgradedScene.pickSpawnPoint().position
       this.myPresenceTracker = new MyPresence(history, initialPosition)
       this.myPresenceTracker.updateUrlPosition(initialPosition)

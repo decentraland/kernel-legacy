@@ -22,7 +22,7 @@ export class Picture extends React.PureComponent<{ userId: string }> {
       <img
         src={`https://s3.amazonaws.com/avatars-storage.decentraland.org/${this.props.userId}/face.png`}
         alt='Face'
-        style={{ width: '48px', height: '48px', borderRadius: '40px' }}
+        style={{ width: '32px', height: '32px', borderRadius: '40px' }}
       />
     )
   }

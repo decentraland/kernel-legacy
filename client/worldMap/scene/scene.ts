@@ -15,7 +15,7 @@ import {
 import { sha256 } from '@dcl/utils'
 import { stableStringify } from '@dcl/utils'
 
-import { isValidSceneInput } from './validation'
+import { isValidSceneInput, getInvalidReason } from './validation'
 
 export class Scene implements SceneManifest {
   raw: UnsanitizedSceneManifest
@@ -32,7 +32,7 @@ export class Scene implements SceneManifest {
 
   constructor(raw: any) {
     if (!isValidSceneInput(raw)) {
-      throw new Error('Invalid input')
+      throw new Error('Invalid input: ' + getInvalidReason(raw))
     }
     this.raw = raw
   }
