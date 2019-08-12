@@ -2,7 +2,7 @@ import { MainController } from '@dcl/client'
 import { Observable } from '@dcl/utils'
 import { Store, Middleware } from 'redux'
 
-export const client = new MainController.MainController()
+export const client: MainController.MainController = new MainController.MainControllerImpl() as any
 
 export type SystemsState = {
   status: { [key: string]: string }
@@ -57,7 +57,13 @@ export const systemsMiddleware: any = (store: Store<SystemsRootState>) => {
   return (next: Middleware) => (action: any) => {
     const result = next(action)
     switch (action.type) {
-      case '@@INIT':
+      case '@@router/LOCATION_CHANGE':
+        if (client.Config._status === 'Waiting') {
+          client.Config.tryStart()
+        }
+        if (client.Assets._status === 'Waiting') {
+          client.Assets.tryStart()
+        }
         break
       case START_SYSTEM:
         client[action.payload.name].tryStart()

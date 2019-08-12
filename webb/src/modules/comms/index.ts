@@ -1,12 +1,8 @@
 import { AnyAction, Middleware, Store } from 'redux'
-import { Auth } from 'decentraland-auth'
 
-import { Comms } from '@dcl/client'
 import { intersectLogger } from '@dcl/utils'
 
 import { AuthRootState } from '~/modules/auth'
-
-const { connect } = Comms
 
 export type CommsStateSummary =
   | 'Not initialized'
@@ -68,6 +64,7 @@ export function commsReducer(state?: CommsState, action?: AnyAction): CommsState
     case 'Comms log':
       return { ...state, log: [...state.log, action.payload[0]] }
     case 'Error':
+      debugger
       return { ...state, summary: 'Auth error' }
   }
   return state
@@ -94,34 +91,6 @@ export const commsMiddleware: any = (store: Store<CommsRootState & AuthRootState
     })
   }
   return (next: Middleware) => (action: any) => {
-    const dispatch = (type: any, payload?: any) =>
-      typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
-
-    switch (action.type) {
-      case 'Login successful':
-        if (needsInitialization(store, action)) {
-          startConnecting(dispatch)
-        }
-        break
-    }
     return next(action)
-  }
-}
-
-export function needsInitialization(store: Store<CommsRootState>, action: AnyAction): boolean {
-  return store.getState().comms.summary === 'Not initialized' && action.type === 'Login successful'
-}
-
-export async function startConnecting(dispatch: any) {
-  try {
-    const auth = new Auth()
-    await auth.login()
-    await auth.getAccessTokenData()
-    const flow = await connect(async (message: any) => {
-      return auth.getMessageCredentials(message)
-    })
-    dispatch('Connecting', flow)
-  } catch (e) {
-    dispatch('Error', e)
   }
 }

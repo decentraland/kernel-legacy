@@ -24,10 +24,11 @@ export class Auth {
   static defaultOptions: AuthOptions = {
     ephemeralKeyTTL: 60 * 60 * 2 // TTL for the ephemeral key
   }
+  _userTokenData: any
+  userToken: string | null = null
 
   private options: AuthOptions
   private api: API
-  private userToken: string | null = null
   private accessToken: string | null = null
   private serverPublicKey: string | null = null
   private ephemeralKey: BasicEphemeralKey | null = null
@@ -94,6 +95,7 @@ export class Auth {
     if (this.accessToken) {
       try {
         const tokenData = jwt.decode(this.accessToken) as AccessToken
+        this._userTokenData = tokenData
         if (tokenData.ephemeral_key === pubKey) {
           const publicKey = await this.getServerPublicKey()
           jwt.verify(this.accessToken, publicKey)

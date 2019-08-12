@@ -44,7 +44,12 @@ export abstract class SubsystemController {
   }
 
   readyToLoad() {
-    return this.deps.reduce((status, dep) => status && dep._status === 'Started', true)
+    return (
+      this.deps.reduce((status, dep) => status && dep._status === 'Started', true) &&
+      this._status !== 'Started' &&
+      this._status !== 'Loading' &&
+      this._status !== 'UserWaiting'
+    )
   }
 
   dependencyFailed() {

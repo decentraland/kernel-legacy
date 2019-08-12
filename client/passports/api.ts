@@ -37,7 +37,7 @@ export class ProfileStore {
     } else {
       try {
         const profileRequest = await getStoredPassportForUser(auth, userId)
-        const profileResponse = await fetch(profileRequest).then(_ => _.json())
+        const profileResponse = await profileRequest.json()
         if (!profileResponse['ok']) {
           throw new Error(`Profile not found for id ${userId}`)
         }
@@ -51,10 +51,10 @@ export class ProfileStore {
     }
   }
 
-  async getResolvedProfile(auth: Auth, userId: string, versionHint: string): Promise<ResolvedProfile> {
+  async getResolvedProfile(auth: Auth, userId: string, versionHint?: string): Promise<ResolvedProfile> {
     try {
       const returnValue = future<ResolvedProfile>()
-      if (this.resolvedMap.has(userId) && this.resolvedMap.get(userId)!.version === versionHint) {
+      if ((this.resolvedMap.has(userId) && !versionHint) || this.resolvedMap.get(userId)!.version === versionHint) {
         returnValue.resolve(this.resolvedMap.get(userId)!)
         return returnValue
       } else {
@@ -72,12 +72,12 @@ export class ProfileStore {
     const profile: StoredProfile = {
       userId: rawData.userId,
       email: rawData.email,
-      avatar: rawData.avatar,
-      name: rawData.name,
-      description: rawData.description,
-      created_at: rawData.created_at,
-      updated_at: rawData.updated_at,
-      version: rawData.version
+      avatar: rawData.profile.avatar,
+      name: rawData.profile.name,
+      description: rawData.profile.description,
+      created_at: rawData.profile.created_at,
+      updated_at: rawData.updatedAt,
+      version: rawData.profile.version
     }
     this.profileMap.set(rawData.userId, profile)
     saveToLocalStorage('dcl-profiles', [...this.profileMap.values()])
@@ -148,8 +148,12 @@ function parseColorRGBObject(object: { color: { r: number; g: number; b: number 
   return new Color4(object.color.r, object.color.g, object.color.b)
 }
 
-function getStoredPassportForUser(auth: Auth, userId: string) {
-  return auth.createRequest(`https://avatars-api.decentraland.org/api/profile/${userId}`)
+async function getStoredPassportForUser(auth: Auth, userId: string) {
+  return fetch(`https://avatars-api.decentraland.org/api/profile/${userId}`, {
+    headers: {
+      Authorization: 'Bearer ' + auth.userToken
+    }
+  })
 }
 
 const DCL_ASSET_BASE_URL = 'dcl://base-avatars/'

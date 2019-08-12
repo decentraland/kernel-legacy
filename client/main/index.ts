@@ -26,7 +26,22 @@ export type Subsystems =
   | 'SceneLoader'
   | 'SceneRunner'
 
-export class MainController {
+export type SubsystemAccess = {
+  Assets: AssetSystem
+  Auth: AuthSystem
+  Comms: CommsSystem
+  Config: ConfigSystem
+  Passports: PassportSystem
+  PeerPresence: PeerPresenceSystem
+  MyPresence: MyPresenceSystem
+  SocialModeration: SocialModerationSystem
+  InWorldAvatars: InWorldAvatarSystem
+  WorldMap: WorldMapSystem
+  SceneLoader: SceneLoaderSystem
+  SceneRunner: SceneRunnerSystem
+}
+
+export class MainControllerImpl {
   subsystems: SubsystemController[] = []
   indexedSystems: Map<string, SubsystemController> = new Map<string, SubsystemController>()
 
@@ -67,3 +82,5 @@ export class MainController {
     return system
   }
 }
+
+export type MainController = MainControllerImpl & SubsystemAccess

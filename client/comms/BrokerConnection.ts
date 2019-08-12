@@ -60,7 +60,6 @@ export class BrokerConnection implements IBrokerConnection {
   private ws: WebSocket | null = null
 
   constructor(public url: string, public auth: Auth) {
-    debugger;
     this.connectRTC()
     this.connectWS()
 

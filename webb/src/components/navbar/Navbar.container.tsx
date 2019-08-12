@@ -11,7 +11,7 @@ function mapState(state: RootState) {
     isLoggingIn: state.auth.summary !== 'Not logged in',
     isLoggedIn,
     profileLoaded: false,
-    userId: isLoggedIn ? state.auth.sub : ''
+    userId: isLoggedIn ? state.auth.userId : ''
   }
 }
 

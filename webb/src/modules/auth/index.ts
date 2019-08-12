@@ -17,6 +17,7 @@ export type AuthStatusSummary =
 export type AuthState = {
   summary: AuthStatusSummary
   isAuthenticated: boolean
+  userId: string
 }
 
 export type AuthRootState = {
@@ -26,9 +27,6 @@ export type AuthRootState = {
 export type AuthActionTemplates = [
   { type: 'Auth initializing' },
   { type: 'Not logged in' },
-  { type: 'Set email'; payload: string },
-  { type: 'Need verification'; payload: string },
-  { type: 'Set verification'; payload: string },
   { type: 'Login successful' },
   { type: 'Logout requested' },
   { type: 'Login error' }
@@ -58,7 +56,8 @@ export function authReducer(state = EMPTY_AUTH_STATE, action?: AuthAction | AnyA
       return {
         ...state,
         summary: 'Logged in',
-        ...(action as any).payload
+        isAuthenticated: true,
+        userId: (action as any).payload._userTokenData.user_id
       } as AuthState
     case 'Login error':
       return { ...state, summary: 'Not logged in' } as AuthState
@@ -89,6 +88,17 @@ export const authMiddleware: any = (store: Store<RouterRootState & AuthRootState
       if (action.payload.name === 'Auth' && action.payload.state === 'UserWaiting') {
         store.dispatch(push('/login'))
       }
+      if (action.payload.name === 'Auth' && action.payload.state === 'Started') {
+        store.dispatch({
+          type: 'Login successful',
+          payload: client.Auth.auth
+        })
+      }
+      break
+    case 'Login successful':
+      if (store.getState().router.location.pathname === '/login') {
+        store.dispatch(push('/'))
+      }
       break
   }
   return next(action)
@@ -105,9 +115,6 @@ export async function checkSessionAndRedirectToHome(
   try {
     if (client.Auth && client.Auth.auth && client.Auth.auth.isLoggedIn) {
       dispatch('Login successful', client.Auth.auth)
-      if (store.getState().router.location.pathname === '/login') {
-        store.dispatch(push('/'))
-      }
     } else {
       if (client.Auth.readyToLoad()) {
         client.Auth.tryStart()

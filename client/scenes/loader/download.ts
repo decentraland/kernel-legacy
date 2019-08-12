@@ -34,24 +34,24 @@ export class SceneDataDownloadManager {
     const promised = future<string | null>()
     this.positionToSceneId.set(pos, promised)
     const nw = pos.split(',').map($ => parseInt($, 10))
-    const responseContent = await jsonFetch(
-      this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
-    )
 
-    if (!responseContent.ok) {
-      error(`Error in ${this.options.contentServer}/scenes response!`, responseContent)
-      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
-      promised.reject(ret)
-      throw ret
-    } else {
-      const contents = (await responseContent.json()) as SceneMappingResponse
+    try {
+      const responseContent = await jsonFetch(
+        this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
+      )
+      const contents = responseContent as SceneMappingResponse
       if (!contents.data.length) {
         promised.resolve(null)
         return null
       }
       this.setSceneRoots(contents)
+      return promised
+    } catch (err) {
+      error(`Error in ${this.options.contentServer}/scenes response!`, err.message)
+      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
+      promised.reject(ret)
+      throw ret
     }
-    return promised
   }
 
   setSceneRoots(contents: SceneMappingResponse) {
@@ -76,72 +76,68 @@ export class SceneDataDownloadManager {
 
     const promised = future<ILand | null>()
     this.sceneIdToLandData.set(sceneId, promised)
-    const actualResponse = await fetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
-    if (!actualResponse.ok) {
-      error(`Error in ${this.options.contentServer}/parcel_info response!`, actualResponse)
-      const ret = new Error(`Error in ${this.options.contentServer}/parcel_info response!`)
-      promised.reject(ret)
-      throw ret
-    }
-    const mappings = (await actualResponse.json()) as { data: ParcelInfoResponse[] }
-    if (!promised.isPending) {
-      return promised
-    }
-    const content = mappings.data[0]
-    if (!content || !content.content || !content.content.contents) {
-      logger.info(`Resolved ${sceneId} to null -- no contents`, content)
-      promised.resolve(null)
-      return null
-    }
-    const sceneJsonMapping = content.content.contents.find($ => $.file === 'scene.json')
-
-    if (!sceneJsonMapping) {
-      logger.info(`Resolved ${sceneId} to null -- no sceneJsonMapping`)
-      promised.resolve(null)
-      return null
-    }
-
-    const baseUrl = this.options.contentServer + '/contents/'
-
-    const scene = (await jsonFetch(baseUrl + sceneJsonMapping.hash)) as IScene
-
-    if (!promised.isPending) {
-      return promised
-    }
-
-    const data: ILand = {
-      sceneId: sceneId,
-      baseUrl,
-      scene,
-      mappingsResponse: content.content
-    }
-
-    const pendingSceneData = this.sceneIdToLandData.has(sceneId)
-      ? this.sceneIdToLandData.get(sceneId)
-      : future<ILand | null>()
-
-    if (pendingSceneData.isPending) {
-      pendingSceneData.resolve(data)
-    }
-
-    if (!this.sceneIdToLandData.has(sceneId)) {
-      this.sceneIdToLandData.set(sceneId, pendingSceneData)
-    }
 
     try {
+      const actualResponse = await jsonFetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
+      const mappings = actualResponse as { data: ParcelInfoResponse[] }
+      if (!promised.isPending) {
+        return promised
+      }
+      const content = mappings.data[0]
+      if (!content || !content.content || !content.content.contents) {
+        logger.info(`Resolved ${sceneId} to null -- no contents`, content)
+        promised.resolve(null)
+        return null
+      }
+      const sceneJsonMapping = content.content.contents.find($ => $.file === 'scene.json')
+
+      if (!sceneJsonMapping) {
+        logger.info(`Resolved ${sceneId} to null -- no sceneJsonMapping`)
+        promised.resolve(null)
+        return null
+      }
+
+      const baseUrl = this.options.contentServer + '/contents/'
+
+      const scene = (await jsonFetch(baseUrl + sceneJsonMapping.hash)) as IScene
+
+      if (!promised.isPending) {
+        return promised
+      }
+
+      const data: ILand = {
+        sceneId: sceneId,
+        baseUrl,
+        scene,
+        mappingsResponse: content.content
+      }
+
+      const pendingSceneData = this.sceneIdToLandData.has(sceneId)
+        ? this.sceneIdToLandData.get(sceneId)
+        : future<ILand | null>()
+
+      if (pendingSceneData.isPending) {
+        pendingSceneData.resolve(data)
+      }
+
+      if (!this.sceneIdToLandData.has(sceneId)) {
+        this.sceneIdToLandData.set(sceneId, pendingSceneData)
+      }
       const resolvedSceneId = future<string | null>()
       resolvedSceneId.resolve(sceneId)
 
       scene.scene.parcels.forEach($ => {
         this.positionToSceneId.set($, resolvedSceneId)
       })
-    } catch (e) {
-      logger.error(e)
+      promised.resolve(data)
+
+      return data
+    } catch (err) {
+      error(`Error in ${this.options.contentServer}/parcel_info response!`, err.message)
+      const ret = new Error(`Error in ${this.options.contentServer}/parcel_info response!`)
+      promised.reject(ret)
+      throw ret
     }
-
-    promised.resolve(data)
-
-    return data
   }
 
   async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {

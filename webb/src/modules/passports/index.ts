@@ -4,6 +4,7 @@ import { ProfileStore } from '@dcl/client/passports/api'
 import { getBaseCatalog } from '@dcl/client/assets/wearables/base'
 import { AuthRootState } from '../auth'
 import { StoredProfile } from '@dcl/client/passports/types'
+import { client } from '../systems'
 
 var profile: ProfileStore | undefined
 
@@ -41,12 +42,12 @@ export function passportsReducer(state?: PassportState, action?: AnyAction): Pas
         ...state,
         info: { ...state.info, [action.payload]: { status: 'loading' } }
       }
-    case 'Profile passport':
+    case 'Fetched passport':
       return {
         ...state,
         info: {
           ...state.info,
-          [action.payload.userId]: { status: 'ok', data: action.payload }
+          [action.payload.userId]: action.payload
         }
       }
     case 'Error fetching passport':
@@ -72,24 +73,27 @@ export const passportsMiddleware: any = (store: Store<PassportRootState & AuthRo
     typeof type === 'string' ? store.dispatch({ type, payload }) : store.dispatch(type)
   switch (action.type) {
     case 'Login successful':
-      dispatch('Request passport', action.payload.sub)
+      dispatch('Request passport', action.payload._userTokenData.user_id)
       break
     case 'Request passport':
       setTimeout(() => {
-        if (!(store.getState() as PassportRootState).passports.info[action.payload]) {
-          fetchProfile((store.getState()!.auth as any).accessToken, action.payload, dispatch)
+        if (
+          !(store.getState() as PassportRootState).passports.info[action.payload] ||
+          (store.getState() as PassportRootState).passports.info[action.payload].status === 'error'
+        ) {
+          fetchProfile(action.payload, dispatch)
         }
-      }, 100)
+      }, 1)
       break
   }
   return next(action)
 }
 
-export async function fetchProfile(accessToken: string, userId: any, dispatch: (type: any, payload?: any) => any) {
+export async function fetchProfile(userId: any, dispatch: (type: any, payload?: any) => any) {
   profile = profile || new ProfileStore(await getBaseCatalog())
   try {
     dispatch('Fetching passport', userId)
-    const storedProfile = await profile.getStoredProfile(accessToken, userId)
+    const storedProfile = await profile.getStoredProfile(client.Auth.auth, userId)
     dispatch('Fetched passport', storedProfile)
   } catch (e) {
     dispatch('Error fetching Passport', e)
