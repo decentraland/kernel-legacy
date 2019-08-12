@@ -4,7 +4,7 @@ import { Address, Button, Header, HeaderMenu, Icon, Segment, Tabs } from 'decent
 import { NoDeployment } from './NoDeployment'
 import { LoadingSceneInfo } from './LoadingSceneInfo'
 
-import { scene as sceneUrl } from 'dcl/webb/src/locations'
+import { scene as sceneUrl } from '~/locations'
 
 export class SceneInfo extends React.Component<any> {
   render() {

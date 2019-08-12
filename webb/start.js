@@ -1,3 +1,10 @@
+const path = require('path')
+const appPath = require('app-root-path')
+appPath.setPath(path.join(process.env.PWD, '..', 'dcl', 'webb'))
+process.env.PROJECT_FOLDER = appPath.path
+process.env.PROJECT_ROOT = appPath.path
+process.env.PROJECT_NODE_MODULES = appPath.resolve('node_modules')
+
 const {
   FuseBox,
   WebIndexPlugin,
@@ -39,10 +46,28 @@ const fuse = FuseBox.init({
 })
 fuse.dev({ port: 3000 }) // launch http server
 fuse.bundle('vendor').instructions('~ index.tsx')
-fuse.bundle('dclclient').instructions('~ dclclient/**/*.ts')
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')
   .watch()
   .hmr()
-fuse.run()
+const running = fuse.run()
+
+function watchStdin(action) {
+  process.stdin.resume()
+  process.stdin.on('data', async function(chunk) {
+    const data = chunk.toString()
+    if (data === 'IBAZEL_BUILD_COMPLETED SUCCESS') {
+      action()
+      fuse.sendPageReload()
+    }
+  })
+  process.stdin.on('end', function() {
+    fuse.exit()
+  })
+}
+if (process.env.IBAZEL_NOTIFY_CHANGES) {
+  running.then(producer => {
+    watchStdin(() => producer.reset() && producer.run())
+  })
+}

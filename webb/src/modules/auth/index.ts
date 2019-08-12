@@ -120,7 +120,6 @@ export async function checkSessionAndRedirectToHome(
   dispatch: (type: any, payload?: any) => any
 ) {
   try {
-    debugger
     const result = await AuthLib.checkSession()
     dispatch('Login successful', result)
     if (store.getState().router.location.pathname === '/login') {

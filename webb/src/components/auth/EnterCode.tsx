@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { AuthStatusSummary } from 'dcl/webb/src/modules/auth'
+import { AuthStatusSummary } from '~/modules/auth'
 
 import { SingleFieldSubmitForm } from './SingleFieldSubmitForm'
 

@@ -3,7 +3,7 @@ import React from 'react'
 import { Push } from 'connected-react-router'
 import { Address, Button, Header, HeaderMenu, Icon, Loader, Segment } from 'decentraland-ui'
 
-import { ParcelData } from 'dcl/webb/src/modules/world'
+import { ParcelData } from '~/modules/world'
 
 import { LinkReactComponent } from './LinkReactComponent'
 

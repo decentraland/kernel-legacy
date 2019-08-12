@@ -4,7 +4,7 @@ import { Auth } from 'decentraland-auth'
 import { Comms } from '@dcl/client'
 import { intersectLogger } from '@dcl/utils'
 
-import { AuthRootState } from 'dcl/webb/src/modules/auth'
+import { AuthRootState } from '~/modules/auth'
 
 const { connect } = Comms
 

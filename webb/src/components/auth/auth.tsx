@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Segment, Page, Center } from 'decentraland-ui'
 
-import { AuthStatusSummary } from 'dcl/webb/src/modules/auth'
+import { AuthStatusSummary } from '~/modules/auth'
 import { EnterCode } from './EnterCode'
 import { EnterEmail } from './EnterEmail'
 

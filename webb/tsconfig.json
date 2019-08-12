@@ -11,6 +11,9 @@
     "moduleResolution": "node",
     "jsx": "react",
     "baseUrl": "./src",
+    "paths": {
+      "~/*": ["./*", "./src/*"]
+    },
     "downlevelIteration": true
   }
 }

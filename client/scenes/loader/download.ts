@@ -7,7 +7,6 @@ const { error } = logger
 export type DeployedScene = {
   parcel_id: string
   root_cid: string
-  /** DO NOT USE THIS ONE YET */
   scene_cid: ''
 }
 
