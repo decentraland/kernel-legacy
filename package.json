@@ -54,6 +54,7 @@
         "react-hot-loader": "^4.12.10",
         "react-redux": "^7.1.0",
         "react-router": "^5.0.1",
+    "react-json-tree": "^0.11.2",
         "redux": "^4.0.4",
         "require.js": "^1.0.0",
         "requirejs": "^2.3.6",

@@ -64,7 +64,6 @@ export function commsReducer(state?: CommsState, action?: AnyAction): CommsState
     case 'Comms log':
       return { ...state, log: [...state.log, action.payload[0]] }
     case 'Error':
-      debugger
       return { ...state, summary: 'Auth error' }
   }
   return state

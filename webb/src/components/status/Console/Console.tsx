@@ -1,5 +1,7 @@
 import React from 'react'
+import { Validations } from '@dcl/client'
 import { client } from '~/modules/systems'
+import { Segment } from 'decentraland-ui'
 const Terminal = require('react-console-emulator').default
 
 var term = null
@@ -8,13 +10,6 @@ function makeCommands(that) {
   if (!term) {
     term = that
     Object.assign(commands, {
-      echo: {
-        description: 'Echo a passed string.',
-        usage: 'echo <string>',
-        fn: function() {
-          return `${Array.from(arguments).join(' ')}`
-        }
-      },
       getProfile: {
         description: 'Get a profile using a userId',
         usage: 'getProfile <userId>',
@@ -35,7 +30,16 @@ function makeCommands(that) {
       goto: {
         description: 'Teleport to another position',
         usage: 'goto <x> <y>',
-        fn: function(x: string, y: string) {}
+        fn: function(w: string, z: string) {
+          if (w.includes(',') && !z) {
+            ;[w, z] = w.split(',')
+          }
+          const [x, y] = [w, z].map(_ => parseInt(_.replace(',', ''), 10))
+          if (!Validations.isValidCoordinateDefinition(`${x},${y}`)) {
+            return 'Invalid coordinates, sample usage: "goto 4, -100"'
+          }
+          client.MyPresence.myPresenceTracker
+        }
       },
       list: {
         description: 'List userIds around your position',
@@ -66,13 +70,16 @@ export class MyTerminal extends React.Component {
   terminal = React.createRef()
   render() {
     return (
-      <Terminal
-        style={{ background: '#ffffff', maxHeight: '200px' }}
-        inputStyle={{ color: '#2f2f2c', height: '25px' }}
-        commands={makeCommands(this)}
-        ref={this.terminal}
-        promptLabel={'$'}
-      />
+      <Segment>
+        <h3>Console</h3>
+        <Terminal
+          style={{ background: '#ffffff', maxHeight: '200px' }}
+          inputStyle={{ color: '#2f2f2c', height: '25px' }}
+          commands={makeCommands(this)}
+          ref={this.terminal}
+          promptLabel={'$'}
+        />
+      </Segment>
     )
   }
 }

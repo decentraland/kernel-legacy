@@ -12,6 +12,7 @@ function mapState(state: RootState) {
 export default connect(
   mapState,
   {
+    thing: () => ({}),
     onClick: (x: number, y: number) => ({
       type: 'Set selected world parcel',
       payload: { x, y }

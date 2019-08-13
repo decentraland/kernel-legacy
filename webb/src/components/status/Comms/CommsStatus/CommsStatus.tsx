@@ -11,7 +11,7 @@ export class CommsStatus extends React.Component<CommsStatusProps> {
   render() {
     return (
       <Segment>
-        <h3>Communication</h3>
+        <h3>Communications</h3>
         <h4>Status: {this.props.status}</h4>
         {(this.props.status !== 'Connected!' && this.props.log.length && (
           <>

@@ -10,4 +10,6 @@ import * as WorldSceneV1 from './worldMap/compat/v1'
 import * as Systems from './main/impl/index'
 import * as MainController from './main/index'
 
+export * from './presence'
+
 export { Auth, AuthTypes, Comms, Config, MainController, PassportApi, PassportTypes, WorldScene, WorldSceneV1, Systems }

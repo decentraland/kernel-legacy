@@ -1,0 +1,20 @@
+export const JSONTheme = {
+  scheme: 'Github',
+  author: 'Defman21',
+  base00: '#ffffff',
+  base01: '#f5f5f5',
+  base02: '#c8c8fa',
+  base03: '#969896',
+  base04: '#e8e8e8',
+  base05: '#ffffff',
+  base06: '#ffffff',
+  base07: '#ffffff',
+  base08: '#676370',
+  base09: '#676370',
+  base0A: '#353135',
+  base0B: '#353135',
+  base0C: '#676370',
+  base0D: '#ff2d55',
+  base0E: '#a71d5d',
+  base0F: '#272329'
+}

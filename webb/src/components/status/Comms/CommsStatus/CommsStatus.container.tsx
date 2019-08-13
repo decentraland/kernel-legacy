@@ -1,7 +1,8 @@
 import { connect } from 'react-redux'
 
-import { CommsStatus } from './CommsStatus'
 import { RootState } from '~/store'
+
+import { CommsStatus } from './CommsStatus'
 
 function mapState(state: RootState) {
   return {

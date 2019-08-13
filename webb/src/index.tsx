@@ -1,8 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import App from '~/App'
+import { default as App } from '~/App'
+
+import { setStatefulModules } from './hmr'
 
 import 'index.css'
 import 'decentraland-ui/lib/styles.css'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+setStatefulModules('hmr', 'App', 'store', 'modules')
+App()

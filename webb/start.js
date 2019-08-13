@@ -19,6 +19,8 @@ const fuse = FuseBox.init({
   homeDir: 'src',
   target: 'browser@es6',
   output: 'dist/$name.js',
+  cache: true,
+  hmr: true,
   alias: {
     components: '~/components',
     modules: '~/modules',
@@ -50,18 +52,20 @@ fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http 
 fuse
   .bundle('vendor')
   .instructions('~ index.tsx')
-  .sourceMaps(true)
+  .hmr()
+  .watch()
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')
-  .watch()
   .hmr()
+  .watch()
 const running = fuse.run()
 
 function watchStdin(action) {
   process.stdin.resume()
-  process.stdin.on('data', async function(chunk) {
-    fuse.sendPageReload()
+  process.stdin.on('data', async function() {
+    action()
+    // fuse.sendPageReload()
   })
   process.stdin.on('end', function() {
     fuse.exit()
@@ -69,6 +73,6 @@ function watchStdin(action) {
 }
 if (process.env.IBAZEL_NOTIFY_CHANGES) {
   running.then(producer => {
-    watchStdin(() => producer.reset() && producer.run())
+    watchStdin(() => 1)
   })
 }

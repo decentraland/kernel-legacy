@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Page, Modal } from 'decentraland-ui'
+import { Page, Modal, Loader } from 'decentraland-ui'
 import { client } from '~/modules/systems'
 
 export default class AuthConnect extends React.Component {
@@ -31,10 +31,11 @@ export default class AuthConnect extends React.Component {
           <Modal
             size={'fullscreen'}
             className='embed'
-            style={{ height: '100%', width: '100%' }}
             ref={this.modal as any}
             open={true}
-          ></Modal>
+          >
+            <Loader/>
+          </Modal>
         </Page>
       </>
     )

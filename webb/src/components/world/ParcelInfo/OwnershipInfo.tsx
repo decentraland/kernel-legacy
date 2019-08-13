@@ -5,7 +5,7 @@ import { Address, Button, Header, HeaderMenu, Icon, Loader, Segment } from 'dece
 
 import { ParcelData } from '~/modules/world'
 
-import { LinkReactComponent } from './LinkReactComponent'
+import { LinkReactComponent } from '~/components/Reusable/LinkReactComponent'
 
 function marketplaceEstateUrl(estateId: string) {
   return `https://market.decentraland.org/estates/${estateId}/detail`

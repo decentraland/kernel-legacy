@@ -1,4 +1,16 @@
-export function upgradeToV2(scene: any, mappings: any) {
+import { ILand } from '@dcl/utils'
+import { Scene } from '../scene'
+
+export function upgradeToV2(scene: ILand | any, mappings?: any) {
+  const raw = scene.mappingsResponse ? _upgradeToV2ILand(scene) : _upgradeToV2(scene, mappings)
+  return new Scene(raw)
+}
+
+function _upgradeToV2ILand(scene: ILand) {
+  return _upgradeToV2(scene.scene, { data: [{ content: scene.mappingsResponse }] })
+}
+
+function _upgradeToV2(scene: any, mappings: any) {
   if (!mappings.data || !mappings.data[0] || !mappings.data[0].content || !mappings.data[0].content.contents) {
     throw new Error('Invalid mappings: key `data[0].content.contents` not found')
   }
