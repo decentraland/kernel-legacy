@@ -18,7 +18,7 @@ export async function getBaseCatalog() {
     for (let main of asset.main) {
       const type = main.type
       result[type] = result[type] || {}
-      result[type][name] = { ...asset, main }
+      result[type][asset.name] = { ...asset, main }
     }
   }
   return result

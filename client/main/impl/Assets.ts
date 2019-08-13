@@ -1,11 +1,11 @@
 import { SubsystemController } from '../subsystems'
-import { getBaseWearables } from '../../assets/wearables/base'
+import { getBaseCatalog } from '../../assets/wearables/base'
 
 export class AssetSystem extends SubsystemController {
   assets: any
 
   protected async onStart() {
-    this.assets = await getBaseWearables()
+    this.assets = await getBaseCatalog()
     return this.onSuccess()
   }
 }
