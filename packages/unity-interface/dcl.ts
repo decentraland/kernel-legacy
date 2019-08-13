@@ -41,6 +41,7 @@ import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfi
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
 import { getUserProfile } from '../shared/comms/peers'
+import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 
 let gameInstance!: GameInstance
 
@@ -83,8 +84,8 @@ const browserInterface = {
     switch (eventType) {
       case 'SceneReady': {
         const { sceneId } = payload
-        defaultLogger.info(`SceneReady ${sceneId}`)
-        // TODO - check and wait for the other scene ready message and finally send loading screen message - moliva - 08/08/2019
+
+        sceneLifeCycleObservable.notifyObservers({ sceneId, status: 'ready' })
         break
       }
       case 'ActivateRenderingACK': {

@@ -6,6 +6,7 @@ import { positionObservable, teleportObservable } from './positionThings'
 import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
+import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
@@ -60,9 +61,17 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
   return parcelSceneWorker
 }
 
+function setLoadingScreenVisible(shouldShow: boolean) {
+  document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
+}
+
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
   const ret = await initParcelSceneWorker()
   const position = Vector2.Zero()
+
+  ret.on('LoadingScreen.setVisible', (opts: { show: boolean }) => {
+    setLoadingScreenVisible(opts.show)
+  })
 
   ret.on('Scene.shouldPrefetch', async (opts: { sceneId: string }) => {
     const parcelSceneToLoad = await ret.getParcelData(opts.sceneId)
@@ -113,5 +122,9 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
   positionObservable.add(obj => {
     worldToGrid(obj.position, position)
     ret.notify('User.setPosition', { position })
+  })
+
+  sceneLifeCycleObservable.add(sceneStatus => {
+    ret.notify('Scene.status', sceneStatus)
   })
 }

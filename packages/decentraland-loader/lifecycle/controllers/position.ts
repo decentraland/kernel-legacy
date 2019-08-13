@@ -24,6 +24,7 @@ export class PositionLifecycleController extends EventEmitter {
     }
   }
 
+  // TODO - this will come through the SceneReady events from the engine - moliva - 12/08/2019
   reportSceneStarted(scene: SceneLifeCycleStatus) {
     if (!this.isSettled && this.sceneController.contains(scene, this.currentPosition!)) {
       this.isSettled = true

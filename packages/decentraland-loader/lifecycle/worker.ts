@@ -4,7 +4,7 @@
 import { WebWorkerTransport } from 'decentraland-rpc'
 import { Adapter } from './lib/adapter'
 import { ParcelLifeCycleController } from './controllers/parcel'
-import { SceneLifeCycleController } from './controllers/scene'
+import { SceneLifeCycleController, SceneLifeCycleStatusReport } from './controllers/scene'
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
 import { ILand } from 'shared/types'
@@ -26,10 +26,6 @@ let downloadManager: SceneDataDownloadManager
  * - 'Scene.shouldUnload' (sceneId: string)
  * - 'Scene.shouldPrefetch' (sceneId: string)
  *
- * And optionally (to show loading boxes):
- * - 'Parcel.sighted' (xy: string)
- * - 'Parcel.lostSight' (xy: string)
- *
  * Make sure the main thread reports:
  * - 'User.setPosition' { position: {x: number, y: number } }
  * - 'Scene.prefetchDone' { sceneId: string }
@@ -41,11 +37,11 @@ let downloadManager: SceneDataDownloadManager
     sceneController = new SceneLifeCycleController({ downloadManager })
     positionController = new PositionLifecycleController(sceneController)
 
-    parcelController.on('Sighted', (parcel: string) => sceneController.onSight(parcel))
-    parcelController.on('Lost sight', (parcel: string) => sceneController.lostSight(parcel))
+    parcelController.on('Sighted', (parcels: string[]) => sceneController.onSight(parcels))
+    parcelController.on('Lost sight', (parcels: string[]) => sceneController.lostSight(parcels))
 
-    parcelController.on('Sighted', (parcel: string) => connector.notify('Parcel.sighted', { parcel }))
-    parcelController.on('Lost sight', (parcel: string) => connector.notify('Parcel.lostSight', { parcel }))
+    parcelController.on('Sighted', (parcels: string[]) => connector.notify('Parcel.sighted', { parcels }))
+    parcelController.on('Lost sight', (parcels: string[]) => connector.notify('Parcel.lostSight', { parcels }))
 
     positionController.on('Settled Position', (sceneId: string) => {
       connector.notify('Position.settled', { sceneId })
@@ -64,6 +60,10 @@ let downloadManager: SceneDataDownloadManager
       connector.notify('Scene.shouldUnload', { sceneId })
     })
 
+    sceneController.on('LoadingScreen setVisible', show => {
+      connector.notify('LoadingScreen.setVisible', { show })
+    })
+
     connector.on('User.setPosition', (opt: { position: { x: number; y: number } }) => {
       parcelController.reportCurrentPosition(opt.position)
       positionController.reportCurrentPosition(opt.position)
@@ -77,6 +77,10 @@ let downloadManager: SceneDataDownloadManager
 
     connector.on('Scene.prefetchDone', (opt: { sceneId: string }) => {
       sceneController.reportDataLoaded(opt.sceneId)
+    })
+
+    connector.on('Scene.status', (data: SceneLifeCycleStatusReport) => {
+      sceneController.reportStatus(data.sceneId, data.status)
     })
   })
 }
