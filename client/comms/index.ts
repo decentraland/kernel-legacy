@@ -1,7 +1,5 @@
-import 'webrtc-adapter'
-
-import { USE_LOCAL_COMMS, getServerConfigurations } from 'dcl/config'
-import { defaultLogger } from 'dcl/utils/Logger'
+import { USE_LOCAL_COMMS, getServerConfigurations } from '@dcl/config'
+import { defaultLogger } from '@dcl/utils'
 
 import { WorldInstanceConnection } from './worldInstanceConnection'
 
@@ -13,6 +11,7 @@ import { Auth } from '../auth/Auth'
 export async function connect(auth: Auth) {
   let commsBroker: IBrokerConnection
 
+  debugger
   if (USE_LOCAL_COMMS) {
     const commsUrl = document.location.toString().replace(/^http/, 'ws')
     defaultLogger.log('Using WebSocket comms: ' + commsUrl)

@@ -10,13 +10,11 @@ import {
   decideFloat,
   parseCoordinate,
   getMinimum
-} from '@dcl/utils/scene'
+} from '@dcl/utils'
 
-import { sha256 } from '@dcl/utils'
-import { stableStringify } from '@dcl/utils'
+import { stableStringify, parcelLimits, sha256 } from '@dcl/utils'
 
 import { isValidSceneInput, getInvalidReason } from './validation'
-import { parcelLimits } from 'dcl/utils'
 
 export class Scene implements SceneManifest {
   raw: UnsanitizedSceneManifest

@@ -10,6 +10,7 @@ import * as WorldSceneV1 from './worldMap/compat/v1'
 import * as Systems from './main/impl/index'
 import * as MainController from './main/index'
 
+export * from './assets/wearables/base'
 export * from './presence'
 import * as Validations from './worldMap/scene/validation'
 

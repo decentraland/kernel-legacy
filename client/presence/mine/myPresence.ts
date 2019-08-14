@@ -57,9 +57,9 @@ export class MyPresence {
     const landData = await this.loader.getSceneForCoordinates(x, y)
     const scene = upgradeToV2(landData)
     const spawn = scene.pickSpawnPoint()
-    console.log(`picked ${spawn.position} as new spawn`)
     const pos = spawn.position
     const rotation = Quaternion.RotationYawPitchRoll(spawn.camera.y, 0, 0)
+
     this.positionObservable.notifyObservers({
       position: pos,
       quaternion: rotation,

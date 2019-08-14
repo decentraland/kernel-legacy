@@ -2,6 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
+filegroup(
+    name = "srcs",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = ["node_modules/**/*"],
+    ),
+)
+
 ts_library(
     name = "config",
     srcs = glob(

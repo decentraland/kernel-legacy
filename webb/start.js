@@ -1,24 +1,17 @@
 const path = require('path')
 const appPath = require('app-root-path')
-appPath.setPath(path.join(process.env.PWD, '..', 'dcl', 'webb'))
+appPath.setPath(path.join(process.env.PWD, 'webb'))
 process.env.PROJECT_FOLDER = appPath.path
 process.env.PROJECT_ROOT = appPath.path
-process.env.PROJECT_NODE_MODULES = appPath.resolve('node_modules')
+process.env.PROJECT_NODE_MODULES = path.join(process.env.PWD, '..', 'npm', 'node_modules')
 
-const {
-  FuseBox,
-  WebIndexPlugin,
-  JSONPlugin,
-  SassPlugin,
-  CSSPlugin,
-  PostCSSPlugin,
-  CSSResourcePlugin
-} = require('fuse-box')
+const { FuseBox, WebIndexPlugin, JSONPlugin, CSSPlugin, PostCSSPlugin, CSSResourcePlugin } = require('fuse-box')
 
 const fuse = FuseBox.init({
   homeDir: 'src',
   target: 'browser@es6',
   output: 'dist/$name.js',
+  modulesFolder: [appPath.resolve('..')],
   cache: true,
   hmr: true,
   alias: {
@@ -40,7 +33,6 @@ const fuse = FuseBox.init({
     JSONPlugin(),
     [
       PostCSSPlugin([require('postcss-import')]),
-      SassPlugin(),
       CSSResourcePlugin({
         dist: 'dist/css-resources'
       }),
@@ -49,11 +41,32 @@ const fuse = FuseBox.init({
   ]
 })
 fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http server
+fuse.register('@dcl/config', {
+  homeDir: '../config',
+  main: 'index.ts',
+  instructions: '**/**.ts'
+})
+fuse.register('@dcl/utils', {
+  homeDir: '../utils',
+  main: 'index.ts',
+  instructions: '**/**.ts'
+})
+fuse.register('@dcl/client', {
+  homeDir: '../client',
+  main: 'index.ts',
+  instructions: '**/**.ts'
+})
+fuse.register('@dcl/protos', {
+  homeDir: '../protos/package',
+  main: 'index.js',
+  instructions: '**/**.js'
+})
 fuse
-  .bundle('vendor')
-  .instructions('~ index.tsx')
+  .bundle('dcl')
+  .instructions('+ [@dcl/client] + [@dcl/utils] + [@dcl/config]')
   .hmr()
   .watch()
+fuse.bundle('vendor').instructions('~ index.tsx - [@dcl/client]')
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')

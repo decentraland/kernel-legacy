@@ -1,4 +1,4 @@
-import { EntityAction } from 'dcl/utils/BagOfThings'
+import { EntityAction } from '@dcl/utils'
 
 export interface IEngineAPI {
   /**

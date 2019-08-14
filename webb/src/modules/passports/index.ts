@@ -1,9 +1,8 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { ProfileStore } from '@dcl/client/passports/api'
-import { getBaseCatalog } from '@dcl/client/assets/wearables/base'
+import { ProfileStore, getBaseCatalog, StoredProfile } from '@dcl/client'
+
 import { AuthRootState } from '../auth'
-import { StoredProfile } from '@dcl/client/passports/types'
 import { client } from '../systems'
 
 var profile: ProfileStore | undefined
@@ -90,7 +89,7 @@ export const passportsMiddleware: any = (store: Store<PassportRootState & AuthRo
 }
 
 export async function fetchProfile(userId: any, dispatch: (type: any, payload?: any) => any) {
-  profile = profile || new ProfileStore(await getBaseCatalog())
+  profile = profile || client.Passports.passports
   try {
     dispatch('Fetching passport', userId)
     const storedProfile = await profile.getStoredProfile(client.Auth.auth, userId)

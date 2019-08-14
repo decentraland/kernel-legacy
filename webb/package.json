@@ -1,7 +1,6 @@
 {
   "name": "webb",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.0",
   "dependencies": {
     "@babel/core": "^7.5.5",
     "@types/history": "^4.7.2",
@@ -10,13 +9,8 @@
     "@types/react-dom": "16.8.4",
     "@types/react-redux": "^7.1.1",
     "@types/react-router": "^5.0.3",
-    "auth0-js": "^9.11.2",
     "connected-react-router": "^6.5.2",
-    "decentraland-auth": "^0.12.0",
-    "decentraland-auth-protocol": "^0.3.2",
     "decentraland-ui": "^2.6.0",
-    "fs-extra": "7.0.1",
-    "google-protobuf": "^3.9.0",
     "history": "^4.9.0",
     "react": "^16.8.6",
     "react-console-emulator": "^3.0.2",
@@ -28,82 +22,9 @@
     "typesafe-actions": "^4.4.2",
     "typescript": "3.5.3"
   },
-  "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
-      "!src/**/*.d.ts"
-    ],
-    "setupFiles": [
-      "react-app-polyfill/jsdom"
-    ],
-    "setupFilesAfterEnv": [],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
-    ],
-    "testEnvironment": "jest-environment-jsdom-fourteen",
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
-      "^.+\\.module\\.(css|sass|scss)$"
-    ],
-    "modulePaths": [
-      "/usr/src/app/src"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
-    ],
-    "watchPlugins": [
-      "jest-watch-typeahead/filename",
-      "jest-watch-typeahead/testname"
-    ]
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "fuse-box": "^3.7.1",
-    "node-sass": "^4.12.0",
     "postcss-import": "^12.0.1",
     "terser": "^4.1.4",
     "uglify-js": "^3.6.0"
