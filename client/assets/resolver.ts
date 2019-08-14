@@ -7,4 +7,6 @@ export function fetchAssetDescription(assetURI: string) {
   url.pathname
 }
 
+export default fetchAssetDescription
+
 // Should be: import { Assets } from 'dcl/config/Assets'

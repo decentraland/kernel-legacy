@@ -16,6 +16,7 @@ export * from './ecs/EventManager'
 
 // DECENTRALAND DEPENDENCIES
 export * from '@dcl/utils/math'
+
 export * from './engine/Types'
 export * from './engine/Components'
 export * from './engine/Systems'

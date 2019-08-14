@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "declarationDir": "dist",
+    "outDir": "dist",
+    "strictNullChecks": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+    "stripInternal": true,
+    "moduleResolution": "node",
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "downlevelIteration": true,
+    "keyofStringsOnly": true,
+    "noUnusedLocals": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "./ecs",
+    "./engine",
+    "./lib",
+    "./schema",
+    "./index.ts"
+  ]
+}

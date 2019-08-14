@@ -46,11 +46,9 @@ yarn_install(
 )
 
 load("@npm//:install_bazel_dependencies.bzl", "install_bazel_dependencies")
-
 install_bazel_dependencies()
 
 load("@npm_bazel_typescript//:index.bzl", "ts_setup_workspace")
-
 ts_setup_workspace()
 
 http_archive(
@@ -74,3 +72,22 @@ http_archive(
 load("@ts_protoc_gen//:defs.bzl", "typescript_proto_dependencies")
 
 typescript_proto_dependencies()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "io_bazel_rules_webtesting",
+    sha256 = "f89ca8e91ac53b3c61da356c685bf03e927f23b97b086cc593db8edc088c143f",
+    urls = [
+        "https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.1/rules_webtesting.tar.gz",
+    ],
+)
+
+load("@io_bazel_rules_webtesting//web:repositories.bzl", "web_test_repositories")
+web_test_repositories()
+
+load("@io_bazel_rules_webtesting//web/versioned:browsers-0.3.1.bzl", "browser_repositories")
+browser_repositories(chromium=True)
+
+load("@npm_bazel_karma//:package.bzl", "rules_karma_dependencies")
+rules_karma_dependencies()

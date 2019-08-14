@@ -18,13 +18,14 @@ export class StatusNav extends React.Component<{
     return (
       <Segment>
         <div className='ui secondary fluid stackable menu' style={{ flexFlow: 'row wrap' }}>
-          <a
+          <LinkReactComponent
+            push={this.props.push}
             className={'link item' + (['/', '/status'].includes(this.props.current) ? ' active' : '')}
             key='console'
             href={`/status`}
           >
             Console
-          </a>
+          </LinkReactComponent>
           {Object.keys(this.props.systems.status).map(state => {
             const status =
               this.props.systems.status[state] === LOADING
