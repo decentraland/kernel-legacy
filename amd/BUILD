@@ -6,7 +6,7 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 ts_library(
     name = "dclamd",
     srcs = glob(
-        include = ["src/*.ts"],
+        include = ["*.ts"],
         exclude = [
             "test/**/*",
             "node_modules/**/*",
@@ -34,7 +34,7 @@ load("@npm_bazel_karma//:defs.bzl", "ts_web_test_suite")
 ts_web_test_suite(
     name = "test",
     srcs = [
-        "src/amd.js",
+        "amd.js",
     ],
     browsers = [
         "@io_bazel_rules_webtesting//browsers:chromium-local",
@@ -53,6 +53,7 @@ jasmine_node_test(
     name = "amd_test",
     srcs = [
         "test/simple.spec.js",
+        ":dclamd",
     ],
     deps = [
         "@npm//jasmine",

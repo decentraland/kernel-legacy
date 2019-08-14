@@ -33,7 +33,7 @@ describe('simple test with external module', () => {
           starters.push(cb)
         }
       }
-      var name = require.resolve('../src/amd')
+      var name = require.resolve('../amd')
       delete require.cache[name]
       require(name)
     }
@@ -113,7 +113,7 @@ describe('simple test with external module that doesnt exist and throw', () => {
         }
       }
 
-      var name = require.resolve('../src/amd')
+      var name = require.resolve('../amd')
       delete require.cache[name]
       require(name)
     }
