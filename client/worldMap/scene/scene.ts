@@ -16,6 +16,7 @@ import { sha256 } from '@dcl/utils'
 import { stableStringify } from '@dcl/utils'
 
 import { isValidSceneInput, getInvalidReason } from './validation'
+import { parcelLimits } from 'dcl/utils'
 
 export class Scene implements SceneManifest {
   raw: UnsanitizedSceneManifest
@@ -122,9 +123,9 @@ export class Scene implements SceneManifest {
     return {
       ...spawnArea,
       position: {
-        x: decideFloat(spawnArea.position.x),
+        x: decideFloat(spawnArea.position.x) + this.baseParcel.x * parcelLimits.parcelSize,
         y: decideFloat(spawnArea.position.y),
-        z: decideFloat(spawnArea.position.z)
+        z: decideFloat(spawnArea.position.z) + this.baseParcel.y * parcelLimits.parcelSize
       },
       camera: {
         y: decideFloat(spawnArea.camera.y)

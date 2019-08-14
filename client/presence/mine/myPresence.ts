@@ -22,6 +22,7 @@ export class MyPresence {
   positionObservable = new Observable<Readonly<PositionReport>>()
   teleportObservable = new Observable<ReadOnlyVector2>()
 
+  lastTeleport: ReadOnlyVector2
   lastPlayerPositionReport: PositionReport
   lastPlayerPosition: MVector3 = new MVector3()
   lastTimeUpdatedUrl = 0
@@ -48,11 +49,15 @@ export class MyPresence {
     }
   }
 
+  goTo = (x: number, y: number) => this.teleport(x, y)
+  teleportTo = (x: number, y: number) => this.teleport(x, y)
   async teleport(x: number, y: number) {
+    this.lastTeleport = { x, y }
     this.teleportObservable.notifyObservers({ x, y })
     const landData = await this.loader.getSceneForCoordinates(x, y)
     const scene = upgradeToV2(landData)
     const spawn = scene.pickSpawnPoint()
+    console.log(`picked ${spawn.position} as new spawn`)
     const pos = spawn.position
     const rotation = Quaternion.RotationYawPitchRoll(spawn.camera.y, 0, 0)
     this.positionObservable.notifyObservers({
@@ -65,7 +70,7 @@ export class MyPresence {
 
   updateUrlPosition(cameraVector: Vector3) {
     worldToGrid(cameraVector, temporaryVector)
-    const positionInUrl = qs.parse(this.location.search || '')
+    const positionInUrl = qs.parse(this.location.search.slice(1) || '')
     if (positionInUrl.x !== temporaryVector.x || positionInUrl.y !== temporaryVector.y) {
       positionInUrl.x = temporaryVector.x
       positionInUrl.y = temporaryVector.y
