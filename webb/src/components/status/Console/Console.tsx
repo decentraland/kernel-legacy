@@ -38,7 +38,8 @@ function makeCommands(that) {
           if (!Validations.isValidCoordinateDefinition(`${x},${y}`)) {
             return 'Invalid coordinates, sample usage: "goto 4, -100"'
           }
-          client.MyPresence.myPresenceTracker
+          client.MyPresence.myPresenceTracker.teleport(x, y)
+          return `Teleporting to ${x}, ${y}`
         }
       },
       list: {

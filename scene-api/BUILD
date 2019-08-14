@@ -17,15 +17,12 @@ ts_library(
     ],
 )
 
-nodejs_binary(
-    name = "api_extractor",
+filegroup(
+    name = "extractor-filedeps",
     data = [
-        ":lib",
-        "@npm//@bazel/typescript",
-        "@npm//@microsoft/api-extractor",
+        "api-extractor.json",
+        "tsconfig.json",
     ],
-    entry_point = ":index.ts",
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
@@ -43,6 +40,28 @@ dcl_npm_package(
         "scene-api.package.json",
     ],
     deps = [
-        ":lib",
+        ":scene-api",
     ],
+)
+
+nodejs_binary(
+    name = "api_extractor",
+    args = [
+        "run",
+        "--local",
+        "--verbose",
+        "--typescript-compiler-folder ../npm/node_modules/typescript",
+        "-c scene-api/api-extractor.json",
+    ],
+    data = [
+        ":extractor-filedeps",
+        ":package",
+        ":scene-api",
+        "//utils",
+        "@npm//@bazel/typescript",
+        "@npm//@microsoft/api-extractor",
+        "@npm//typescript",
+    ],
+    entry_point = "@npm//:node_modules/@microsoft/api-extractor/bin/api-extractor",
+    visibility = ["//visibility:public"],
 )

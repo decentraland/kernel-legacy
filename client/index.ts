@@ -11,5 +11,18 @@ import * as Systems from './main/impl/index'
 import * as MainController from './main/index'
 
 export * from './presence'
+import * as Validations from './worldMap/scene/validation'
 
-export { Auth, AuthTypes, Comms, Config, MainController, PassportApi, PassportTypes, WorldScene, WorldSceneV1, Systems }
+export {
+  Auth,
+  AuthTypes,
+  Comms,
+  Config,
+  MainController,
+  PassportApi,
+  PassportTypes,
+  Systems,
+  WorldScene,
+  WorldSceneV1,
+  Validations
+}

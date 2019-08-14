@@ -2,7 +2,7 @@ import { defaultLogger } from '@dcl/utils'
 
 import { UIValue } from '../ecs/UIValue'
 import { UIStackOrientation } from '../engine/UIShapes'
-import { ReadOnlyVector2, ReadOnlyVector3, Color3, ReadOnlyColor3, Color4, ReadOnlyQuaternion } from '@dcl/utils/math'
+import { ReadOnlyVector2, ReadOnlyVector3, Color3, ReadOnlyColor3, Color4, ReadOnlyQuaternion } from '@dcl/utils'
 
 export type ISchema<Keys> = { [key: string]: { type: keyof Keys; default?: any } }
 export type Validator<T = any> = (x: any, defaultValue: T) => T

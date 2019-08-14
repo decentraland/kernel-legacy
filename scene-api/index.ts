@@ -1,7 +1,5 @@
 // UTILS
-export * from '@dcl/utils/Task'
-export * from '@dcl/utils/Logger'
-export * from '@dcl/utils/Observable'
+export * from '@dcl/utils'
 
 // Library
 export * from './lib/DevTools'
@@ -15,8 +13,6 @@ export * from './ecs/UIValue'
 export * from './ecs/EventManager'
 
 // DECENTRALAND DEPENDENCIES
-export * from '@dcl/utils/math'
-
 export * from './engine/Types'
 export * from './engine/Components'
 export * from './engine/Systems'
