@@ -80,16 +80,14 @@ const browserInterface = {
   },
 
   ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
-    // TODO - delegate to lifecycle manager - moliva - 08/08/2019
     switch (eventType) {
       case 'SceneReady': {
         const { sceneId } = payload
-
         sceneLifeCycleObservable.notifyObservers({ sceneId, status: 'ready' })
         break
       }
       case 'ActivateRenderingACK': {
-        // TODO - remove loading screen effectively - moliva - 08/08/2019
+        setLoadingScreenVisible(false)
         break
       }
       default: {
@@ -98,6 +96,10 @@ const browserInterface = {
       }
     }
   }
+}
+
+function setLoadingScreenVisible(shouldShow: boolean) {
+  document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
 }
 
 const unityInterface = {
@@ -146,6 +148,10 @@ const unityInterface = {
 
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+  },
+
+  ActivateRendering() {
+    gameInstance.SendMessage('SceneController', 'ActivateRendering')
   },
 
   UnlockCursor() {
@@ -275,6 +281,12 @@ export async function startUnityParcelLoading() {
       lands.forEach($ => {
         unityInterface.UnloadScene($.sceneId)
       })
+    },
+    onPositionSettled: () => {
+      unityInterface.ActivateRendering()
+    },
+    onPositionUnsettled: () => {
+      setLoadingScreenVisible(true)
     }
   })
 }

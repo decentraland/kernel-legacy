@@ -8,6 +8,7 @@ import { SceneLifeCycleController, SceneLifeCycleStatusReport } from './controll
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
 import { ILand } from 'shared/types'
+import defaultLogger from 'shared/logger'
 
 const connector = new Adapter(WebWorkerTransport(self as any))
 
@@ -35,16 +36,13 @@ let downloadManager: SceneDataDownloadManager
     downloadManager = new SceneDataDownloadManager({ contentServer: options.contentServer })
     parcelController = new ParcelLifeCycleController({ lineOfSightRadius: options.lineOfSightRadius })
     sceneController = new SceneLifeCycleController({ downloadManager })
-    positionController = new PositionLifecycleController(sceneController)
-
-    parcelController.on('Sighted', (parcels: string[]) => sceneController.onSight(parcels))
-    parcelController.on('Lost sight', (parcels: string[]) => sceneController.lostSight(parcels))
+    positionController = new PositionLifecycleController(parcelController, sceneController)
 
     parcelController.on('Sighted', (parcels: string[]) => connector.notify('Parcel.sighted', { parcels }))
     parcelController.on('Lost sight', (parcels: string[]) => connector.notify('Parcel.lostSight', { parcels }))
 
-    positionController.on('Settled Position', (sceneId: string) => {
-      connector.notify('Position.settled', { sceneId })
+    positionController.on('Settled Position', () => {
+      connector.notify('Position.settled')
     })
     positionController.on('Unsettled Position', () => {
       connector.notify('Position.unsettled')
@@ -60,13 +58,10 @@ let downloadManager: SceneDataDownloadManager
       connector.notify('Scene.shouldUnload', { sceneId })
     })
 
-    sceneController.on('LoadingScreen setVisible', show => {
-      connector.notify('LoadingScreen.setVisible', { show })
-    })
-
-    connector.on('User.setPosition', (opt: { position: { x: number; y: number } }) => {
-      parcelController.reportCurrentPosition(opt.position)
-      positionController.reportCurrentPosition(opt.position)
+    connector.on('User.setPosition', (opt: { position: { x: number; y: number }; teleported: boolean }) => {
+      positionController
+        .reportCurrentPosition(opt.position, opt.teleported)
+        .catch(e => defaultLogger.error(`error when updating position`))
     })
 
     connector.on('Scene.dataRequest', async (data: { sceneId: string }) =>

@@ -21,8 +21,6 @@ export class SceneLifeCycleController extends EventEmitter {
 
   private sceneParcelSightCount = new Map<SceneId, number>()
 
-  private currentlySightedScenes: SceneId[] = []
-
   constructor(opts: { downloadManager: SceneDataDownloadManager }) {
     super()
     this.downloadManager = opts.downloadManager
@@ -42,39 +40,14 @@ export class SceneLifeCycleController extends EventEmitter {
     )
   }
 
-  isReady(sceneId: SceneId): boolean {
-    const status = this.sceneStatus.get(sceneId)
-    return !!status && status.isReady()
-  }
-
-  isPositionUnsettled() {
-    return true
-  }
-
   distinct(value: any, index: number, self: Array<any>) {
     return self.indexOf(value) === index
-  }
-
-  eqSet(as: Array<any>, bs: Array<any>) {
-    if (as.length !== bs.length) return false
-    for (const a of as) if (!bs.includes(a)) return false
-    return true
   }
 
   async onSight(positions: string[]) {
     const positionSceneIds = (await Promise.all(
       positions.map(position => this.requestSceneId(position).then(sceneId => ({ position, sceneId })))
     )).filter(({ sceneId }) => sceneId !== undefined) as { position: string; sceneId: SceneId }[]
-
-    const newlySightedScenes = positionSceneIds.map($ => $.sceneId).filter(this.distinct)
-
-    if (this.eqSet(this.currentlySightedScenes, newlySightedScenes)) {
-      return
-    }
-
-    this.currentlySightedScenes = newlySightedScenes
-
-    this.checkSightedSceneStatus()
 
     positionSceneIds.forEach(async ({ position, sceneId }) => {
       const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
@@ -92,12 +65,8 @@ export class SceneLifeCycleController extends EventEmitter {
         this.sceneStatus.get(sceneId)!.status = 'awake'
       }
     })
-  }
 
-  checkSightedSceneStatus() {
-    const shouldShowLoadingScreen =
-      this.isPositionUnsettled() && this.currentlySightedScenes.some($ => !this.isReady($))
-    this.emit('LoadingScreen setVisible', shouldShowLoadingScreen)
+    return positionSceneIds.map($ => $.sceneId).filter(this.distinct)
   }
 
   lostSight(positions: string[]) {
@@ -127,15 +96,20 @@ export class SceneLifeCycleController extends EventEmitter {
     }
   }
 
+  isReady(sceneId: SceneId): boolean {
+    const status = this.sceneStatus.get(sceneId)
+    return !!status && status.isReady()
+  }
+
   reportStatus(sceneId: string, status: SceneLifeCycleStatusType) {
     const lifeCycleStatus = this.sceneStatus.get(sceneId)
     if (!lifeCycleStatus) {
-      defaultLogger.info(`not lifecycle status for scene ${sceneId}`)
+      defaultLogger.info(`no lifecycle status for scene ${sceneId}`)
       return
     }
     lifeCycleStatus.status = status
 
-    this.checkSightedSceneStatus()
+    this.emit('Scene ready', sceneId)
   }
 
   async requestSceneId(position: string): Promise<string | undefined> {

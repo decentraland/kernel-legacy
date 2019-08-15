@@ -5,6 +5,11 @@ import { Vector2Component } from 'atomicHelpers/landHelpers'
 import { parcelsInScope, ParcelConfigurationOptions } from '../lib/scope'
 import { ParcelLifeCycleStatus } from '../lib/parcel.status'
 
+export type ParcelSightSeeingReport = {
+  sighted: string[]
+  lostSight: string[]
+}
+
 export class ParcelLifeCycleController extends EventEmitter {
   config: ParcelConfigurationOptions
   currentPosition?: Vector2Component
@@ -22,9 +27,10 @@ export class ParcelLifeCycleController extends EventEmitter {
     this.config = config
   }
 
-  reportCurrentPosition(position: Vector2Component) {
+  reportCurrentPosition(position: Vector2Component): Partial<ParcelSightSeeingReport> {
     if (this.currentPosition && this.currentPosition.x === position.x && this.currentPosition.y === position.y) {
-      return
+      // same position, no news
+      return {}
     }
     this.currentPosition = position
 
@@ -36,14 +42,17 @@ export class ParcelLifeCycleController extends EventEmitter {
       sightedParcelsSet.add(parcel)
       return this.parcelSighted(parcel)
     })
-    this.emit('Sighted', newlySightedParcels)
 
     const newlyOOSParcels = [...this.currentlySightedParcels]
       .filter(parcel => !sightedParcelsSet.has(parcel))
       .filter(parcel => this.switchParcelToOutOfSight(parcel))
-    this.emit('Lost sight', newlyOOSParcels)
 
     this.currentlySightedParcels = sightedParcelsSet
+
+    this.emit('Sighted', newlySightedParcels)
+    this.emit('Lost sight', newlyOOSParcels)
+
+    return { sighted: newlySightedParcels, lostSight: newlyOOSParcels }
   }
 
   inSight(parcel: string) {

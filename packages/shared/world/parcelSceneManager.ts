@@ -14,6 +14,8 @@ export type EnableParcelSceneLoadingOptions = {
   onSpawnpoint?: (initialLand: ILand) => void
   onLoadParcelScenes?(x: ILand[]): void
   onUnloadParcelScenes?(x: ILand[]): void
+  onPositionSettled?(): void
+  onPositionUnsettled?(): void
 }
 
 export const loadedSceneWorkers = new Map<string, SceneWorker>()
@@ -61,17 +63,9 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
   return parcelSceneWorker
 }
 
-function setLoadingScreenVisible(shouldShow: boolean) {
-  document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
-}
-
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
   const ret = await initParcelSceneWorker()
   const position = Vector2.Zero()
-
-  ret.on('LoadingScreen.setVisible', (opts: { show: boolean }) => {
-    setLoadingScreenVisible(opts.show)
-  })
 
   ret.on('Scene.shouldPrefetch', async (opts: { sceneId: string }) => {
     const parcelSceneToLoad = await ret.getParcelData(opts.sceneId)
@@ -109,19 +103,25 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     }
   })
 
-  ret.on('Position.settled', async (sceneId: string) => {
-    if (options.onSpawnpoint) {
-      options.onSpawnpoint(await ret.getParcelData(sceneId))
+  ret.on('Position.settled', () => {
+    if (options.onPositionSettled) {
+      options.onPositionSettled()
+    }
+  })
+
+  ret.on('Position.unsettled', () => {
+    if (options.onPositionUnsettled) {
+      options.onPositionUnsettled()
     }
   })
 
   teleportObservable.add((position: { x: number; y: number }) => {
-    ret.notify('User.setPosition', { position })
+    ret.notify('User.setPosition', { position, teleported: true })
   })
 
   positionObservable.add(obj => {
     worldToGrid(obj.position, position)
-    ret.notify('User.setPosition', { position })
+    ret.notify('User.setPosition', { position, teleported: false })
   })
 
   sceneLifeCycleObservable.add(sceneStatus => {
