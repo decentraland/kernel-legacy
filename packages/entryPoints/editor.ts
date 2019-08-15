@@ -24,6 +24,7 @@ import {
   readyBuilderScene,
   preloadFileBuilder,
   getMousePositionBuilder,
+  takeScreenshotBuilder,
   futures
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
@@ -239,8 +240,9 @@ namespace editor {
   export function getLoadingEntity() {
     console.log('getLoadingEntity')
   }
-  export function takeScreenshot() {
+  export function takeScreenshot(mime?: string) {
     console.log('takeScreenshot')
+    takeScreenshotBuilder(mime)
   }
 
   export function setCameraPosition(position: string) {

@@ -122,6 +122,7 @@ export const unityInterface = {
       throw new Error('Only one scene at a time!')
     }
     gameInstance.SendMessage('SceneController', 'UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
+    this.sendBuilderMessage('UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
@@ -145,6 +146,10 @@ export const unityInterface = {
   },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+
+  SetBuilderReady() {
+    gameInstance.SendMessage('SceneController', 'BuilderReady')
   }
 }
 
@@ -337,6 +342,10 @@ export function getMousePositionBuilder(x: string, y: string, id: string) {
   unityInterface.sendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
 }
 
+export function takeScreenshotBuilder(mime?: string) {
+  unityInterface.sendBuilderMessage('TakeScreenshot', mime ? mime : '')
+}
+
 let currentLoadedScene: SceneWorker
 
 export async function loadPreviewScene() {
@@ -394,7 +403,7 @@ export function loadBuilderScene(sceneData: ILand) {
 }
 
 export function readyBuilderScene() {
-  unityInterface.sendBuilderMessage('SetReady')
+  unityInterface.SetBuilderReady()
 }
 
 export function updateBuilderScene(sceneData: ILand) {
