@@ -5,6 +5,7 @@ import { ParcelLifeCycleController } from './parcel'
 
 export class PositionLifecycleController extends EventEmitter {
   private positionSettled: boolean = false
+  private currentSceneId?: string
   private currentlySightedScenes: string[] = []
 
   constructor(public parcelController: ParcelLifeCycleController, public sceneController: SceneLifeCycleController) {
@@ -14,6 +15,8 @@ export class PositionLifecycleController extends EventEmitter {
 
   async reportCurrentPosition(position: Vector2Component, teleported: boolean) {
     const { sighted, lostSight } = this.parcelController.reportCurrentPosition(position)
+
+    this.currentSceneId = await this.sceneController.requestSceneId(`${position.x},${position.y}`)
 
     if (sighted) {
       const newlySightedScenes = await this.sceneController.onSight(sighted)
@@ -46,7 +49,7 @@ export class PositionLifecycleController extends EventEmitter {
 
       if (settling) {
         this.positionSettled = settling
-        this.emit('Settled Position')
+        this.emit('Settled Position', this.currentSceneId)
       }
     }
   }

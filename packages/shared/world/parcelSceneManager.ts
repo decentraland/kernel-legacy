@@ -103,7 +103,8 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     }
   })
 
-  ret.on('Position.settled', () => {
+  ret.on('Position.settled', async (opt: { sceneId: string }) => {
+    // TODO - readd spawnpoint - moliva - 15/08/2019
     if (options.onPositionSettled) {
       options.onPositionSettled()
     }
