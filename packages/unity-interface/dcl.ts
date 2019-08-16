@@ -227,6 +227,8 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
+  unityInterface.DeactivateRendering()
+
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
 
   if (DEBUG) {
@@ -310,7 +312,6 @@ async function initializeDecentralandUI() {
 
   await ensureUiApis(worker)
 
-  unityInterface.DeactivateRendering()
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
   unityInterface.LoadProfile(getUserProfile().profile)
 }
