@@ -7,6 +7,7 @@ import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
+import { worldRunningObservable } from './worldState'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
@@ -114,6 +115,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     if (options.onPositionUnsettled) {
       options.onPositionUnsettled()
     }
+    worldRunningObservable.notifyObservers(false)
   })
 
   teleportObservable.add((position: { x: number; y: number }) => {

@@ -246,9 +246,9 @@ export interface IEvents {
   }
 
   /**
-   * This is triggered once the scene is ready to start.
+   * This is triggered once the scene should start.
    */
-  sceneReady: {}
+  sceneStart: {}
 
   /**
    * After checking entities outside the fences, if any is outside, this event

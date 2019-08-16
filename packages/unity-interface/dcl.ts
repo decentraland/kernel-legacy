@@ -30,7 +30,8 @@ import {
   getSceneWorkerBySceneID,
   getParcelSceneID,
   stopParcelSceneWorker,
-  loadParcelScene
+  loadParcelScene,
+  worldRunningObservable
 } from '../shared/world/parcelSceneManager'
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
@@ -87,7 +88,7 @@ const browserInterface = {
         break
       }
       case 'ActivateRenderingACK': {
-        setLoadingScreenVisible(false)
+        worldRunningObservable.notifyObservers(true)
         break
       }
       default: {
@@ -359,6 +360,12 @@ export async function loadPreviewScene() {
 
 teleportObservable.add((position: { x: number; y: number }) => {
   unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
+})
+
+worldRunningObservable.add(isRunning => {
+  if (isRunning) {
+    setLoadingScreenVisible(false)
+  }
 })
 
 window['messages'] = (e: any) => chatObservable.notifyObservers(e)

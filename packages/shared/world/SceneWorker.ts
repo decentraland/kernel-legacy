@@ -12,6 +12,7 @@ import { Vector3, Quaternion, Vector2 } from 'decentraland-ecs/src/decentraland/
 import { PositionReport, positionObservable } from './positionThings'
 import { Observer, Observable } from 'decentraland-ecs/src'
 import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
+import { worldRunningObservable, isWorldRunning } from './worldState'
 
 // tslint:disable-next-line:whitespace
 type EngineAPI = import('../apis/EngineAPI').EngineAPI
@@ -57,6 +58,10 @@ export class SceneWorker {
   private readonly lastSentRotation = new Quaternion(0, 0, 0, 1)
   private positionObserver: Observer<any> | null = null
   private sceneLifeCycleObserver: Observer<any> | null = null
+  private worldRunningObserver: Observer<any> | null = null
+
+  private sceneReady: boolean = false
+  private sceneStarted: boolean = false
 
   constructor(public parcelScene: ParcelSceneAPI, transport?: ScriptingTransport) {
     parcelScene.registerWorker(this)
@@ -75,6 +80,10 @@ export class SceneWorker {
       if (this.sceneLifeCycleObserver) {
         sceneLifeCycleObservable.remove(this.sceneLifeCycleObserver)
         delete this.sceneLifeCycleObserver
+      }
+      if (this.worldRunningObserver) {
+        worldRunningObservable.remove(this.worldRunningObserver)
+        delete this.worldRunningObserver
       }
 
       this.enabled = false
@@ -127,14 +136,26 @@ export class SceneWorker {
     })
   }
 
-  private subscribeToSceneLifeCycleEvents() {
-    this.sceneLifeCycleObserver = sceneLifeCycleObservable.add(obj => {
-      if (this.parcelScene.data.sceneId === obj.sceneId) {
-        this.engineAPI!.sendSubscriptionEvent('sceneReady', {})
-      }
-
-      sceneLifeCycleObservable.remove(this.sceneLifeCycleObserver)
+  private subscribeToWorldRunningEvents() {
+    this.worldRunningObserver = worldRunningObservable.addOnce(isRunning => {
+      this.sendSceneReadyIfNecessary()
     })
+  }
+
+  private subscribeToSceneLifeCycleEvents() {
+    this.sceneLifeCycleObserver = sceneLifeCycleObservable.addOnce(obj => {
+      if (this.parcelScene.data.sceneId === obj.sceneId) {
+        this.sceneReady = true
+      }
+      this.sendSceneReadyIfNecessary()
+    })
+  }
+
+  private sendSceneReadyIfNecessary() {
+    if (!this.sceneStarted && isWorldRunning() && this.sceneReady) {
+      this.sceneStarted = true
+      this.engineAPI!.sendSubscriptionEvent('sceneStart', {})
+    }
   }
 
   private async startSystem(transport: ScriptingTransport) {
@@ -149,6 +170,7 @@ export class SceneWorker {
 
     this.subscribeToPositionEvents()
     this.subscribeToSceneLifeCycleEvents()
+    this.subscribeToWorldRunningEvents()
 
     return system
   }
