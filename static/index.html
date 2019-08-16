@@ -87,22 +87,23 @@
         height: 100%;
         display: inline-flex;
         background-color: #eb455a;
-        /* animation: progress_30 10s forwards; */
+        animation: progress_30 10s forwards;
       }
 
       .progress.loaded {
         z-index: 1;
       }
 
-      /* .progress.loaded .full {
+      .progress.loaded .full {
         animation: progress_50 5s forwards;
-      } */
-
-      .progress.loaded.ingame .full {
-        animation: progress_100 10s forwards;
       }
 
-      /* @keyframes progress_30 {
+      .progress.ingame .full {
+        animation: progress_100 10s forwards;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes progress_30 {
         from {
           width: 0;
         }
@@ -110,9 +111,9 @@
         to {
           width: 30%;
         }
-      } */
+      }
 
-      /* @keyframes progress_50 {
+      @keyframes progress_50 {
         from {
           width: 30%;
         }
@@ -120,7 +121,7 @@
         to {
           width: 50%;
         }
-      } */
+      }
 
       @keyframes progress_100 {
         from {
@@ -136,7 +137,7 @@
 
   <body class="dcl-loading">
     <div id="overlay"></div>
-    <div class="progress ingame">
+    <div id="progress-bar" class="progress ingame">
       <div class="full"></div>
     </div>
     <div id="gameContainer"></div>

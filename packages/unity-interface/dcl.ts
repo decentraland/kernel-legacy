@@ -101,6 +101,7 @@ const browserInterface = {
 
 function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
+  document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }
 
 const unityInterface = {
