@@ -310,6 +310,7 @@ async function initializeDecentralandUI() {
 
   await ensureUiApis(worker)
 
+  unityInterface.DeactivateRendering()
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
   unityInterface.LoadProfile(getUserProfile().profile)
 }
