@@ -227,6 +227,7 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
+  setLoadingScreenVisible(true)
   unityInterface.DeactivateRendering()
 
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
