@@ -150,11 +150,12 @@ const unityInterface = {
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   },
-
   ActivateRendering() {
     gameInstance.SendMessage('SceneController', 'ActivateRendering')
   },
-
+  DeactivateRendering() {
+    gameInstance.SendMessage('SceneController', 'DeactivateRendering')
+  },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   }
@@ -288,6 +289,7 @@ export async function startUnityParcelLoading() {
     },
     onPositionUnsettled: () => {
       setLoadingScreenVisible(true)
+      unityInterface.DeactivateRendering()
     }
   })
 }
