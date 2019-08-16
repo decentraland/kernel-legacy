@@ -66,6 +66,9 @@ export class SceneWorker {
   constructor(public parcelScene: ParcelSceneAPI, transport?: ScriptingTransport) {
     parcelScene.registerWorker(this)
 
+    this.subscribeToSceneLifeCycleEvents()
+    this.subscribeToWorldRunningEvents()
+
     this.loadSystem(transport)
       .then($ => this.system.resolve($))
       .catch($ => this.system.reject($))
@@ -143,11 +146,12 @@ export class SceneWorker {
   }
 
   private subscribeToSceneLifeCycleEvents() {
-    this.sceneLifeCycleObserver = sceneLifeCycleObservable.addOnce(obj => {
+    this.sceneLifeCycleObserver = sceneLifeCycleObservable.add(obj => {
       if (this.parcelScene.data.sceneId === obj.sceneId) {
         this.sceneReady = true
+        sceneLifeCycleObservable.remove(this.sceneLifeCycleObserver)
+        this.sendSceneReadyIfNecessary()
       }
-      this.sendSceneReadyIfNecessary()
     })
   }
 
@@ -169,8 +173,6 @@ export class SceneWorker {
     system.enable()
 
     this.subscribeToPositionEvents()
-    this.subscribeToSceneLifeCycleEvents()
-    this.subscribeToWorldRunningEvents()
 
     return system
   }
