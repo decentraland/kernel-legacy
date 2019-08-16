@@ -379,7 +379,7 @@ export default class GamekitScene extends Script {
         }
       }
 
-      this.eventSubscriber.once('sceneReady', () => {
+      this.eventSubscriber.once('sceneStart', () => {
         if (!this.manualUpdate) {
           this.startLoop()
         }
