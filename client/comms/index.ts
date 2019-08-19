@@ -11,7 +11,6 @@ import { Auth } from '../auth/Auth'
 export async function connect(auth: Auth) {
   let commsBroker: IBrokerConnection
 
-  debugger
   if (USE_LOCAL_COMMS) {
     const commsUrl = document.location.toString().replace(/^http/, 'ws')
     defaultLogger.log('Using WebSocket comms: ' + commsUrl)

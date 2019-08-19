@@ -51,6 +51,7 @@ export class Scene implements SceneManifest {
     if (!this._baseParcel) {
       this._baseParcel = getMinimum(this.parcels)
     }
+    debugger
     return this._baseParcel
   }
 
