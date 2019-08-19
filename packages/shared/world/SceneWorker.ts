@@ -140,14 +140,14 @@ export class SceneWorker {
   }
 
   private subscribeToWorldRunningEvents() {
-    this.worldRunningObserver = worldRunningObservable.addOnce(isRunning => {
+    this.worldRunningObserver = worldRunningObservable.add(isRunning => {
       this.sendSceneReadyIfNecessary()
     })
   }
 
   private subscribeToSceneLifeCycleEvents() {
     this.sceneLifeCycleObserver = sceneLifeCycleObservable.add(obj => {
-      if (this.parcelScene.data.sceneId === obj.sceneId) {
+      if (this.parcelScene.data.sceneId === obj.sceneId && obj.status === 'ready') {
         this.sceneReady = true
         sceneLifeCycleObservable.remove(this.sceneLifeCycleObserver)
         this.sendSceneReadyIfNecessary()
@@ -159,6 +159,7 @@ export class SceneWorker {
     if (!this.sceneStarted && isWorldRunning() && this.sceneReady) {
       this.sceneStarted = true
       this.engineAPI!.sendSubscriptionEvent('sceneStart', {})
+      worldRunningObservable.remove(this.worldRunningObserver)
     }
   }
 
