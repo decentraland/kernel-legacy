@@ -1,8 +1,4 @@
-import { Entity
-  , BoxShape
-  , engine, Vector3, Transform, Component, ISystem, Shape
-  , GLTFShape
- } from 'decentraland-ecs/src'
+import { Entity, BoxShape, engine, Vector3, Transform, Component, ISystem, Shape, GLTFShape, Animator, AnimationState, OnClick} from 'decentraland-ecs/src'
 
 @Component('Movement')
 export class PathMovement {
@@ -60,7 +56,7 @@ export class PingPongMovementSystem implements ISystem
 let movementSystem = new PingPongMovementSystem()
 engine.addSystem(movementSystem)
 
-export function spawnShape(waypointsPath: Vector3[], speed: number, shape: Shape) {
+export function configureShapePositions(waypointsPath: Vector3[], speed: number, shape: Shape) {
   const ent = new Entity()
   ent.addComponentOrReplace(shape)
   ent.addComponentOrReplace(
@@ -74,9 +70,9 @@ export function spawnShape(waypointsPath: Vector3[], speed: number, shape: Shape
   return ent
 }
 
-spawnShape([new Vector3(16, 1, 16)], 0.8, new BoxShape())
-spawnShape([new Vector3(-1, 1, 8), new Vector3(17, 1, 8)], 0.8, new BoxShape())
-spawnShape([new Vector3(8, 1, 16),
+configureShapePositions([new Vector3(16, 1, 16)], 0.8, new BoxShape())
+configureShapePositions([new Vector3(-1, 1, 8), new Vector3(17, 1, 8)], 0.8, new BoxShape())
+configureShapePositions([new Vector3(8, 1, 16),
           new Vector3(8, 1, 0),
           new Vector3(8, 1, -16),
           new Vector3(8, 1, -24),
@@ -86,4 +82,43 @@ spawnShape([new Vector3(8, 1, 16),
           new Vector3(24, 1, -40),
           new Vector3(24, 1, -24)
         ], 0.7, new BoxShape())
-spawnShape([new Vector3(32, 1, -16)], 0.7, new GLTFShape('models/shark.gltf'))
+
+// PUSHABLE SHARK
+let sharkEntity = configureShapePositions([new Vector3(32, 1, -16)], 0.7, new GLTFShape('models/shark.gltf'))
+let animator = new Animator()
+let clipSwim = new AnimationState('swim')
+animator.addClip(clipSwim)
+sharkEntity.addComponent(animator)
+clipSwim.play()
+
+let sharkLeftMovementTrigger = new Entity()
+sharkLeftMovementTrigger.addComponentOrReplace(new BoxShape());
+sharkLeftMovementTrigger.addComponent(
+  new Transform({
+    position: new Vector3(-0.25, 0, 0),
+    scale: new Vector3(0.3, 1, 2) // stretched out to "match" the shark's shape
+  })
+)
+sharkLeftMovementTrigger.addComponent(
+  new OnClick(e => {
+    sharkEntity.getComponent(Transform).position.x += 1
+  })
+)
+engine.addEntity(sharkLeftMovementTrigger)
+sharkLeftMovementTrigger.setParent(sharkEntity)
+
+let sharkRightMovementTrigger = new Entity()
+sharkRightMovementTrigger.addComponentOrReplace(new BoxShape());
+sharkRightMovementTrigger.addComponent(
+  new Transform({
+    position: new Vector3(0.25, 0, 0),
+    scale: new Vector3(0.3, 1, 2) // stretched out to "match" the shark's shape
+  })
+)
+sharkRightMovementTrigger.addComponent(
+  new OnClick(e => {
+    sharkEntity.getComponent(Transform).position.x -= 1
+  })
+)
+engine.addEntity(sharkRightMovementTrigger)
+sharkRightMovementTrigger.setParent(sharkEntity)
