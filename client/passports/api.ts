@@ -1,6 +1,6 @@
 import future from 'fp-future'
-import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from 'dcl/utils'
-import { getServerConfigurations } from 'dcl/config'
+import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from '@dcl/utils'
+import { getServerConfigurations } from '@dcl/config'
 
 import { StoredProfile, ResolvedProfile } from './types'
 import { Catalog } from '../assets/wearables/base'
@@ -18,7 +18,7 @@ export class ProfileStore {
 
   restoreProfileMapping() {
     // First version: just store it as a JSON
-    const values = getFromLocalStorage('dcl-profiles')
+    const values = getFromLocalStorage('@dcl-profiles')
     const result = new Map<string, StoredProfile>()
     if (!values) {
       return result
@@ -80,7 +80,7 @@ export class ProfileStore {
       version: rawData.profile.version
     }
     this.profileMap.set(rawData.userId, profile)
-    saveToLocalStorage('dcl-profiles', [...this.profileMap.values()])
+    saveToLocalStorage('@dcl-profiles', [...this.profileMap.values()])
     return profile
   }
 
@@ -156,7 +156,7 @@ async function getStoredPassportForUser(auth: Auth, userId: string) {
   })
 }
 
-const DCL_ASSET_BASE_URL = 'dcl://base-avatars/'
+const DCL_ASSET_BASE_URL = '@dcl://base-avatars/'
 
 function stripDclUriFrom(url: string) {
   return url.slice(DCL_ASSET_BASE_URL.length)

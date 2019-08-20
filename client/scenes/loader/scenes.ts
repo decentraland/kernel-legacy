@@ -1,7 +1,7 @@
 import future, { IFuture } from 'fp-future'
 import { EventEmitter } from 'events'
 
-import { Vector2 } from 'dcl/utils'
+import { Vector2 } from '@dcl/utils'
 
 import { SceneDataDownloadManager } from './download'
 import { SceneLifeCycleStatus } from './types'

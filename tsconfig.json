@@ -6,10 +6,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "dcl/rpc-common": ["bazel-genfiles/rpc/common"],
-      "dcl/rpc-client": ["bazel-genfiles/rpc/client"],
-      "dcl/rpc-host": ["bazel-genfiles/rpc/host"],
-      "dcl/*": ["bazel-genfiles/*"]
+      "@dcl/rpc-common": ["bazel-genfiles/rpc/common"],
+      "@dcl/rpc-client": ["bazel-genfiles/rpc/client"],
+      "@dcl/rpc-host": ["bazel-genfiles/rpc/host"],
+      "@dcl/*": ["bazel-genfiles/*"],
+      "@dcl/webb/*": ["webb/src/*", "bazel-genfiles/webb/*"]
     },
     "module": "esnext",
     "diagnostics": false,

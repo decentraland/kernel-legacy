@@ -10,12 +10,17 @@
     "module": "esnext",
     "moduleResolution": "node",
     "jsx": "react",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "~/*": ["./src/*"],
-      "@dcl/*": ["bazel-bin/*", "bazel-genfiles/*", "*"],
+      "~/*": ["./*"],
+      "@dcl/webb/*": ["./*"],
+      "@dcl/utils/*": ["../../utils/*"],
+      "@dcl/utils": ["../../utils"],
+      "@dcl/client": ["../../client"],
+      "@dcl/client/*": ["../../client/*"],
+      "@dcl/config": ["../../config"],
+      "@dcl/config/*": ["../../config/*"]
     },
     "downlevelIteration": true
-  },
-  "extends": "../tsconfig.json"
+  }
 }

@@ -1,10 +1,10 @@
-import { registerAPI, exposeMethod, API } from 'dcl/rpc-host'
+import { registerAPI, exposeMethod, API } from '@dcl/rpc-host'
 
 // THIS INTERFACE MOCKS THE chromedevtools API
 import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'
 import Protocol from 'devtools-protocol'
 
-import { ILogger, defaultLogger } from 'dcl/utils'
+import { ILogger, defaultLogger } from '@dcl/utils'
 
 export interface DevToolsServer {
   event<T extends keyof ProtocolMapping.Events>(type: T, params: ProtocolMapping.Events[T]): Promise<void>

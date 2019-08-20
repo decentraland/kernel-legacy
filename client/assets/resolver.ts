@@ -9,4 +9,4 @@ export function fetchAssetDescription(assetURI: string) {
 
 export default fetchAssetDescription
 
-// Should be: import { Assets } from 'dcl/config/Assets'
+// Should be: import { Assets } from '@dcl/config/Assets'

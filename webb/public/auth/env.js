@@ -4,11 +4,11 @@ var config = {
     client_id: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG'
   },
   today: {
-    domain: 'dcl-stg.auth0.com',
+    domain: '@dcl-stg.auth0.com',
     client_id: '0UB0I7w6QA3AgSvbXh9rGvDuhKrJV1C0'
   },
   zone: {
-    domain: 'dcl-test.auth0.com',
+    domain: '@dcl-test.auth0.com',
     client_id: 'lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx'
   }
 }

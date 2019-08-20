@@ -1,7 +1,7 @@
 // The rendering view
 import * as React from 'react'
 
-import * as Configuration from 'dcl/config'
+import * as Configuration from '@dcl/config'
 
 import { ConfigActionProperties, ConfigStateProperties } from './Config.types'
 import { DefaultDataVisualizer } from '~/components/Reusable/DefaultDataVisualizer'

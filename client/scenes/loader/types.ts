@@ -1,4 +1,4 @@
-import { parseParcelPosition, ILand } from 'dcl/utils'
+import { parseParcelPosition, ILand } from '@dcl/utils'
 
 export class ParcelLifeCycleStatus {
   x: number

@@ -1,4 +1,4 @@
-import { getServerConfigurations } from 'dcl/config'
+import { getServerConfigurations } from '@dcl/config'
 
 export type APIOptions = {
   baseURL?: string

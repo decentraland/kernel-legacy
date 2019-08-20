@@ -1,5 +1,5 @@
 // UTILS
-export * from 'dcl/utils'
+export * from '@dcl/utils'
 
 // Library
 export * from './lib/DevTools'

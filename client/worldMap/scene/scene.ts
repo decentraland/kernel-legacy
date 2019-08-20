@@ -10,9 +10,9 @@ import {
   decideFloat,
   parseCoordinate,
   getMinimum
-} from 'dcl/utils'
+} from '@dcl/utils'
 
-import { stableStringify, parcelLimits, sha256 } from 'dcl/utils'
+import { stableStringify, parcelLimits, sha256 } from '@dcl/utils'
 
 import { isValidSceneInput, getInvalidReason } from './validation'
 

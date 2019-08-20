@@ -1,5 +1,5 @@
-import { USE_LOCAL_COMMS, getServerConfigurations } from 'dcl/config'
-import { defaultLogger } from 'dcl/utils'
+import { USE_LOCAL_COMMS, getServerConfigurations } from '@dcl/config'
+import { defaultLogger } from '@dcl/utils'
 
 import { WorldInstanceConnection } from './worldInstanceConnection'
 

@@ -1,5 +1,5 @@
-import { Observable } from 'dcl/utils'
-import { getFromLocalStorage, saveToLocalStorage } from 'dcl/utils'
+import { Observable } from '@dcl/utils'
+import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils'
 
 export type ModerationEvent = {
   type: 'BlockedUser' | 'UnblockedUser' | 'MutedUser' | 'UnmutedUser'
@@ -16,9 +16,9 @@ export class SocialModeration {
 
   constructor() {
     const blocked: Set<string> = new Set(
-      getFromLocalStorage('dcl-blocked-users')
+      getFromLocalStorage('@dcl-blocked-users')
     )
-    const muted: Set<string> = new Set(getFromLocalStorage('dcl-muted-users'))
+    const muted: Set<string> = new Set(getFromLocalStorage('@dcl-muted-users'))
 
     for (let userId of blocked) {
       this.blockedUsersMap.set(userId, true)
@@ -62,7 +62,7 @@ export class SocialModeration {
     if (!this.blockedUsersMap.has(userId)) {
       this.blockedUsersMap.set(userId, true)
       saveToLocalStorage(
-        'dcl-blocked-users',
+        '@dcl-blocked-users',
         Array.from(this.blockedUsersMap.keys())
       )
       this.peerModerationObservable.notifyObservers({
@@ -79,7 +79,7 @@ export class SocialModeration {
     if (this.blockedUsersMap.has(userId)) {
       this.blockedUsersMap.delete(userId)
       saveToLocalStorage(
-        'dcl-blocked-users',
+        '@dcl-blocked-users',
         Array.from(this.blockedUsersMap.keys())
       )
       this.peerModerationObservable.notifyObservers({
@@ -97,7 +97,7 @@ export class SocialModeration {
     if (!this.mutedUsersMap.has(userId)) {
       this.mutedUsersMap.set(userId, true)
       saveToLocalStorage(
-        'dcl-muted-users',
+        '@dcl-muted-users',
         Array.from(this.mutedUsersMap.keys())
       )
       this.peerModerationObservable.notifyObservers({
@@ -115,7 +115,7 @@ export class SocialModeration {
     if (this.mutedUsersMap.has(userId)) {
       this.mutedUsersMap.delete(userId)
       saveToLocalStorage(
-        'dcl-muted-users',
+        '@dcl-muted-users',
         Array.from(this.mutedUsersMap.keys())
       )
       this.peerModerationObservable.notifyObservers({

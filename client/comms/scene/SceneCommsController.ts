@@ -1,13 +1,13 @@
 export class SceneCommsController {}
 // // tslint:disable:prefer-function-over-method
-// import { registerAPI, exposeMethod, APIOptions } from 'dclrpc/lib/host'
+// import { registerAPI, exposeMethod, APIOptions } from '@dclrpc/lib/host'
 //
 // import {
 //   sendParcelSceneCommsMessage,
 //   subscribeParcelSceneToCommsMessages,
 //   unsubscribeParcelSceneToCommsMessages
 // } from './actions'
-// import { EngineAPI } from 'dclscenes/EngineAPI'
+// import { EngineAPI } from '@dclscenes/EngineAPI'
 // import { ParcelIdentity } from './ParcelIdentity'
 // import { PeerInformation } from 'shared/comms/types'
 //

@@ -20,7 +20,7 @@ export default class AuthConnect extends React.Component {
           client.Auth.callback.resolve(true)
         })
       } else {
-        client.Auth.callback.resolve((this.modal.current as any).ref))
+        client.Auth.callback.resolve((this.modal.current as any).ref)
       }
     }
   }
@@ -28,13 +28,8 @@ export default class AuthConnect extends React.Component {
     return (
       <>
         <Page>
-          <Modal
-            size={'fullscreen'}
-            className='embed'
-            ref={this.modal as any}
-            open={true}
-          >
-            <Loader/>
+          <Modal size={'fullscreen'} className='embed' ref={this.modal as any} open={true}>
+            <Loader />
           </Modal>
         </Page>
       </>

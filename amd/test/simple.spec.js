@@ -4,7 +4,7 @@ describe('simple test with external module', () => {
     /* define global.dcl */ () => {
       global.dcl = {
         loadModule(moduleName) {
-          if (moduleName == 'dcl/test')
+          if (moduleName == '@dcl/test')
             return Promise.resolve({
               rpcHandle: '123',
               methods: [
@@ -64,7 +64,7 @@ describe('simple test with external module', () => {
         .catch(done)
     })
 
-    define('a', ['exports', 'dcl/test'], (exports, testDCL) => {
+    define('a', ['exports', '@dcl/test'], (exports, testDCL) => {
       exports.exportedTestDCL = testDCL
     })
   })

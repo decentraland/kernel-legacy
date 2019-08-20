@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Page, Center, Grid } from 'decentraland-ui'
+import { Page, Grid } from 'decentraland-ui'
 import { Switch, Route } from 'react-router'
 
 import { RootState } from '~/store'
@@ -12,13 +12,6 @@ import Config from '../Config'
 
 export default (_: RootState) => (
   <Page>
-    <div className='ui container'>
-      <div className='dcl hero' style={{ marginBottom: 0 }}>
-        <Center>
-          <h1>Webb</h1>
-        </Center>
-      </div>
-    </div>
     <StatusNav />
     <Grid>
       <Grid.Row>

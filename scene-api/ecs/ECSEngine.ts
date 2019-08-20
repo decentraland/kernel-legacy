@@ -13,7 +13,7 @@ import {
 import { EventManager } from './EventManager'
 import { ComponentGroup } from './ComponentGroup'
 
-import { log, error } from 'dcl/utils'
+import { log, error } from '@dcl/utils'
 
 /**
  * @internal

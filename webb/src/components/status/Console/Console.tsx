@@ -1,5 +1,5 @@
 import React from 'react'
-import { Validations } from 'dcl/client'
+import { Validations } from '@dcl/client'
 import { client } from '~/modules/systems'
 import { Segment } from 'decentraland-ui'
 const Terminal = require('react-console-emulator').default

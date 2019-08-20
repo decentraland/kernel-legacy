@@ -1,8 +1,8 @@
-import { EventSubscriber, inject, Script } from 'dcl/rpc-client'
-import { IEngineAPI, DecentralandInterface, DevTools } from 'dcl/scene-api'
+import { EventSubscriber, inject, Script } from '@dcl/rpc-client'
+import { IEngineAPI, DecentralandInterface, DevTools } from '@dcl/scene-api'
 import { generateInterface } from './generateDcl'
 import { customEval, getES5Context } from './sandbox'
-import { EntityAction, defaultLogger, RPCSendableMessage } from 'dcl/utils'
+import { EntityAction, defaultLogger, RPCSendableMessage } from '@dcl/utils'
 
 const FPS = 30
 const UPDATE_INTERVAL = 1000 / FPS

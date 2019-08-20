@@ -1,5 +1,5 @@
-import { MainController } from 'dcl/client'
-import { Observable } from 'dcl/utils'
+import { MainController } from '@dcl/client'
+import { Observable } from '@dcl/utils'
 import { Store, Middleware } from 'redux'
 
 export const client: MainController.MainController = new MainController.MainControllerImpl() as any

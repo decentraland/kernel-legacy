@@ -1,6 +1,6 @@
 import { BasicEphemeralKey, MessageInput } from './Ephemeral'
 
-import { defaultLogger } from 'dcl/utils'
+import { defaultLogger } from '@dcl/utils'
 import { Login } from './Login'
 import { API, APIOptions } from './api'
 

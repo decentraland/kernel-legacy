@@ -20,6 +20,7 @@ export const Routes = (
         <Switch>
           <Redirect to='/' path='/callback' />
           <Route exact path='/login' component={Auth} />
+          <Route exact path='/auth/login' component={Auth} />
 
           <Route exact path='/map' component={World} />
           <Route exact path='/map1' component={World} />

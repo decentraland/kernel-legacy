@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { PositionData } from 'dcl/protos'
+import { PositionData } from '@dcl/protos'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 
 export class Reporter extends EventEmitter {}
