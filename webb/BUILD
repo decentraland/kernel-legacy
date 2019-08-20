@@ -18,7 +18,10 @@ filegroup(
 filegroup(
     name = "public",
     srcs = glob(
-        include = ["public/**/*"],
+        include = [
+            "public/**/*",
+            "dist/**/*",
+        ],
     ),
 )
 
@@ -42,6 +45,10 @@ nodejs_binary(
         ":public",
         ":tsconfig.json",
         # Other modules
+        "//client",
+        "//utils",
+        "//config",
+        "//protos",
         "//client:package",
         "//utils:package",
         "//config:package",

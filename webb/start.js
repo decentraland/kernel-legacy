@@ -72,7 +72,6 @@ function watchStdin(action) {
   process.stdin.resume()
   process.stdin.on('data', async function() {
     action()
-    // fuse.sendPageReload()
   })
   process.stdin.on('end', function() {
     fuse.exit()
