@@ -13,8 +13,7 @@ ts_library(
         ],
     ),
     module_name = "@dcl/amd",
-    deps = [
-    ],
+    deps = [],
 )
 
 ts_library(
@@ -32,10 +31,7 @@ ts_library(
 load("@npm_bazel_karma//:defs.bzl", "ts_web_test_suite")
 
 ts_web_test_suite(
-    name = "test",
-    srcs = [
-        "amd.js",
-    ],
+    name = "test_suite",
     browsers = [
         "@io_bazel_rules_webtesting//browsers:chromium-local",
     ],
@@ -50,7 +46,7 @@ ts_web_test_suite(
 )
 
 jasmine_node_test(
-    name = "amd_test",
+    name = "test",
     srcs = [
         "test/simple.spec.js",
         ":dclamd",

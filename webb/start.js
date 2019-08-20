@@ -43,23 +43,23 @@ const fuse = FuseBox.init({
 
 fuse.register('@dcl/config', {
   homeDir: '../config',
-  main: 'index.ts',
-  instructions: '../config/**/**.ts'
+  main: 'index.js',
+  instructions: '../config/package/**'
 })
 fuse.register('@dcl/utils', {
-  homeDir: '../utils',
-  main: 'index.ts',
-  instructions: '../utils/**/**.ts'
+  homeDir: '../utils/package',
+  main: 'index.js',
+  instructions: '../utils/package/**'
 })
 fuse.register('@dcl/client', {
-  homeDir: '../client',
-  main: 'index.ts',
-  instructions: '../client/**/**.ts'
+  homeDir: '../client/package',
+  main: 'index.js',
+  instructions: '../client/package/**'
 })
 fuse.register('@dcl/protos', {
   homeDir: '../protos/package',
   main: 'index.js',
-  instructions: '../protos/**/**.js'
+  instructions: '../protos/**/**'
 })
 
 fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http server
