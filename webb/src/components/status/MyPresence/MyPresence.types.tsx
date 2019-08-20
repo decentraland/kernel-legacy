@@ -1,5 +1,5 @@
-import { PositionReport } from '@dcl/client'
-import { Vector3 } from '@dcl/utils'
+import { PositionReport } from 'dcl/client'
+import { Vector3 } from 'dcl/utils'
 
 export type MyPresenceStateProperties = {
   lastPlayerPositionReport: PositionReport

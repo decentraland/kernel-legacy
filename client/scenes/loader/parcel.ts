@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { Vector2 } from '@dcl/utils'
+import { Vector2 } from 'dcl/utils'
 
 import { ParcelConfigurationOptions, parcelsInScope } from './scope'
 import { ParcelLifeCycleStatus } from './types'

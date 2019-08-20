@@ -1,6 +1,6 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { jsonFetch } from '@dcl/utils'
+import { jsonFetch } from 'dcl/utils'
 
 import { AuthRootState } from '~/modules/auth'
 

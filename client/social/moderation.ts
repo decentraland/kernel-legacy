@@ -1,5 +1,5 @@
-import { Observable } from '@dcl/utils'
-import { getFromLocalStorage, saveToLocalStorage } from '@dcl/utils'
+import { Observable } from 'dcl/utils'
+import { getFromLocalStorage, saveToLocalStorage } from 'dcl/utils'
 
 export type ModerationEvent = {
   type: 'BlockedUser' | 'UnblockedUser' | 'MutedUser' | 'UnmutedUser'

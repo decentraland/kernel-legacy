@@ -1,5 +1,5 @@
-import { parcelLimits } from '@dcl/utils'
-import { getServerConfigurations } from '@dcl/config'
+import { parcelLimits } from 'dcl/utils'
+import { getServerConfigurations } from 'dcl/config'
 
 import { SubsystemController } from '../subsystems'
 import { SceneLoader } from '../../scenes/loader'

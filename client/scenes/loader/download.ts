@@ -1,5 +1,5 @@
 import { future, IFuture } from 'fp-future'
-import { IScene, ILand, createLogger, jsonFetch, ParcelInfoResponse } from '@dcl/utils'
+import { IScene, ILand, createLogger, jsonFetch, ParcelInfoResponse } from 'dcl/utils'
 
 const logger = createLogger('DownloadManager')
 const { error } = logger

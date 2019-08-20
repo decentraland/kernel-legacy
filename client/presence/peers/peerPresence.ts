@@ -1,5 +1,5 @@
-import { Vector3 } from '@dcl/utils'
-import { ReadOnlyQuaternion } from '@dcl/utils'
+import { Vector3 } from 'dcl/utils'
+import { ReadOnlyQuaternion } from 'dcl/utils'
 
 /**
  * This class

@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { Vector2 } from '@dcl/utils'
+import { Vector2 } from 'dcl/utils'
 
 import { SceneDataDownloadManager } from './download'
 import { ParcelLifeCycleController } from './parcel'

@@ -1,4 +1,4 @@
-import { getServerConfigurations } from '@dcl/config'
+import { getServerConfigurations } from 'dcl/config'
 import future, { IFuture } from 'fp-future'
 
 import { SubsystemController } from '../subsystems'

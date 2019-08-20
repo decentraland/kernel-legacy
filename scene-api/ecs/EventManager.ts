@@ -1,4 +1,4 @@
-import { error } from '@dcl/utils'
+import { error } from 'dcl/utils'
 import { newId } from './IdGenerator'
 
 const eventNameSymbol = '__event_name__'

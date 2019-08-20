@@ -1,6 +1,6 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { intersectLogger } from '@dcl/utils'
+import { intersectLogger } from 'dcl/utils'
 
 import { AuthRootState } from '~/modules/auth'
 

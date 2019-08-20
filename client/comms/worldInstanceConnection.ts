@@ -1,9 +1,9 @@
 import { Message } from 'google-protobuf'
 
-import { createLogger } from '@dcl/utils'
-import { parcelLimits } from '@dcl/utils'
+import { createLogger } from 'dcl/utils'
+import { parcelLimits } from 'dcl/utils'
 
-import { Category, ChatData, PositionData, ProfileData, DataHeader } from '@dcl/protos'
+import { Category, ChatData, PositionData, ProfileData, DataHeader } from 'dcl/protos'
 import {
   MessageType,
   PingMessage,
@@ -14,7 +14,7 @@ import {
   MessageHeader,
   TopicIdentityMessage,
   TopicIdentityFWMessage
-} from '@dcl/protos'
+} from 'dcl/protos'
 
 import { Position, position2parcel } from './utils'
 import { UserInformation } from './types'

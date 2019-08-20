@@ -1,6 +1,6 @@
 import * as secp256k1 from 'secp256k1'
 
-import { sha256 as digest } from '@dcl/utils'
+import { sha256 as digest } from 'dcl/utils'
 
 export function getCurrentEpoch(): number {
   return parseInt((Date.now() / 1000).toString(), 10) // GetTime retrieves milliseconds

@@ -1,11 +1,11 @@
 import { future, IFuture } from 'fp-future'
 import { Message } from 'google-protobuf'
 
-import { Communications } from '@dcl/config'
-import { ILogger, createLogger } from '@dcl/utils'
-import { Observable } from '@dcl/utils'
+import { Communications } from 'dcl/config'
+import { ILogger, createLogger } from 'dcl/utils'
+import { Observable } from 'dcl/utils'
 
-import { AuthData } from '@dcl/protos'
+import { AuthData } from 'dcl/protos'
 import {
   WelcomeMessage,
   WebRtcMessage,
@@ -14,7 +14,7 @@ import {
   MessageType,
   AuthMessage,
   Role
-} from '@dcl/protos'
+} from 'dcl/protos'
 
 import { SocketReadyState } from './worldInstanceConnection'
 import { Stats } from './Reporter'

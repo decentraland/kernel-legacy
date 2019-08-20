@@ -50,29 +50,29 @@ const fuse2 = FuseBox.init({
   sourceMap: false,
   plugins: [JSONPlugin()],
   alias: {
-    '@dcl/client': '~/client/index',
-    '@dcl/utils': '~/utils/index',
-    '@dcl/protos': '~/protos/index',
-    '@dcl/config': '~/config/index'
+    'dcl/client': '~/client/index',
+    'dcl/utils': '~/utils/index',
+    'dcl/protos': '~/protos/index',
+    'dcl/config': '~/config/index'
   }
 })
 
-fuse2.register('@dcl/config', {
+fuse2.register('dcl/config', {
   homeDir: './config',
   main: 'index.ts',
   instructions: '**/**.ts'
 })
-fuse2.register('@dcl/utils', {
+fuse2.register('dcl/utils', {
   homeDir: './utils',
   main: 'index.ts',
   instructions: '**/**.ts'
 })
-fuse2.register('@dcl/client', {
+fuse2.register('dcl/client', {
   homeDir: './client',
   main: 'index.ts',
   instructions: '**/**.ts'
 })
-fuse2.register('@dcl/protos', {
+fuse2.register('dcl/protos', {
   homeDir: './protos/package',
   main: 'index.js',
   instructions: '**/**.js'

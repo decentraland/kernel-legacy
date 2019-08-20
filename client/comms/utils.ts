@@ -1,4 +1,4 @@
-import { parcelLimits } from '@dcl/utils'
+import { parcelLimits } from 'dcl/utils'
 
 export type Position = [number, number, number, number, number, number, number]
 

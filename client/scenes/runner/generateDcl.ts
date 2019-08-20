@@ -9,8 +9,8 @@ import {
   ComponentDisposedPayload,
   ComponentUpdatedPayload,
   EntityAction
-} from '@dcl/utils'
-import { EventSubscriber } from '@dcl/rpc-client'
+} from 'dcl/utils'
+import { EventSubscriber } from 'dcl/rpc-client'
 
 const componentNameRE = /^(engine\.)/
 

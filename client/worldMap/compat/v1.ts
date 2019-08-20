@@ -1,4 +1,4 @@
-import { ILand } from '@dcl/utils'
+import { ILand } from 'dcl/utils'
 import { Scene } from '../scene'
 
 export function upgradeToV2(scene: ILand | any, mappings?: any) {

@@ -1,5 +1,5 @@
-import { error } from '@dcl/utils'
-import { Observable, Observer } from '@dcl/utils'
+import { error } from 'dcl/utils'
+import { Observable, Observer } from 'dcl/utils'
 
 import { DecentralandInterface, ModuleDescriptor, IEvents } from './Types'
 
