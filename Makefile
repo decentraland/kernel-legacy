@@ -48,9 +48,27 @@ packages/build-ecs/%.js: packages/build-ecs/%.ts
 
 build-support: $(COMPILED_SUPPORT_JS_FILES) packages/build-ecs/index.js scripts/tsconfig.json packages/build-ecs/tsconfig.json
 
-build-hell-map:
+HELLMAP_SOURCE_FILES := $(wildcard public/hell-map/*/game.ts)
+HELLMAP_GAMEJS_FILES := $(subst .ts,.js,$(DECENTRALAND_ECS_SOURCES))
+
+public/hell-map/%/game.js: public/hell-map/%/game.ts
 	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
 	$(COMPILER) build.hell-map.json
+
+build-hell-map: $(HELLMAP_GAMEJS_FILES) packages/decentraland-ecs/dist/index.d.ts
+
+ECS_CONFIG_DEPENDENCIES := packages/decentraland-ecs/package.json packages/decentraland-ecs/tsconfig.json
+DECENTRALAND_ECS_SOURCES := $(wildcard packages/decentraland-ecs/src/**/*.ts)
+DECENTRALAND_ECS_COMPILED_FILES := packages/decentraland-ecs/dist/src/index.js
+packages/decentraland-ecs/dist/src/index.js: $(DECENTRALAND_ECS_SOURCES) $(ECS_CONFIG_DEPENDENCIES)
+	$(COMPILER) build.sdk.json
+
+test-dist: $(DECENTRALAND_ECS_COMPILED_FILES)
+
+packages/decentraland-ecs/dist/index.d.ts: $(DECENTRALAND_ECS_COMPILED_FILES)
+	$(COMPILER) build.sdk.json
+	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local --verbose
+	node ./scripts/buildEcsTypes.js
 
 build-test-scenes: build-sdk
 	@echo "$(GREEN)=================== Building test scenes ===================$(RESET)"
