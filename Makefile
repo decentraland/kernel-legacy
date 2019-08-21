@@ -35,9 +35,18 @@ build-sdk: build-support
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter markdown -i types/dcl -o docs
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter yaml -i types/dcl -o docs-yaml
 
-build-support:
+SOURCE_SUPPORT_TS_FILES := $(wildcard scripts/*.ts)
+COMPILED_SUPPORT_JS_FILES := $(subst .ts,.js,$(SOURCE_SUPPORT_TS_FILES))
+
+scripts/%.js: $(SOURCE_SUPPORT_TS_FILES)
 	@echo "$(GREEN)================== Building support files ==================$(RESET)"
 	$(COMPILER) build.support.json
+
+packages/build-ecs/%.js: packages/build-ecs/%.ts
+	@echo "$(GREEN)================== Building support files ==================$(RESET)"
+	$(COMPILER) build.support.json
+
+build-support: $(COMPILED_SUPPORT_JS_FILES) packages/build-ecs/index.js scripts/tsconfig.json packages/build-ecs/tsconfig.json
 
 build-hell-map:
 	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
