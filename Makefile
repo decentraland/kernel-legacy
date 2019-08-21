@@ -111,7 +111,14 @@ generate-images:
 			make generate-images-local
 	$(MAKE) generate-mocks
 
-generate-mocks:
+generate-mocks: public/local-ipfs/mappings
+
+PARCEL_SCENE_JSONS := $(wildcard public/test-parcels/*/scene.json)
+ECS_SCENE_JSONS := $(wildcard public/ecs-parcels/*/scene.json)
+HELLMAP_SCENE_JSONS := $(wildcard public/hell-map/*/scene.json)
+SCENE_JSONS := $(PARCEL_SCENE_JSONS) $(ECS_SCENE_JSONS) $(HELLMAP_SCENE_JSONS)
+
+public/local-ipfs/mappings: ./scripts/createMockJson.js $(SCENE_JSONS)
 	$(NODE) ./scripts/createMockJson.js
 
 lint:
