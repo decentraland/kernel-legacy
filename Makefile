@@ -58,11 +58,16 @@ packages/decentraland-ecs/types/dcl/index.d.ts: $(COMPILED_SUPPORT_JS_FILES) $(D
 	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local
 	@node ./scripts/buildEcsTypes.js
 
+docs: $(DECENTRALAND_ECS_TYPEDEF_FILE)
+	@echo "$(GREEN)======================= Updating docs ======================$(RESET)"
+	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter markdown -i types/dcl -o docs
+	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-documenter yaml -i types/dcl -o docs-yaml
+
 HELLMAP_SOURCE_FILES := $(wildcard public/hell-map/*/game.ts)
 HELLMAP_GAMEJS_FILES := $(subst .ts,.js,$(HELLMAP_SOURCE_FILES))
 
-public/hell-map/%/game.js: public/hell-map/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
-	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
+public/hell-map/%/game.js: $(COMPILED_SUPPORT_JS_FILES) public/hell-map/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
+	@echo "$(GREEN)===================== Building Hell Map Scenes ====================$(RESET)"
 	$(COMPILER) build.hell-map.json
 
 build-hell-map: $(HELLMAP_GAMEJS_FILES)
@@ -70,23 +75,27 @@ build-hell-map: $(HELLMAP_GAMEJS_FILES)
 TEST_SCENES_SOURCE_FILES := $(wildcard public/test-scenes/*/game.ts)
 TEST_SCENES_GAMEJS_FILES := $(subst .ts,.js,$(TEST_SCENES_SOURCE_FILES))
 
-public/test-scenes/%/game.js: public/test-scenes/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
-	@echo "$(GREEN)===================== Building test scenes =================$(RESET)"
+public/test-scenes/%/game.js: $(COMPILED_SUPPORT_JS_FILES) public/test-scenes/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
+	@echo "$(GREEN)===================== Building Unit Test Scenes =================$(RESET)"
 	$(COMPILER) build.test-scenes.json
 
-build-test-scenes: $(TEST_SCENES_GAMEJS_FILES)
+TEST_ECS_SCENE_SOURCES := $(wildcard public/ecs-scenes/*/game.ts)
+TEST_ECS_SCENE_GAMEJS_FILES := $(subst .ts,.js,$(TEST_ECS_SCENE_SOURCES))
 
-build-test-scenes: build-sdk
-	@echo "$(GREEN)=================== Building test scenes ===================$(RESET)"
-	$(COMPILER) build.test-scenes.json
-	$(MAKE) build-hell-map
+public/ecs-scenes/%/game.js: $(COMPILED_SUPPORT_JS_FILES) public/ecs-scenes/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
+	@echo "$(GREEN)===================== Building ECS Test Scenes =================$(RESET)"
 	node scripts/buildECSprojects.js
 
-export-preview: | clean compile-entry-points
+build-test-scenes: $(TEST_SCENES_GAMEJS_FILES) $(HELLMAP_GAMEJS_FILES) $(TEST_ECS_SCENE_GAMEJS_FILES)
+
+static/dist/%.js: packages/entryPoints/%.ts
+	$(COMPILER) build.entryPoints.json
+
+export-preview: static/dist/preview.js
 	@echo "$(GREEN)============== Exporting Preview File to CLI ===============$(RESET)"
 	cp static/dist/preview.js ${DCL_PROJECT}/node_modules/decentraland-ecs/artifacts/
 
-publish:
+publish: static/dist/unity.js
 	@echo "$(GREEN)=================== getting release ready ==================$(RESET)"
 	$(NODE) ./scripts/prepareDist.js
 
@@ -147,7 +156,7 @@ generate-images:
 generate-mocks: public/local-ipfs/mappings
 
 PARCEL_SCENE_JSONS := $(wildcard public/test-scenes/*/scene.json)
-ECS_SCENE_JSONS := $(wildcard public/ecs-parcels/*/scene.json)
+ECS_SCENE_JSONS := $(wildcard public/ecs-scenes/*/scene.json)
 HELLMAP_SCENE_JSONS := $(wildcard public/hell-map/*/scene.json)
 SCENE_JSONS := $(PARCEL_SCENE_JSONS) $(ECS_SCENE_JSONS) $(HELLMAP_SCENE_JSONS)
 
