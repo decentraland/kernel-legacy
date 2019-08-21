@@ -21,7 +21,7 @@ const ipfsMock: any[] = []
 const ipfsMockFilename = path.resolve(__dirname, '../public/local-ipfs/mappings')
 
 glob
-  .sync(path.resolve(__dirname, '../public/test-parcels/*/scene.json'), { absolute: true })
+  .sync(path.resolve(__dirname, '../public/test-scenes/*/scene.json'), { absolute: true })
   .concat(glob.sync(path.resolve(__dirname, '../public/ecs-parcels/*/scene.json'), { absolute: true }))
   .concat(glob.sync(path.resolve(__dirname, '../public/hell-map/*/scene.json'), { absolute: true }))
   .forEach(file => {

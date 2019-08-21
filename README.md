@@ -50,7 +50,7 @@ Visual tests are meant to work in a similar way as `snapshot tests`. Each time a
 
 ### Test parcels
 
-It is possible to define new parcels inside this repo for testing purposes. To do so, create a new folder in `public/test-parcels`. There are several conventions to be followed regarding the name of these folders and the positions of the parcels, these can be found in the [README](https://github.com/decentraland/client/blob/master/public/test-parcels/README.md) file.
+It is possible to define new parcels inside this repo for testing purposes. To do so, create a new folder in `public/test-scenes`. There are several conventions to be followed regarding the name of these folders and the positions of the parcels, these can be found in the [README](https://github.com/decentraland/client/blob/master/public/test-scenes/README.md) file.
 
 All test parcels must be registered in the `mock.json` file located in the same folder. Using the `test-local:` prefix means that the parcel will only be available while running the client locally.
 

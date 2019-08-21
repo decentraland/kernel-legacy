@@ -46,7 +46,7 @@
   {
     "name": "Compile test scenes",
     "kind": "Webpack",
-    "file": "./public/test-parcels/*/scene.tsx",
+    "file": "./public/test-scenes/*/scene.tsx",
     "target": "webworker"
   },
   {

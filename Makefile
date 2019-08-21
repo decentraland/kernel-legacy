@@ -39,36 +39,42 @@ SOURCE_SUPPORT_TS_FILES := $(wildcard scripts/*.ts)
 COMPILED_SUPPORT_JS_FILES := $(subst .ts,.js,$(SOURCE_SUPPORT_TS_FILES))
 
 scripts/%.js: $(SOURCE_SUPPORT_TS_FILES)
-	@echo "$(GREEN)================== Building support files ==================$(RESET)"
-	$(COMPILER) build.support.json
+	npx tsc --build scripts/tsconfig.json
 
 packages/build-ecs/%.js: packages/build-ecs/%.ts
-	@echo "$(GREEN)================== Building support files ==================$(RESET)"
-	$(COMPILER) build.support.json
+	npx tsc --build packages/build-ecs/tsconfig.json
 
 build-support: $(COMPILED_SUPPORT_JS_FILES) packages/build-ecs/index.js scripts/tsconfig.json packages/build-ecs/tsconfig.json
-
-HELLMAP_SOURCE_FILES := $(wildcard public/hell-map/*/game.ts)
-HELLMAP_GAMEJS_FILES := $(subst .ts,.js,$(DECENTRALAND_ECS_SOURCES))
-
-public/hell-map/%/game.js: public/hell-map/%/game.ts
-	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
-	$(COMPILER) build.hell-map.json
-
-build-hell-map: $(HELLMAP_GAMEJS_FILES) packages/decentraland-ecs/dist/index.d.ts
+	@echo "$(GREEN)================== Support files built ==================$(RESET)"
 
 ECS_CONFIG_DEPENDENCIES := packages/decentraland-ecs/package.json packages/decentraland-ecs/tsconfig.json
 DECENTRALAND_ECS_SOURCES := $(wildcard packages/decentraland-ecs/src/**/*.ts)
-DECENTRALAND_ECS_COMPILED_FILES := packages/decentraland-ecs/dist/src/index.js
+DECENTRALAND_ECS_COMPILED_FILES := packages/decentraland-ecs/dist/src/index.js packages/decentraland-ecs/dist/index.d.ts
 packages/decentraland-ecs/dist/src/index.js: $(DECENTRALAND_ECS_SOURCES) $(ECS_CONFIG_DEPENDENCIES)
 	$(COMPILER) build.sdk.json
 
-test-dist: $(DECENTRALAND_ECS_COMPILED_FILES)
+DECENTRALAND_ECS_TYPEDEF_FILE := packages/decentraland-ecs/types/dcl/index.d.ts
+packages/decentraland-ecs/types/dcl/index.d.ts: $(COMPILED_SUPPORT_JS_FILES) $(DECENTRALAND_ECS_COMPILED_FILES) $(DECENTRALAND_ECS_SOURCES) $(ECS_CONFIG_DEPENDENCIES)
+	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local
+	@node ./scripts/buildEcsTypes.js
 
-packages/decentraland-ecs/dist/index.d.ts: $(DECENTRALAND_ECS_COMPILED_FILES)
-	$(COMPILER) build.sdk.json
-	cd $(PWD)/packages/decentraland-ecs; $(PWD)/node_modules/.bin/api-extractor run --typescript-compiler-folder "$(PWD)/node_modules/typescript" --local --verbose
-	node ./scripts/buildEcsTypes.js
+HELLMAP_SOURCE_FILES := $(wildcard public/hell-map/*/game.ts)
+HELLMAP_GAMEJS_FILES := $(subst .ts,.js,$(HELLMAP_SOURCE_FILES))
+
+public/hell-map/%/game.js: public/hell-map/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
+	@echo "$(GREEN)===================== Building hell map ====================$(RESET)"
+	$(COMPILER) build.hell-map.json
+
+build-hell-map: $(HELLMAP_GAMEJS_FILES)
+
+TEST_SCENES_SOURCE_FILES := $(wildcard public/test-scenes/*/game.ts)
+TEST_SCENES_GAMEJS_FILES := $(subst .ts,.js,$(TEST_SCENES_SOURCE_FILES))
+
+public/test-scenes/%/game.js: public/test-scenes/%/game.ts packages/decentraland-ecs/types/dcl/index.d.ts
+	@echo "$(GREEN)===================== Building test scenes =================$(RESET)"
+	$(COMPILER) build.test-scenes.json
+
+build-test-scenes: $(TEST_SCENES_GAMEJS_FILES)
 
 build-test-scenes: build-sdk
 	@echo "$(GREEN)=================== Building test scenes ===================$(RESET)"
@@ -140,7 +146,7 @@ generate-images:
 
 generate-mocks: public/local-ipfs/mappings
 
-PARCEL_SCENE_JSONS := $(wildcard public/test-parcels/*/scene.json)
+PARCEL_SCENE_JSONS := $(wildcard public/test-scenes/*/scene.json)
 ECS_SCENE_JSONS := $(wildcard public/ecs-parcels/*/scene.json)
 HELLMAP_SCENE_JSONS := $(wildcard public/hell-map/*/scene.json)
 SCENE_JSONS := $(PARCEL_SCENE_JSONS) $(ECS_SCENE_JSONS) $(HELLMAP_SCENE_JSONS)
@@ -166,7 +172,7 @@ watch: compile-dev
 
 FILE=-100.*
 watch-single:
-	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-scenes/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
 	@node_modules/.bin/concurrently \
 		-n "entryPoints,debug-scene,server" \
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
@@ -174,7 +180,7 @@ watch-single:
 			"node ./scripts/runTestServer.js --keep-open"
 
 watch-single-no-server:
-	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-parcels/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
+	@echo '[{"name": "Debug","kind": "Webpack","file": "public/test-scenes/$(FILE)/game.ts","target": "web"}]' > build.single-debug.json
 	@node_modules/.bin/concurrently \
 		-n "entryPoints,debug-scene" \
 			"$(PARALLEL_COMPILER) build.entryPoints.json --watch" \
@@ -205,8 +211,6 @@ initialize-ecs-npm-link: build-sdk
 	ln -sf $(CWD)/static/unity packages/decentraland-ecs/artifacts/unity
 	ln -sf $(CWD)/static/unity-preview.html packages/decentraland-ecs/artifacts/unity-preview.html
 	cd packages/decentraland-ecs; npm link
-
-
 
 dev-watch:
 	@node_modules/.bin/concurrently \
