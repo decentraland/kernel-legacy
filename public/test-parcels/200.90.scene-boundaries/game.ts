@@ -1,4 +1,4 @@
-import { Entity, BoxShape, engine, Vector3, Transform, Component, ISystem, Shape, GLTFShape, Animator, AnimationState, OnClick} from 'decentraland-ecs/src'
+import { Entity, BoxShape, engine, Vector3, Transform, Component, ISystem, Shape, GLTFShape, Animator, AnimationState, OnClick, NFTShape} from 'decentraland-ecs/src'
 
 @Component('Movement')
 export class PathMovement {
@@ -56,7 +56,7 @@ export class PingPongMovementSystem implements ISystem
 let movementSystem = new PingPongMovementSystem()
 engine.addSystem(movementSystem)
 
-export function configureShapePositions(waypointsPath: Vector3[], speed: number, shape: Shape) {
+export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: number, shape: Shape) {
   const ent = new Entity()
   ent.addComponentOrReplace(shape)
   ent.addComponentOrReplace(
@@ -70,9 +70,10 @@ export function configureShapePositions(waypointsPath: Vector3[], speed: number,
   return ent
 }
 
-configureShapePositions([new Vector3(16, 1, 16)], 0.8, new BoxShape())
-configureShapePositions([new Vector3(-1, 1, 8), new Vector3(17, 1, 8)], 0.8, new BoxShape())
-configureShapePositions([new Vector3(8, 1, 16),
+configureShapeEntityPositions([new Vector3(-3, 1, -8), new Vector3(35, 1, -8)], 0.2, new NFTShape('ethereum://0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/558536'))
+configureShapeEntityPositions([new Vector3(16, 1, 16)], 0.8, new BoxShape())
+configureShapeEntityPositions([new Vector3(-1, 1, 8), new Vector3(17, 1, 8)], 0.8, new BoxShape())
+configureShapeEntityPositions([new Vector3(8, 1, 16),
           new Vector3(8, 1, 0),
           new Vector3(8, 1, -16),
           new Vector3(8, 1, -24),
@@ -84,7 +85,7 @@ configureShapePositions([new Vector3(8, 1, 16),
         ], 0.7, new BoxShape())
 
 // PUSHABLE SHARK
-let sharkEntity = configureShapePositions([new Vector3(32, 1, -16)], 0.7, new GLTFShape('models/shark.gltf'))
+let sharkEntity = configureShapeEntityPositions([new Vector3(32, 1, -16)], 0.7, new GLTFShape('models/shark.gltf'))
 let animator = new Animator()
 let clipSwim = new AnimationState('swim')
 animator.addClip(clipSwim)
@@ -95,8 +96,8 @@ let sharkLeftMovementTrigger = new Entity()
 sharkLeftMovementTrigger.addComponentOrReplace(new BoxShape());
 sharkLeftMovementTrigger.addComponent(
   new Transform({
-    position: new Vector3(-0.25, 0, 0),
-    scale: new Vector3(0.3, 1, 2) // stretched out to "match" the shark's shape
+    position: new Vector3(-0.25, 2, 0),
+    scale: new Vector3(0.3, 1, 3)
   })
 )
 sharkLeftMovementTrigger.addComponent(
@@ -111,8 +112,8 @@ let sharkRightMovementTrigger = new Entity()
 sharkRightMovementTrigger.addComponentOrReplace(new BoxShape());
 sharkRightMovementTrigger.addComponent(
   new Transform({
-    position: new Vector3(0.25, 0, 0),
-    scale: new Vector3(0.3, 1, 2) // stretched out to "match" the shark's shape
+    position: new Vector3(0.25, 2, 0),
+    scale: new Vector3(0.3, 1, 3)
   })
 )
 sharkRightMovementTrigger.addComponent(
