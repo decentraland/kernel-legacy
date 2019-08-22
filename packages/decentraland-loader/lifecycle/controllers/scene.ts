@@ -50,19 +50,24 @@ export class SceneLifeCycleController extends EventEmitter {
     )).filter(({ sceneId }) => sceneId !== undefined) as { position: string; sceneId: SceneId }[]
 
     positionSceneIds.forEach(async ({ position, sceneId }) => {
-      const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
-      this.sceneParcelSightCount.set(sceneId, previousSightCount + 1)
+      try {
+        const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
+        this.sceneParcelSightCount.set(sceneId, previousSightCount + 1)
 
-      if (!this.sceneStatus.has(sceneId)) {
-        const data = await this.downloadManager.getParcelData(position)
-        if (data) {
-          this.sceneStatus.set(sceneId, new SceneLifeCycleStatus(data))
+        if (!this.sceneStatus.has(sceneId)) {
+          const data = await this.downloadManager.getParcelData(position)
+          if (data) {
+            this.sceneStatus.set(sceneId, new SceneLifeCycleStatus(data))
+          }
         }
-      }
 
-      if (this.sceneStatus.get(sceneId)!.isDead()) {
-        this.emit('Preload scene', sceneId)
-        this.sceneStatus.get(sceneId)!.status = 'awake'
+        if (this.sceneStatus.get(sceneId)!.isDead()) {
+          this.emit('Preload scene', sceneId)
+          this.sceneStatus.get(sceneId)!.status = 'awake'
+        }
+      } catch (e) {
+        defaultLogger.error(`error while loading scene ${sceneId}`)
+        defaultLogger.error(e)
       }
     })
 
@@ -96,9 +101,9 @@ export class SceneLifeCycleController extends EventEmitter {
     }
   }
 
-  isReady(sceneId: SceneId): boolean {
+  isRenderable(sceneId: SceneId): boolean {
     const status = this.sceneStatus.get(sceneId)
-    return !!status && status.isReady()
+    return !!status && (status.isReady() || status.isFailed())
   }
 
   reportStatus(sceneId: string, status: SceneLifeCycleStatusType) {
@@ -109,7 +114,7 @@ export class SceneLifeCycleController extends EventEmitter {
     }
     lifeCycleStatus.status = status
 
-    this.emit('Scene ready', sceneId)
+    this.emit('Scene status', { sceneId, status })
   }
 
   async requestSceneId(position: string): Promise<string | undefined> {
