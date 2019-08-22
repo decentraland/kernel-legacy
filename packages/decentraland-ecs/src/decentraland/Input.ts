@@ -4,7 +4,7 @@
 import { DecentralandInterface, PointerEvent } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
-import { defaultLogger } from 'shared/logger'
+import { log } from '../ecs/helpers'
 
 declare let dcl: DecentralandInterface | void
 
@@ -99,8 +99,8 @@ export class Input {
       dcl.subscribe('pointerDown')
 
       dcl.onEvent(event => {
-        defaultLogger.log(event.type)
-        defaultLogger.log(event.data)
+        log('Hola', event.type)
+        log('Hola', JSON.stringify(event.data))
 
         if (event.type === 'pointerUp') {
           this.handlePointerUp(event.data as PointerEvent)

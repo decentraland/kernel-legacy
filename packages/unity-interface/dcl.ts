@@ -68,6 +68,8 @@ const browserInterface = {
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
     const scene = getSceneWorkerBySceneID(data.sceneId)
 
+    console.log('Event: ', data.eventType)
+
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
