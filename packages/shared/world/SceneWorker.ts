@@ -10,7 +10,7 @@ import { EntityAction, EnvironmentData } from 'shared/types'
 import { EnvironmentAPI } from 'shared/apis/EnvironmentAPI'
 import { Vector3, Quaternion, Vector2 } from 'decentraland-ecs/src/decentraland/math'
 import { PositionReport, positionObservable } from './positionThings'
-import { Observer, Observable } from 'decentraland-ecs/src'
+import { Observer, Observable, PointerEvent } from 'decentraland-ecs/src'
 import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable, isWorldRunning } from './worldState'
 
@@ -137,6 +137,14 @@ export class SceneWorker {
 
       this.sendUserViewMatrix(obj)
     })
+  }
+
+  public dispatchPointerUp(pointerUp: PointerEvent) {
+    this.engineAPI!.sendSubscriptionEvent('pointerUp', pointerUp)
+  }
+
+  public dispatchPointerDown(pointerDown: PointerEvent) {
+    this.engineAPI!.sendSubscriptionEvent('pointerDown', pointerDown)
   }
 
   private subscribeToWorldRunningEvents() {

@@ -35,7 +35,7 @@ import {
 import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
-import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
+import { IEventNames, IEvents, PointerEvent } from '../decentraland-ecs/src/decentraland/Types'
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
@@ -43,6 +43,7 @@ import { queueTrackingEvent } from '../shared/analytics'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { pointerUpObservable } from '../shared/clickEvents'
 
 let gameInstance!: GameInstance
 
@@ -76,6 +77,13 @@ const browserInterface = {
     } else {
       defaultLogger.error(`SceneEvent: Scene ${data.sceneId} not found`, data)
     }
+  },
+
+  pointerUp(event: PointerEvent) {
+    pointerUpObservable.notifyObservers(event)
+  },
+  pointerDown(event: PointerEvent) {
+    pointerUpObservable.notifyObservers(event)
   },
 
   PreloadFinished(data: { sceneId: string }) {
