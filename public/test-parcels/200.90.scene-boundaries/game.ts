@@ -57,17 +57,17 @@ let movementSystem = new PingPongMovementSystem()
 engine.addSystem(movementSystem)
 
 export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: number, shape: Shape) {
-  const ent = new Entity()
-  ent.addComponentOrReplace(shape)
-  ent.addComponentOrReplace(
+  const entity = new Entity()
+  entity.addComponentOrReplace(shape)
+  entity.addComponentOrReplace(
     new Transform({
       position: waypointsPath[0]
     }))
 
-  ent.addComponentOrReplace(new PathMovement(waypointsPath, speed))
+  entity.addComponentOrReplace(new PathMovement(waypointsPath, speed))
 
-  engine.addEntity(ent)
-  return ent
+  engine.addEntity(entity)
+  return entity
 }
 
 configureShapeEntityPositions([new Vector3(-3, 1, -8), new Vector3(35, 1, -8)], 0.2, new NFTShape('ethereum://0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/558536'))
@@ -85,7 +85,7 @@ configureShapeEntityPositions([new Vector3(8, 1, 16),
         ], 0.7, new BoxShape())
 
 // PUSHABLE SHARK
-let sharkEntity = configureShapeEntityPositions([new Vector3(32, 1, -16)], 0.7, new GLTFShape('models/shark.gltf'))
+let sharkEntity = configureShapeEntityPositions([new Vector3(32, 1.2, -16)], 0.7, new GLTFShape('models/shark.gltf'))
 let animator = new Animator()
 let clipSwim = new AnimationState('swim')
 animator.addClip(clipSwim)
@@ -94,6 +94,7 @@ clipSwim.play()
 
 let sharkLeftMovementTrigger = new Entity()
 sharkLeftMovementTrigger.addComponentOrReplace(new BoxShape());
+sharkLeftMovementTrigger.setParent(sharkEntity)
 sharkLeftMovementTrigger.addComponent(
   new Transform({
     position: new Vector3(-0.25, 2, 0),
@@ -106,10 +107,10 @@ sharkLeftMovementTrigger.addComponent(
   })
 )
 engine.addEntity(sharkLeftMovementTrigger)
-sharkLeftMovementTrigger.setParent(sharkEntity)
 
 let sharkRightMovementTrigger = new Entity()
 sharkRightMovementTrigger.addComponentOrReplace(new BoxShape());
+sharkRightMovementTrigger.setParent(sharkEntity)
 sharkRightMovementTrigger.addComponent(
   new Transform({
     position: new Vector3(0.25, 2, 0),
@@ -122,4 +123,3 @@ sharkRightMovementTrigger.addComponent(
   })
 )
 engine.addEntity(sharkRightMovementTrigger)
-sharkRightMovementTrigger.setParent(sharkEntity)
