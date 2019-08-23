@@ -36,7 +36,7 @@ export class LifecycleManager extends TransportBasedServer {
 
   getCurrentScene() {
     const data = future<string>()
-    this.once('CurrentScene.response', (payload: string) => data.resolve(payload))
+    this.once('CurrentScene.response', (event: { payload: string }) => data.resolve(event.payload))
     this.notify('CurrentScene.request', {})
     return data
   }

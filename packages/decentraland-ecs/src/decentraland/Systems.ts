@@ -9,6 +9,27 @@ declare var dcl: DecentralandInterface | void
 /**
  * @public
  */
+export class PointerEventSystem implements ISystem {
+  activate(_: Engine) {
+    if (typeof dcl !== 'undefined') {
+      dcl.subscribe('pointerUp')
+      dcl.subscribe('pointerDown')
+    }
+  }
+
+  deactivate() {
+    if (typeof dcl !== 'undefined') {
+      dcl.unsubscribe('pointerUp')
+      dcl.unsubscribe('pointerDown')
+    }
+  }
+}
+/** @internal */
+export const pointerEventSystem = new PointerEventSystem()
+
+/**
+ * @public
+ */
 export class UUIDEventSystem implements ISystem {
   handlerMap: { [uuid: string]: OnUUIDEvent<any> } = {}
 
