@@ -129,6 +129,14 @@ export class SceneWorker {
     }
   }
 
+  public dispatchPointerUp(pointerUp: PointerEvent) {
+    this.engineAPI!.sendSubscriptionEvent('pointerUp', pointerUp)
+  }
+
+  public dispatchPointerDown(pointerDown: PointerEvent) {
+    this.engineAPI!.sendSubscriptionEvent('pointerDown', pointerDown)
+  }
+
   private subscribeToPositionEvents() {
     const position = Vector2.Zero()
 
@@ -137,14 +145,6 @@ export class SceneWorker {
 
       this.sendUserViewMatrix(obj)
     })
-  }
-
-  public dispatchPointerUp(pointerUp: PointerEvent) {
-    this.engineAPI!.sendSubscriptionEvent('pointerUp', pointerUp)
-  }
-
-  public dispatchPointerDown(pointerDown: PointerEvent) {
-    this.engineAPI!.sendSubscriptionEvent('pointerDown', pointerDown)
   }
 
   private subscribeToWorldRunningEvents() {

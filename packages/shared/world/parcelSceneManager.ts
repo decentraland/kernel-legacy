@@ -64,7 +64,7 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
   return parcelSceneWorker
 }
 
-export var parcelSceneWorker: LifecycleManager
+export let parcelSceneWorker: LifecycleManager
 
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
   const ret = (parcelSceneWorker = await initParcelSceneWorker())

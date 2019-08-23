@@ -43,7 +43,7 @@ import { queueTrackingEvent } from '../shared/analytics'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
-import { pointerUpObservable } from '../shared/clickEvents'
+import { pointerUpObservable, pointerDownObservable } from '../shared/clickEvents'
 
 let gameInstance!: GameInstance
 
@@ -68,9 +68,6 @@ const browserInterface = {
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
     const scene = getSceneWorkerBySceneID(data.sceneId)
-
-    console.log('Event: ', data.eventType)
-
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
@@ -83,7 +80,7 @@ const browserInterface = {
     pointerUpObservable.notifyObservers(event)
   },
   pointerDown(event: PointerEvent) {
-    pointerUpObservable.notifyObservers(event)
+    pointerDownObservable.notifyObservers(event)
   },
 
   PreloadFinished(data: { sceneId: string }) {
