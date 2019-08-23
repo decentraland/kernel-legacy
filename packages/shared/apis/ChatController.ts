@@ -193,7 +193,7 @@ export class ChatController extends ExposableAPI implements IChatController {
         id: uuid(),
         isCommand: true,
         sender: 'Decentraland',
-        message: strings ? `Users in range:\n${strings}` : 'No other players are near you'
+        message: strings ? `Players around you:\n${strings}` : 'No other players are near to your location'
       }
     })
 
