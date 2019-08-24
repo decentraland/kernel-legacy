@@ -13,7 +13,7 @@ export default class Comms extends React.PureComponent {
             <CommsStatus />
           </Grid.Column>
           <Grid.Column width={10}>
-            <Segment>Placeholder for logs</Segment>
+            <Segment>Placeholder logs</Segment>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>

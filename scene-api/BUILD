@@ -3,12 +3,31 @@ package(default_visibility = ["//visibility:public"])
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
+filegroup(
+    name = "srcs",
+    srcs = glob(
+        include = [
+            "**/*.ts",
+            "index.ts",
+        ],
+        exclude = [
+            "extract.ts",
+        ],
+    ),
+)
+
 ts_library(
     name = "scene-api",
-    srcs = glob([
-        "**/*.ts",
-        "index.ts",
-    ]),
+    srcs = glob(
+        include = [
+            "**/*.ts",
+            "index.ts",
+        ],
+        exclude = [
+            "extract.ts",
+        ],
+    ),
+    tsconfig = ":tsconfig.json",
     deps = [
         "//rpc/host",
         "//utils",
@@ -44,24 +63,38 @@ dcl_npm_package(
     ],
 )
 
+ts_library(
+    name = "extract-lib",
+    srcs = [
+        "extract.ts",
+    ],
+    tsconfig = "//:tsconfig.json",
+    deps = [
+        "@npm//@bazel/typescript",
+        "@npm//@microsoft/api-extractor",
+        "@npm//@types/node",
+        "@npm//typescript",
+    ],
+)
+
 nodejs_binary(
-    name = "api_extractor",
+    name = "extract",
     args = [
-        "run",
-        "--local",
-        "--verbose",
-        "--typescript-compiler-folder ../npm/node_modules/typescript",
-        "-c scene-api/api-extractor.json",
+        "scene-api/tsconfig.json",
+        "scene-api/index.d.ts",
     ],
     data = [
+        ":extract-lib",
         ":extractor-filedeps",
-        ":package",
+        ":package.json",
         ":scene-api",
+        "//rpc/common",
+        "//rpc/host",
         "//utils",
         "@npm//@bazel/typescript",
         "@npm//@microsoft/api-extractor",
         "@npm//typescript",
     ],
-    entry_point = "@npm//:node_modules/@microsoft/api-extractor/bin/api-extractor",
+    entry_point = ":extract.ts",
     visibility = ["//visibility:public"],
 )

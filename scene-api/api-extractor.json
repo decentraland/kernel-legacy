@@ -12,21 +12,21 @@
         "types/env"
       ]
     },
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
   "apiReport": {
     "enabled": true,
-    "reportFolder": "<projectFolder>/types/dcl/"
+    "reportFolder": "<projectFolder>"
   },
   "docModel": {
     "enabled": true,
-    "apiJsonFilePath": "types/dcl/decentraland-scene-api.api.json"
+    "apiJsonFilePath": "scene-api.json"
   },
   "dtsRollup": {
     "enabled": true,
-    "untrimmedFilePath": "types/dcl/index-full.d.ts",
-    "betaTrimmedFilePath": "types/dcl/index-beta.d.ts",
-    "publicTrimmedFilePath": "<projectFolder>/index.d.ts"
+    "untrimmedFilePath": "scene-api-full.d.ts",
+    "betaTrimmedFilePath": "scene-api-beta.d.ts",
+    "publicTrimmedFilePath": "cene-api.d.ts"
   },
   "tsdocMetadata": {
     "enabled": true

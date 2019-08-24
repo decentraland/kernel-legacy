@@ -1,25 +1,40 @@
 import { ObservableComponent, Component } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color4 } from '@dcl/utils'
+import { Color4 } from '../../utils/math/Color4'
 
+/**
+ * @public
+ */
 export class Wearable {
   category!: string
   contentName!: string
 }
 
+/**
+ * @public
+ */
 export class Skin {
   color!: Color4
 }
 
+/**
+ * @public
+ */
 export class Hair {
   color!: Color4
 }
 
+/**
+ * @public
+ */
 export class Face {
   mask!: string
   texture!: string
 }
 
+/**
+ * @public
+ */
 export class Eyes extends Face {
   color!: Color4
 }

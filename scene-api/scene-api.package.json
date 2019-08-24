@@ -1,3 +1,6 @@
 {
-  "name": "@dcl/scene-api"
+  "name": "@dcl/scene-api",
+  "dependencies": {
+    "@dcl/utils": "$DCL_VERSION"
+  }
 }

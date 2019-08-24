@@ -74,7 +74,7 @@ export abstract class SubsystemController {
   protected abstract onStart()
 
   /**
-   * Called if the load was successful
+   * Call this from `onStart` if the load was successful
    */
   protected onSuccess() {
     this._status = 'Started'
@@ -82,7 +82,7 @@ export abstract class SubsystemController {
   }
 
   /**
-   * Called if the load resulted in an error
+   * Call this from `onStart` if the load resulted in an error
    */
   protected onError<T extends Error>(error: T) {
     this._status = 'Errored'
