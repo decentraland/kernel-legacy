@@ -8,44 +8,29 @@ filegroup(
     srcs = glob(
         include = [
             "**/*.ts",
-            "index.ts",
         ],
         exclude = [
             "extract.ts",
         ],
     ),
-)
-
-ts_library(
-    name = "standalone-scene-api",
-    srcs = glob(
-        include = [
-            "**/*.ts",
-            "index.ts",
-        ],
-        exclude = [
-            "extract.ts",
-        ],
-    ),
-    tsconfig = ":standalone.tsconfig.json",
-    deps = [
-        "//rpc",
-        "//utils",
-        "@npm//@types/node",
-        "@npm//devtools-protocol",
-    ],
 )
 
 ts_library(
     name = "scene-api",
     srcs = glob(
         include = [
-            "**/*.ts",
+            "ecs/*.ts",
+            "engine/*.ts",
+            "lib/*.ts",
+            "schema/*.ts",
+            "index.ts",
         ],
         exclude = [
             "extract.ts",
+            "init.ts",
         ],
     ),
+    module_name = "@dcl/scene-api",
     deps = [
         "//rpc",
         "//utils",
@@ -95,23 +80,23 @@ ts_library(
     ],
 )
 
-nodejs_binary(
-    name = "extract",
-    args = [
-        "scene-api/standalone.tsconfig.json",
-        "scene-api/index.d.ts",
-    ],
-    data = [
-        ":extract-lib",
-        ":extractor-filedeps",
-        ":package.json",
-        ":standalone-scene-api",
-        "//rpc",
-        "//utils",
-        "@npm//@bazel/typescript",
-        "@npm//@microsoft/api-extractor",
-        "@npm//typescript",
-    ],
-    entry_point = ":extract.ts",
-    visibility = ["//visibility:public"],
-)
+# nodejs_binary(
+#     name = "extract",
+#     args = [
+#         "scene-api/standalone.tsconfig.json",
+#         "scene-api/index.d.ts",
+#     ],
+#     data = [
+#         ":extract-lib",
+#         ":extractor-filedeps",
+#         ":package.json",
+#         ":standalone-scene-api",
+#         "//rpc",
+#         "//utils",
+#         "@npm//@bazel/typescript",
+#         "@npm//@microsoft/api-extractor",
+#         "@npm//typescript",
+#     ],
+#     entry_point = ":extract.ts",
+#     visibility = ["//visibility:public"],
+# )

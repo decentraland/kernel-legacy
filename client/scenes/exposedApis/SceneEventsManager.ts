@@ -1,16 +1,18 @@
-import { APIOptions, exposeMethod, registerAPI, ExposableAPI } from '@dcl/rpc'
+import { registerAPI, ExposableAPI } from '@dcl/rpc'
+import { APIOptions, exposeMethod } from '@dcl/rpc/common/API'
 import { defaultLogger } from '@dcl/utils'
 import { EntityAction } from '@dcl/utils/BagOfThings'
 import { IEventsAPI } from './IEventsAPI'
 import { IEventNames, IEvents } from '@dcl/scene-api'
 import { IEventsManager } from './IEventsManager'
+import { IParcelSceneAPI } from '../types/IParcelSceneAPI'
 
 /**
  * This is the interface to handle queries from the scene scripts, but this runs on the main thread
  */
 @registerAPI('EngineAPI')
 export class SceneEventsManager extends ExposableAPI implements IEventsAPI, IEventsManager {
-  parcelSceneAPI!: ParcelSceneAPI
+  parcelSceneAPI!: IParcelSceneAPI
 
   subscribedEventListeners: Partial<Record<IEventNames, (data: any) => void>> = {}
 

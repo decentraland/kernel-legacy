@@ -7,4 +7,5 @@ export interface IParcelSceneAPI {
   registerWorker(worker: ISceneWorker): void
   dispose(): void
   on(event: string, cb: (event: any) => void): void
+  off(event: string, cb: (event: any) => void): void
 }

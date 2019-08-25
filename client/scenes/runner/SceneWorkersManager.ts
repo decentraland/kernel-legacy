@@ -1,14 +1,13 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-
 import { ISceneManifest } from '@dcl/utils'
+
 import { ISceneWorker } from '../types/ISceneWorker'
-import { SceneManifest } from '../worldMap/scene/SceneManifest'
 
 export abstract class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
-  sceneManifests = new Map<string, Scene>()
+  sceneManifests = new Map<string, ISceneManifest>()
 
-  constructor(public bootstrapScene: (scene: SceneManifest, transport: ScriptingTransport) => ISceneWorker) {}
+  constructor(public bootstrapScene: (scene: ISceneManifest, transport: ScriptingTransport) => ISceneWorker) {}
 
   getSceneWorkerBySceneID(sceneId: string) {
     return this.loadedSceneWorkers.get(sceneId)
@@ -30,7 +29,7 @@ export abstract class SceneWorkersManager {
     worker.dispose()
   }
 
-  loadScene(scene: Scene, transport: ScriptingTransport) {
+  loadScene(scene: ISceneManifest, transport: ScriptingTransport) {
     const sceneId = scene.cannonicalCID
 
     let worker = this.loadedSceneWorkers.get(sceneId)
@@ -44,9 +43,9 @@ export abstract class SceneWorkersManager {
     return worker
   }
 
-  abstract onSceneAwake(scene: Scene)
-  abstract onSceneWillStart(scene: Scene)
-  abstract onSceneRunning(scene: Scene)
-  abstract onSceneWillUnload(scene: Scene)
-  abstract onSceneDidUnload(scene: Scene)
+  abstract onSceneAwake(scene: ISceneManifest)
+  abstract onSceneWillStart(scene: ISceneManifest)
+  abstract onSceneRunning(scene: ISceneManifest)
+  abstract onSceneWillUnload(scene: ISceneManifest)
+  abstract onSceneDidUnload(scene: ISceneManifest)
 }

@@ -1,11 +1,14 @@
 import { EventSubscriber, inject, Script } from '@dcl/rpc/client'
 import { DecentralandInterface, DevTools, IECSEngine } from '@dcl/scene-api'
+import { EntityAction, defaultLogger } from '@dcl/utils'
+
 import { generateDCLInterface } from '../generateDCLInterface'
 import { customEval, getES5Context } from './sandbox'
-import { EntityAction, defaultLogger } from '@dcl/utils'
 import { resolveMapping } from './resolveMapping'
 import { getEthereumProvider } from '../../exposedApis/ethereumProvider'
 import { UPDATE_INTERVAL } from './constants'
+import { SceneEventsManager } from '../../exposedApis/SceneEventsManager'
+import { ILifecycleAPI } from '../../exposedApis/ILifecycleAPI'
 
 export default class GamekitScene extends Script {
   @inject('EngineAPI')
@@ -92,7 +95,7 @@ export default class GamekitScene extends Script {
           this.startLoop()
         }
         this.onStartFunctions.push(() => {
-          const engine: IECSEngine = this.engine as any
+          const engine: IECSEngine & ILifecycleAPI = this.engine as any
           engine.startSignal().catch((e: Error) => this.onError(e))
         })
       } catch (e) {
@@ -131,7 +134,7 @@ export default class GamekitScene extends Script {
       if (this.events.length) {
         const batch = this.events.slice()
         this.events.length = 0
-        ;((this.engine as any) as IECSEngine).sendBatch(batch).catch((e: Error) => this.onError(e))
+        ;((this.engine as any) as SceneEventsManager).sendBatch(batch).catch((e: Error) => this.onError(e))
       }
     } catch (e) {
       this.onError(e)

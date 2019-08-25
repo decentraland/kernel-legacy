@@ -1,6 +1,7 @@
 import { IEventNames } from '@dcl/scene-api'
+import { IECSActionsReporting } from './IECSActionsAPI'
 
-export interface IEventsAPI {
+export interface IEventsAPI extends IECSActionsReporting {
   /**
    * Subscribes to events dispatched by the EngineAPI
    * Scripts use it to listen to events from the scene (like `click`)

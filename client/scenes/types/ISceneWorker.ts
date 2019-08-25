@@ -1,7 +1,7 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-
 import { Observable } from '@dcl/utils'
-import { SceneManifest } from 'client/worldMap/scene/SceneManifest'
+
+import { SceneManifest } from '../../worldMap/scene/SceneManifest'
 
 export interface ISceneWorker {
   scene: SceneManifest
