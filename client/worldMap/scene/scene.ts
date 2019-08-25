@@ -1,7 +1,7 @@
 import {
   UnsanitizedSceneManifest,
   Coordinate,
-  SceneManifest,
+  ISceneManifest,
   NonEmptyCoordinateArray,
   AssetDefinition,
   AssetTagDefinition,
@@ -16,7 +16,7 @@ import { stableStringify, parcelLimits, sha256 } from '@dcl/utils'
 
 import { isValidSceneInput, getInvalidReason } from './validation'
 
-export class Scene implements SceneManifest {
+export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest
 
   private _cannonicalRepresentation?: string

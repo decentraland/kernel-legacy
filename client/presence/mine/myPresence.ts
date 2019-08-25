@@ -2,8 +2,8 @@ const qs = require('querystring')
 import { MVector3, ReadOnlyVector3, ReadOnlyQuaternion, MVector2, ReadOnlyVector2 } from '@dcl/utils'
 import { Observable, Quaternion, worldToGrid, Vector3, playerConfigurations } from '@dcl/utils'
 
-import { SceneLoader } from '../../scenes/loader'
 import { upgradeToV2 } from '../../worldMap/compat/v1'
+import { SceneLoader } from '../../scenes/loader/SceneLoader'
 
 export type PositionReport = {
   /** Camera position, world space */

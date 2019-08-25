@@ -1,18 +1,5 @@
 import { Vector3 } from '../Vector'
 
-export interface SceneManifest {
-  version: number
-  assets: AssetDefinition[]
-  assetTags: AssetTagDefinition[]
-  requiredAssets: AssetDefinition[]
-  main: string
-  referenceSystem: ReferenceSystem
-  parcels: NonEmptyCoordinateArray
-  spawnPoints: SpawnPoint[]
-  title: string
-  screenshot: string
-}
-
 export interface UnsanitizedSceneManifest {
   version: number
   assets: AssetDefinition[]

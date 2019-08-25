@@ -1,25 +1,14 @@
 import { ScriptingTransport } from '@dcl/rpc-common/json-rpc/types'
-import { Observable } from '@dcl/utils'
 
 import { Scene } from '../../worldMap/scene'
+import { ISceneWorker } from '../types/ISceneWorker'
+import { SceneManifest } from 'client/worldMap/scene/scene'
 
-export class SceneWorker {
-  scene: Scene
-  transport: ScriptingTransport
-  constructor(scene: Scene, transport: ScriptingTransport) {
-    this.scene = scene
-    this.transport = transport
-  }
-  persistent: boolean
-  dispose: Function
-  onDisposeObservable: Observable<string>
-}
-
-export abstract class SceneRunner {
-  loadedSceneWorkers = new Map<string, SceneWorker>()
+export abstract class SceneWorkersManager {
+  loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, Scene>()
 
-  constructor() {}
+  constructor(public bootstrapScene: (scene: SceneManifest, transport: ScriptingTransport) => ISceneWorker) {}
 
   getSceneWorkerBySceneID(sceneId: string) {
     return this.loadedSceneWorkers.get(sceneId)
@@ -37,7 +26,7 @@ export abstract class SceneRunner {
     this._forceStopSceneWorker(worker)
   }
 
-  private _forceStopSceneWorker(worker: SceneWorker) {
+  private _forceStopSceneWorker(worker: ISceneWorker) {
     worker.dispose()
   }
 
@@ -46,7 +35,7 @@ export abstract class SceneRunner {
 
     let worker = this.loadedSceneWorkers.get(sceneId)
     if (!worker) {
-      worker = new SceneWorker(scene, transport)
+      worker = this.bootstrapScene(scene, transport)
       this.loadedSceneWorkers.set(sceneId, worker)
       worker.onDisposeObservable.addOnce(() => {
         this.loadedSceneWorkers.delete(sceneId)

@@ -1,18 +1,14 @@
 import future, { IFuture } from 'fp-future'
 import { EventEmitter } from 'events'
-
 import { Vector2 } from '@dcl/utils'
-
-import { SceneDataDownloadManager } from './download'
-import { SceneLifeCycleStatus } from './types'
+import { SceneDataDownloadManager } from './SceneDataDownloadManager'
+import { SceneLifeCycleStatus } from '../types/SceneLifeCycleStatus'
 
 export class SceneLifeCycleController extends EventEmitter {
   private downloadManager: SceneDataDownloadManager
-
   private _positionToSceneId = new Map<string, string | undefined>()
   private futureOfPositionToSceneId = new Map<string, IFuture<string | undefined>>()
   private sceneStatus = new Map<string, SceneLifeCycleStatus>()
-
   private sceneParcelSightCount = new Map<string, number>()
 
   constructor(opts: { downloadManager: SceneDataDownloadManager }) {
@@ -36,24 +32,22 @@ export class SceneLifeCycleController extends EventEmitter {
 
   async onSight(position: string) {
     let sceneId = await this.requestSceneId(position)
-
     if (sceneId) {
       const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
       this.sceneParcelSightCount.set(sceneId, previousSightCount + 1)
-
       if (!this.sceneStatus.has(sceneId)) {
         const data = await this.downloadManager.getParcelData(position)
         if (data) {
           this.sceneStatus.set(sceneId, new SceneLifeCycleStatus(data))
         }
       }
-
       if (this.sceneStatus.get(sceneId)!.isDead()) {
         this.emit('Scene.awake', sceneId)
         this.sceneStatus.get(sceneId)!.status = 'awake'
       }
     }
   }
+
   async lostSight(position: string) {
     let sceneId = await this.requestSceneId(position)
     if (!sceneId) {
@@ -62,7 +56,6 @@ export class SceneLifeCycleController extends EventEmitter {
     const previousSightCount = this.sceneParcelSightCount.get(sceneId) || 0
     const newSightCount = previousSightCount - 1
     this.sceneParcelSightCount.set(sceneId, newSightCount)
-
     if (newSightCount <= 0) {
       const sceneStatus = this.sceneStatus.get(sceneId)
       if (sceneStatus && sceneStatus.isAwake()) {
@@ -87,17 +80,14 @@ export class SceneLifeCycleController extends EventEmitter {
       this.futureOfPositionToSceneId.set(position, future<string | undefined>())
       try {
         const land = await this.downloadManager.getParcelData(position)
-
         if (!land) {
           this.futureOfPositionToSceneId.get(position)!.resolve(undefined)
           return this.futureOfPositionToSceneId.get(position)!
         }
-
         for (const pos of land.scene.scene.parcels) {
           if (!this._positionToSceneId.has(pos)) {
             this._positionToSceneId.set(pos, land.sceneId)
           }
-
           const hasFuture = this.futureOfPositionToSceneId.has(pos)
           if (hasFuture) {
             const futurePosition = this.futureOfPositionToSceneId.get(pos)

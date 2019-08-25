@@ -5,7 +5,7 @@ type ModuleDescriptor = {
 
 type MethodDescriptor = { name: string }
 
-type DecentralandInterface = {
+type BasicRPCInterface = {
   loadModule(moduleName: string): PromiseLike<ModuleDescriptor>
   callRpc(moduleHandle: string, methodName: string, args: ArrayLike<any>): PromiseLike<any>
   onStart(cb: Function)
@@ -18,7 +18,7 @@ type Module = {
   handlers: Function[]
 }
 
-declare var dcl: DecentralandInterface
+declare var dcl: BasicRPCInterface
 declare var global: any
 declare var self: Window
 

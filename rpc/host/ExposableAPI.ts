@@ -1,8 +1,4 @@
-import { API, exposeMethod, getExposedMethods } from '@dcl/rpc/host'
-
-export interface IExposableAPI extends API {
-  _getExposedMethods(): Promise<string[]>
-}
+import { API, exposeMethod, getExposedMethods } from '../common/API'
 
 export class ExposableAPI extends API {
   @exposeMethod

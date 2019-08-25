@@ -1,4 +1,4 @@
-import { NumberOrRange } from './types'
+import { NumberOrRange } from './SceneManifestTypes'
 export function decideFloat(x: NumberOrRange) {
   if (typeof x === 'number') {
     return x

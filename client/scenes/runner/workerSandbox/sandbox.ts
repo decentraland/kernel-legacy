@@ -51,7 +51,7 @@ export async function customEval(code: string, context: any) {
 }
 
 export function getES5Context(base: Record<string, any>) {
-  whitelistES5.forEach($ => (base[$] = global[$]))
+  whitelistES5.forEach($ => (base[$ as any] = global[$]))
 
   return base
 }
