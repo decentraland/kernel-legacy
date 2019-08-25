@@ -1,4 +1,4 @@
-import { SceneManifest } from './scene'
+import { SceneManifest } from './SceneManifest'
 import * as Validations from './validation'
 
-export { SceneManifest as Scene, Validations }
+export { SceneManifest, Validations }

@@ -1,8 +1,8 @@
-import { ScriptingTransport } from '@dcl/rpc-common/json-rpc/types'
+import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
 
-import { Scene } from '../../worldMap/scene'
+import { ISceneManifest } from '@dcl/utils'
 import { ISceneWorker } from '../types/ISceneWorker'
-import { SceneManifest } from 'client/worldMap/scene/scene'
+import { SceneManifest } from '../worldMap/scene/SceneManifest'
 
 export abstract class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
@@ -14,14 +14,14 @@ export abstract class SceneWorkersManager {
     return this.loadedSceneWorkers.get(sceneId)
   }
 
-  stopSceneWorker(scene: string | Scene) {
+  stopSceneWorker(scene: string | ISceneManifest) {
     const worker = this.loadedSceneWorkers.get(typeof scene === 'string' ? scene : scene.cannonicalCID)
     if (worker && !worker.persistent) {
       this._forceStopSceneWorker(worker)
     }
   }
 
-  forceStopSceneWorker(scene: string | Scene) {
+  forceStopSceneWorker(scene: string | ISceneManifest) {
     const worker = this.loadedSceneWorkers.get(typeof scene === 'string' ? scene : scene.cannonicalCID)
     this._forceStopSceneWorker(worker)
   }

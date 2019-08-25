@@ -17,19 +17,14 @@
     "removeComments": false,
     "noUnusedLocals": true,
     "allowUmdGlobalAccess": true,
-    "baseUrl": "..",
-    "paths": {
-      "@dcl/utils": ["./utils"],
-      "@dcl/utils/*": ["./utils/*"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["extract.ts"],
   "include": [
-    "./utils/**/*.ts",
-    "./scene-api/ecs/**/*.ts",
-    "./scene-api/engine/**/*.ts",
-    "./scene-api/lib/**/*.ts",
-    "./scene-api/schema/**/*.ts",
-    "./scene-api/index.ts"
+    "./ecs/**/*.ts",
+    "./engine/**/*.ts",
+    "./lib/**/*.ts",
+    "./schema/**/*.ts",
+    "./index.ts"
   ]
 }

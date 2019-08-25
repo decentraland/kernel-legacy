@@ -1,9 +1,9 @@
 import { ILand } from '@dcl/utils'
-import { Scene } from '../scene'
+import { SceneManifest } from '../scene'
 
 export function upgradeToV2(scene: ILand | any, mappings?: any) {
   const raw = scene.mappingsResponse ? _upgradeToV2ILand(scene) : _upgradeToV2(scene, mappings)
-  return new Scene(raw)
+  return new SceneManifest(raw)
 }
 
 function _upgradeToV2ILand(scene: ILand) {

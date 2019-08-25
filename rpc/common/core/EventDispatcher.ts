@@ -1,7 +1,3 @@
-export interface Dictionary<T = any> {
-  [key: string]: T
-}
-
 const eventSplitter = /\s+/g
 
 export class EventDispatcherBinding {
@@ -53,7 +49,7 @@ export interface EventDispatcherEventsBase {
 }
 
 export class EventDispatcher<T = EventDispatcherEventsBase> {
-  private edBindings: Dictionary<EventDispatcherBinding[]> = {}
+  private edBindings: Record<string, EventDispatcherBinding[]> = {}
   private edBindCount = 0
 
   on<K extends keyof T>(event: K, callback: T[K], once?: boolean): EventDispatcherBinding

@@ -1,10 +1,11 @@
-import { registerAPI, exposeMethod, API } from '../../rpc/host'
+import { registerAPI } from '@dcl/rpc/host'
 
 // THIS INTERFACE MOCKS THE chromedevtools API
 import { ProtocolMapping } from 'devtools-protocol/types/protocol-mapping'
 import Protocol from 'devtools-protocol'
 
-import { ILogger, defaultLogger } from '../../utils'
+import { ILogger, defaultLogger } from '@dcl/utils'
+import { API, exposeMethod } from '@dcl/rpc/common/API'
 
 /**
  * @public

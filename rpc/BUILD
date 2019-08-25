@@ -3,9 +3,9 @@ package(default_visibility = ["//visibility:public"])
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 ts_library(
-    name = "common",
+    name = "rpc",
     srcs = glob(["**/*.ts"]),
-    module_name = "@dcl/rpc-common",
+    module_name = "@dcl/rpc",
     deps = [
         "@npm//@types",
     ],
@@ -18,9 +18,9 @@ dcl_npm_package(
     package_layers = [
         "//:common.package.json",
         "//:tslib.package.json",
-        "rpc-common.package.json",
+        "rpc.package.json",
     ],
     deps = [
-        ":common",
+        ":rpc",
     ],
 )

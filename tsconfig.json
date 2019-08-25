@@ -6,9 +6,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@dcl/rpc-common": ["bazel-genfiles/rpc/common"],
-      "@dcl/rpc-client": ["bazel-genfiles/rpc/client"],
-      "@dcl/rpc-host": ["bazel-genfiles/rpc/host"],
       "@dcl/*": ["bazel-genfiles/*", "bazel-bin/*"],
       "@dcl/webb/*": ["webb/src/*", "bazel-genfiles/webb/*"]
     },
@@ -27,7 +24,6 @@
     "tsBuildInfoFile": ".tsbuildinfo",
     "removeComments": false,
     "target": "es6",
-    "sourceMap": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "jsx": "react",

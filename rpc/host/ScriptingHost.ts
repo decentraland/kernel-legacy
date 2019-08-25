@@ -1,4 +1,3 @@
-import { Dictionary } from '../common/core/EventDispatcher'
 import { TransportBasedServer } from './TransportBasedServer'
 import { APIClass, API, APIOptions } from '../common/API'
 import { ScriptingTransport } from '../common/json-rpc/types'
@@ -11,7 +10,7 @@ const hasSymbol = typeof Symbol === 'function' && Symbol.for
 
 const apiNameSymbol: any = hasSymbol ? Symbol('pluginName') : 0xfea2
 
-const registeredAPIs: Dictionary<APIClass<API>> = {}
+const registeredAPIs: Record<string, APIClass<API>> = {}
 
 namespace PrivateHelpers {
   export function _registerAPI(apiName: string, api: APIClass<API>) {

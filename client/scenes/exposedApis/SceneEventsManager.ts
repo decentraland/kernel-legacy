@@ -1,8 +1,8 @@
-import { APIOptions, exposeMethod, registerAPI, ExposableAPI } from '@dcl/rpc-host'
+import { APIOptions, exposeMethod, registerAPI, ExposableAPI } from '@dcl/rpc'
 import { defaultLogger } from '@dcl/utils'
 import { EntityAction } from '@dcl/utils/BagOfThings'
 import { IEventsAPI } from './IEventsAPI'
-import { IEventNames, IEvents } from '../runner/generateDCLInterface/node_modules/@dcl/scene-api'
+import { IEventNames, IEvents } from '@dcl/scene-api'
 import { IEventsManager } from './IEventsManager'
 
 /**

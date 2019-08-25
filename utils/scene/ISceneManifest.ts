@@ -11,6 +11,7 @@ export interface ISceneManifest {
   assets: AssetDefinition[]
   assetTags: AssetTagDefinition[]
   requiredAssets: AssetDefinition[]
+  cannonicalCID: string
   main: string
   referenceSystem: ReferenceSystem
   parcels: NonEmptyCoordinateArray

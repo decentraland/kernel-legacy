@@ -25,7 +25,7 @@ ts_library(
         "main/**/*.ts",
         "passports/**/*.ts",
         "presence/**/*.ts",
-        "scenes/loader/**/*.ts",
+        "scenes/**/*.ts",
         "social/**/*.ts",
         "worldMap/**/*.ts",
     ]),
@@ -33,8 +33,7 @@ ts_library(
     deps = [
         "//config",
         "//protos",
-        "//rpc/client",
-        "//rpc/host",
+        "//rpc",
         "//scene-api",
         "//utils",
         "@npm//@types",

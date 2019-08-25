@@ -29,7 +29,7 @@ ts_library(
     ),
     tsconfig = ":tsconfig.json",
     deps = [
-        "//rpc/host",
+        "//rpc",
         "//utils",
         "@npm//@types/node",
         "@npm//devtools-protocol",
@@ -88,8 +88,7 @@ nodejs_binary(
         ":extractor-filedeps",
         ":package.json",
         ":scene-api",
-        "//rpc/common",
-        "//rpc/host",
+        "//rpc",
         "//utils",
         "@npm//@bazel/typescript",
         "@npm//@microsoft/api-extractor",

@@ -1,8 +1,9 @@
-import { Client } from '@dcl/rpc-common/json-rpc/Client'
-import { getApi } from '@dcl/rpc-common/json-rpc/API'
-import { ILogOpts, ScriptingTransport } from '@dcl/rpc-common/json-rpc/types'
-import { isPromiseLike } from '@dcl/rpc-common/core/isPromiseLike'
-import { hasOwnSymbol } from '@dcl/rpc-common/core/SymbolShim'
+import { Client } from '../common/json-rpc/Client'
+import { getApi } from '../common/json-rpc/getApi'
+import { ILogOpts, ScriptingTransport } from '../common/json-rpc/types'
+import { isPromiseLike } from '../common/core/isPromiseLike'
+import { hasOwnSymbol } from '../common/core/SymbolShim'
+import { API } from '../common/API'
 
 /** this is defined in the constructor ScriptingHost() */
 const loadAPIsNotificationName = 'LoadComponents'
@@ -18,8 +19,6 @@ const injectedAPISymbol = hasSymbol ? Symbol('injectedAPIs') : 0xfea0
 interface Script {
   systemDidEnable?(): Promise<void> | void
 }
-
-export type API = any
 
 /**
  * This function decorates parameters to load APIs
@@ -73,7 +72,7 @@ async function _injectAPIs(target: Script) {
   await target.loadAPIs(Array.from(injectedMap.values()))
 
   injectedMap.forEach(function(apiName: string, property) {
-    target[property] = target.loadedAPIs[apiName]
+    target[property as any] = target.loadedAPIs[apiName]
   })
 }
 

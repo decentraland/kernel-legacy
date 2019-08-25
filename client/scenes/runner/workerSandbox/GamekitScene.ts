@@ -1,4 +1,4 @@
-import { EventSubscriber, inject, Script } from '@dcl/rpc-client'
+import { EventSubscriber, inject, Script } from '@dcl/rpc/client'
 import { DecentralandInterface, DevTools, IECSEngine } from '@dcl/scene-api'
 import { generateDCLInterface } from '../generateDCLInterface'
 import { customEval, getES5Context } from './sandbox'

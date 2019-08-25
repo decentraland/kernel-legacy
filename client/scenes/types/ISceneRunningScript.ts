@@ -1,5 +1,5 @@
 import { EntityAction } from '@dcl/utils'
-import { EventSubscriber } from '@dcl/rpc-client'
+import { EventSubscriber } from '@dcl/rpc/client'
 
 export interface ISceneRunningScript {
   onLog: (...args: any) => void
