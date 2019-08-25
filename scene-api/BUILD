@@ -17,7 +17,7 @@ filegroup(
 )
 
 ts_library(
-    name = "scene-api",
+    name = "standalone-scene-api",
     srcs = glob(
         include = [
             "**/*.ts",
@@ -27,7 +27,25 @@ ts_library(
             "extract.ts",
         ],
     ),
-    tsconfig = ":tsconfig.json",
+    tsconfig = ":standalone.tsconfig.json",
+    deps = [
+        "//rpc",
+        "//utils",
+        "@npm//@types/node",
+        "@npm//devtools-protocol",
+    ],
+)
+
+ts_library(
+    name = "scene-api",
+    srcs = glob(
+        include = [
+            "**/*.ts",
+        ],
+        exclude = [
+            "extract.ts",
+        ],
+    ),
     deps = [
         "//rpc",
         "//utils",
@@ -40,7 +58,7 @@ filegroup(
     name = "extractor-filedeps",
     data = [
         "api-extractor.json",
-        "tsconfig.json",
+        "standalone.tsconfig.json",
     ],
 )
 
@@ -80,14 +98,14 @@ ts_library(
 nodejs_binary(
     name = "extract",
     args = [
-        "scene-api/tsconfig.json",
+        "scene-api/standalone.tsconfig.json",
         "scene-api/index.d.ts",
     ],
     data = [
         ":extract-lib",
         ":extractor-filedeps",
         ":package.json",
-        ":scene-api",
+        ":standalone-scene-api",
         "//rpc",
         "//utils",
         "@npm//@bazel/typescript",

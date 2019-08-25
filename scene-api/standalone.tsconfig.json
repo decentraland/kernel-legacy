@@ -17,14 +17,8 @@
     "removeComments": false,
     "noUnusedLocals": true,
     "allowUmdGlobalAccess": true,
-    "baseUrl": "."
+    "baseUrl": ".."
   },
-  "exclude": ["extract.ts"],
-  "include": [
-    "./ecs/**/*.ts",
-    "./engine/**/*.ts",
-    "./lib/**/*.ts",
-    "./schema/**/*.ts",
-    "./index.ts"
-  ]
+  "exclude": ["scene-api/extract.ts"],
+  "include": ["./utils/**/*.ts", "./rpc/**/*.ts", "./scene-api/**/*.ts"]
 }
