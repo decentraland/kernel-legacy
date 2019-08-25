@@ -1,5 +1,3 @@
-/// <amd-module name="@dcl/scene-api/ecs/Component"/>
-
 import { newId } from './IdGenerator'
 import { EventConstructor } from './EventManager'
 import { UIValue } from './UIValue'

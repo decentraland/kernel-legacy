@@ -1,6 +1,7 @@
 {
   "name": "@dcl/scene-api",
   "dependencies": {
-    "@dcl/utils": "$DCL_VERSION"
+    "@dcl/utils": "$DCL_VERSION",
+    "@dcl/rpc": "$DCL_VERSION"
   }
 }

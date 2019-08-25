@@ -1,6 +1,6 @@
 import { ObservableComponent, Component } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { Color4 } from '../../utils/math/Color4'
+import { Color4 } from '@dcl/utils/math/Color4'
 
 /**
  * @public

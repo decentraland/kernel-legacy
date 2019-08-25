@@ -1,4 +1,4 @@
-import { MVector3, Quaternion, Matrix, MathTmp, Color3 } from '../../utils'
+import { MVector3, Quaternion, Matrix, MathTmp, Color3 } from '@dcl/utils'
 
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
 import { AnimationState } from './AnimationState'
