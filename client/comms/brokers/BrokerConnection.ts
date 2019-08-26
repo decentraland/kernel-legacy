@@ -16,7 +16,7 @@ import {
   Role
 } from '@dcl/protos'
 
-import { SocketReadyState } from '../worldInstanceConnection'
+import { SocketReadyState } from '../types/SocketReadyState'
 import { Stats } from '../Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import Auth from '../../auth'

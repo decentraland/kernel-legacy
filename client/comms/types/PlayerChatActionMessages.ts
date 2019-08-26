@@ -1,5 +1,6 @@
 import { AvatarMessageType } from './AvatarMessageType'
-export type UserMessage = {
+
+export type PlayerChatAction = {
   type:
     | AvatarMessageType.SET_LOCAL_UUID
     | AvatarMessageType.USER_BLOCKED

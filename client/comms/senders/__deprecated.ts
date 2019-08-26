@@ -1,9 +1,27 @@
-import { parcelLimits } from '@dcl/utils'
+import { parcelLimits, worldToGrid } from '@dcl/utils'
 
 export type Position = [number, number, number, number, number, number, number]
 
 export class Parcel {
   constructor(public x: number, public z: number) {}
+}
+
+export function positionHashFromArray(p: number[]) {
+  const parcelCoordinates = { x: 0, y: 0 }
+  worldToGrid({ x: p[0], y: p[1], z: p[2] }, parcelCoordinates as any)
+  return positionHash(parcelCoordinates)
+}
+
+export function positionHashFromVector<T extends { x: number; y: number; z: number }>(p: T) {
+  const parcelCoordinates = { x: 0, y: 0 }
+  worldToGrid(p, parcelCoordinates as any)
+  return positionHash(parcelCoordinates)
+}
+
+export function positionHash(parcel: { x: number; y: number }) {
+  const x = (parcel.x + parcelLimits.maxParcelX) >> 2
+  const y = (parcel.y + parcelLimits.maxParcelZ) >> 2
+  return `${x}:${y}`
 }
 
 export function position2parcel(p: Position): Parcel {

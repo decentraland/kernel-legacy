@@ -1,6 +1,6 @@
-import { WorldInstanceConnection } from '../worldInstanceConnection'
-import { MyPresence } from '../../presence/mine/myPresence'
-import { sendPosition } from '../senders/position'
+import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
+import { MyPresence } from '../myPresence'
+import { sendPosition } from '../../../comms/senders/position'
 
 export const POSITION_BEACON_INTERVAL = 100
 

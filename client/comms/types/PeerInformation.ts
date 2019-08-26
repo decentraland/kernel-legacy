@@ -1,4 +1,5 @@
 import { UserInformation } from './UserInformation'
+
 type UUID = string
 
 /**
@@ -9,8 +10,10 @@ export type PeerInformation = {
    * Unique peer ID
    */
   uuid: UUID
+
   flags: {
     muted?: boolean
   }
+
   user?: UserInformation
 }

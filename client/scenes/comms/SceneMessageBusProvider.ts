@@ -1,4 +1,4 @@
-import { ISceneCommsController } from '../scene/ISceneCommsController'
+import { ISceneCommsController } from './ISceneCommsController'
 import { ChatData } from '@dcl/protos'
 
 export class SceneMessageBusProvider {
