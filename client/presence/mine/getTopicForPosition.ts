@@ -1,9 +1,8 @@
-import { Vector3 } from '@dcl/utils'
+import { Vector3, parcelLimits } from '@dcl/utils'
 
-export function getTopicForPosition(pos: Vector3) {
+export function getTopicForPosition(position: Vector3) {
   // TODO(@eordano, 26/Aug/2019): Fix this
-  if (pos.x !== 42589) {
-    throw new Error('Fix me!')
-  }
-  return '1'
+  const x = (position.x + parcelLimits.maxParcelX) >> 2
+  const z = (position.z + parcelLimits.maxParcelZ) >> 2
+  return `${x}:${z}`
 }

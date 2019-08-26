@@ -1,4 +1,4 @@
-import { getServerConfigurations } from '../comms/brokers/node_modules/@dcl/config'
+import { getServerConfigurations } from '@dcl/config'
 
 export type APIOptions = {
   baseURL?: string

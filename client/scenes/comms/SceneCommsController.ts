@@ -1,27 +1,22 @@
 import { registerAPI, ExposableAPI } from '@dcl/rpc/host'
 import { exposeMethod, APIOptions } from '@dcl/rpc/common/API'
 
-import {
-  sendParcelSceneCommsMessage,
-  subscribeParcelSceneToCommsMessages,
-  unsubscribeParcelSceneToCommsMessages
-} from './SceneToSceneComms'
+import { subscribeParcelSceneToCommsMessages, unsubscribeParcelSceneToCommsMessages } from './SceneToSceneComms'
 
-import { EngineAPI } from '@dcl/scenes-api/EngineAPI'
-import { PeerInformation } from 'shared/comms/types'
+import { IEventsManager } from '../exposedApis/IEventsManager'
+import { PeerInformation } from '@dcl/client/comms/types'
 
 @registerAPI('CommunicationsController')
 export class SceneCommsController extends ExposableAPI {
-  sceneInfo = this.options.getAPIInstance(SceneInformationProvider) as SceneInformationProvider
-  engineAPI = this.options.getAPIInstance(EngineAPI)
-
-  get cid() {
-    return this.sceneManifest.cannonicalCID
-  }
-
   constructor(public options: APIOptions) {
     super(options)
     subscribeParcelSceneToCommsMessages(this)
+  }
+
+  engineAPI = this.options.getAPIInstance() as IEventsManager
+
+  get cid() {
+    return '1' // this.sceneManifest.cannonicalCID
   }
 
   apiWillUnmount() {
@@ -29,7 +24,7 @@ export class SceneCommsController extends ExposableAPI {
     unsubscribeParcelSceneToCommsMessages(this)
   }
 
-  receiveCommsMessage(message: string, sender: PeerInformation) {
+  forwardNetworkToScript(message: string, sender: PeerInformation) {
     this.engineAPI.sendSubscriptionEvent('comms', {
       message,
       sender: sender.uuid
@@ -38,6 +33,6 @@ export class SceneCommsController extends ExposableAPI {
 
   @exposeMethod
   async send(message: string): Promise<void> {
-    sendParcelSceneCommsMessage(this.cid, message)
+    // checkAndForwardScriptToNetwork(this.cid, message)
   }
 }

@@ -32,7 +32,7 @@ export class BroadcastPresence {
   checkAndAnnouncePosition() {
     if (this.shouldSendPositionBeacon()) {
       const topic = this.myPresence.getTopicForCurrentPosition()
-      sendPosition(this.comms, topic, this.myPresence.getPositionReport())
+      sendPosition(this.comms, topic, this.myPresence.getPositionReport() as any)
     }
   }
 
