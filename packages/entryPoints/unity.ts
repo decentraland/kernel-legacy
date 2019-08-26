@@ -3,6 +3,7 @@ import { startUnityParcelLoading } from '../unity-interface/dcl'
 import { lastPlayerPosition, teleportObservable } from '../shared/world/positionThings'
 import defaultLogger from '../shared/logger'
 import { worldToGrid } from '../atomicHelpers/parcelScenePositions'
+import { registerPointerEvents } from '../shared/clickEvents'
 
 const container = document.getElementById('gameContainer')
 
@@ -11,6 +12,7 @@ if (!container) throw new Error('cannot find element #gameContainer')
 initializeUnity(container)
   .then(async _ => {
     await startUnityParcelLoading()
+    registerPointerEvents(false)
 
     _.instancedJS
       .then($ => {

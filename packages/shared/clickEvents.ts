@@ -5,32 +5,28 @@ import { parcelSceneWorker, getSceneWorkerBySceneID } from './world/parcelSceneM
 export const pointerUpObservable = new Observable<Readonly<PointerEvent>>()
 export const pointerDownObservable = new Observable<Readonly<PointerEvent>>()
 
-pointerUpObservable.add(async event => {
-  if (!parcelSceneWorker) {
-    return
-  }
-  const currentSceneId = await parcelSceneWorker.getCurrentScene()
-  if (!currentSceneId) {
-    return
-  }
-  const worker = getSceneWorkerBySceneID(currentSceneId)
-  if (!worker) {
-    return
-  }
-  worker.dispatchPointerUp(event)
-})
+export function registerPointerEvents(preview: boolean) {
+  pointerUpObservable.add(async event => {
+    const currentSceneId = preview ? 'previewScene' : parcelSceneWorker && (await parcelSceneWorker.getCurrentScene())
+    if (!currentSceneId) {
+      return
+    }
+    const worker = getSceneWorkerBySceneID(currentSceneId)
+    if (!worker) {
+      return
+    }
+    worker.dispatchPointerUp(event)
+  })
 
-pointerDownObservable.add(async event => {
-  if (!parcelSceneWorker) {
-    return
-  }
-  const currentSceneId = await parcelSceneWorker.getCurrentScene()
-  if (!currentSceneId) {
-    return
-  }
-  const worker = getSceneWorkerBySceneID(currentSceneId)
-  if (!worker) {
-    return
-  }
-  worker.dispatchPointerDown(event)
-})
+  pointerDownObservable.add(async event => {
+    const currentSceneId = preview ? 'previewScene' : parcelSceneWorker && (await parcelSceneWorker.getCurrentScene())
+    if (!currentSceneId) {
+      return
+    }
+    const worker = getSceneWorkerBySceneID(currentSceneId)
+    if (!worker) {
+      return
+    }
+    worker.dispatchPointerDown(event)
+  })
+}
