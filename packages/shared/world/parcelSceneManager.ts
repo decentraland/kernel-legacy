@@ -6,6 +6,8 @@ import { SceneDataDownloadManager } from 'decentraland-loader/lifecycle/controll
 import { positionObservable, teleportObservable } from './positionThings'
 import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
 import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
+import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
+import { worldRunningObservable } from './worldState'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
@@ -14,6 +16,8 @@ export type EnableParcelSceneLoadingOptions = {
   onSpawnpoint?: (initialLand: ILand) => void
   onLoadParcelScenes?(x: ILand[]): void
   onUnloadParcelScenes?(x: ILand[]): void
+  onPositionSettled?(): void
+  onPositionUnsettled?(): void
 }
 
 export const loadedSceneWorkers = new Map<string, SceneWorker>()
@@ -76,18 +80,34 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
   })
 
   ret.on('Scene.shouldStart', async (opts: { sceneId: string }) => {
-    const parcelSceneToStart = await ret.getParcelData(opts.sceneId)
+    const sceneId = opts.sceneId
+    const parcelSceneToStart = await ret.getParcelData(sceneId)
 
     // create the worker if don't exist
-    if (!getSceneWorkerBySceneID(opts.sceneId)) {
+    if (!getSceneWorkerBySceneID(sceneId)) {
       const parcelScene = new options.parcelSceneClass(ILandToLoadableParcelScene(parcelSceneToStart))
       loadParcelScene(parcelScene)
     }
 
+    const observer = sceneLifeCycleObservable.add(sceneStatus => {
+      if (sceneStatus.sceneId === sceneId) {
+        ret.notify('Scene.status', sceneStatus)
+      }
+      sceneLifeCycleObservable.remove(observer)
+    })
+
     // tell the engine to load the parcel scene
     if (options.onLoadParcelScenes) {
-      options.onLoadParcelScenes([await ret.getParcelData(opts.sceneId)])
+      options.onLoadParcelScenes([await ret.getParcelData(sceneId)])
     }
+
+    setTimeout(() => {
+      const worker = getSceneWorkerBySceneID(sceneId)
+      if (worker && !worker.sceneStarted) {
+        sceneLifeCycleObservable.remove(observer)
+        ret.notify('Scene.status', { sceneId, status: 'failed' })
+      }
+    }, 30000)
   })
 
   ret.on('Scene.shouldUnload', async (opts: { sceneId: string }) => {
@@ -101,18 +121,26 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     }
   })
 
-  ret.on('Position.settled', async (sceneId: string) => {
-    if (options.onSpawnpoint) {
-      options.onSpawnpoint(await ret.getParcelData(sceneId))
+  ret.on('Position.settled', async (opt: { sceneId: string }) => {
+    // TODO - readd spawnpoint - moliva - 15/08/2019
+    if (options.onPositionSettled) {
+      options.onPositionSettled()
     }
   })
 
+  ret.on('Position.unsettled', () => {
+    if (options.onPositionUnsettled) {
+      options.onPositionUnsettled()
+    }
+    worldRunningObservable.notifyObservers(false)
+  })
+
   teleportObservable.add((position: { x: number; y: number }) => {
-    ret.notify('User.setPosition', { position })
+    ret.notify('User.setPosition', { position, teleported: true })
   })
 
   positionObservable.add(obj => {
     worldToGrid(obj.position, position)
-    ret.notify('User.setPosition', { position })
+    ret.notify('User.setPosition', { position, teleported: false })
   })
 }

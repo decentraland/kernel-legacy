@@ -72,10 +72,11 @@ export class ChatController extends ExposableAPI implements IChatController {
       // If the message was not a command ("/cmdname"), then send message through wire
       const currentUser = getCurrentUser()
       if (!currentUser) throw new Error('cannotGetCurrentUser')
+      if (!currentUser.profile) throw new Error('profileNotInitialized')
       const newEntry = (entry = {
         id: uuid(),
         isCommand: false,
-        sender: currentUser.displayName || currentUser.publicKey || 'unknown',
+        sender: currentUser.profile.name || currentUser.userId || 'unknown',
         message
       })
 
@@ -126,33 +127,6 @@ export class ChatController extends ExposableAPI implements IChatController {
 
   // @internal
   initChatCommands() {
-    this.addChatCommand('setavatar', 'Sets avatar model', message => {
-      const avatarType = message
-        .split(' ')
-        .join('-')
-        .toLowerCase()
-
-      persistCurrentUser({ avatarType: avatarType })
-
-      return {
-        id: uuid(),
-        isCommand: true,
-        sender: 'Decentraland',
-        message: `Avatar type changed to ${message}.`
-      }
-    })
-
-    this.addChatCommand('setname', 'Sets your username', message => {
-      const avatarAttrs = persistCurrentUser({ displayName: message })
-
-      return {
-        id: uuid(),
-        isCommand: true,
-        sender: 'Decentraland',
-        message: `Display Name was changed to ${avatarAttrs.displayName}.`
-      }
-    })
-
     this.addChatCommand('goto', 'Teleport to another parcel', message => {
       const coordinates = parseParcelPosition(message)
       const isValid = isFinite(coordinates.x) && isFinite(coordinates.y)
@@ -190,13 +164,14 @@ export class ChatController extends ExposableAPI implements IChatController {
     })
 
     this.addChatCommand('getname', 'Gets your username', message => {
-      const avatarAttrs = getCurrentUser()
-      if (!avatarAttrs) throw new Error('cannotGetCurrentUser')
+      const currentUser = getCurrentUser()
+      if (!currentUser) throw new Error('cannotGetCurrentUser')
+      if (!currentUser.profile) throw new Error('profileNotInitialized')
       return {
         id: uuid(),
         isCommand: true,
         sender: 'Decentraland',
-        message: `Your Display Name is ${avatarAttrs.displayName}.`
+        message: `Your Display Name is ${currentUser.profile.name}.`
       }
     })
 
@@ -208,14 +183,14 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.publicKey) {
+      if (user && user.userId) {
         // Cannot block yourself
-        if (user.publicKey === currentUser.publicKey) {
+        if (user.userId === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot block yourself.` }
         }
 
-        addToBlockedUsers(user.publicKey)
-        addToMutedUsers(user.publicKey)
+        addToBlockedUsers(user.userId)
+        addToMutedUsers(user.userId)
 
         return {
           id: uuid(),
@@ -238,10 +213,10 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.publicKey) {
-        removeFromBlockedUsers(user.publicKey)
+      if (user && user.userId) {
+        removeFromBlockedUsers(user.userId)
         // TODO: Remove this literal mute, muting shold happen automatticaly with block
-        removeFromMutedUsers(user.publicKey)
+        removeFromMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You unblocked user ${username}.` }
       } else {
@@ -271,8 +246,8 @@ export class ChatController extends ExposableAPI implements IChatController {
         sender: 'Decentraland',
         message: `These are the users you are blocking:\n${[...users]
           .map(user => {
-            const profile = getPeer(user)
-            return `\t${profile && profile.user ? `${profile.user.displayName}: ${user}` : user}\n`
+            const peer = getPeer(user)
+            return `\t${peer && peer.user && peer.user.profile ? `${peer.user.profile.name}: ${user}` : user}\n`
           })
           .join('\n')}`
       }
@@ -284,13 +259,13 @@ export class ChatController extends ExposableAPI implements IChatController {
       if (!currentUser) throw new Error('cannotGetCurrentUser')
 
       const user = findPeerByName(username)
-      if (user && user.publicKey) {
+      if (user && user.userId) {
         // Cannot mute yourself
-        if (username === currentUser.displayName) {
+        if (username === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot mute yourself.` }
         }
 
-        addToMutedUsers(user.publicKey)
+        addToMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You muted user ${username}.` }
       } else {
@@ -310,13 +285,13 @@ export class ChatController extends ExposableAPI implements IChatController {
 
       const user = findPeerByName(username)
 
-      if (user && user.publicKey) {
+      if (user && user.userId) {
         // Cannot unmute or mute yourself
-        if (username === currentUser.displayName) {
+        if (username === currentUser.userId) {
           return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You cannot mute or unmute yourself.` }
         }
 
-        removeFromMutedUsers(user.publicKey)
+        removeFromMutedUsers(user.userId)
 
         return { id: uuid(), isCommand: true, sender: 'Decentraland', message: `You unmuted user ${username}.` }
       } else {
@@ -352,11 +327,15 @@ export class ChatController extends ExposableAPI implements IChatController {
         id: uuid(),
         isCommand: true,
         sender: 'Decentraland',
-        message: `Available commands:\n${Object.keys(this.chatCommands)
-          .filter(name => name !== 'help')
-          .map(name => `\t'${name}': ${this.chatCommands[name].description}`)
-          .concat('\thelp: Show this list of commands')
-          .join('\n')}`
+        message:
+          `Click on the screen to lock the cursor, later you can unlock it with the [ESC] key.` +
+          `\n\nYou can move with the [WASD] keys and jump with the [SPACE] key.` +
+          `\n\nYou can toggle the chat with the [ENTER] key.` +
+          `\n\nAvailable commands:\n${Object.keys(this.chatCommands)
+            .filter(name => name !== 'help')
+            .map(name => `\t'${name}': ${this.chatCommands[name].description}`)
+            .concat('\thelp: Show this list of commands')
+            .join('\n')}`
       }
     })
   }

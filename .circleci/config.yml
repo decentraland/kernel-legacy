@@ -65,16 +65,6 @@ jobs:
           name: send coverage to codecov
           command: npx codecov
 
-      - run:
-          name: Set up NPM
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          when: on_success
-
-      - run:
-          name: publish decentraland-api
-          command: make publish
-          when: on_success
-
       - store_artifacts:
           path: packages/decentraland-ecs/api-docs-review/decentraland-ecs.api.ts
           when: on_fail
@@ -86,6 +76,69 @@ jobs:
           paths:
             - static
           key: build-{{ .Revision }}
+      - save_cache:
+          paths:
+            - Makefile
+            - packages
+            - scripts
+            - package-lock.json
+            - package.json
+            - .git
+          key: build-npm-{{ .Revision }}
+
+  publish-ecs-latest:
+    docker:
+      - image: circleci/node:10-browsers
+    working_directory: /tmp/explorer
+    steps:
+      # restore build files
+      - restore_cache:
+          keys:
+            - build-{{ .Revision }}
+      - restore_cache:
+          keys:
+            - build-npm-{{ .Revision }}
+      # restore node_modules
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Set up NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          when: on_success
+
+      - run:
+          name: publish decentraland-api
+          command: make publish
+          when: on_success
+
+  publish-ecs-next:
+    docker:
+      - image: circleci/node:10-browsers
+    working_directory: /tmp/explorer
+    steps:
+      # restore build files
+      - restore_cache:
+          keys:
+            - build-{{ .Revision }}
+      - restore_cache:
+          keys:
+            - build-npm-{{ .Revision }}
+      # restore node_modules
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Set up NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          when: on_success
+
+      - run:
+          name: publish decentraland-api
+          command: make publish
+          when: on_success
 
   deploy-on-pr:
     docker:
@@ -126,6 +179,9 @@ jobs:
       - run:
           name: Invalidate cloudfront cache .zone
           command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
+      - run:
+          name: Invalidate cloudflare cache .zone
+          command: curl "$PURGE_CACHE_ZONE"
 
   deploy-stg:
     docker:
@@ -151,6 +207,9 @@ jobs:
       - run:
           name: Invalidate cloudfront cache .today
           command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E315GYHDRD7XX6 --paths "/*"
+      - run:
+          name: Invalidate cloudflare cache .today
+          command: curl "$PURGE_CACHE_TODAY"
 
   deploy-prd:
     docker:
@@ -176,6 +235,9 @@ jobs:
       - run:
           name: Invalidate cloudfront cache .org
           command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E253JP8V3Y9YUI --paths "/*"
+      - run:
+          name: Invalidate cloudflare cache .org
+          command: curl "$PURGE_CACHE_ORG"
 
 # Ignore branches because CircleCI OR's multiple filters
 # https://discuss.circleci.com/t/workflow-job-with-tag-filter-being-run-for-every-commit/20762/4
@@ -187,7 +249,16 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - hold:
+      - hold-explorer:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/
+      - hold-ecs:
           type: approval
           requires:
             - build
@@ -208,6 +279,12 @@ workflows:
           filters:
             branches:
               only: master
+      - publish-ecs-next:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       - deploy-stg:
           requires:
             - build
@@ -219,7 +296,15 @@ workflows:
               only: /^\d+\.\d+\.\d(.*)/
       - deploy-prd:
           requires:
-            - hold
+            - hold-explorer
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/
+      - publish-ecs-latest:
+          requires:
+            - hold-ecs
           filters:
             branches:
               ignore: /.*/

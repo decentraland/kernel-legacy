@@ -148,14 +148,12 @@ export class Billboard extends ObservableComponent {
 export class Shape extends ObservableComponent {
   /**
    * Set to true to turn on the collider for the entity.
-   * @alpha
    */
   @ObservableComponent.field
-  withCollisions: boolean = false
+  withCollisions: boolean = true
 
   /**
    * Defines if the entity and its children should be rendered
-   * @alpha
    */
   @ObservableComponent.field
   visible: boolean = true
@@ -334,9 +332,14 @@ export class NFTShape extends Shape {
   @Shape.readonly
   readonly src!: string
 
-  constructor(src: string) {
+  @ObservableComponent.field
+  color: Color3
+
+  // Light purple as the default background color
+  constructor(src: string, color: Color3 = new Color3(0.6404918, 0.611472, 0.8584906)) {
     super()
     this.src = src
+    this.color = color
   }
 }
 

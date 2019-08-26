@@ -13,10 +13,9 @@ import {
 } from 'shared/comms/types'
 import { execute } from './rpc'
 import { AvatarShape } from 'decentraland-ecs/src/decentraland/AvatarShape'
+import { Profile } from '../../shared/types'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
-
-const GENERIC_AVATAR = 'fox/completeFox.glb'
 
 const avatarMap = new Map<string, AvatarEntity>()
 
@@ -28,15 +27,35 @@ export class AvatarEntity extends Entity {
   readonly transform: Transform
   avatarShape!: AvatarShape
 
-  constructor(uuid?: string) {
+  constructor(uuid?: string, avatarShape = new AvatarShape()) {
     super(uuid)
+    this.avatarShape = avatarShape
 
-    this.avatarShape = new AvatarShape()
     this.addComponentOrReplace(this.avatarShape)
 
     // we need this component to filter the interpolator system
     this.transform = this.getComponentOrCreate(Transform)
+  }
 
+  loadProfile(profile: Profile) {
+    if (profile) {
+      const { avatar } = profile
+
+      const shape = new AvatarShape()
+      shape.id = profile.userId
+      shape.name = profile.name
+
+      shape.baseUrl = avatar.baseUrl
+      shape.skin = avatar.skin
+      shape.hair = avatar.hair
+      shape.wearables = avatar.wearables
+      shape.bodyShape = avatar.bodyShape
+      shape.eyes = avatar.eyes
+      shape.eyebrows = avatar.eyebrows
+      shape.mouth = avatar.mouth
+
+      this.addComponentOrReplace(shape)
+    }
     this.setVisible(true)
   }
 
@@ -55,13 +74,9 @@ export class AvatarEntity extends Entity {
       this.setPose(userData.pose)
     }
 
-    if (userData.displayName) {
-      this.setDisplayName(userData.displayName)
+    if (userData.profile) {
+      this.loadProfile(userData.profile)
     }
-  }
-
-  setDisplayName(name: string) {
-    this.avatarShape.name = name
   }
 
   setPose(pose: Pose): void {
@@ -89,11 +104,11 @@ export class AvatarEntity extends Entity {
 }
 
 /**
- * for every UUID, ensures that exist an avatar and a user in the local state.
+ * For every UUID, ensures synchronously that an avatar exists in the local state.
  * Returns the AvatarEntity instance
  * @param uuid
  */
-function ensureAvatar(uuid: UUID): AvatarEntity | null {
+function ensureAvatar(uuid: UUID): AvatarEntity {
   let avatar = avatarMap.get(uuid)
 
   if (avatar) {
@@ -101,7 +116,6 @@ function ensureAvatar(uuid: UUID): AvatarEntity | null {
   }
 
   avatar = new AvatarEntity(uuid)
-
   avatarMap.set(uuid, avatar)
 
   executeTask(hideBlockedUsers)
@@ -136,10 +150,6 @@ function handleUserData(message: ReceiveUserDataMessage): void {
 
   if (avatar) {
     const userData = message.data
-
-    // We force the GENERIC_AVATAR for now until the Avatar system and creation/integration pipeline has been defined
-    // TODO: Remove this override once the Avatar system design has been defined.
-    userData.avatarType = GENERIC_AVATAR
 
     avatar.setUserData(userData)
   }

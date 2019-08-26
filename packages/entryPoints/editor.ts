@@ -25,11 +25,13 @@ import {
   preloadFileBuilder,
   getMousePositionBuilder,
   takeScreenshotBuilder,
-  futures
+  futures,
+  ActivateRendering
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
 import { Vector3 } from '../decentraland-ecs/src/decentraland/math'
+import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
@@ -47,6 +49,13 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
 
   const system = await unityScene.worker.system
   const engineAPI = unityScene.worker.engineAPI!
+
+  sceneLifeCycleObservable.addOnce(obj => {
+    if (sceneData.sceneId === obj.sceneId && obj.status === 'ready') {
+      ActivateRendering()
+    }
+  })
+
   while (!system.isEnabled || !engineAPI.didStart) {
     await sleep(10)
   }

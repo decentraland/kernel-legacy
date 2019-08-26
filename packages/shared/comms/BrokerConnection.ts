@@ -9,7 +9,7 @@ import {
   AuthMessage,
   Role
 } from './proto/broker'
-import { Auth } from 'decentraland-auth'
+import { Auth } from 'shared/auth'
 import { AuthData } from './proto/comms'
 import { Message } from 'google-protobuf'
 import { SocketReadyState } from './worldInstanceConnection'
@@ -35,6 +35,7 @@ export class BrokerConnection implements IBrokerConnection {
 
   public onMessageObservable = new Observable<BrokerMessage>()
 
+  public gotCandidatesFuture = future<RTCSessionDescription>()
   private unreliableFuture = future<void>()
   private reliableFuture = future<void>()
 
@@ -172,38 +173,46 @@ export class BrokerConnection implements IBrokerConnection {
           break
         }
 
-        const sdp = message.getSdp()
-
         if (message.getFromAlias() !== this.commServerAlias) {
           this.logger.log('ignore webrtc message from unknown peer', message.getFromAlias())
           break
         }
 
+        const decoder = new TextDecoder('utf8')
+        const sessionData = decoder.decode(message.getData() as ArrayBuffer)
+
         if (msgType === MessageType.WEBRTC_ICE_CANDIDATE) {
           try {
-            await this.webRtcConn!.addIceCandidate({ candidate: sdp })
+            const candidate = JSON.parse(sessionData)
+            await this.webRtcConn!.addIceCandidate(candidate)
           } catch (err) {
             this.logger.error(err)
           }
         } else if (msgType === MessageType.WEBRTC_OFFER) {
           try {
-            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }))
-            const desc = await this.webRtcConn!.createAnswer()
+            await this.webRtcConn!.setRemoteDescription(JSON.parse(sessionData))
+            const desc = await this.webRtcConn!.createAnswer({})
             await this.webRtcConn!.setLocalDescription(desc)
 
-            if (desc.sdp) {
+            let answer = this.webRtcConn!.localDescription
+
+            if (answer && answer.sdp) {
               const msg = new WebRtcMessage()
               msg.setToAlias(this.commServerAlias)
               msg.setType(MessageType.WEBRTC_ANSWER)
-              msg.setSdp(desc.sdp)
+              const encoder = new TextEncoder()
+              const data = encoder.encode(JSON.stringify(answer))
+              msg.setData(data)
               this.sendCoordinatorMessage(msg)
             }
+
+            this.webRtcConn!.onicecandidate = this.onIceCandidate
           } catch (err) {
             this.logger.error(err)
           }
         } else if (msgType === MessageType.WEBRTC_ANSWER) {
           try {
-            await this.webRtcConn!.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp }))
+            await this.webRtcConn!.setRemoteDescription(JSON.parse(sessionData))
           } catch (err) {
             this.logger.error(err)
           }
@@ -247,7 +256,6 @@ export class BrokerConnection implements IBrokerConnection {
       this.logger.log(`ice connection state: ${this.webRtcConn!.iceConnectionState}`)
     }
 
-    this.webRtcConn.onicecandidate = this.onIceCandidate
     this.webRtcConn.ondatachannel = this.onDataChannel
   }
 
@@ -273,14 +281,19 @@ export class BrokerConnection implements IBrokerConnection {
   }
 
   private onIceCandidate = (event: RTCPeerConnectionIceEvent) => {
-    if (event.candidate !== null) {
+    if (event.candidate && event.candidate.candidate) {
       const msg = new WebRtcMessage()
       msg.setType(MessageType.WEBRTC_ICE_CANDIDATE)
       // TODO: Ensure commServerAlias, it may be null
       msg.setToAlias(this.commServerAlias!)
-      msg.setSdp(event.candidate.candidate)
-      // TODO: add sdp fields
+
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(event.candidate.toJSON()))
+      msg.setData(data)
+
       this.sendCoordinatorMessage(msg)
+    } else {
+      this.gotCandidatesFuture.resolve(this.webRtcConn!.localDescription!)
     }
   }
 

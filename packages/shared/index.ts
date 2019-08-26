@@ -1,16 +1,19 @@
-import { Auth } from 'decentraland-auth'
+import { Auth } from './auth'
 
 import './apis/index'
 import './events'
 
-import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, AVOID_WEB3, EDITOR } from '../config'
+import { ETHEREUM_NETWORK, setNetwork, getTLD, PREVIEW, DEBUG, ENABLE_WEB3, STATIC_WORLD, EDITOR } from '../config'
 
-import { getUserAccount, getNetwork } from './ethereum/EthereumService'
-import { awaitWeb3Approval } from './ethereum/provider'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { connect } from './comms'
 import { initialize, queueTrackingEvent } from './analytics'
 import { defaultLogger } from './logger'
+import { initWeb3, getNetworkFromTLD, getAppNetwork } from './web3'
+import { fetchProfile, createProfile, createStubProfileSpec, resolveProfileSpec } from './world/profiles'
+import { ProfileSpec } from './types'
+import { persistCurrentUser } from './comms/index'
+import { localProfileUUID } from './comms/peers'
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -27,43 +30,6 @@ export async function initializeAnalytics(userId: string) {
   }
 }
 
-function getNetworkFromTLD(): ETHEREUM_NETWORK | null {
-  const tld = getTLD()
-  if (tld === 'zone') {
-    return ETHEREUM_NETWORK.ROPSTEN
-  }
-
-  if (tld === 'today' || tld === 'org') {
-    return ETHEREUM_NETWORK.MAINNET
-  }
-
-  return null
-}
-
-async function getAddress(): Promise<string | undefined> {
-  try {
-    await awaitWeb3Approval()
-    return await getUserAccount()
-  } catch (e) {
-    defaultLogger.info(e)
-  }
-}
-
-async function getAppNetwork(): Promise<ETHEREUM_NETWORK> {
-  const web3Network = await getNetwork()
-  const web3net = web3Network === '1' ? ETHEREUM_NETWORK.MAINNET : ETHEREUM_NETWORK.ROPSTEN
-  // TLD environment have priority
-  const net = getNetworkFromTLD() || web3net
-
-  if (web3net && net !== web3net) {
-    // TODO @fmiras show an HTML error if web3 networks differs from domain network and do not load client at all
-    defaultLogger.error(`Switch to network ${net}`)
-  }
-
-  defaultLogger.info('Using ETH network: ', net)
-  return net
-}
-
 export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth()
 
@@ -74,7 +40,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     return ETHEREUM_NETWORK.MAINNET
   }
 
-  let userId: string = ''
+  let userId: string
 
   console['group']('connect#login')
 
@@ -91,7 +57,6 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
       console['groupEnd']()
       throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
     }
-
     await initializeAnalytics(userId)
   }
 
@@ -100,33 +65,26 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   console['groupEnd']()
 
   console['group']('connect#ethereum')
-  const address = await getAddress()
 
-  if (address) {
-    defaultLogger.log(`Identifying address ${address}`)
-    queueTrackingEvent('Use web3 address', { address })
+  let net: ETHEREUM_NETWORK
+
+  if (ENABLE_WEB3) {
+    await initWeb3()
+    net = await getAppNetwork()
+  } else {
+    net = getNetworkFromTLD() || ETHEREUM_NETWORK.MAINNET
   }
 
-  const net = await getAppNetwork()
   queueTrackingEvent('Use network', { net })
 
   // Load contracts from https://contracts.decentraland.org
   await setNetwork(net)
   console['groupEnd']()
 
-  console['group']('connect#comms')
-  await connect(
-    userId,
-    net,
-    auth,
-    address
-  )
-  console['groupEnd']()
-
   initializeUrlPositionObserver()
 
   // Warn in case wallet is set in mainnet
-  if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && !AVOID_WEB3) {
+  if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && ENABLE_WEB3) {
     const style = document.createElement('style')
     style.appendChild(
       document.createTextNode(
@@ -135,6 +93,52 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     )
     document.head.appendChild(style)
   }
+
+  // DCL Servers connections/requests after this
+  if (STATIC_WORLD) {
+    return net
+  }
+
+  console['group']('connect#comms')
+  await connect(
+    userId,
+    net,
+    auth
+  )
+  console['groupEnd']()
+
+  // initialize profile
+  console['group']('connect#profile')
+  if (!PREVIEW) {
+    let response
+    try {
+      response = await fetchProfile()
+    } catch (e) {
+      defaultLogger.error(`Not able to fetch profile for current user`)
+    }
+
+    let spec: ProfileSpec
+    if (response && response.ok) {
+      spec = await response.json()
+    } else {
+      defaultLogger.info(`Non existing profile, creating a random one`)
+      spec = await createStubProfileSpec()
+
+      const avatar = spec.avatar
+      try {
+        const creationResponse = await createProfile(avatar)
+        defaultLogger.info(`New profile created with response ${creationResponse.status}`)
+      } catch (e) {
+        defaultLogger.error(`Error while creating profile`)
+        defaultLogger.error(e)
+      }
+    }
+
+    const profile = await resolveProfileSpec(localProfileUUID!, spec)
+
+    persistCurrentUser({ userId: localProfileUUID!, version: profile.version, profile })
+  }
+  console['groupEnd']()
 
   return net
 }

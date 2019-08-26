@@ -4,6 +4,7 @@ type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
 }
 
+import { IFuture } from 'fp-future'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 
 import {
@@ -14,7 +15,8 @@ import {
   ILandToLoadableParcelSceneUpdate,
   IScene,
   MappingsResponse,
-  ILand
+  ILand,
+  Profile
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -41,7 +43,9 @@ import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../dec
 import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, EDITOR, parcelLimits, playerConfigurations } from '../config'
 import { chatObservable } from '../shared/comms/chat'
 import { queueTrackingEvent } from '../shared/analytics'
-import { IFuture } from 'fp-future'
+import { getUserProfile } from '../shared/comms/peers'
+import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
+import { worldRunningObservable } from '../shared/world/worldState'
 
 let gameInstance!: GameInstance
 
@@ -87,13 +91,39 @@ const browserInterface = {
 
   PreloadFinished(data: { sceneId: string }) {
     // stub. there is no code about this in unity side yet
+  },
+
+  ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
+    switch (eventType) {
+      case 'SceneReady': {
+        const { sceneId } = payload
+        sceneLifeCycleObservable.notifyObservers({ sceneId, status: 'ready' })
+        break
+      }
+      case 'ActivateRenderingACK': {
+        worldRunningObservable.notifyObservers(true)
+        break
+      }
+      default: {
+        defaultLogger.warn(`Unknown event type ${eventType}, ignoring`)
+        break
+      }
+    }
   }
+}
+
+function setLoadingScreenVisible(shouldShow: boolean) {
+  document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
+  document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }
 
 export const unityInterface = {
   debug: false,
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
+  },
+  LoadProfile(profile: Profile) {
+    gameInstance.SendMessage('SceneController', 'LoadProfile', JSON.stringify(profile))
   },
   CreateUIScene(data: { id: string; baseUrl: string }) {
     /**
@@ -141,9 +171,19 @@ export const unityInterface = {
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   },
+
   sendBuilderMessage(method: string, payload: string = '') {
     gameInstance.SendMessage(`BuilderController`, method, payload)
   },
+
+  ActivateRendering() {
+    gameInstance.SendMessage('SceneController', 'ActivateRendering')
+  },
+
+  DeactivateRendering() {
+    gameInstance.SendMessage('SceneController', 'DeactivateRendering')
+  },
+
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   },
@@ -219,7 +259,10 @@ export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
+  setLoadingScreenVisible(true)
+
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
+  unityInterface.DeactivateRendering()
 
   if (DEBUG) {
     unityInterface.SetDebug()
@@ -281,6 +324,13 @@ export async function startUnityParcelLoading(downloadManager?: SceneDataDownloa
       lands.forEach($ => {
         unityInterface.UnloadScene($.sceneId)
       })
+    },
+    onPositionSettled: () => {
+      unityInterface.ActivateRendering()
+    },
+    onPositionUnsettled: () => {
+      setLoadingScreenVisible(true)
+      unityInterface.DeactivateRendering()
     }
   })
 }
@@ -302,6 +352,7 @@ async function initializeDecentralandUI() {
   await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
+  unityInterface.LoadProfile(getUserProfile().profile)
 }
 
 //Builder functions
@@ -346,12 +397,19 @@ export function takeScreenshotBuilder(mime?: string) {
   unityInterface.sendBuilderMessage('TakeScreenshot', mime ? mime : '')
 }
 
+export function ActivateRendering() {
+  unityInterface.ActivateRendering()
+}
+
 let currentLoadedScene: SceneWorker
 
 export async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
 
+  let lastId: string | null = null
+
   if (currentLoadedScene) {
+    lastId = currentLoadedScene.parcelScene.data.sceneId
     stopParcelSceneWorker(currentLoadedScene)
   }
 
@@ -370,17 +428,23 @@ export async function loadPreviewScene() {
       mappingsResponse: mappingsResponse
     }
 
-    defaultLogger.info('Starting Preview...')
     const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(defaultScene))
     currentLoadedScene = loadParcelScene(parcelScene)
 
     const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(defaultScene).data }
     delete target.land
 
+    defaultLogger.info('Reloading scene...')
+
+    if (lastId) {
+      unityInterface.UnloadScene(lastId)
+    }
+
     unityInterface.LoadParcelScenes([target])
   } else {
     throw new Error('Could not load scene.json')
   }
+  defaultLogger.info('finish...')
 }
 
 export function loadBuilderScene(sceneData: ILand) {
@@ -418,6 +482,12 @@ export function updateBuilderScene(sceneData: ILand) {
 
 teleportObservable.add((position: { x: number; y: number }) => {
   unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
+})
+
+worldRunningObservable.add(isRunning => {
+  if (isRunning) {
+    setLoadingScreenVisible(false)
+  }
 })
 
 window['messages'] = (e: any) => chatObservable.notifyObservers(e)
