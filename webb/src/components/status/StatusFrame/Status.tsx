@@ -9,6 +9,8 @@ import Comms from '../Comms'
 import Console from '../Console'
 import { BuildConnectedVisualizer } from '~/components/Reusable/BuildConnectedVisualizer'
 import Config from '../Config'
+import WorldStatus from '~/components/world/World'
+import MyPresence from '../MyPresence'
 
 export default (_: RootState) => (
   <Page>
@@ -18,7 +20,7 @@ export default (_: RootState) => (
         <Grid.Column>
           <Switch>
             <Route path='/status/Comms' component={Comms} />
-            <Route path='/status/MyPresence' component={BuildConnectedVisualizer('MyPresence')} />
+            <Route path='/status/MyPresence' component={MyPresence} />
             <Route path='/status/SceneLoader' component={BuildConnectedVisualizer('SceneLoader')} />
             <Route path='/status/Config' component={Config} />
             <Route path='/status/PeerPresence' component={BuildConnectedVisualizer('PeerPresence')} />
@@ -27,7 +29,7 @@ export default (_: RootState) => (
             <Route path='/status/Passports' component={BuildConnectedVisualizer('Passports')} />
             <Route path='/status/SocialModeration' component={BuildConnectedVisualizer('SocialModeration')} />
             <Route path='/status/InWorldAvatars' component={BuildConnectedVisualizer('InWorldAvatars')} />
-            <Route path='/status/WorldMap' component={BuildConnectedVisualizer('WorldMap')} />
+            <Route path='/status/WorldMap' component={WorldStatus} />
             <Route path='/status/SceneRunner' component={BuildConnectedVisualizer('SceneRunner')} />
             <Route path='/*' exact={false} component={Console} />
           </Switch>

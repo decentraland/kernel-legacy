@@ -1,0 +1,15 @@
+export enum AvatarMessageType {
+  // Networking related messages
+  USER_DATA = 'USER_DATA',
+  USER_POSE = 'USER_POSE',
+  USER_VISIBLE = 'USER_VISIBLE',
+  USER_REMOVED = 'USER_REMOVED',
+  SET_LOCAL_UUID = 'SET_LOCAL_UUID',
+  // Actions related messages
+  USER_MUTED = 'USER_MUTED',
+  USER_UNMUTED = 'USER_UNMUTED',
+  USER_BLOCKED = 'USER_BLOCKED',
+  USER_UNBLOCKED = 'USER_UNBLOCKED',
+  ADD_FRIEND = 'ADD_FRIEND',
+  SHOW_WINDOW = 'SHOW_WINDOW'
+}

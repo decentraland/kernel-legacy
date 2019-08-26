@@ -8,8 +8,8 @@ import Status from '~/components/status/StatusFrame'
 
 import { history } from '~/store'
 import Navbar from '~/components/navbar'
-import World from '~/components/world'
-import ParcelInfo from '~/components/world/ParcelInfo'
+import Atlas from '~/components/atlas'
+import ParcelInfo from '~/components/atlas/ParcelInfo'
 import Scene from '~/components/scene'
 
 export const Routes = (
@@ -22,8 +22,8 @@ export const Routes = (
           <Route exact path='/login' component={Auth} />
           <Route exact path='/auth/login' component={Auth} />
 
-          <Route exact path='/map' component={World} />
-          <Route exact path='/map1' component={World} />
+          <Route exact path='/map' component={Atlas} />
+          <Route exact path='/map1' component={Atlas} />
 
           <Route path='/scene/:scene' component={Scene} />
           <Route path='/parcel/:coordinate' component={ParcelInfo} />

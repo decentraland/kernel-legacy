@@ -1,6 +1,6 @@
-import { Color4 } from '@dcl/utils'
-import { Vector3 } from '@dcl/utils'
-import { Quaternion } from '@dcl/utils'
+import { Color4 } from '../comms/brokers/node_modules/@dcl/utils'
+import { Vector3 } from '../comms/brokers/node_modules/@dcl/utils'
+import { Quaternion } from '../comms/brokers/node_modules/@dcl/utils'
 
 export type AssetNameAndHash = { name: string; hash: string }
 

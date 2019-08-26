@@ -1,6 +1,6 @@
 import { BasicEphemeralKey, MessageInput } from './Ephemeral'
 
-import { defaultLogger } from '@dcl/utils'
+import { defaultLogger } from '../comms/brokers/node_modules/@dcl/utils'
 import { Login } from './Login'
 import { API, APIOptions } from './api'
 

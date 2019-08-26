@@ -12,6 +12,7 @@ const fuse = FuseBox.init({
   target: 'browser@es6',
   output: 'dist/$name.js',
   cache: true,
+  watch: true,
   hmr: true,
   sourceMap: false,
   alias: {
@@ -65,7 +66,11 @@ fuse.register('@dcl/protos', {
 fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http server
 
 fuse.bundle('vendor').instructions('~ index.tsx')
-fuse.bundle('app').instructions('!> [index.tsx]')
+fuse
+  .bundle('app')
+  .instructions('!> [index.tsx]')
+  .hmr()
+  .watch()
 const run1 = fuse.run()
 
 function watchStdin(action) {

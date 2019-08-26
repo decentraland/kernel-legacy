@@ -3,9 +3,9 @@ import { defaultLogger } from '@dcl/utils'
 
 import { WorldInstanceConnection } from './worldInstanceConnection'
 
-import { BrokerConnection } from './BrokerConnection'
-import { CliBrokerConnection } from './CliBrokerConnection'
-import { IBrokerConnection } from './IBrokerConnection'
+import { BrokerConnection } from './brokers/BrokerConnection'
+import { CliBrokerConnection } from './brokers/CliBrokerConnection'
+import { IBrokerConnection } from './brokers/IBrokerConnection'
 import { Auth } from '../auth/Auth'
 
 export async function connect(auth: Auth) {

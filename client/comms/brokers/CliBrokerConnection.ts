@@ -4,8 +4,8 @@ import { ILogger, createLogger } from '@dcl/utils'
 import { Observable } from '@dcl/utils'
 
 import { MessageType, CoordinatorMessage, WelcomeMessage, ConnectMessage } from '@dcl/protos'
-import { SocketReadyState } from './worldInstanceConnection'
-import { Stats } from './Reporter'
+import { SocketReadyState } from '../worldInstanceConnection'
+import { Stats } from '../Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 
 export class CliBrokerConnection implements IBrokerConnection {

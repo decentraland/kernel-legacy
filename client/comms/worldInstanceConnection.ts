@@ -1,25 +1,24 @@
-import { Message } from 'google-protobuf'
-
-import { createLogger } from '@dcl/utils'
-import { parcelLimits } from '@dcl/utils'
-
-import { Category, ChatData, PositionData, ProfileData, DataHeader } from '@dcl/protos'
 import {
+  Category,
+  ChatData,
+  DataHeader,
+  Format,
+  MessageHeader,
   MessageType,
   PingMessage,
-  TopicMessage,
-  TopicFWMessage,
-  Format,
+  PositionData,
+  ProfileData,
   SubscriptionMessage,
-  MessageHeader,
+  TopicFWMessage,
+  TopicIdentityFWMessage,
   TopicIdentityMessage,
-  TopicIdentityFWMessage
+  TopicMessage
 } from '@dcl/protos'
-
-import { Position, position2parcel } from './utils'
-import { UserInformation } from './types'
-import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import { Stats } from './Reporter'
+import { createLogger } from '@dcl/utils'
+import { Message } from 'google-protobuf'
+import { Position } from './senders/__deprecated'
+import { BrokerMessage, IBrokerConnection } from './brokers/IBrokerConnection'
+import { UserInformation } from './types/UserInformation'
 
 export enum SocketReadyState {
   CONNECTING,
@@ -32,22 +31,9 @@ class SendResult {
   constructor(public bytesSize: number) {}
 }
 
-export function positionHash(p: Position) {
-  const parcel = position2parcel(p)
-  const x = (parcel.x + parcelLimits.maxParcelX) >> 2
-  const z = (parcel.z + parcelLimits.maxParcelZ) >> 2
-  return `${x}:${z}`
-}
-
 export class WorldInstanceConnection {
-  public positionHandler: ((fromAlias: string, positionData: PositionData) => void) | null = null
-  public profileHandler: ((fromAlias: string, identity: string, profileData: ProfileData) => void) | null = null
-  public chatHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
-  // TODO: Once we have the correct class, change ChatData
-  public sceneMessageHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   public ping: number = -1
 
-  public stats: Stats | null = null
   private pingInterval: any = null
 
   private logger = createLogger('World: ')
@@ -56,39 +42,10 @@ export class WorldInstanceConnection {
     this.pingInterval = setInterval(this.sendPing, 10000)
     this.connection.onMessageObservable.add(this.handleMessage.bind(this))
   }
+}
+{
 
-  sendPing = () => {
-    const msg = new PingMessage()
-    msg.setType(MessageType.PING)
-    msg.setTime(Date.now())
-    const bytes = msg.serializeBinary()
-
-    if (this.connection.hasUnreliableChannel) {
-      this.connection.sendUnreliable(bytes)
-    } else {
-      this.ping = -1
-    }
-  }
-
-  sendPositionMessage(p: Position) {
-    const topic = positionHash(p)
-
-    const d = new PositionData()
-    d.setCategory(Category.POSITION)
-    d.setTime(Date.now())
-    d.setPositionX(p[0])
-    d.setPositionY(p[1])
-    d.setPositionZ(p[2])
-    d.setRotationX(p[3])
-    d.setRotationY(p[4])
-    d.setRotationZ(p[5])
-    d.setRotationW(p[6])
-
-    const r = this.sendTopicMessage(false, topic, (d as any) as Message)
-    if (this.stats) {
-      this.stats.position.incrementSent(1, r.bytesSize)
-    }
-  }
+export const sendPositionMessage = (p: Position) {}
 
   sendProfileMessage(p: Position, userProfile: UserInformation) {
     const topic = positionHash(p)

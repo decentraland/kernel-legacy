@@ -1,5 +1,5 @@
 import { SubsystemController } from '../subsystems'
-import { connect } from '../../comms'
+import { connect } from '../../comms/connect'
 import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
 import { AuthSystem } from '.'
 
