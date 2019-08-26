@@ -139,7 +139,7 @@ export class Input {
   }
 
   private getPointerById(id: number): Pointer {
-    if (id === 1) return Pointer.PRIMARY
+    if (id === 0) return Pointer.PRIMARY
     return Pointer.SECONDARY
   }
 
