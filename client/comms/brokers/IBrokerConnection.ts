@@ -1,14 +1,11 @@
 import { Observable } from '@dcl/utils'
 
-import { Stats } from '../Reporter'
-
 export type BrokerMessage = {
   data: Uint8Array
   channel: string
 }
 
 export interface IBrokerConnection {
-  stats: Stats | null
   onMessageObservable: Observable<BrokerMessage>
   readonly hasUnreliableChannel: boolean
   readonly hasReliableChannel: boolean

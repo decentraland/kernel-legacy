@@ -1,5 +1,5 @@
 import { PeerPresenceManager } from './peers/peerPresence'
-import { ProfileStore } from '../passports/api'
+import { ProfileStore } from '../passports/ProfileStore'
 
 export class AvatarPresenceManager {
   peerPresence: PeerPresenceManager

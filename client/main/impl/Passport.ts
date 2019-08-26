@@ -1,5 +1,5 @@
 import { SubsystemController } from '../subsystems'
-import { ProfileStore } from '../../passports/api'
+import { ProfileStore } from '../../passports/ProfileStore'
 import { getBaseCatalog } from '../../assets/wearables/base'
 
 export class PassportSystem extends SubsystemController {

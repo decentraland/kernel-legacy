@@ -5,13 +5,10 @@ import { Observable } from '@dcl/utils'
 
 import { MessageType, CoordinatorMessage, WelcomeMessage, ConnectMessage } from '@dcl/protos'
 import { SocketReadyState } from '../types/SocketReadyState'
-import { Stats } from '../Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 
 export class CliBrokerConnection implements IBrokerConnection {
   public alias: number | null = null
-
-  public stats: Stats | null = null
 
   public logger: ILogger = createLogger('Broker: ')
 
@@ -76,16 +73,11 @@ export class CliBrokerConnection implements IBrokerConnection {
   async onWsMessage(event: MessageEvent) {
     const data = event.data
     const msg = new Uint8Array(data)
-    const msgSize = msg.length
 
     const msgType = CoordinatorMessage.deserializeBinary(data).getType()
 
     switch (msgType) {
       case MessageType.WELCOME: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
-
         let message: WelcomeMessage
         try {
           message = WelcomeMessage.deserializeBinary(msg)
@@ -110,10 +102,6 @@ export class CliBrokerConnection implements IBrokerConnection {
       case MessageType.TOPIC_FW:
       case MessageType.TOPIC_IDENTITY_FW:
       case MessageType.PING: {
-        if (this.stats) {
-          this.stats.dispatchTopicDuration.start()
-        }
-
         this.onMessageObservable.notifyObservers({
           channel: 'ws',
           data: msg
@@ -122,9 +110,6 @@ export class CliBrokerConnection implements IBrokerConnection {
         break
       }
       default: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
         this.logger.warn('Ignoring message type', msgType)
         break
       }

@@ -17,7 +17,6 @@ import {
 } from '@dcl/protos'
 
 import { SocketReadyState } from '../types/SocketReadyState'
-import { Stats } from '../Reporter'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import Auth from '../../auth'
 
@@ -30,8 +29,6 @@ export class BrokerConnection implements IBrokerConnection {
 
   public reliableDataChannel: RTCDataChannel | null = null
   public unreliableDataChannel: RTCDataChannel | null = null
-
-  public stats: Stats | null = null
 
   public logger: ILogger = createLogger('Broker: ')
 
@@ -116,23 +113,15 @@ export class BrokerConnection implements IBrokerConnection {
   async onWsMessage(event: MessageEvent) {
     const data = event.data
     const msg = new Uint8Array(data)
-    const msgSize = msg.length
 
     const msgType = CoordinatorMessage.deserializeBinary(data).getType()
 
     switch (msgType) {
       case MessageType.UNKNOWN_MESSAGE_TYPE: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
         this.logger.log('unsopported message')
         break
       }
       case MessageType.WELCOME: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
-
         let message: WelcomeMessage
         try {
           message = WelcomeMessage.deserializeBinary(msg)
@@ -162,10 +151,6 @@ export class BrokerConnection implements IBrokerConnection {
       case MessageType.WEBRTC_ICE_CANDIDATE:
       case MessageType.WEBRTC_OFFER:
       case MessageType.WEBRTC_ANSWER: {
-        if (this.stats) {
-          this.stats.webRtcSession.incrementRecv(msgSize)
-        }
-
         let message: WebRtcMessage
         try {
           message = WebRtcMessage.deserializeBinary(msg)
@@ -219,9 +204,6 @@ export class BrokerConnection implements IBrokerConnection {
         break
       }
       default: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
         this.logger.log('ignoring message with type', msgType)
         break
       }
@@ -234,10 +216,6 @@ export class BrokerConnection implements IBrokerConnection {
     }
 
     const bytes = msg.serializeBinary()
-
-    if (this.stats) {
-      this.stats.webRtcSession.incrementSent(1, bytes.length)
-    }
 
     this.ws.send(bytes)
   }
@@ -336,10 +314,6 @@ export class BrokerConnection implements IBrokerConnection {
     }
 
     dc.onmessage = (e: MessageEvent) => {
-      if (this.stats) {
-        this.stats.dispatchTopicDuration.start()
-      }
-
       const data = e.data
       const msg = new Uint8Array(data)
 

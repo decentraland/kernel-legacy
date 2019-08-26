@@ -21,6 +21,7 @@ import { IBrokerConnection, BrokerMessage } from './brokers/IBrokerConnection'
 
 export class WorldInstanceConnection extends EventEmitter {
   logger: ILogger
+  // TODO(@eordano, 26/Aug/2019): add stats reporting back
 
   constructor(public connection: IBrokerConnection) {
     super()
@@ -53,6 +54,7 @@ export class WorldInstanceConnection extends EventEmitter {
   }
 
   private handleMessage(message: BrokerMessage) {
+    // TODO(@eordano, 26/Aug/2019): refactor this so it fits one single screen
     const msgSize = message.data.length
 
     let msgType: number = MessageType.UNKNOWN_MESSAGE_TYPE
@@ -136,11 +138,7 @@ export class WorldInstanceConnection extends EventEmitter {
         switch (category) {
           case Category.PROFILE: {
             const profileData = ProfileData.deserializeBinary(body)
-            if (this.stats) {
-              this.stats.dispatchTopicDuration.stop()
-              this.stats.profile.incrementRecv(msgSize)
-            }
-            this.profileHandler && this.profileHandler(alias, userId, profileData)
+            this.emit('' + Category.PROFILE, { ...profileData, alias, userId })
             break
           }
           default: {
@@ -154,23 +152,14 @@ export class WorldInstanceConnection extends EventEmitter {
         let pingMessage
         try {
           pingMessage = PingMessage.deserializeBinary(message.data)
+          this.emit('' + MessageType.PING, pingMessage)
         } catch (e) {
           this.logger.error('cannot deserialize ping message', e, message)
           break
         }
-
-        if (this.stats) {
-          this.stats.ping.incrementRecv(msgSize)
-        }
-
-        this.ping = Date.now() - pingMessage.getTime()
-
         break
       }
       default: {
-        if (this.stats) {
-          this.stats.others.incrementRecv(msgSize)
-        }
         this.logger.log('ignoring message with type', msgType)
         break
       }

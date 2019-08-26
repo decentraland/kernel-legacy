@@ -1,23 +1,21 @@
 const qs = require('querystring')
-import { MVector3, ReadOnlyVector3, ReadOnlyQuaternion, MVector2, ReadOnlyVector2 } from '@dcl/utils'
-import { Observable, Quaternion, worldToGrid, Vector3, playerConfigurations } from '@dcl/utils'
-
-import { upgradeToV2 } from '../../worldMap/compat/v1'
+import {
+  MVector2,
+  MVector3,
+  Observable,
+  playerConfigurations,
+  Quaternion,
+  ReadOnlyVector2,
+  Vector3,
+  worldToGrid
+} from '@dcl/utils'
 import { SceneLoader } from '../../scenes/loader/SceneLoader'
-
-export type PositionReport = {
-  /** Camera position, world space */
-  position: ReadOnlyVector3
-  /** Camera rotation */
-  quaternion: ReadOnlyQuaternion
-  /** Camera rotation, euler from quaternion */
-  rotation: ReadOnlyVector3
-  /** Camera height, relative to the feet of the avatar or ground */
-  playerHeight: number
-}
+import { upgradeToV2 } from '../../worldMap/compat/v1'
+import { PositionReport } from '../types/PositionReport'
+import { getPositionReport } from './getPositionReport'
+import { getTopicForPosition } from './getTopicForPosition'
 
 const temporaryVector = new MVector2()
-
 export class MyPresence {
   positionObservable = new Observable<Readonly<PositionReport>>()
   teleportObservable = new Observable<ReadOnlyVector2>()
@@ -76,6 +74,14 @@ export class MyPresence {
       positionInUrl.y = temporaryVector.y
       this.history.replaceState({}, '', '?' + qs.stringify(positionInUrl))
     }
+  }
+
+  getPositionReport() {
+    return getPositionReport(this.lastPlayerPositionReport)
+  }
+
+  getTopicForCurrentPosition() {
+    return getTopicForPosition(this.lastPlayerPositionReport.position)
   }
 
   enablePositionWatch() {
