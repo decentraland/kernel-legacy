@@ -78,6 +78,13 @@ export function initializeUrlPositionObserver() {
   }
 }
 
+/**
+ * Computes the spawn point based on a scene.
+ *
+ * The computation takes the spawning points defined in the scene document and computes the spawning point in the world based on the base parcel position.
+ *
+ * @param land Scene on which the player is spawning
+ */
 export function getWorldSpawnpoint(land: ILand): Vector3 {
   const spawnpoint = getSpawnpoint(land)
 
@@ -85,13 +92,15 @@ export function getWorldSpawnpoint(land: ILand): Vector3 {
     return lastPlayerPosition
   }
 
+  const baseParcel = land.scene.scene.base
+  const [bx, by] = baseParcel.split(',')
+
+  const basePosition = new Vector3()
+
+  gridToWorld(parseInt(bx, 10), parseInt(by, 10), basePosition)
   const [x, y, z] = spawnpoint.split(',')
 
-  return new Vector3(
-    (lastPlayerPosition.x += parseFloat(x)),
-    (lastPlayerPosition.y += parseFloat(y)),
-    (lastPlayerPosition.z += parseFloat(z))
-  )
+  return basePosition.add({ x, y, z })
 }
 
 function getSpawnpoint(land: ILand) {

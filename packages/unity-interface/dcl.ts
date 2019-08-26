@@ -123,7 +123,7 @@ const unityInterface = {
   },
   /** Sends the camera position to the engine */
   SetPosition(x: number, y: number, z: number) {
-    let theY = y <= 0 ? 2 : y
+    const theY = y <= 0 ? 2 : y
 
     gameInstance.SendMessage('CharacterController', 'SetPosition', JSON.stringify({ x, y: theY, z }))
   },
@@ -260,6 +260,12 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 }
 
+function setInitialPosition(initialLand: ILand) {
+  const newPosition = getWorldSpawnpoint(initialLand)
+  unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
+  queueTrackingEvent('Scene Spawn', { parcel: initialLand.scene.scene.base, spawnpoint: newPosition })
+}
+
 export async function startUnityParcelLoading() {
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
@@ -268,11 +274,6 @@ export async function startUnityParcelLoading() {
       // 1) implement preload call
       // 2) await for preload message or timeout
       // 3) return
-    },
-    onSpawnpoint: initialLand => {
-      const newPosition = getWorldSpawnpoint(initialLand)
-      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
-      queueTrackingEvent('Scene Spawn', { parcel: initialLand.scene.scene.base, spawnpoint: newPosition })
     },
     onLoadParcelScenes: lands => {
       unityInterface.LoadParcelScenes(
@@ -288,7 +289,8 @@ export async function startUnityParcelLoading() {
         unityInterface.UnloadScene($.sceneId)
       })
     },
-    onPositionSettled: () => {
+    onPositionSettled: land => {
+      land && setInitialPosition(land)
       unityInterface.ActivateRendering()
     },
     onPositionUnsettled: () => {
