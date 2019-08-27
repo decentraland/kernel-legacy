@@ -44,7 +44,7 @@ bodyReadyFuture
   .catch(handleError)
 
 function setInitialPosition(initialLand: ILand) {
-  const newPosition = getWorldSpawnpoint(initialLand)
+  const newPosition = getWorldSpawnpoint(initialLand).position
   const result = new BABYLON.Vector3(newPosition.x, newPosition.y, newPosition.z)
   if (scene.activeCamera) {
     scene.activeCamera.position.copyFrom(result)

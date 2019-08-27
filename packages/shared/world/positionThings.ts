@@ -9,6 +9,7 @@ import {
 } from 'decentraland-ecs/src/decentraland/math'
 import { Observable } from 'decentraland-ecs/src/ecs/Observable'
 import { ILand } from 'shared/types'
+import { Vector3Component } from '../../atomicHelpers/landHelpers'
 
 declare var location: any
 declare var history: any
@@ -85,11 +86,11 @@ export function initializeUrlPositionObserver() {
  *
  * @param land Scene on which the player is spawning
  */
-export function getWorldSpawnpoint(land: ILand): Vector3 {
+export function getWorldSpawnpoint(land: ILand): { position: Vector3Component; cameraTarget?: Vector3Component } {
   const spawnpoint = getSpawnpoint(land)
 
   if (!spawnpoint) {
-    return lastPlayerPosition
+    return { position: lastPlayerPosition }
   }
 
   const baseParcel = land.scene.scene.base
@@ -97,13 +98,17 @@ export function getWorldSpawnpoint(land: ILand): Vector3 {
 
   const basePosition = new Vector3()
 
-  gridToWorld(parseInt(bx, 10), parseInt(by, 10), basePosition)
-  const [x, y, z] = spawnpoint.split(',').map($ => parseFloat($))
+  const { position, cameraTarget } = spawnpoint
 
-  return basePosition.add({ x, y, z })
+  gridToWorld(parseInt(bx, 10), parseInt(by, 10), basePosition)
+
+  return {
+    position: basePosition.add(position),
+    cameraTarget: cameraTarget ? basePosition.add(cameraTarget) : undefined
+  }
 }
 
-function getSpawnpoint(land: ILand) {
+function getSpawnpoint(land: ILand): { position: Vector3Component; cameraTarget?: Vector3Component } | undefined {
   if (!land.scene || !land.scene.spawnPoints || land.scene.spawnPoints.length === 0) {
     return undefined
   }
@@ -115,10 +120,17 @@ function getSpawnpoint(land: ILand) {
   const eligiblePoints = defaults.length === 0 ? land.scene.spawnPoints : defaults
 
   // 3 - pick randomly between spawn points
-  const point = eligiblePoints[Math.floor(Math.random() * eligiblePoints.length)].position
+  const { position, cameraTarget } = eligiblePoints[Math.floor(Math.random() * eligiblePoints.length)]
 
   // 4 - generate random x, y, z components when in arrays
-  return `${computeComponentValue(point.x)},${computeComponentValue(point.y)},${computeComponentValue(point.z)}`
+  return {
+    position: {
+      x: computeComponentValue(position.x),
+      y: computeComponentValue(position.y),
+      z: computeComponentValue(position.z)
+    },
+    cameraTarget
+  }
 }
 
 function computeComponentValue(x: number | number[]) {
