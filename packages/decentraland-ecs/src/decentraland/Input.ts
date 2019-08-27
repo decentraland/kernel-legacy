@@ -1,13 +1,9 @@
 // tslint:disable:ter-indent
 // tslint:disable:ter-indent
 
-import { DecentralandInterface, PointerEvent } from './Types'
+import { PointerEvent } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
-import { PointerDownEvent, PointerUpEvent } from './Events'
-import { engine } from '../'
-
-declare let dcl: DecentralandInterface | void
 
 /** @public */
 export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
@@ -94,28 +90,7 @@ export class Input {
     }
   }
 
-  private constructor() {
-    if (typeof dcl !== 'undefined') {
-      dcl.subscribe('pointerUp')
-      dcl.subscribe('pointerDown')
-
-      engine.eventManager.addListener(PointerDownEvent, this, event => {
-        this.handlePointerDown(event.payload as PointerEvent)
-      })
-
-      engine.eventManager.addListener(PointerUpEvent, this, event => {
-        this.handlePointerUp(event.payload as PointerEvent)
-      })
-
-      dcl.onEvent(event => {
-        if (event.type === 'pointerUp') {
-          this.handlePointerUp(event.data as PointerEvent)
-        } else if (event.type === 'pointerDown') {
-          this.handlePointerDown(event.data as PointerEvent)
-        }
-      })
-    }
-  }
+  private constructor() {}
 
   static ensureInstance(): any {
     if (!Input._instance) {
@@ -148,12 +123,7 @@ export class Input {
     return false
   }
 
-  private getPointerById(id: number): Pointer {
-    if (id === 0) return Pointer.PRIMARY
-    return Pointer.SECONDARY
-  }
-
-  private handlePointerUp(data: PointerEvent) {
+  public handlePointerUp(data: PointerEvent) {
     const pointer = this.getPointerById(data.pointerId)
     const newData: LocalPointerEvent = {
       ...data,
@@ -185,7 +155,7 @@ export class Input {
     }
   }
 
-  private handlePointerDown(data: PointerEvent) {
+  public handlePointerDown(data: PointerEvent) {
     const pointer = this.getPointerById(data.pointerId)
     const newData: LocalPointerEvent = {
       ...data,
@@ -215,5 +185,10 @@ export class Input {
         handler.callback(newData)
       }
     }
+  }
+
+  private getPointerById(id: number): Pointer {
+    if (id === 0) return Pointer.PRIMARY
+    return Pointer.SECONDARY
   }
 }

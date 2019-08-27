@@ -12,14 +12,14 @@ export class UUIDEvent<T = any> {
  * @public
  */
 @EventConstructor()
-export class PointerDownEvent<PointerEvent> {
-  constructor(public readonly payload: PointerEvent) {}
+export class PointerDownEvent<LocalPointerEvent> {
+  constructor(public readonly payload: LocalPointerEvent) {}
 }
 
 /**
  * @public
  */
 @EventConstructor()
-export class PointerUpEvent<PointerEvent> {
-  constructor(public readonly payload: PointerEvent) {}
+export class PointerUpEvent<LocalPointerEvent> {
+  constructor(public readonly payload: LocalPointerEvent) {}
 }

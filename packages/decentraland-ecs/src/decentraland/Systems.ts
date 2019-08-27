@@ -1,9 +1,9 @@
 import { Engine } from '../ecs/Engine'
 import { UUIDEvent, PointerDownEvent, PointerUpEvent } from './Events'
-import { DecentralandInterface } from './Types'
+import { DecentralandInterface, PointerEvent } from './Types'
 import { OnUUIDEvent } from './Components'
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
-import { log } from 'util'
+import { Input } from './Input'
 
 declare var dcl: DecentralandInterface | void
 
@@ -11,7 +11,15 @@ declare var dcl: DecentralandInterface | void
  * @public
  */
 export class PointerEventSystem implements ISystem {
-  activate(_: Engine) {
+  activate(engine: Engine) {
+    engine.eventManager.addListener(PointerDownEvent, this, event => {
+      Input.instance.handlePointerDown(event.payload as PointerEvent)
+    })
+
+    engine.eventManager.addListener(PointerUpEvent, this, event => {
+      Input.instance.handlePointerUp(event.payload as PointerEvent)
+    })
+
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('pointerUp')
       dcl.subscribe('pointerDown')
@@ -25,6 +33,7 @@ export class PointerEventSystem implements ISystem {
     }
   }
 }
+
 /** @internal */
 export const pointerEventSystem = new PointerEventSystem()
 
@@ -38,14 +47,6 @@ export class UUIDEventSystem implements ISystem {
     engine.eventManager.addListener(UUIDEvent, this, this.handleEvent)
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
     engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)
-
-    engine.eventManager.addListener(PointerDownEvent, this, event => {
-      log('pointer down')
-    })
-
-    engine.eventManager.addListener(PointerUpEvent, this, event => {
-      log('pointer up')
-    })
 
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('uuidEvent')
