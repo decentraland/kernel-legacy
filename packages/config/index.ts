@@ -79,7 +79,7 @@ export namespace visualConfigurations {
 }
 
 // Entry points
-export const PREVIEW: boolean = !!(global as any).preview
+export const PREVIEW: boolean = true
 export const EDITOR: boolean = !!(global as any).isEditor
 
 export const STATIC_WORLD = location.search.indexOf('STATIC_WORLD') !== -1 || !!(global as any).staticWorld
