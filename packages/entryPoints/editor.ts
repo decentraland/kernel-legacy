@@ -48,7 +48,7 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
   bindSceneEvents()
 
   const system = await unityScene.worker.system
-  const engineAPI = unityScene.worker.engineAPI!
+  const engineAPI = unityScene.worker.engineAPI! //
 
   sceneLifeCycleObservable.addOnce(obj => {
     if (sceneData.sceneId === obj.sceneId && obj.status === 'ready') {
