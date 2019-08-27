@@ -98,17 +98,41 @@ export function getWorldSpawnpoint(land: ILand): Vector3 {
   const basePosition = new Vector3()
 
   gridToWorld(parseInt(bx, 10), parseInt(by, 10), basePosition)
-  const [x, y, z] = spawnpoint.split(',')
+  const [x, y, z] = spawnpoint.split(',').map($ => parseFloat($))
 
   return basePosition.add({ x, y, z })
 }
 
 function getSpawnpoint(land: ILand) {
-  if (!land.scene && !land.scene['policy']) {
-    return
+  if (!land.scene || !land.scene.spawnPoints || land.scene.spawnPoints.length === 0) {
+    return undefined
   }
 
-  return (land.scene as any).policy.teleportPosition
+  // 1 - default spawn points
+  const defaults = land.scene.spawnPoints.filter($ => $.default)
+
+  // 2 - if no default spawn points => all existing spawn points
+  const eligiblePoints = defaults.length === 0 ? land.scene.spawnPoints : defaults
+
+  // 3 - pick randomly between spawn points
+  const point = eligiblePoints[Math.floor(Math.random() * eligiblePoints.length)].position
+
+  // 4 - generate random x, y, z components when in arrays
+  return `${computeComponentValue(point.x)},${computeComponentValue(point.y)},${computeComponentValue(point.z)}`
+}
+
+function computeComponentValue(x: number | number[]) {
+  if (typeof x === 'number') {
+    return x
+  }
+  if (x.length !== 2) {
+    throw new Error(`array must have two values ${JSON.stringify(x)}`)
+  }
+  const [min, max] = x
+  if (max <= min) {
+    throw new Error(`max value (${max}) must be greater than min value (${min})`)
+  }
+  return Math.random() * (max - min) + min
 }
 
 export function getLandBase(land: ILand): { x: number; y: number } {
