@@ -1,8 +1,9 @@
 import { Engine } from '../ecs/Engine'
-import { UUIDEvent } from './Events'
+import { UUIDEvent, PointerDownEvent, PointerUpEvent } from './Events'
 import { DecentralandInterface } from './Types'
 import { OnUUIDEvent } from './Components'
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
+import { log } from 'util'
 
 declare var dcl: DecentralandInterface | void
 
@@ -37,6 +38,14 @@ export class UUIDEventSystem implements ISystem {
     engine.eventManager.addListener(UUIDEvent, this, this.handleEvent)
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
     engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)
+
+    engine.eventManager.addListener(PointerDownEvent, this, event => {
+      log('pointer down')
+    })
+
+    engine.eventManager.addListener(PointerUpEvent, this, event => {
+      log('pointer up')
+    })
 
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('uuidEvent')

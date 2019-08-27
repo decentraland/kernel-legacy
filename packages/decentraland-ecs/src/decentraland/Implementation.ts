@@ -1,6 +1,6 @@
 import { Engine } from '../ecs/Engine'
 import { IEntity, ISystem, ComponentAdded, ComponentRemoved, ParentChanged } from '../ecs/IEntity'
-import { UUIDEvent } from './Events'
+import { UUIDEvent, PointerDownEvent, PointerUpEvent } from './Events'
 import {
   DisposableComponentCreated,
   DisposableComponentRemoved,
@@ -43,10 +43,16 @@ export class DecentralandSynchronizationSystem implements ISystem {
     })
 
     this.dcl.onEvent(event => {
+      const data = event.data as any
       switch (event.type) {
         case 'uuidEvent':
-          const data = event.data as any
           engine.eventManager.fireEvent(new UUIDEvent(data.uuid, data.payload))
+          break
+        case 'pointerDown':
+          engine.eventManager.fireEvent(new PointerDownEvent(data.payload))
+          break
+        case 'pointerUp':
+          engine.eventManager.fireEvent(new PointerUpEvent(data.payload))
           break
       }
     })

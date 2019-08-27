@@ -4,6 +4,8 @@
 import { DecentralandInterface, PointerEvent } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
+import { PointerDownEvent, PointerUpEvent } from './Events'
+import { engine } from '../'
 
 declare let dcl: DecentralandInterface | void
 
@@ -96,6 +98,14 @@ export class Input {
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('pointerUp')
       dcl.subscribe('pointerDown')
+
+      engine.eventManager.addListener(PointerDownEvent, this, event => {
+        this.handlePointerDown(event.payload as PointerEvent)
+      })
+
+      engine.eventManager.addListener(PointerUpEvent, this, event => {
+        this.handlePointerUp(event.payload as PointerEvent)
+      })
 
       dcl.onEvent(event => {
         if (event.type === 'pointerUp') {
