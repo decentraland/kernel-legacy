@@ -169,6 +169,7 @@ export function getServerConfigurations() {
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
     profile: `https://profile.decentraland.${TLDDefault}/api/v1`,
     avatar: {
+      server: 'https://avatar-api.decentraland.${TLDDefault}/',
       catalog: 'https://avatar-assets.now.sh',
       contents: `https://s3.amazonaws.com/content-service.decentraland.org/`,
       presets: `https://s3.amazonaws.com/avatars-storage.decentraland.org/mobile-avatars`
