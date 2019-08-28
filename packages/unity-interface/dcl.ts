@@ -43,6 +43,7 @@ import { queueTrackingEvent } from '../shared/analytics'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { Vector3Component } from '../atomicHelpers/landHelpers'
 
 let gameInstance!: GameInstance
 
@@ -73,6 +74,10 @@ const browserInterface = {
     } else {
       defaultLogger.error(`SceneEvent: Scene ${data.sceneId} not found`, data)
     }
+  },
+
+  OpenWebURL(data: { url: string }) {
+    window.open(data.url, '_blank')
   },
 
   PreloadFinished(data: { sceneId: string }) {
@@ -121,10 +126,10 @@ const unityInterface = {
     gameInstance.SendMessage('SceneController', 'CreateUIScene', JSON.stringify(data))
   },
   /** Sends the camera position to the engine */
-  SetPosition(x: number, y: number, z: number) {
-    let theY = y <= 0 ? 2 : y
+  SetPosition(x: number, y: number, z: number, cameraTarget?: Vector3Component) {
+    const theY = y <= 0 ? 2 : y
 
-    gameInstance.SendMessage('CharacterController', 'SetPosition', JSON.stringify({ x, y: theY, z }))
+    gameInstance.SendMessage('CharacterController', 'SetPosition', JSON.stringify({ x, y: theY, z, cameraTarget }))
   },
   /** Tells the engine which scenes to load */
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
@@ -259,6 +264,12 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 }
 
+function setInitialPosition(initialLand: ILand) {
+  const { position, cameraTarget } = getWorldSpawnpoint(initialLand)
+  unityInterface.SetPosition(position.x, position.y, position.z, cameraTarget)
+  queueTrackingEvent('Scene Spawn', { parcel: initialLand.scene.scene.base, spawnpoint: position })
+}
+
 export async function startUnityParcelLoading() {
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
@@ -267,11 +278,6 @@ export async function startUnityParcelLoading() {
       // 1) implement preload call
       // 2) await for preload message or timeout
       // 3) return
-    },
-    onSpawnpoint: initialLand => {
-      const newPosition = getWorldSpawnpoint(initialLand)
-      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
-      queueTrackingEvent('Scene Spawn', { parcel: initialLand.scene.scene.base, spawnpoint: newPosition })
     },
     onLoadParcelScenes: lands => {
       unityInterface.LoadParcelScenes(
@@ -287,8 +293,9 @@ export async function startUnityParcelLoading() {
         unityInterface.UnloadScene($.sceneId)
       })
     },
-    onPositionSettled: () => {
+    onPositionSettled: land => {
       unityInterface.ActivateRendering()
+      land && setInitialPosition(land)
     },
     onPositionUnsettled: () => {
       setLoadingScreenVisible(true)
