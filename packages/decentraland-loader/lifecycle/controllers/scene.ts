@@ -55,7 +55,7 @@ export class SceneLifeCycleController extends EventEmitter {
     const difference = this.diff(lostSight, sighted)
     this.lostSight(difference)
 
-    return { sighted, lostSight }
+    return { sighted, lostSight: difference }
   }
 
   async fetchSceneIds(positions: string[]): Promise<string[]> {
