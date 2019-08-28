@@ -29,7 +29,7 @@ import {
 } from './world/profiles'
 
 // TODO fill with segment keys and integrate identity server
-export async function initializeAnalytics(userId: string) {
+async function initializeAnalytics(userId: string) {
   const TLD = getTLD()
   switch (TLD) {
     case 'org':
@@ -42,6 +42,8 @@ export async function initializeAnalytics(userId: string) {
       return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
   }
 }
+
+declare let window: any
 
 export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth({

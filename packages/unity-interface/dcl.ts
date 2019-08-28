@@ -40,6 +40,8 @@ import { chatObservable } from '../shared/comms/chat'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { Vector3Component } from '../atomicHelpers/landHelpers'
+import { Auth } from '../shared/auth/Auth'
 
 let gameInstance!: GameInstance
 
@@ -78,6 +80,10 @@ const browserInterface = {
 
   PreloadFinished(data: { sceneId: string }) {
     // stub. there is no code about this in unity side yet
+  },
+
+  async LogOut() {
+    await Auth.instance.logout()
   },
 
   ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
