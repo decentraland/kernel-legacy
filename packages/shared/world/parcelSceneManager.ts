@@ -1,5 +1,5 @@
 import { Vector2 } from 'decentraland-ecs/src/decentraland/math'
-import { initParcelSceneWorker, LifecycleManager } from 'decentraland-loader/lifecycle/manager'
+import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
 import { worldToGrid } from 'atomicHelpers/parcelScenePositions'
 
 import { positionObservable, teleportObservable } from './positionThings'
@@ -64,10 +64,8 @@ export function loadParcelScene(parcelScene: ParcelSceneAPI, transport?: Scripti
   return parcelSceneWorker
 }
 
-export let parcelSceneWorker: LifecycleManager
-
 export async function enableParcelSceneLoading(options: EnableParcelSceneLoadingOptions) {
-  const ret = (parcelSceneWorker = await initParcelSceneWorker())
+  const ret = await initParcelSceneWorker()
   const position = Vector2.Zero()
 
   ret.on('Scene.shouldPrefetch', async (opts: { sceneId: string }) => {

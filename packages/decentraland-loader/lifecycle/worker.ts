@@ -70,12 +70,6 @@ let downloadManager: SceneDataDownloadManager
       })
     )
 
-    connector.on('CurrentScene.request', async (_: any) => {
-      connector.notify('CurrentScene.response', {
-        payload: positionController.currentSceneId
-      })
-    })
-
     connector.on('Scene.prefetchDone', (opt: { sceneId: string }) => {
       sceneController.reportDataLoaded(opt.sceneId)
     })

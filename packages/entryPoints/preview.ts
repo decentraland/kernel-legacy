@@ -9,7 +9,6 @@ import { initializeUnity } from '../unity-interface/initializer'
 import { loadPreviewScene } from '../unity-interface/dcl'
 import { DEBUG_WS_MESSAGES } from '../config'
 import defaultLogger from '../shared/logger'
-import { registerPointerEvents } from '../shared/clickEvents'
 
 // Remove the 'dcl-loading' class, used until JS loads.
 document.body.classList.remove('dcl-loading')
@@ -57,7 +56,6 @@ function startPreviewWatcher() {
 
 initializeUnity(container)
   .then(ret => {
-    registerPointerEvents(true)
     startPreviewWatcher()
 
     ret.instancedJS

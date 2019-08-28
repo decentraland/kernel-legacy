@@ -34,13 +34,6 @@ export class LifecycleManager extends TransportBasedServer {
     })
   }
 
-  getCurrentScene() {
-    const data = future<string>()
-    this.once('CurrentScene.response', (event: { payload: string }) => data.resolve(event.payload))
-    this.notify('CurrentScene.request', {})
-    return data
-  }
-
   getParcelData(sceneId: string) {
     let theFuture = this.sceneIdToRequest.get(sceneId)
     if (!theFuture) {

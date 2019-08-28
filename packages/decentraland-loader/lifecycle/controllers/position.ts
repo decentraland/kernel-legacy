@@ -5,9 +5,8 @@ import { ParcelLifeCycleController } from './parcel'
 
 export class PositionLifecycleController extends EventEmitter {
   private positionSettled: boolean = false
+  private currentSceneId?: string
   private currentlySightedScenes: string[] = []
-
-  currentSceneId?: string
 
   constructor(public parcelController: ParcelLifeCycleController, public sceneController: SceneLifeCycleController) {
     super()
