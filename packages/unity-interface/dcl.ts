@@ -291,8 +291,8 @@ export async function startUnityParcelLoading() {
       })
     },
     onPositionSettled: land => {
-      land && setInitialPosition(land)
       unityInterface.ActivateRendering()
+      land && setInitialPosition(land)
     },
     onPositionUnsettled: () => {
       setLoadingScreenVisible(true)
