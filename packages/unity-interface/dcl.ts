@@ -44,6 +44,7 @@ import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
 import { Vector3Component } from '../atomicHelpers/landHelpers'
+import { getTLD } from '../config/index'
 
 let gameInstance!: GameInstance
 
@@ -107,9 +108,6 @@ function setLoadingScreenVisible(shouldShow: boolean) {
 
 const unityInterface = {
   debug: false,
-  SetDebug() {
-    gameInstance.SendMessage('SceneController', 'SetDebug')
-  },
   LoadProfile(profile: Profile) {
     gameInstance.SendMessage('SceneController', 'LoadProfile', JSON.stringify(profile))
   },
@@ -144,14 +142,6 @@ const unityInterface = {
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
-
-  SetSceneDebugPanel() {
-    gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
-  },
-
-  SetEngineDebugPanel() {
-    gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
-  },
   ActivateRendering() {
     gameInstance.SendMessage('SceneController', 'ActivateRendering')
   },
@@ -160,6 +150,13 @@ const unityInterface = {
   },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+  InitializeConfiguration(config: {
+    debug?: boolean
+    debugPanel?: 'SceneDebugPanel' | 'EngineDebugPanel'
+    env: 'localhost' | 'zone' | 'today' | 'org'
+  }) {
+    gameInstance.SendMessage('SceneController', 'InitializeConfiguration', JSON.stringify(config))
   }
 }
 
@@ -234,19 +231,15 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
   unityInterface.DeactivateRendering()
 
-  if (DEBUG) {
-    unityInterface.SetDebug()
-  }
-
-  if (SCENE_DEBUG_PANEL) {
-    unityInterface.SetSceneDebugPanel()
-  }
-
-  if (ENGINE_DEBUG_PANEL) {
-    unityInterface.SetEngineDebugPanel()
-  }
+  unityInterface.InitializeConfiguration({
+    debug: DEBUG,
+    debugPanel: ENGINE_DEBUG_PANEL ? 'EngineDebugPanel' : SCENE_DEBUG_PANEL ? 'SceneDebugPanel' : undefined,
+    env: getTLD()
+  })
 
   await initializeDecentralandUI()
+
+  unityInterface.LoadProfile(getUserProfile().profile)
 
   return {
     unityInterface,
@@ -318,7 +311,6 @@ async function initializeDecentralandUI() {
   await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
-  unityInterface.LoadProfile(getUserProfile().profile)
 }
 
 let currentLoadedScene: SceneWorker
