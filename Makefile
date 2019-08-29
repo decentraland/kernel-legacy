@@ -82,7 +82,7 @@ public/ecs-scenes/%/game.js: $(SCENE_SYSTEM) public/ecs-scenes/%/game.ts
 # All scenes together
 
 test-scenes: $(TEST_SCENES_GAMEJS_FILES) $(HELLMAP_GAMEJS_FILES) $(TEST_ECS_SCENE_GAMEJS_FILES) ## Build the test scenes
-	$(MAKE) generate-ip
+	$(MAKE) generate-mocks
 
 # Entry points
 
