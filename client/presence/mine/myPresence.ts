@@ -10,7 +10,7 @@ import {
   worldToGrid
 } from '@dcl/utils'
 import { SceneLoader } from '../../scenes/loader/SceneLoader'
-import { upgradeToV2 } from '../../worldMap/compat/v1'
+import { upgradeToV2 } from '../../worldMap/sceneCompatibility/migrateFromILand'
 import { PositionReport } from '../types/PositionReport'
 import { getPositionReport } from './getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'

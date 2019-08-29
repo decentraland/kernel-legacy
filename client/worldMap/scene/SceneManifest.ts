@@ -14,6 +14,7 @@ import {
 
 import { stableStringify, parcelLimits, sha256 } from '@dcl/utils'
 import { isValidSceneInput, getInvalidReason } from './validation'
+
 export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest
   private _cannonicalRepresentation?: string

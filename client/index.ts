@@ -3,7 +3,7 @@ import * as AuthTypes from './auth/types'
 import * as Comms from './comms/connect'
 import * as Config from './config'
 import * as WorldScene from './worldMap/scene'
-import * as WorldSceneV1 from './worldMap/compat/v1'
+import * as WorldSceneV1 from './worldMap/sceneCompatibility/migrateFromILand'
 
 import * as Systems from './main/impl/index'
 import * as MainController from './main/index'
