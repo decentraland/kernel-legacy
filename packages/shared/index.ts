@@ -120,7 +120,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     }
 
     let spec: ProfileSpec
-    if (response && !response.ok) {
+    if (!response || !response.ok) {
       const legacy = await fetch(`${getServerConfigurations().avatar.server}api/profile`, {
         headers: { Authorization: 'Bearer ' + localStorage.getItem('decentraland-auth-user-token') }
       })
