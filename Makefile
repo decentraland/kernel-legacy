@@ -81,7 +81,7 @@ public/ecs-scenes/%/game.js: $(SCENE_SYSTEM) public/ecs-scenes/%/game.ts
 
 # All scenes together
 
-build-test-scenes: $(TEST_SCENES_GAMEJS_FILES) $(HELLMAP_GAMEJS_FILES) $(TEST_ECS_SCENE_GAMEJS_FILES) ## Build the test scenes
+test-scenes: $(TEST_SCENES_GAMEJS_FILES) $(HELLMAP_GAMEJS_FILES) $(TEST_ECS_SCENE_GAMEJS_FILES) ## Build the test scenes
 
 # Entry points
 
@@ -109,7 +109,7 @@ TEST_SOURCE_FILES := $(wildcard test/**/*.ts)
 test/out/index.js: build-essentials $(TEST_SOURCE_FILES)
 	@$(COMPILER) ./targets/test.json
 
-test: build-essentials build-test-scenes generate-mocks test/out/index.js ## Run all the tests
+test: build-essentials test-scenes generate-mocks test/out/index.js ## Run all the tests
 	@node scripts/runTestServer.js
 
 test-docker: ## Run all the tests using a docker container
@@ -215,4 +215,4 @@ clean: ## Clean all generated files
 .DEFAULT_GOAL := help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
-	@echo "\nYou probably want to run 'make watch'"
+	@echo "\nYou probably want to run 'make watch' or 'make test-scenes watch' to build all the test scenes and run the local comms server."
