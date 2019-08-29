@@ -12,14 +12,6 @@ export class UUIDEvent<T = any> {
  * @public
  */
 @EventConstructor()
-export class PointerDownEvent<LocalPointerEvent> {
-  constructor(public readonly payload: LocalPointerEvent) {}
-}
-
-/**
- * @public
- */
-@EventConstructor()
-export class PointerUpEvent<LocalPointerEvent> {
-  constructor(public readonly payload: LocalPointerEvent) {}
+export class PointerEvent<GlobalInputEventResult> {
+  constructor(public readonly payload: GlobalInputEventResult) {}
 }

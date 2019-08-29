@@ -1,7 +1,7 @@
 // tslint:disable:ter-indent
 // tslint:disable:ter-indent
 
-import { PointerEvent } from './Types'
+import { GlobalInputEventResult, InputEventType } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
 
@@ -25,11 +25,11 @@ export type InputState = Record<
 >
 
 /** @public */
-export type LocalPointerEvent = PointerEvent & {
+export type LocalPointerEvent = GlobalInputEventResult & {
   origin: Vector3
   direction: Vector3
   pointer: Pointer
-  hit?: PointerEvent['hit'] & {
+  hit?: GlobalInputEventResult['hit'] & {
     hitPoint: Vector3
     normal: Vector3
     worldNormal: Vector3
@@ -123,7 +123,7 @@ export class Input {
     return false
   }
 
-  public handlePointerUp(data: PointerEvent) {
+  public handlePointerEvent(data: GlobalInputEventResult) {
     const pointer = this.getPointerById(data.pointerId)
     const newData: LocalPointerEvent = {
       ...data,
@@ -140,49 +140,33 @@ export class Input {
         : undefined
     }
 
-    this.internalState[Pointer.PRIMARY].BUTTON_DOWN = false
+    if (data.type === InputEventType.DOWN) {
+      this.internalState[Pointer.PRIMARY].BUTTON_DOWN = true
 
-    for (let i = 0; i < this.subscriptions['BUTTON_UP'].length; i++) {
-      this.subscriptions['BUTTON_UP'][i](newData)
-    }
-
-    if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-      const entity = DisposableComponent.engine.entities[newData.hit.entityId]
-      const handler = entity && entity.getComponentOrNull(GlobalPointerUp)
-      if (handler) {
-        handler.callback(newData)
+      for (let i = 0; i < this.subscriptions['BUTTON_DOWN'].length; i++) {
+        this.subscriptions['BUTTON_DOWN'][i](newData)
       }
-    }
-  }
 
-  public handlePointerDown(data: PointerEvent) {
-    const pointer = this.getPointerById(data.pointerId)
-    const newData: LocalPointerEvent = {
-      ...data,
-      pointer,
-      direction: new Vector3().copyFrom(data.direction),
-      origin: new Vector3().copyFrom(data.origin),
-      hit: data.hit
-        ? {
-            ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
-          }
-        : undefined
-    }
+      if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[newData.hit.entityId]
+        const handler = entity && entity.getComponentOrNull(GlobalPointerDown)
+        if (handler) {
+          handler.callback(newData)
+        }
+      }
+    } else {
+      this.internalState[Pointer.PRIMARY].BUTTON_DOWN = false
 
-    this.internalState[Pointer.PRIMARY].BUTTON_DOWN = true
+      for (let i = 0; i < this.subscriptions['BUTTON_UP'].length; i++) {
+        this.subscriptions['BUTTON_UP'][i](newData)
+      }
 
-    for (let i = 0; i < this.subscriptions['BUTTON_DOWN'].length; i++) {
-      this.subscriptions['BUTTON_DOWN'][i](newData)
-    }
-
-    if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-      const entity = DisposableComponent.engine.entities[newData.hit.entityId]
-      const handler = entity && entity.getComponentOrNull(GlobalPointerDown)
-      if (handler) {
-        handler.callback(newData)
+      if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[newData.hit.entityId]
+        const handler = entity && entity.getComponentOrNull(GlobalPointerUp)
+        if (handler) {
+          handler.callback(newData)
+        }
       }
     }
   }
