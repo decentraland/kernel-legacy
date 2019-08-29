@@ -17,8 +17,8 @@
       "@dcl/webb/*": ["./*"],
       "@dcl/utils/*": ["../../utils/package/*"],
       "@dcl/utils": ["../../utils/package"],
-      "@dcl/client": ["../../client/package"],
-      "@dcl/client/*": ["../../client/package/*"],
+      "@dcl/kernel": ["../../client/package"],
+      "@dcl/kernel/*": ["../../client/package/*"],
       "@dcl/config": ["../../config/package"],
       "@dcl/config/*": ["../../config/package/*"]
     },

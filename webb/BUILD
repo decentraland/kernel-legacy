@@ -45,11 +45,11 @@ nodejs_binary(
         ":public",
         ":tsconfig.json",
         # Other modules
-        "//client",
+        "//kernel",
         "//utils",
         "//config",
         "//protos",
-        "//client:package",
+        "//kernel:package",
         "//utils:package",
         "//config:package",
         "//protos:package",

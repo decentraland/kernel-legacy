@@ -1,4 +1,4 @@
-import { MainController } from '@dcl/client'
+import { MainController } from '@dcl/kernel'
 import { Observable } from '@dcl/utils'
 import { Store, Middleware } from 'redux'
 

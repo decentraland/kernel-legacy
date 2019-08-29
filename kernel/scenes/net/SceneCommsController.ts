@@ -4,7 +4,7 @@ import { exposeMethod, APIOptions } from '@dcl/rpc/common/API'
 import { subscribeParcelSceneToCommsMessages, unsubscribeParcelSceneToCommsMessages } from './SceneToSceneComms'
 
 import { IEventsManager } from '../exposedApis/IEventsManager'
-import { PeerInformation } from '@dcl/client/comms/types'
+import { PeerInformation } from '@dcl/kernel/comms/types'
 
 @registerAPI('CommunicationsController')
 export class SceneCommsController extends ExposableAPI {

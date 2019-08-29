@@ -1,6 +1,6 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { ProfileStore, StoredProfile } from '@dcl/client'
+import { ProfileStore, StoredProfile } from '@dcl/kernel'
 
 import { AuthRootState } from '../auth'
 import { client } from '../systems'

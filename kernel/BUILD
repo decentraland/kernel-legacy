@@ -15,7 +15,7 @@ filegroup(
 )
 
 ts_library(
-    name = "client",
+    name = "kernel",
     srcs = glob([
         "index.ts",
         "auth/**/*.ts",
@@ -29,7 +29,7 @@ ts_library(
         "social/**/*.ts",
         "worldMap/**/*.ts",
     ]),
-    module_name = "@dcl/client",
+    module_name = "@dcl/kernel",
     deps = [
         "//config",
         "//protos",
@@ -55,7 +55,7 @@ dcl_npm_package(
     package_layers = [
         "//:common.package.json",
         "//:tslib.package.json",
-        "client.package.json",
+        "kernel.package.json",
     ],
-    deps = [":client"],
+    deps = [":kernel"],
 )

@@ -2,6 +2,12 @@
   "name": "webb",
   "version": "0.0.0",
   "dependencies": {
+    "@dcl/kernel": "$DCL_VERSION",
+    "@dcl/utils": "$DCL_VERSION",
+    "@dcl/protos": "$DCL_VERSION",
+    "@dcl/scene-api": "$DCL_VERSION",
+    "@dcl/rpc": "$DCL_VERSION",
+    "@dcl/config": "$DCL_VERSION",
     "@babel/core": "^7.5.5",
     "@types/history": "^4.7.2",
     "@types/node": "12.6.8",

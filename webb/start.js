@@ -52,7 +52,7 @@ fuse.register('@dcl/utils', {
   main: 'index.js',
   instructions: '../utils/package/**'
 })
-fuse.register('@dcl/client', {
+fuse.register('@dcl/kernel', {
   homeDir: '../client/package',
   main: 'index.js',
   instructions: '../client/package/**'

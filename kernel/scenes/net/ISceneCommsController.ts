@@ -1,4 +1,4 @@
-import { PeerInformation } from '@dcl/client/comms/types'
+import { PeerInformation } from '@dcl/kernel/comms/types'
 
 @registerAPI('CommsController')
 export interface ISceneCommsController {

@@ -1,5 +1,5 @@
 {
-  "name": "@dcl/client",
+  "name": "@dcl/kernel",
   "version": "0.0.0",
   "description": "Client libraries for Decentraland",
   "repository": "https://github.com/decentraland/explorer",
