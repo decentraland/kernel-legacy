@@ -1,28 +1,23 @@
-import { Auth } from './auth'
-
-import './apis/index'
-import './events'
-
-import {
-  ETHEREUM_NETWORK,
-  setNetwork,
-  getTLD,
-  PREVIEW,
-  DEBUG,
-  ENABLE_WEB3,
-  STATIC_WORLD,
-  getServerConfigurations
-} from '../config'
-
-import { initializeUrlPositionObserver } from './world/positionThings'
-import { connect } from './comms'
+import { DEBUG, ENABLE_WEB3, ETHEREUM_NETWORK, getTLD, PREVIEW, setNetwork, STATIC_WORLD } from '../config'
 import { initialize, queueTrackingEvent } from './analytics'
-import { defaultLogger } from './logger'
-import { initWeb3, getNetworkFromTLD, getAppNetwork } from './web3'
-import { fetchProfile, createProfile, createStubProfileSpec, resolveProfileSpec, legacyToSpec } from './world/profiles'
-import { ProfileSpec } from './types'
+import './apis/index'
+import { Auth } from './auth'
+import { connect } from './comms'
 import { persistCurrentUser } from './comms/index'
 import { localProfileUUID } from './comms/peers'
+import './events'
+import { defaultLogger } from './logger'
+import { ProfileSpec } from './types'
+import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
+import { initializeUrlPositionObserver } from './world/positionThings'
+import {
+  createProfile,
+  createStubProfileSpec,
+  fetchLegacy,
+  fetchProfile,
+  legacyToSpec,
+  resolveProfileSpec
+} from './world/profiles'
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -121,9 +116,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
     let spec: ProfileSpec
     if (!response || !response.ok) {
-      const legacy = await fetch(`${getServerConfigurations().avatar.server}api/profile`, {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('decentraland-auth-user-token') }
-      })
+      const legacy = await fetchLegacy()
       if (legacy.ok) {
         spec = legacyToSpec((await legacy.json()).data)
       } else {

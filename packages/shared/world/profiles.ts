@@ -20,7 +20,7 @@ export async function resolveProfile(uuid: string = ''): Promise<Profile> {
     spec = (await response.json()) as ProfileSpec
   } else {
     const legacy = await fetchLegacy(uuid)
-    if (legacy && legacy.ok) {
+    if (!PREVIEW && legacy && legacy.ok) {
       spec = legacyToSpec((await legacy.json()).data)
     } else {
       spec = await createStubProfileSpec()
