@@ -82,6 +82,7 @@ public/ecs-scenes/%/game.js: $(SCENE_SYSTEM) public/ecs-scenes/%/game.ts
 # All scenes together
 
 test-scenes: $(TEST_SCENES_GAMEJS_FILES) $(HELLMAP_GAMEJS_FILES) $(TEST_ECS_SCENE_GAMEJS_FILES) ## Build the test scenes
+	$(MAKE) generate-ip
 
 # Entry points
 
@@ -109,7 +110,8 @@ TEST_SOURCE_FILES := $(wildcard test/**/*.ts)
 test/out/index.js: build-essentials $(TEST_SOURCE_FILES)
 	@$(COMPILER) ./targets/test.json
 
-test: build-essentials test-scenes generate-mocks test/out/index.js ## Run all the tests
+test: build-essentials test-scenes test/out/index.js ## Run all the tests
+	$(MAKE) generate-mocks
 	@node scripts/runTestServer.js
 
 test-docker: ## Run all the tests using a docker container
@@ -211,7 +213,7 @@ clean: ## Clean all generated files
 
 # Makefile
 
-.PHONY: help clean watch lint lint-fix generate-mocks generate-images test-ci test-docker
+.PHONY: help clean watch lint lint-fix generate-images test-ci test-docker
 .DEFAULT_GOAL := help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
