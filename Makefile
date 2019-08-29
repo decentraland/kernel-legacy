@@ -173,6 +173,16 @@ npm-link: build-essentials static/dist/preview.js static/dist/editor.js ## Run `
 	ln -sf $(CWD)/static/unity-preview.html packages/decentraland-ecs/artifacts/unity-preview.html
 	cd packages/decentraland-ecs; npm link
 
+watch-builder: build-essentials static/dist/editor.js ## Watch the files required for hacking with the builder
+	@node_modules/.bin/concurrently \
+		-n "ecs,scene-system,internal-scenes,loader,preview,unity,builder,server" \
+			"$(COMPILER) targets/engine/ecs.json --watch" \
+			"$(COMPILER) targets/engine/scene-system.json --watch" \
+			"$(COMPILER) targets/engine/internal-scenes.json --watch" \
+			"$(COMPILER) targets/engine/loader.json --watch" \
+			"$(COMPILER) targets/entryPoints/editor.json --watch" \
+			"node ./scripts/runTestServer.js --keep-open"
+
 watch-cli: build-essentials ## Watch the files required for building the CLI
 	@node_modules/.bin/concurrently \
 		-n "ecs,scene-system,internal-scenes,loader,preview,unity,server" \
