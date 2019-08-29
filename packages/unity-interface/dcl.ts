@@ -448,7 +448,10 @@ export async function loadPreviewScene() {
 }
 
 export function loadBuilderScene(sceneData: ILand) {
+  let lastId: string | null = null
+
   if (currentLoadedScene) {
+    lastId = currentLoadedScene.parcelScene.data.sceneId
     stopParcelSceneWorker(currentLoadedScene)
   }
 
@@ -462,6 +465,10 @@ export function loadBuilderScene(sceneData: ILand) {
   const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
   delete target.land
 
+  if (lastId) {
+    unityInterface.UnloadScene(lastId)
+  }
+
   unityInterface.LoadParcelScenes([target])
   return parcelScene
 }
@@ -473,6 +480,7 @@ export function readyBuilderScene() {
 export function updateBuilderScene(sceneData: ILand) {
   defaultLogger.info('Updating Builder Scene...')
   defaultLogger.info('mappings: ', sceneData.mappingsResponse)
+
   if (currentLoadedScene) {
     const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
     delete target.land
