@@ -85,7 +85,7 @@ configureShapeEntityPositions([new Vector3(8, 1, 16),
         ], 0.7, new BoxShape())
 
 // PUSHABLE SHARK
-let sharkEntity = configureShapeEntityPositions([new Vector3(32, 1.2, -16)], 0.7, new GLTFShape('models/shark.gltf'))
+let sharkEntity = configureShapeEntityPositions([new Vector3(31.5, 1.2, -16)], 0.7, new GLTFShape('models/shark.gltf'))
 let animator = new Animator()
 let clipSwim = new AnimationState('swim')
 animator.addClip(clipSwim)
@@ -123,3 +123,20 @@ sharkRightMovementTrigger.addComponent(
   })
 )
 engine.addEntity(sharkRightMovementTrigger)
+
+let sharkVisibilityTrigger = new Entity()
+sharkVisibilityTrigger.addComponentOrReplace(new BoxShape());
+sharkVisibilityTrigger.setParent(sharkEntity)
+sharkVisibilityTrigger.addComponent(
+  new Transform({
+    position: new Vector3(-0.25, 3, 0),
+    scale: new Vector3(0.3, 0.3, 0.3)
+  })
+)
+sharkVisibilityTrigger.addComponent(
+  new OnClick(e => {
+    let shapeComponent = sharkEntity.getComponent(GLTFShape)
+    shapeComponent.visible = !shapeComponent.visible
+  })
+)
+engine.addEntity(sharkVisibilityTrigger)
