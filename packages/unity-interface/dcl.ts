@@ -14,7 +14,9 @@ import {
   IScene,
   MappingsResponse,
   ILand,
-  Profile
+  Profile,
+  Ray,
+  RayQuery
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -147,6 +149,20 @@ const unityInterface = {
       defaultLogger.info(parcelSceneId, method, payload, tag)
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
+  },
+
+  RaycastQuery(ray: RayQuery) {
+    const parameters = [
+      ray.queryId,
+      ray.origin.x,
+      ray.origin.y,
+      ray.origin.z,
+      ray.direction.x,
+      ray.direction.y,
+      ray.direction.z,
+      ray.distance
+    ]
+    gameInstance.SendMessage(`PhysicsCast`, ray.queryType, parameters.join('\t'))
   },
 
   SetSceneDebugPanel() {

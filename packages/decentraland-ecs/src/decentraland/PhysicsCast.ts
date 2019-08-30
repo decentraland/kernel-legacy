@@ -1,45 +1,47 @@
 import { ReadOnlyVector3 } from './math'
 
-interface RaycastQuery {
+export interface RaycastQuery {
+  queryId: string
+  queryType: 'hitFirst' | 'hitAll' | 'hitFirstAvatar' | 'hitAllAvatars'
   ray: Ray
 }
 
-interface RaycastHit {
+export interface RaycastHit {
   didHit: boolean
   ray: Ray
   hitPoint: ReadOnlyVector3
   hitNormal: ReadOnlyVector3
 }
 
-interface Ray {
+export interface Ray {
   origin: ReadOnlyVector3
   direction: ReadOnlyVector3
   distance: number
 }
 
-interface HitEntityInfo {
+export interface HitEntityInfo {
   entityId: string
   meshName: string
 }
 
-interface RaycastHitEntities extends RaycastHit {
+export interface RaycastHitEntities extends RaycastHit {
   entities: HitEntityInfo[]
 }
 
-interface RaycastHitEntity extends RaycastHit {
+export interface RaycastHitEntity extends RaycastHit {
   entities: HitEntityInfo
 }
 
-interface BasicAvatarInfo {
+export interface BasicAvatarInfo {
   userId: string
   name: string
 }
 
-interface RaycastHitAvatar extends RaycastHit {
+export interface RaycastHitAvatar extends RaycastHit {
   avatar: BasicAvatarInfo
 }
 
-interface RaycastHitAvatars extends RaycastHit {
+export interface RaycastHitAvatars extends RaycastHit {
   avatars: BasicAvatarInfo[]
 }
 

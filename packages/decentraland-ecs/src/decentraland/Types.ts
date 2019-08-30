@@ -1,4 +1,5 @@
 import { ReadOnlyVector3, ReadOnlyQuaternion } from './math'
+import { RaycastResponse } from './Events'
 
 /** @public */
 export type ModuleDescriptor = {
@@ -148,6 +149,11 @@ export interface IEvents {
    * It could be a VR controller, a touch screen or the mouse.
    */
   pointerDown: PointerEvent
+
+  /**
+   * `raycastResponse` is triggered in response to a raycast query
+   */
+  raycastResponse: RaycastResponse
 
   /**
    * `chatMessage` is triggered when the user sends a message through chat entity.

@@ -1,6 +1,6 @@
 import { Engine } from '../ecs/Engine'
 import { IEntity, ISystem, ComponentAdded, ComponentRemoved, ParentChanged } from '../ecs/IEntity'
-import { UUIDEvent } from './Events'
+import { UUIDEvent, RaycastResponse } from './Events'
 import {
   DisposableComponentCreated,
   DisposableComponentRemoved,
@@ -47,6 +47,9 @@ export class DecentralandSynchronizationSystem implements ISystem {
         case 'uuidEvent':
           const data = event.data as any
           engine.eventManager.fireEvent(new UUIDEvent(data.uuid, data.payload))
+          break
+        case 'raycastResponse':
+          engine.eventManager.fireEvent(new RaycastResponse(data))
           break
       }
     })

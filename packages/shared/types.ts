@@ -392,6 +392,17 @@ export type AvatarAsset = {
   }>
 }
 
+export type Ray = {
+  origin: Vector3Component
+  direction: Vector3Component
+  distance: number
+}
+
+export type RayQuery = {
+  queryId: string
+  queryType: 'hitFirst' | 'hitAll' | 'hitFirstAvatar' | 'hitAllAvatars'
+} & Ray
+
 export function normalizeContentMappings(
   mappings: Record<string, string> | Array<ContentMapping>
 ): Array<ContentMapping> {
