@@ -44,7 +44,6 @@ jobs:
           name: Restoring node-modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
 
       # install differences in node_modules
       - run: npm ci
@@ -115,7 +114,6 @@ jobs:
           name: Restore node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
       - run:
           name: Set up NPM access tokens
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
@@ -142,7 +140,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
       - run:
           name: Set up NPM
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
