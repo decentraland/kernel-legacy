@@ -1,6 +1,6 @@
 {
   "name": "dcl-kernel",
-  "version": "6.0.0",
+  "version": "6.4.0",
   "license": "Apache-2.0",
   "scripts": {
     "postinstall": "git lfs install --force",
