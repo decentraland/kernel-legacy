@@ -41,7 +41,7 @@ jobs:
 
       # restore node_modules
       - restore_cache:
-          name: Restoring node-modules
+          name: Restoring node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
 
