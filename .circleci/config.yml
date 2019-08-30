@@ -38,14 +38,10 @@ jobs:
           key: gitlfs-{{ .Branch }}
           paths:
             - .git/lfs
-
-      # restore node_modules
       - restore_cache:
           name: Restoring node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-
-      # install differences in node_modules
       - run:
           name: Install differences in node_modules
           command: |
@@ -56,7 +52,29 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
-
+      - run:
+          name: Run linters and checks
+          command: |
+              make lint
+              npm outdated --depth 0 || true
+      - run:
+          name: Build decentraland-ecs
+          command: |
+              make build-essentials
+      - restore_cache:
+          name: Restore cached test scenes
+          keys:
+            - cached-scenes-{{ checksum "packages/decentraland-ecs/dist/index.d.ts" }}
+      - run:
+          name: Build scenes
+          command: |
+              make test-scenes
+      - save_cache:
+          name: Store cached test scenes
+          paths:
+            - packages/decentraland-ecs
+            - public
+          key: cached-scenes-{{ checksum "packages/decentraland-ecs/dist/index.d.ts" }}
       - run:
           name: Run checks and tests
           command: |
@@ -64,7 +82,6 @@ jobs:
               npm outdated --depth 0 || true
               make test-ci
               npx codecov
-
       - store_artifacts:
           name: Save screenshots of visual tests
           path: test/diff
