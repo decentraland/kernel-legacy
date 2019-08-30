@@ -84,7 +84,7 @@ configureShapeEntityPositions([new Vector3(8, 1, 16),
           new Vector3(24, 1, -24)
         ], 0.7, new BoxShape())
 
-// PUSHABLE SHARK
+// PUSHABLE ANIMATED SHARK
 let sharkEntity = configureShapeEntityPositions([new Vector3(31.5, 1.2, -16)], 0.7, new GLTFShape('models/shark.gltf'))
 let animator = new Animator()
 let clipSwim = new AnimationState('swim')
@@ -140,3 +140,55 @@ sharkVisibilityTrigger.addComponent(
   })
 )
 engine.addEntity(sharkVisibilityTrigger)
+
+// PUSHABLE COLLIDING TREE
+let treeEntity = configureShapeEntityPositions([new Vector3(16, 0, 0)], 0.7, new GLTFShape('models/PalmTree_01.glb'))
+
+let treeLeftMovementTrigger = new Entity()
+treeLeftMovementTrigger.addComponentOrReplace(new BoxShape());
+treeLeftMovementTrigger.setParent(treeEntity)
+treeLeftMovementTrigger.addComponent(
+  new Transform({
+    position: new Vector3(-0.25, 2, 0),
+    scale: new Vector3(0.3, 1, 3)
+  })
+)
+treeLeftMovementTrigger.addComponent(
+  new OnClick(e => {
+    treeEntity.getComponent(Transform).position.x += 1
+  })
+)
+engine.addEntity(treeLeftMovementTrigger)
+
+let treeRightMovementTrigger = new Entity()
+treeRightMovementTrigger.addComponentOrReplace(new BoxShape());
+treeRightMovementTrigger.setParent(treeEntity)
+treeRightMovementTrigger.addComponent(
+  new Transform({
+    position: new Vector3(0.25, 2, 0),
+    scale: new Vector3(0.3, 1, 3)
+  })
+)
+treeRightMovementTrigger.addComponent(
+  new OnClick(e => {
+    treeEntity.getComponent(Transform).position.x -= 1
+  })
+)
+engine.addEntity(treeRightMovementTrigger)
+
+let treeVisibilityTrigger = new Entity()
+treeVisibilityTrigger.addComponentOrReplace(new BoxShape());
+treeVisibilityTrigger.setParent(treeEntity)
+treeVisibilityTrigger.addComponent(
+  new Transform({
+    position: new Vector3(-0.25, 3, 0),
+    scale: new Vector3(0.3, 0.3, 0.3)
+  })
+)
+treeVisibilityTrigger.addComponent(
+  new OnClick(e => {
+    let shapeComponent = treeEntity.getComponent(GLTFShape)
+    shapeComponent.visible = !shapeComponent.visible
+  })
+)
+engine.addEntity(treeVisibilityTrigger)
