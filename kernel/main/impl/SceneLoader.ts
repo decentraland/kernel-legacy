@@ -2,7 +2,7 @@ import { parcelLimits } from '@dcl/utils'
 import { getServerConfigurations } from '@dcl/config'
 
 import { SubsystemController } from '../subsystems'
-import { SceneLoader } from '../../scenes/loader/SceneLoader'
+import { SceneLoader } from '../../loader/SceneLoader'
 
 export class SceneLoaderSystem extends SubsystemController {
   sceneLoader: SceneLoader

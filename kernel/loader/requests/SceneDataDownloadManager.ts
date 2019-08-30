@@ -1,8 +1,8 @@
 import { future, IFuture } from 'fp-future'
 import { IScene, ILand, ParcelInfoResponse, error, defaultLogger } from '@dcl/utils'
 
-import { getSceneIdFromSceneMappingResponse } from './scope/getSceneIdFromSceneMappingResponse'
-import { SceneMappingResponse } from '../types/SceneMappingResponse'
+import { getSceneIdFromSceneMappingResponse } from '../scope/getSceneIdFromSceneMappingResponse'
+import { SceneMappingResponse } from '../../scenes/types/SceneMappingResponse'
 import { jsonFetch } from '@dcl/utils/network'
 
 export class SceneDataDownloadManager {
@@ -18,7 +18,7 @@ export class SceneDataDownloadManager {
     // stub
   }
 
-  async resolveSceneSceneId(pos: string): Promise<string | null> {
+  async resolvePositionToSceneId(pos: string): Promise<string | null> {
     if (this.positionToSceneId.has(pos)) {
       return this.positionToSceneId.get(pos)!
     }
@@ -73,7 +73,7 @@ export class SceneDataDownloadManager {
       }
       const content = mappings.data[0]
       if (!content || !content.content || !content.content.contents) {
-        defaultLogger.info(`Resolved ${sceneId} to null -- no contents`, content)
+        // defaultLogger.info(`Resolved ${sceneId} to null -- no contents`, content)
         promised.resolve(null)
         return null
       }
@@ -118,12 +118,13 @@ export class SceneDataDownloadManager {
     }
   }
 
-  async getParcelDataBySceneId(sceneId: string): Promise<ILand<any> | null> {
+  async getSceneDataForSceneId(sceneId: string): Promise<ILand<any> | null> {
     return this.sceneIdToLandData.get(sceneId)!
   }
 
-  async getParcelData(position: string): Promise<ILand<any> | null> {
-    const sceneId = await this.resolveSceneSceneId(position)
+  async getSceneData(position: string): Promise<ILand<any> | null> {
+    const sceneId = await this.resolvePositionToSceneId(position)
+    console.log(`Resolved ${position} to ${sceneId}`)
     if (sceneId === null) {
       return null
     }

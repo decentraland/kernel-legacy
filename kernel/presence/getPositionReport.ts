@@ -1,4 +1,4 @@
-import { PositionReport } from '../types/PositionReport'
+import { PositionReport } from './types/PositionReport'
 
 export function getPositionReport(positionReport: PositionReport) {
   const p = positionReport.position

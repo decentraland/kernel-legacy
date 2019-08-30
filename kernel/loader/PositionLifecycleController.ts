@@ -6,23 +6,23 @@ import { Vector2 } from '@dcl/utils'
 export class PositionLifecycleController extends EventEmitter {
   private positionSettled: boolean = false
   private currentSceneId?: string
-  private currentlySightedScenes: string[] = []
+  private currentlySightedParcels: string[] = []
 
   constructor(public parcelController: ParcelLifeCycleController, public sceneController: SceneLifeCycleController) {
     super()
-    sceneController.on('Scene status', () => this.checkPositionSettlement())
+    sceneController.on('Scene.started', () => this.checkPositionSettlement())
   }
 
   async reportCurrentPosition(position: Vector2, teleported: boolean) {
     const parcels = this.parcelController.reportCurrentPosition(position)
 
-    this.currentSceneId = await this.sceneController.requestSceneId(`${position.x},${position.y}`)
+    this.currentSceneId = await this.sceneController.resolvePositionToSceneId(`${position.x},${position.y}`)
 
     if (parcels) {
-      const newlySightedScenes = await this.sceneController.reportSightedParcels(parcels.sighted, parcels.lostSight)
+      await this.sceneController.reportSightedParcels(parcels.sighted, parcels.lostSight)
 
-      if (!this.eqSet(this.currentlySightedScenes, newlySightedScenes.sighted)) {
-        this.currentlySightedScenes = newlySightedScenes.sighted
+      if (!this.eqSet(this.currentlySightedParcels, parcels.inSight)) {
+        this.currentlySightedParcels = parcels.inSight
       }
     }
 
@@ -42,7 +42,7 @@ export class PositionLifecycleController extends EventEmitter {
 
   private checkPositionSettlement() {
     if (!this.positionSettled) {
-      const settling = this.currentlySightedScenes.every($ => this.sceneController.isRenderable($))
+      const settling = this.currentlySightedParcels.every($ => this.sceneController.isPositionRendereable($))
 
       if (settling) {
         this.positionSettled = settling

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Validations } from '@dcl/kernel'
+import { worldToGrid } from '@dcl/utils'
+import { Validations, MyPresence, SceneLoader } from '@dcl/kernel'
 import { client } from '~/modules/systems'
 import { Segment } from 'decentraland-ui'
 const Terminal = require('react-console-emulator').default
@@ -25,6 +26,19 @@ function makeCommands(that) {
             }
           }, 0)
           return 'Fetching profile for user ' + userId + '...'
+        }
+      },
+      status: {
+        description: 'Print your position and the current scene',
+        usage: 'status',
+        fn: function() {
+          ;(async () => {
+            const { x, z } = (client.MyPresence.myPresenceTracker as MyPresence).lastPlayerPosition
+            const [a, b] = worldToGrid({ x, z })
+            const { sceneId } = await (client.MyPresence.myPresenceTracker
+              .loader as SceneLoader).getSceneForCoordinates(a, b)
+            return term.terminal.current.pushToStdout(`You are at ${a},${b}: ${sceneId}`)
+          })()
         }
       },
       goto: {
@@ -56,7 +70,13 @@ function makeCommands(that) {
         description: 'List the scenes that should be loaded around you',
         usage: 'scenes',
         fn: function() {
-          client.Wo
+          ;(async () => {
+            const { x, z } = (client.MyPresence.myPresenceTracker as MyPresence).lastPlayerPosition
+            const [a, b] = worldToGrid({ x, z })
+            const { sceneId } = await (client.MyPresence.myPresenceTracker
+              .loader as SceneLoader).getSceneForCoordinates(a, b)
+            return term.terminal.current.pushToStdout(`You are at ${a},${b}: ${sceneId}`)
+          })()
         }
       },
       scripts: {

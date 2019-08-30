@@ -7,17 +7,15 @@ import {
   Quaternion,
   ReadOnlyVector2,
   Vector3,
-  worldToGrid,
-  gridToWorld
+  worldToGrid
 } from '@dcl/utils'
-import { SceneLoader } from '../../scenes/loader/SceneLoader'
+import { SceneLoader } from '../../loader/SceneLoader'
 import { migrateFromILand } from '../../worldMap/sceneCompatibility/migrateFromILand'
 import { PositionReport } from '../types/PositionReport'
-import { getPositionReport } from './getPositionReport'
+import { getPositionReport } from '../getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'
 
-const temporaryVector = new MVector2()
-const temporaryVector3 = new MVector3()
+const temporaryVector2 = new MVector2()
 export class MyPresence {
   positionObservable = new Observable<Readonly<PositionReport>>()
   teleportObservable = new Observable<ReadOnlyVector2>()
@@ -39,7 +37,8 @@ export class MyPresence {
   }
 
   notifyLoaderListener = event => {
-    this.loader.reportCurrentPosition(event.position)
+    worldToGrid(event.position, temporaryVector2)
+    this.loader.reportCurrentPosition(temporaryVector2)
   }
 
   updateUrlPositionListener = event => {
@@ -54,12 +53,11 @@ export class MyPresence {
   async teleport(x: number, y: number) {
     this.lastTeleport = { x, y }
     this.teleportObservable.notifyObservers({ x, y })
-    gridToWorld(x, y, temporaryVector3)
-    const landData = await this.loader.getSceneForCoordinates(temporaryVector3.x, temporaryVector3.z)
+    const landData = await this.loader.getSceneForCoordinates(x, y)
     const scene = migrateFromILand(landData)
     const spawn = scene.pickSpawnPoint()
-    const pos = spawn.position
-    const rotation = Quaternion.RotationYawPitchRoll(spawn.camera.y, 0, 0)
+    const pos = new MVector3().copyFrom(spawn.position)
+    const rotation = Quaternion.LookRotation(pos, new MVector3(0, 1, 0))
 
     this.positionObservable.notifyObservers({
       position: pos,
@@ -70,11 +68,11 @@ export class MyPresence {
   }
 
   updateUrlPosition(cameraVector: Vector3) {
-    worldToGrid(cameraVector, temporaryVector)
+    worldToGrid(cameraVector, temporaryVector2)
     const positionInUrl = qs.parse(this.location.search.slice(1) || '')
-    if (positionInUrl.x !== temporaryVector.x || positionInUrl.y !== temporaryVector.y) {
-      positionInUrl.x = temporaryVector.x
-      positionInUrl.y = temporaryVector.y
+    if (positionInUrl.x !== temporaryVector2.x || positionInUrl.y !== temporaryVector2.y) {
+      positionInUrl.x = temporaryVector2.x
+      positionInUrl.y = temporaryVector2.y
       this.history.replaceState({}, '', '?' + qs.stringify(positionInUrl))
     }
   }

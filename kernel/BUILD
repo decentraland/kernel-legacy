@@ -16,19 +16,25 @@ filegroup(
 
 ts_library(
     name = "kernel",
-    srcs = glob([
-        "index.ts",
-        "auth/**/*.ts",
-        "assets/**/*.ts",
-        "comms/**/*.ts",
-        "config/**/*.ts",
-        "main/**/*.ts",
-        "passports/**/*.ts",
-        "presence/**/*.ts",
-        "scenes/**/*.ts",
-        "social/**/*.ts",
-        "worldMap/**/*.ts",
-    ]),
+    srcs = glob(
+        include = [
+            "index.ts",
+            "auth/**/*.ts",
+            "assets/**/*.ts",
+            "comms/**/*.ts",
+            "loader/**/*.ts",
+            "config/**/*.ts",
+            "main/**/*.ts",
+            "passports/**/*.ts",
+            "presence/**/*.ts",
+            "scenes/**/*.ts",
+            "social/**/*.ts",
+            "worldMap/**/*.ts",
+        ],
+        exclude = [
+            "**/*.spec.ts",
+        ],
+    ),
     module_name = "@dcl/kernel",
     deps = [
         "//config",
@@ -45,6 +51,27 @@ ts_library(
         "@npm//fp-future",
         "@npm//google-protobuf",
         "@npm//webrtc-adapter",
+    ],
+)
+
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
+
+ts_library(
+    name = "kernel_spec",
+    srcs = glob([
+        "**/*.spec.ts",
+    ]),
+    deps = [
+        ":kernel",
+        "@npm//@types/jasmine",
+    ],
+)
+
+jasmine_node_test(
+    name = "test",
+    deps = [
+        ":kernel_spec",
+        "@npm//jasmine",
     ],
 )
 

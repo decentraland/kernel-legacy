@@ -37,6 +37,7 @@ function ReturnAuthActionMap(x: AuthActionTemplates, t: number) {
 export type AuthAction = ReturnType<typeof ReturnAuthActionMap>
 
 const EMPTY_AUTH_STATE: AuthState = {
+  userId: '',
   summary: 'Not initialized',
   isAuthenticated: false
 }
