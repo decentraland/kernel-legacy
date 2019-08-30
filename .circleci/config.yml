@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Build scenes
           command: |
-              make test-scenes
+              make -d test-scenes
       - save_cache:
           name: Store cached test scenes
           paths:
