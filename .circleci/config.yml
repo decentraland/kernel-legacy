@@ -76,7 +76,7 @@ jobs:
             - packages/decentraland-ecs
             - static
             - public
-          key: cached-scenes-{{ checksum "packages/decentraland-ecs/dist/index.d.ts" }}
+          key: cached-scenes-{{ checksum ".scene-system-checksum" }}
       - run:
           name: Run checks and tests
           command: |
