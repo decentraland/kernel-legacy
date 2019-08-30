@@ -46,8 +46,13 @@ jobs:
             - v1-dependencies-{{ checksum "package-lock.json" }}
 
       # install differences in node_modules
-      - run: npm ci
+      - run:
+          name: Install differences in node_modules
+          commands: |
+              npm ci
+              git checkout -- package-lock.json
       - save_cache:
+          name: Store node_modules cache
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
