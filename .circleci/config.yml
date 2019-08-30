@@ -63,20 +63,12 @@ jobs:
               make lint
               npm outdated --depth 0 || true
               make test-ci
+              npx codecov
 
       - store_artifacts:
           name: Save screenshots of visual tests
           path: test/diff
           when: on_fail
-
-      - store_artifacts:
-          name: Save test coverage report
-          path: coverage
-
-      - run:
-          name: Send coverage report to codecov
-          command: npx codecov
-
       - store_artifacts:
           path: packages/decentraland-ecs/api-docs-review/decentraland-ecs.api.ts
           when: on_fail
