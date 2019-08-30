@@ -1,12 +1,11 @@
 import { Vector2 } from '@dcl/utils'
-import { ParcelConfigurationOptions } from '../../types/ParcelConfigurationOptions'
 import { calculateCachedDeltas, cachedDeltas } from './calculateCachedDeltas'
 
-export function parcelsInScope(config: ParcelConfigurationOptions, position: Vector2): string[] {
+export function parcelsInScope(radius: number, position: Vector2): string[] {
   const result: string[] = []
   let length = cachedDeltas.length
   if (!length) {
-    calculateCachedDeltas(config)
+    calculateCachedDeltas(radius)
     length = cachedDeltas.length
   }
   for (let i = 0; i < length; i++) {

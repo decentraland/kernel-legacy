@@ -55,7 +55,9 @@ function makeCommands(that) {
       scenes: {
         description: 'List the scenes that should be loaded around you',
         usage: 'scenes',
-        fn: function() {}
+        fn: function() {
+          client.Wo
+        }
       },
       scripts: {
         description: 'List the current running scene scripts',

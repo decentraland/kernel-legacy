@@ -7,7 +7,8 @@ import {
   Quaternion,
   ReadOnlyVector2,
   Vector3,
-  worldToGrid
+  worldToGrid,
+  gridToWorld
 } from '@dcl/utils'
 import { SceneLoader } from '../../scenes/loader/SceneLoader'
 import { migrateFromILand } from '../../worldMap/sceneCompatibility/migrateFromILand'
@@ -16,6 +17,7 @@ import { getPositionReport } from './getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'
 
 const temporaryVector = new MVector2()
+const temporaryVector3 = new MVector3()
 export class MyPresence {
   positionObservable = new Observable<Readonly<PositionReport>>()
   teleportObservable = new Observable<ReadOnlyVector2>()
@@ -52,7 +54,8 @@ export class MyPresence {
   async teleport(x: number, y: number) {
     this.lastTeleport = { x, y }
     this.teleportObservable.notifyObservers({ x, y })
-    const landData = await this.loader.getSceneForCoordinates(x, y)
+    gridToWorld(x, y, temporaryVector3)
+    const landData = await this.loader.getSceneForCoordinates(temporaryVector3.x, temporaryVector3.z)
     const scene = migrateFromILand(landData)
     const spawn = scene.pickSpawnPoint()
     const pos = spawn.position

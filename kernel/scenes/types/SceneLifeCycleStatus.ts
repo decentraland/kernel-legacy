@@ -1,15 +1,29 @@
 import { ILand } from '@dcl/utils'
 
+export type SceneLifeCycleStatusType = 'unloaded' | 'awake' | 'loaded' | 'ready' | 'failed'
+
 export class SceneLifeCycleStatus {
-  status: 'unloaded' | 'awake' | 'ready' = 'unloaded'
+  status: SceneLifeCycleStatusType = 'unloaded'
+
   constructor(public sceneDescription: ILand<any>) {}
+
+  setStatus(status: SceneLifeCycleStatusType) {
+    this.status = status
+  }
+
   isAwake() {
     return this.status !== 'unloaded'
   }
+
   isDead() {
     return this.status === 'unloaded'
   }
-  isRunning() {
+
+  isReady() {
     return this.status === 'ready'
+  }
+
+  isFailed() {
+    return this.status === 'failed'
   }
 }

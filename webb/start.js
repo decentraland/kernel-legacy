@@ -53,9 +53,9 @@ fuse.register('@dcl/utils', {
   instructions: '../utils/package/**'
 })
 fuse.register('@dcl/kernel', {
-  homeDir: '../client/package',
+  homeDir: '../kernel/package',
   main: 'index.js',
-  instructions: '../client/package/**'
+  instructions: '../kernel/package/**'
 })
 fuse.register('@dcl/protos', {
   homeDir: '../protos/package',
@@ -69,8 +69,8 @@ fuse.bundle('vendor').instructions('~ index.tsx')
 fuse
   .bundle('app')
   .instructions('!> [index.tsx]')
-  .hmr()
   .watch()
+  .hmr()
 const run1 = fuse.run()
 
 function watchStdin(action) {
