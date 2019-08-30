@@ -61,10 +61,11 @@ jobs:
           name: Build decentraland-ecs
           command: |
               make build-essentials
+              shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js > .scene-system-checksum
       - restore_cache:
           name: Restore cached test scenes
           keys:
-            - cached-scenes-{{ checksum "packages/decentraland-ecs/dist/index.d.ts" }}
+            - cached-scenes-{{ checksum ".scene-system-checksum" }}
       - run:
           name: Build scenes
           command: |
@@ -73,6 +74,7 @@ jobs:
           name: Store cached test scenes
           paths:
             - packages/decentraland-ecs
+            - static
             - public
           key: cached-scenes-{{ checksum "packages/decentraland-ecs/dist/index.d.ts" }}
       - run:
