@@ -73,7 +73,8 @@ jobs:
       - save_cache:
           name: Store cached test scenes
           paths:
-            - packages/decentraland-ecs
+            - packages
+            - scripts
             - static
             - public
           key: cached-scenes-{{ checksum ".scene-system-checksum" }}
