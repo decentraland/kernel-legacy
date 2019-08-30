@@ -48,7 +48,7 @@ jobs:
       # install differences in node_modules
       - run:
           name: Install differences in node_modules
-          commands: |
+          command: |
               npm ci
               git checkout -- package-lock.json
       - save_cache:
