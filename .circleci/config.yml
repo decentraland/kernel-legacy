@@ -81,6 +81,7 @@ jobs:
             - Makefile
             - packages
             - scripts
+            - tsconfig.json
             - package-lock.json
             - package.json
             - .git
