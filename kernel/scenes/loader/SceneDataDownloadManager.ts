@@ -1,12 +1,14 @@
 import { future, IFuture } from 'fp-future'
-import { IScene, ILand, jsonFetch, ParcelInfoResponse, error, defaultLogger } from '@dcl/utils'
+import { IScene, ILand, ParcelInfoResponse, error, defaultLogger } from '@dcl/utils'
+
 import { getSceneIdFromSceneMappingResponse } from './scope/getSceneIdFromSceneMappingResponse'
 import { SceneMappingResponse } from '../types/SceneMappingResponse'
+import { jsonFetch } from '@dcl/utils/network'
 
 export class SceneDataDownloadManager {
   positionToSceneId: Map<string, IFuture<string | null>> = new Map()
-  sceneIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
-  rootIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
+  sceneIdToLandData: Map<string, IFuture<ILand<any> | null>> = new Map()
+  rootIdToLandData: Map<string, IFuture<ILand<any> | null>> = new Map()
 
   constructor(
     public options: {
@@ -55,11 +57,11 @@ export class SceneDataDownloadManager {
     }
   }
 
-  async resolveLandData(sceneId: string): Promise<ILand | null> {
+  async resolveLandData(sceneId: string): Promise<ILand<any> | null> {
     if (this.sceneIdToLandData.has(sceneId)) {
       return this.sceneIdToLandData.get(sceneId)!
     }
-    const promised = future<ILand | null>()
+    const promised = future<ILand<any> | null>()
     this.sceneIdToLandData.set(sceneId, promised)
     try {
       const actualResponse = await jsonFetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
@@ -86,7 +88,7 @@ export class SceneDataDownloadManager {
       if (!promised.isPending) {
         return promised
       }
-      const data: ILand = {
+      const data: ILand<any> = {
         sceneId: sceneId,
         baseUrl,
         scene,
@@ -94,7 +96,7 @@ export class SceneDataDownloadManager {
       }
       const pendingSceneData = this.sceneIdToLandData.has(sceneId)
         ? this.sceneIdToLandData.get(sceneId)
-        : future<ILand | null>()
+        : future<ILand<any> | null>()
       if (pendingSceneData.isPending) {
         pendingSceneData.resolve(data)
       }
@@ -116,11 +118,11 @@ export class SceneDataDownloadManager {
     }
   }
 
-  async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {
+  async getParcelDataBySceneId(sceneId: string): Promise<ILand<any> | null> {
     return this.sceneIdToLandData.get(sceneId)!
   }
 
-  async getParcelData(position: string): Promise<ILand | null> {
+  async getParcelData(position: string): Promise<ILand<any> | null> {
     const sceneId = await this.resolveSceneSceneId(position)
     if (sceneId === null) {
       return null

@@ -3,7 +3,9 @@ import {
   AssetTagDefinition,
   ReferenceSystem,
   NonEmptyCoordinateArray,
-  SpawnPoint
+  Coordinate,
+  SpawnPointSelection,
+  SpawnPointDefinition
 } from './SceneManifestTypes'
 
 export interface ISceneManifest {
@@ -15,7 +17,9 @@ export interface ISceneManifest {
   main: string
   referenceSystem: ReferenceSystem
   parcels: NonEmptyCoordinateArray
-  spawnPoints: SpawnPoint[]
+  baseParcel: Coordinate
+  spawnPoints: SpawnPointDefinition[]
+  pickSpawnPoint: () => SpawnPointSelection
   title: string
   screenshot: string
 }

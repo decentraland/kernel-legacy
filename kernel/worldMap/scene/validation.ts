@@ -5,13 +5,13 @@ import {
   ReferenceSystem,
   CoordinateDefinition,
   Coordinate,
-  SpawnPoint,
+  SpawnPointDefinition,
   Vector3Range,
   NumberOrRange,
   Range2,
   YRotation,
   UnsanitizedSceneManifest
-} from '@dcl/utils'
+} from '@dcl/utils/scene/SceneManifestTypes'
 import { Vector3 } from '@dcl/utils'
 
 export function getInvalidReason(arg: any) {
@@ -137,14 +137,14 @@ export function isValidStringRecord(arg: any): arg is Record<string, string> {
   return Object.keys(arg).reduce((a: boolean, b: any) => a && typeof b === 'string' && typeof arg[b] === 'string', true)
 }
 
-export function hasValidSpawnPoints(arg: any): arg is { spawnPoints?: SpawnPoint[] } {
+export function hasValidSpawnPoints(arg: any): arg is { spawnPoints?: SpawnPointDefinition[] } {
   return (
     arg.spawnPoints === undefined ||
     (isArray(arg.spawnPoints) && arg.spawnPoints.reduce((a: boolean, b: any) => a && isValidSpawnPoint(b), true))
   )
 }
 
-export function isValidSpawnPoint(arg: any): arg is SpawnPoint {
+export function isValidSpawnPoint(arg: any): arg is SpawnPointDefinition {
   return (
     (arg.name === undefined || isValidString(arg.name)) &&
     isValidVector3NumberOrRange(arg.position) &&

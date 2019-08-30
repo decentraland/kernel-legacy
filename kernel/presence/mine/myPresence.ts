@@ -10,7 +10,7 @@ import {
   worldToGrid
 } from '@dcl/utils'
 import { SceneLoader } from '../../scenes/loader/SceneLoader'
-import { upgradeToV2 } from '../../worldMap/sceneCompatibility/migrateFromILand'
+import { migrateFromILand } from '../../worldMap/sceneCompatibility/migrateFromILand'
 import { PositionReport } from '../types/PositionReport'
 import { getPositionReport } from './getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'
@@ -53,7 +53,7 @@ export class MyPresence {
     this.lastTeleport = { x, y }
     this.teleportObservable.notifyObservers({ x, y })
     const landData = await this.loader.getSceneForCoordinates(x, y)
-    const scene = upgradeToV2(landData)
+    const scene = migrateFromILand(landData)
     const spawn = scene.pickSpawnPoint()
     const pos = spawn.position
     const rotation = Quaternion.RotationYawPitchRoll(spawn.camera.y, 0, 0)

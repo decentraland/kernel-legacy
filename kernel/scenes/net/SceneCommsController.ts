@@ -1,19 +1,17 @@
 import { registerAPI, ExposableAPI } from '@dcl/rpc/host'
 import { exposeMethod, APIOptions } from '@dcl/rpc/common/API'
 
-import { subscribeParcelSceneToCommsMessages, unsubscribeParcelSceneToCommsMessages } from './SceneToSceneComms'
-
 import { IEventsManager } from '../exposedApis/IEventsManager'
-import { PeerInformation } from '@dcl/kernel/comms/types'
+import { PeerInformation } from '../../comms/types/PeerInformation'
 
 @registerAPI('CommunicationsController')
 export class SceneCommsController extends ExposableAPI {
   constructor(public options: APIOptions) {
     super(options)
-    subscribeParcelSceneToCommsMessages(this)
+    // subscribeParcelSceneToCommsMessages(this)
   }
 
-  engineAPI = this.options.getAPIInstance() as IEventsManager
+  engineAPI = (this.options.getAPIInstance('EngineAPI') as any) as IEventsManager
 
   get cid() {
     return '1' // this.sceneManifest.cannonicalCID
@@ -21,7 +19,7 @@ export class SceneCommsController extends ExposableAPI {
 
   apiWillUnmount() {
     // Unsubscribe this parcel from events
-    unsubscribeParcelSceneToCommsMessages(this)
+    // unsubscribeParcelSceneToCommsMessages(this)
   }
 
   forwardNetworkToScript(message: string, sender: PeerInformation) {

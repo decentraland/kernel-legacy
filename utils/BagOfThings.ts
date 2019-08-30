@@ -93,13 +93,13 @@ export type EntityAction = {
 }
 
 /** THIS INTERFACE CANNOT CHANGE, IT IS USED IN THE UNITY BUILD */
-export type LoadableParcelScene = {
+export type LoadableParcelScene<T extends IScene> = {
   id: string
   basePosition: { x: number; y: number }
   parcels: Array<{ x: number; y: number }>
   contents: Array<ContentMapping>
   baseUrl: string
-  land: ILand
+  land: ILand<T>
 }
 
 export const BillboardModes = {
@@ -157,13 +157,13 @@ export type EnvironmentData<T> = {
   data: T
 }
 
-export interface ILand {
+export interface ILand<T extends IScene> {
   /**
    * sceneId: Now it is either an internal identifier or the rootCID.
    * In the future will change to the sceneCID
    */
   sceneId: string
-  scene: IScene
+  scene: T
   baseUrl: string
   mappingsResponse: MappingsResponse
 }
@@ -292,14 +292,14 @@ export function normalizeContentMappings(
   return ret
 }
 
-export function ILandToLoadableParcelScene(land: ILand): EnvironmentData<LoadableParcelScene> {
+export function ILandToLoadableParcelScene<T extends IScene>(land: ILand<T>): EnvironmentData<LoadableParcelScene<T>> {
   const mappings: ContentMapping[] = normalizeContentMappings(land.mappingsResponse.contents)
   const sceneJsons = land.mappingsResponse.contents.filter(land => land.file === 'scene.json')
   if (!sceneJsons.length) {
     throw new Error('Invalid scene mapping: no scene.json')
   }
 
-  const ret: EnvironmentData<LoadableParcelScene> = {
+  const ret: EnvironmentData<LoadableParcelScene<T>> = {
     sceneId: land.sceneId,
     baseUrl: land.baseUrl,
     main: land.scene.main,

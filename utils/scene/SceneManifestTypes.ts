@@ -9,7 +9,7 @@ export interface UnsanitizedSceneManifest {
   referenceSystem?: ReferenceSystem
   parcels: NonEmptyCoordinateDefinitionArray
   contact?: Record<string, string>
-  spawnPoints?: [SpawnPoint, ...SpawnPoint[]]
+  spawnPoints?: [SpawnPointDefinition, ...SpawnPointDefinition[]]
   display?: DisplayDefinition
 }
 
@@ -63,11 +63,18 @@ export type ReferenceSystem = {
   position?: Vector3Range
 }
 
-export type SpawnPoint = {
+export type SpawnPointDefinition = {
   name?: string
   position: Vector3Range
-  camera: QuaternionRange | YRotation
+  camera: Vector3
   default?: boolean
+}
+
+export type SpawnPointSelection = {
+  name?: string
+  position: Vector3
+  camera: Vector3
+  wasDefault?: boolean
 }
 
 export type NonEmptyCoordinateDefinitionArray = [CoordinateDefinition, ...CoordinateDefinition[]]

@@ -1,7 +1,6 @@
 import * as Auth from './auth/api'
 import * as AuthTypes from './auth/types'
 import * as Comms from './comms/connect'
-import * as Config from './config'
 import * as WorldScene from './worldMap/scene'
 import * as WorldSceneV1 from './worldMap/sceneCompatibility/migrateFromILand'
 
@@ -14,4 +13,4 @@ export * from './assets/wearables/base'
 export * from './presence'
 import * as Validations from './worldMap/scene/validation'
 
-export { Auth, AuthTypes, Comms, Config, MainController, Systems, WorldScene, WorldSceneV1, Validations }
+export { Auth, AuthTypes, Comms, MainController, Systems, WorldScene, WorldSceneV1, Validations }
