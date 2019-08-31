@@ -38,7 +38,7 @@ export function BuildDCLInterface(that: any) {
      */
     subscribe(eventName: string): void {
       that.engine.subscribe(eventName)
-      that.engine.on(eventName, event => {
+      that.engine.on(eventName, (event: any) => {
         that.fireEvent({ type: eventName, data: event.data })
       })
     },

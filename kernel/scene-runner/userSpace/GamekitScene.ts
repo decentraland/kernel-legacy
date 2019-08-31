@@ -1,14 +1,13 @@
 import { ILogOpts, ScriptingTransport } from '@dcl/rpc'
 import { inject, Script } from '@dcl/rpc/client'
-import { DecentralandInterface, DevTools, IECSEngine } from '@dcl/scene-api'
+import { DecentralandInterface, DevTools } from '@dcl/scene-api'
 import { defaultLogger, EntityAction } from '@dcl/utils'
 
-import { IECSActionsReporting } from '../interface/IECSActionsAPI'
-import { ILifecycleAPI } from '../interface/ILifecycleAPI'
 import { BuildDCLInterface } from './DCLInterface/BuildDCLInterface'
 import { BuildECSInterface } from './DCLInterface/BuildECSInterface'
 import { loadGamekitEntrypoint } from './loadGamekitEntrypoint'
 import { customEval, getES5Context } from './sandbox'
+import { IRendererParcelSceneToScript } from '../kernelSpace/IRendererParcelSceneToScript'
 
 const LOADING = 'loading'
 const AWAKE = 'awake'
@@ -20,7 +19,7 @@ const RUNNING = 'running'
  */
 export default class GamekitScene extends Script {
   @inject('EngineAPI')
-  engine: IECSEngine & ILifecycleAPI & IECSActionsReporting
+  engine: IRendererParcelSceneToScript
 
   @inject('DevTools')
   devTools: any

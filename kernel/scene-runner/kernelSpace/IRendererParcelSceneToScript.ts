@@ -1,6 +1,6 @@
 import { EntityAction } from '@dcl/utils'
 
-export interface IEngineAPI {
+export interface IRendererParcelSceneToScript {
   /**
    * Subscribes to events dispatched by the EngineAPI
    * Use it to listen to events from the scene (like `click`)
