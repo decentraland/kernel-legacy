@@ -1,53 +1,44 @@
 import { EventEmitter } from 'events'
-import { ParcelLifeCycleController } from './ParcelLifeCycleController'
+import { ParcelSightController } from './ParcelSightController'
 import { SceneLifeCycleController } from './SceneLifeCycleController'
-import { Vector2 } from '@dcl/utils'
 
-export class PositionLifecycleController extends EventEmitter {
-  private positionSettled: boolean = false
-  private currentSceneId?: string
-  private currentlySightedParcels: string[] = []
-
-  constructor(public parcelController: ParcelLifeCycleController, public sceneController: SceneLifeCycleController) {
+export class PositionLifeCycleController extends EventEmitter /* Position.settled */ {
+  isSettled: boolean = false
+  constructor(public parcelController: ParcelSightController, public sceneController: SceneLifeCycleController) {
     super()
-    sceneController.on('Scene.started', () => this.checkPositionSettlement())
+    sceneController.on('Parcel.active', () => this.checkSettlement())
+    parcelController.on('Parcel.sightChanges', () => this.checkSettlement())
   }
 
-  async reportCurrentPosition(position: Vector2, teleported: boolean) {
-    const parcels = this.parcelController.reportCurrentPosition(position)
+  checkSettlement() {
+    if (this.isSettled) {
+      this.shouldUnsettle()
+    } else {
+      this.shouldSettle()
+    }
+  }
 
-    this.currentSceneId = await this.sceneController.resolvePositionToSceneId(`${position.x},${position.y}`)
-
-    if (parcels) {
-      await this.sceneController.reportSightedParcels(parcels.sighted, parcels.lostSight)
-
-      if (!this.eqSet(this.currentlySightedParcels, parcels.inSight)) {
-        this.currentlySightedParcels = parcels.inSight
+  shouldSettle() {
+    const list = this.parcelController.currentlySightedList
+    const length = list.length
+    for (let i = 0; i < length; i++) {
+      if (!this.sceneController.isPositionWalkable(list[i])) {
+        return
       }
     }
-
-    if (teleported) {
-      this.positionSettled = false
-      this.emit('Unsettled Position')
-    }
-
-    this.checkPositionSettlement()
+    this.isSettled = true
+    this.emit('Position.settled')
   }
 
-  private eqSet(as: Array<any>, bs: Array<any>) {
-    if (as.length !== bs.length) return false
-    for (const a of as) if (!bs.includes(a)) return false
-    return true
-  }
-
-  private checkPositionSettlement() {
-    if (!this.positionSettled) {
-      const settling = this.currentlySightedParcels.every($ => this.sceneController.isPositionRendereable($))
-
-      if (settling) {
-        this.positionSettled = settling
-        this.emit('Settled Position', this.currentSceneId)
+  shouldUnsettle() {
+    const list = this.parcelController.currentlySightedList
+    const length = list.length
+    for (let i = 0; i < length; i++) {
+      if (this.sceneController.isPositionWalkable(list[i])) {
+        return
       }
     }
+    this.isSettled = false
+    this.emit('Position.unsettled')
   }
 }

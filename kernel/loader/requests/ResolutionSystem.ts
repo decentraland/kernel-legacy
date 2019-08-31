@@ -3,6 +3,16 @@ import { Resolvable } from './Resolvable'
 
 export abstract class ResolutionSystem<T, R> {
   record = new Map<string, Resolvable<T>>()
+  hasStartedResolving(key: string) {
+    return this.record.has(key)
+  }
+  hasFinishedResolving(key: string) {
+    const record = this.record.get(key)
+    if (!record) {
+      return false
+    }
+    return !record.loading
+  }
   resolve(x: string): Promise<T | undefined> {
     if (!this.record.has(x)) {
       const resolvable = {
@@ -16,8 +26,8 @@ export abstract class ResolutionSystem<T, R> {
       this.record.set(x, resolvable)
       const handleError = (err: any) => {
         resolvable.loading = false
-        resolvable.error = false
-        resolvable.promise.reject(err)
+        resolvable.error = true
+        resolvable.promise.resolve(undefined)
       }
       const handleSuccess = (data: T) => {
         resolvable.loading = false
@@ -28,18 +38,21 @@ export abstract class ResolutionSystem<T, R> {
       try {
         this.executeResolution(x)
           .then(d => {
-            if (resolvable.promise.isPending) {
-              if (d) {
-                handleSuccess(this.processResolution(x, d))
-              } else {
-                handleSuccess(undefined)
+            try {
+              if (resolvable.promise.isPending) {
+                if (d) {
+                  handleSuccess(this.processResolution(x, d))
+                } else {
+                  handleSuccess(undefined)
+                }
               }
+            } catch (e) {
+              handleError(e)
             }
           })
           .catch(handleError)
       } catch (e) {
         handleError(e)
-        resolvable.promise.reject(e)
       }
       return resolvable.promise
     } else {

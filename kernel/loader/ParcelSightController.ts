@@ -10,7 +10,7 @@ export type DeltaParcelSightSeeingReport = {
 
 type MapPositionToBoolean = { [pos: string]: boolean }
 
-export class ParcelLifeCycleController extends EventEmitter /*<'Parcel.onSight' | 'Parcel.lostSight'>*/ {
+export class ParcelSightController extends EventEmitter /*<'Parcel.sightChanges'>*/ {
   currentPosition?: Vector2
   isTargetPlaced: boolean = false
   currentlySightedList = []
@@ -28,13 +28,19 @@ export class ParcelLifeCycleController extends EventEmitter /*<'Parcel.onSight' 
 
     this.isTargetPlaced = true
     const sightedParcels = parcelsInScope(this.config.lineOfSightRadius, position)
-
-    const newlySightedParcels = sightedParcels.filter(parcel => !this.currentlySightedMap[parcel])
     const newSightMap: MapPositionToBoolean = {}
     sightedParcels.forEach(pos => (newSightMap[pos] = true))
-    const newlyHiddenParcels = this.currentlySightedList.filter(parcel => !newSightMap[parcel])
 
-    this.emit('Parcel.sightChanges', newlySightedParcels, newlyHiddenParcels)
+    const newlySightedParcels = sightedParcels.filter(parcel => !this.currentlySightedMap[parcel])
+    const newlyHiddenParcels = this.currentlySightedList.filter(parcel => !newSightMap[parcel])
+    this.currentlySightedList = sightedParcels
+    this.currentlySightedMap = newSightMap
+
+    this.emit('Parcel.sightChanges', {
+      sighted: newlySightedParcels,
+      lostSight: newlyHiddenParcels,
+      inSight: this.currentlySightedList
+    })
   }
 
   inSight(parcel: string) {

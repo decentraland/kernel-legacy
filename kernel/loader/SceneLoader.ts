@@ -1,19 +1,22 @@
 import { EventEmitter } from 'events'
 import { Vector2 } from '@dcl/utils'
 import { SceneDataDownloadManager } from './requests/SceneDataDownloadManager'
-import { ParcelLifeCycleController } from './ParcelLifeCycleController'
+import { ParcelSightController } from './ParcelSightController'
 import { SceneLifeCycleController } from './SceneLifeCycleController'
+import { PositionLifeCycleController } from './PositionLifecycleController'
 
 export class SceneLoader extends EventEmitter {
   downloadManager: SceneDataDownloadManager
-  parcelController: ParcelLifeCycleController
+  parcelController: ParcelSightController
   sceneController: SceneLifeCycleController
+  positionController: PositionLifeCycleController
 
   constructor(contentServer: string, lineOfSightRadius: number) {
     super()
     this.downloadManager = new SceneDataDownloadManager({ contentServer })
-    this.parcelController = new ParcelLifeCycleController({ lineOfSightRadius })
-    this.sceneController = new SceneLifeCycleController(this.downloadManager)
+    this.parcelController = new ParcelSightController({ lineOfSightRadius })
+    this.sceneController = new SceneLifeCycleController(this.downloadManager, this.parcelController)
+    this.positionController = new PositionLifeCycleController(this.parcelController, this.sceneController)
     // Internal hooks
     this.parcelController.on('Parcel.sightChanges', (newScenes: string[], old: string[]) =>
       this.sceneController.reportSightedParcels(newScenes, old)

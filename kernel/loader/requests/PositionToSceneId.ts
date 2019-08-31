@@ -5,8 +5,14 @@ export class PositionToSceneId extends ResolutionSystem<string, string> {
   constructor(public downloadManager: SceneDataDownloadManager) {
     super()
   }
-  async executeResolution(position: string) {
-    return await this.downloadManager.resolvePositionToSceneId(position)
+  getScene(position: string): string | undefined {
+    return this.record.has(position) && this.record.get(position).data
+  }
+  hasScene(position: string): boolean {
+    return this.record.has(position)
+  }
+  executeResolution(position: string) {
+    return this.downloadManager.resolvePositionToSceneId(position)
   }
   processResolution(x: string, data: string) {
     return data

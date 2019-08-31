@@ -64,6 +64,8 @@ ts_library(
     deps = [
         ":kernel",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//fp-future",
     ],
 )
 

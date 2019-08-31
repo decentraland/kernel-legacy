@@ -9,6 +9,12 @@ export class SceneIdToData extends ResolutionSystem<ILand<any>, ILand<any>> {
   constructor(public downloadManager: SceneDataDownloadManager, public position: PositionToSceneId) {
     super()
   }
+  hasScene(sceneId: string): boolean {
+    return this.record.has(sceneId)
+  }
+  getScene(sceneId: string): ILand<any> | undefined {
+    return this.record.has(sceneId) && this.record.get(sceneId).data
+  }
   async executeResolution(sceneId: string) {
     return await this.downloadManager.getSceneDataForSceneId(sceneId)
   }

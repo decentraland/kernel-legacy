@@ -1,49 +1,76 @@
 export class SceneLifeCycleStatus {
-  private loaded: boolean
+  private loading: boolean
+  private errors: boolean
   private awake: boolean
-  private empty: boolean
-  private started: boolean
+  private running: boolean
 
-  constructor(private count: number) {}
+  constructor(private _sceneId: string, private count: number) {}
+
+  get sceneId() {
+    return this._sceneId
+  }
+
+  canLoad() {
+    return this.isVisible() && !this.loading && !this.errors && !this.awake && !this.running
+  }
 
   isLoading() {
-    return !this.loaded
+    return this.loading
   }
 
-  isLoaded() {
-    return this.loaded
+  reportLoading() {
+    this.loading = true
+    this.errors = false
+    this.awake = false
+    this.running = false
   }
 
-  shouldAwake() {
-    return this.shouldRender() && !this.isAwake()
-  }
-
-  shouldSleep() {
-    return !this.shouldRender() && this.isAwake()
-  }
-
-  shouldRender() {
+  isVisible() {
     return this.count > 0
   }
 
-  isRendereable() {
-    return this.isAwake() || this.empty
+  canAwake() {
+    return this.loading && !this.errors && !this.awake && !this.running
   }
 
-  setEmpty(_empty: boolean) {
-    this.empty = _empty
+  isAwake() {
+    return this.isVisible() && !this.isLoading() && this.awake
   }
 
-  setAwake(_awake: boolean) {
-    this.awake = _awake
+  reportAwake() {
+    this.loading = false
+    this.awake = true
   }
 
-  setLoaded(_loaded: boolean) {
-    this.loaded = _loaded
+  canRun() {
+    return !this.loading && !this.errors && this.awake && !this.running
   }
 
-  setStarted(_started: boolean) {
-    this.started = _started
+  isRunning() {
+    return this.running
+  }
+
+  reportRunning() {
+    this.awake = false
+    this.running = true
+  }
+
+  reportStopped() {
+    this.errors = false
+    this.loading = false
+    this.running = false
+    this.awake = false
+  }
+
+  hasErrors() {
+    return this.errors
+  }
+
+  reportError() {
+    this.errors = true
+    this.loading = false
+    this.running = false
+    this.awake = false
   }
 
   increaseSight() {
@@ -52,13 +79,5 @@ export class SceneLifeCycleStatus {
 
   decreaseSight() {
     this.count++
-  }
-
-  isAwake() {
-    return this.awake === true
-  }
-
-  isStarted() {
-    return this.started === true
   }
 }

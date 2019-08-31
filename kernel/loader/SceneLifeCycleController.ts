@@ -1,217 +1,168 @@
-import { Observable } from '@dcl/utils'
+import { Observable, IScene, createLogger } from '@dcl/utils'
 import { EventEmitter } from 'events'
-import { ILand } from '@dcl/utils'
 import { SceneLifeCycleStatus } from './SceneLifeCycleStatus'
 import { PositionToSceneId } from './requests/PositionToSceneId'
 import { SceneDataDownloadManager } from './requests/SceneDataDownloadManager'
 import { SceneIdToData } from './requests/SceneIdToData'
+import { ParcelSightController } from './ParcelSightController'
 
 export type SceneLifeCycleStatusReport = { sceneId: string; status: SceneLifeCycleStatus }
 
 export const sceneLifeCycleObservable = new Observable<Readonly<SceneLifeCycleStatusReport>>()
+
+const logger = createLogger('SceneLifecycle')
 
 export class SceneLifeCycleController extends EventEmitter {
   positionToSceneId: PositionToSceneId
   sceneIdToData: SceneIdToData
 
   // Position to Status
-  private positionToStatus = new Map<string, SceneLifeCycleStatus>()
-  private sceneIdToStatus = new Map<string, SceneLifeCycleStatus>()
+  positionToStatus = new Map<string, SceneLifeCycleStatus>()
+  sceneIdToStatus = new Map<string, SceneLifeCycleStatus>()
+  parcelShowingLoad: { [position: string]: boolean } = {}
 
-  constructor(downloadManager: SceneDataDownloadManager) {
+  constructor(public downloadManager: SceneDataDownloadManager, public parcelController: ParcelSightController) {
     super()
     this.positionToSceneId = new PositionToSceneId(downloadManager)
     this.sceneIdToData = new SceneIdToData(downloadManager, this.positionToSceneId)
   }
 
-  reportSceneStarted(sceneId: string) {
-    if (this.sceneIdToStatus.has(sceneId)) {
+  reportSightedParcels(newParcels: string[], lostParcels: string[]) {
+    this.updateSceneSightCount(newParcels, lostParcels)
+    newParcels.forEach(position => {
+      if (!this.positionToSceneId.hasStartedResolving(position)) {
+        this.showLoader(position)
+        this.positionToSceneId.resolve(position).then(() => this.checkPosition(position))
+        return
+      }
+      if (this.positionToSceneId.hasFinishedResolving(position)) {
+        this.handleSceneMoreVisible(this.positionToSceneId.getScene(position))
+        return
+      }
+    })
+    lostParcels.forEach(position => {
+      this.hideParcel(position)
+    })
+  }
+
+  checkPosition(position: string) {
+    const sceneId = this.positionToSceneId.getScene(position)
+    if (sceneId && !this.sceneIdToData.hasStartedResolving(sceneId)) {
+      this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
+      return
+    }
+    if (!sceneId && this.positionToSceneId.hasFinishedResolving(position)) {
+      // Handle empty parcel
+      this.emit('Parcel.empty', position)
+      return
+    }
+  }
+
+  checkScene(sceneId: string) {
+    const scene = this.sceneIdToData.getScene(sceneId)
+    if (!scene) {
+      return
+    }
+    if (!this.sceneIdToStatus.has(sceneId)) {
+      this.setupNewScene(sceneId)
+    } else {
       const status = this.sceneIdToStatus.get(sceneId)
-      if (status.isAwake()) {
-        status.setStarted(true)
-        this.emit('Scene.started', sceneId, this.forceSceneIdToScene(sceneId))
+      if (status.canLoad()) {
+        this.startLoading(sceneId)
       }
     }
   }
 
-  protected checkSceneAndTriggerEffects(sceneId: string) {
+  setupNewScene(sceneId: string) {
+    const scene = this.sceneIdToData.getScene(sceneId)
+    const parcels = (scene.scene as IScene).scene.parcels
+    parcels.reduce((count, position) => count + (this.parcelController.inSight(position) ? 1 : 0), 0)
+    const status = new SceneLifeCycleStatus(sceneId, 0)
+    this.sceneIdToStatus.set(sceneId, status)
+    parcels.forEach(position => this.positionToStatus.set(position, status))
+    this.startLoading(sceneId)
+  }
+
+  reportSceneFinishedFirstRound(sceneId: string) {
+    this.startAwake(sceneId)
+  }
+
+  reportSceneRunning(sceneId: string) {
+    const status = this.sceneIdToStatus.get(sceneId)
+    if (!status || !status.canRun()) {
+      logger.info(`Scene ${sceneId} asked to run but it can't: ${JSON.stringify(status)}`)
+    }
+    const scene = this.sceneIdToData.getScene(sceneId)
+    ;(scene.scene as IScene).scene.parcels.forEach(pos => this.hideLoader(pos))
+    status.reportRunning()
+    this.emit('Scene.running', { sceneId, scene })
+  }
+
+  isPositionWalkable(position: string): boolean {
+    return this.positionToStatus.has(position) && this.positionToStatus.get(position).isRunning()
+  }
+
+  private startLoading(sceneId: string) {
+    const status = this.sceneIdToStatus.get(sceneId)
+    if (!status || !status.canLoad()) {
+      logger.info(`Scene ${sceneId} asked to load but it can't: ${JSON.stringify(status)}`)
+    }
+    this.emit('Scene.loading', { sceneId, scene: this.sceneIdToData.getScene(sceneId) })
+    status.reportLoading()
+  }
+
+  private startAwake(sceneId: string) {
+    const status = this.sceneIdToStatus.get(sceneId)
+    if (!status || !status.canAwake()) {
+      logger.info(`Scene ${sceneId} asked to awake but it can't: ${JSON.stringify(status)}`)
+    }
+    this.sceneIdToStatus.has(sceneId) && this.sceneIdToStatus.get(sceneId).reportAwake()
+    this.emit('Scene.awake', { sceneId, scene: this.sceneIdToData.getScene(sceneId) })
+  }
+
+  showLoader(position: string) {
+    if (!this.parcelShowingLoad[position]) {
+      this.parcelShowingLoad[position] = true
+      this.emit('Parcel.showLoader', position)
+    }
+  }
+
+  hideLoader(position: string) {
+    if (this.parcelShowingLoad[position]) {
+      this.parcelShowingLoad[position] = false
+      this.emit('Parcel.hideLoader', position)
+    }
+  }
+
+  hideParcel(position: string) {
+    this.hideLoader(position)
+    const sceneId = this.positionToSceneId.getScene(position)
+    if (!sceneId) {
+      return
+    }
+    this.handleSceneLessVisible(sceneId)
+  }
+
+  handleSceneLessVisible(sceneId: string) {
     const status = this.sceneIdToStatus.get(sceneId)
     if (!status) {
-      console.error('Logical error -- this shouldnt happen')
-      debugger
-      throw new Error()
-    }
-    if (status.shouldAwake()) {
-      status.setAwake(true)
-      this.emit('Scene.awake', sceneId, this.forceSceneIdToScene(sceneId))
-    } else if (status.shouldSleep()) {
-      status.setAwake(false)
-      this.emit('Scene.sleep', sceneId, this.forceSceneIdToScene(sceneId))
+      return
     }
   }
 
-  reportSightedParcels(sightedParcels: string[], lostSightParcels: string[]) {
-    this.updateSightCounts(sightedParcels, lostSightParcels)
-    this.checkScenesResolved(sightedParcels)
-    this.checkScenesResolved(lostSightParcels)
-    const checkMe: { [sceneId: string]: boolean } = {}
-    for (let sighted of sightedParcels) {
-      if (this.positionHasData(sighted)) {
-        checkMe[this.forcePositionToSceneId(sighted)] = true
-      }
-    }
-    for (let lost of lostSightParcels) {
-      if (this.positionHasData(lost)) {
-        checkMe[this.forcePositionToSceneId(lost)] = true
-      }
-    }
-    const sceneIds = Object.keys(checkMe).filter(_ => _ && !!checkMe[_])
-    for (let sceneId of sceneIds) {
-      this.checkSceneAndTriggerEffects(sceneId)
-    }
-  }
-
-  protected processNewPositionMapping(position: string, sceneId: string) {
-    if (!sceneId) {
-      const status = this.forcePositionToStatus(position)
-      if (!status) {
-        console.log('e', position, sceneId)
-        debugger
-      }
-      status.setEmpty(true)
-      this.emit('Parcel.empty', position)
-    } else if (this.shouldResolveSceneId(sceneId)) {
-      this.resolvePositionToScene(position).then(scene => {
-        this.processNewSceneMapping(this.forcePositionToSceneId(position), scene)
-      })
-    } else if (this.isSceneResolved(sceneId)) {
-      if (this.positionToStatus.get(position) !== this.sceneIdToStatus.get(sceneId)) {
-        this.emit('Parcel.hideLoader')
-        const newStatus = this.sceneIdToStatus.get(sceneId)
-        const deprecatedStatus = this.positionToStatus.get(position)
-        while (deprecatedStatus.shouldRender()) {
-          deprecatedStatus.decreaseSight()
-          newStatus.increaseSight()
-        }
-        this.positionToStatus.set(position, newStatus)
-      }
-    }
-  }
-
-  protected processNewSceneMapping(sceneId: string, scene: ILand<any>) {
-    const oldStatus = this.sceneIdToStatus.get(sceneId)
-    console.log(sceneId, scene)
-    if (!oldStatus) {
-      this.sceneIdToStatus.set(sceneId, new SceneLifeCycleStatus(0))
-      ;(scene as any).scene.scene.parcels.forEach(pos => this.processNewPositionMapping(pos, sceneId))
-      this.emit('Scene.loading', sceneId, scene)
-    }
-    this.checkSceneAndTriggerEffects(sceneId)
-  }
-
-  resolvePositionToSceneId(xy: string) {
-    return this.positionToSceneId.resolve(xy)
-  }
-
-  protected resolveSceneIdToScene(sceneId: string) {
-    return this.sceneIdToData.resolve(sceneId)
-  }
-
-  protected async resolvePositionToScene(sceneId: string) {
-    return this.sceneIdToData.resolve(await this.positionToSceneId.resolve(sceneId))
-  }
-
-  protected shouldResolveSceneId(sceneId: string) {
-    const record = this.sceneIdToData.record.get(sceneId)
-    if (!record) {
-      return true
+  handleSceneMoreVisible(sceneId: string) {
+    const status = this.sceneIdToStatus.get(sceneId)
+    if (!status) {
+      this.setupNewScene(sceneId)
     } else {
-      return !record.loading && !record.error
-    }
-  }
-
-  protected shouldResolvePosition(position: string) {
-    const record = this.positionToSceneId.record.get(position)
-    if (!record) {
-      return true
-    } else {
-      return !record.loading && !record.error
-    }
-  }
-
-  isPositionRendereable(position: string) {
-    return this.positionToStatus.has(position) && this.positionToStatus.get(position).isRendereable()
-  }
-
-  protected isPositionResolved(position: string) {
-    return this.positionToSceneId.record.has(position) && this.positionToSceneId.record.get(position).success
-  }
-
-  protected isSceneResolved(sceneId: string) {
-    return this.sceneIdToData.record.has(sceneId) && this.sceneIdToData.record.get(sceneId).success
-  }
-
-  protected isPositionResolvedToScene(position: string) {
-    return this.isPositionResolved(position) && this.isSceneResolved(this.forcePositionToSceneId(position))
-  }
-
-  protected positionHasData(position: string) {
-    return this.isPositionResolvedToScene(position)
-  }
-
-  protected forcePositionToSceneId(position: string) {
-    return this.positionToSceneId.record.get(position).data
-  }
-
-  protected forcePositionToStatus(position: string) {
-    return this.sceneIdToStatus.get(this.forcePositionToSceneId(position))
-  }
-
-  protected forceSceneIdToScene(sceneId: string) {
-    return this.sceneIdToData.record.get(sceneId).data
-  }
-
-  protected updateSightCounts(sightedParcels: string[], lostSightParcels: string[]) {
-    for (let sighted of sightedParcels) {
-      if (!this.positionToStatus.get(sighted)) {
-        this.positionToStatus.set(sighted, new SceneLifeCycleStatus(1))
-        this.emit('Parcel.showLoader', sighted)
-      } else {
-        this.positionToStatus.get(sighted).increaseSight()
-      }
-    }
-    for (let lost of lostSightParcels) {
-      if (!this.positionToStatus.get(lost)) {
-        this.positionToStatus.set(lost, new SceneLifeCycleStatus(0))
-        this.emit('Parcel.hideLoader', lost)
-      } else {
-        this.positionToStatus.get(lost).decreaseSight()
+      if (status.canLoad()) {
+        this.startLoading(sceneId)
       }
     }
   }
 
-  protected checkScenesResolved(positions: string[]) {
-    for (let pos of positions) {
-      if (this.shouldResolvePosition(pos)) {
-        this.resolvePositionToSceneId(pos)
-          .then(sceneId => {
-            this.processNewPositionMapping(pos, sceneId)
-          })
-          .catch(err => {
-            debugger
-            console.log(err)
-          })
-      }
-      if (this.isPositionResolved(pos) && this.shouldResolveSceneId(this.forcePositionToSceneId(pos))) {
-        this.resolveSceneIdToScene(this.forcePositionToSceneId(pos))
-          .then(scene => {
-            if (!scene) this.processNewSceneMapping(this.forcePositionToSceneId(pos), scene)
-          })
-          .catch(err => {
-            debugger
-            console.log(err)
-          })
-      }
-    }
+  updateSceneSightCount(newParcels: string[], lostParcels: string[]) {
+    newParcels.filter(_ => this.positionToStatus.has(_)).forEach(_ => this.positionToStatus.get(_).increaseSight())
+    lostParcels.filter(_ => this.positionToStatus.has(_)).forEach(_ => this.positionToStatus.get(_).decreaseSight())
   }
 }
