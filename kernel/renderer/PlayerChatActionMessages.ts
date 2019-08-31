@@ -1,12 +1,6 @@
-import { AvatarMessageType } from '../comms/types/AvatarMessageType'
+import { UserActions } from './UserActions'
 
 export type PlayerChatAction = {
-  type:
-    | AvatarMessageType.SET_LOCAL_UUID
-    | AvatarMessageType.USER_BLOCKED
-    | AvatarMessageType.USER_UNBLOCKED
-    | AvatarMessageType.USER_MUTED
-    | AvatarMessageType.USER_UNMUTED
-    | AvatarMessageType.SHOW_WINDOW
+  type: UserActions
   uuid: string
 }

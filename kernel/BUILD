@@ -8,8 +8,7 @@ filegroup(
         include = ["**/*.ts"],
         exclude = [
             "node_modules/**/*",
-            "scenes/exposedApis/**/*",
-            "scenes/runner/**/*",
+            "scene-runner/userSpace/**/*",
         ],
     ),
 )
@@ -19,19 +18,10 @@ ts_library(
     srcs = glob(
         include = [
             "index.ts",
-            "auth/**/*.ts",
-            "assets/**/*.ts",
-            "comms/**/*.ts",
-            "loader/**/*.ts",
-            "config/**/*.ts",
-            "main/**/*.ts",
-            "passports/**/*.ts",
-            "presence/**/*.ts",
-            "scenes/**/*.ts",
-            "social/**/*.ts",
-            "worldMap/**/*.ts",
+            "**/*.ts",
         ],
         exclude = [
+            "scene-runner/userSpace/**/*",
             "**/*.spec.ts",
         ],
     ),

@@ -1,4 +1,4 @@
-import future from 'fp-future'
+import future, { IFuture } from 'fp-future'
 
 import { ScriptingHost, ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
 import { Observable, ISceneManifest } from '@dcl/utils'
@@ -17,7 +17,7 @@ const gamekitWorkerBLOB = new Blob([gamekitWorkerRaw])
 const gamekitWorkerUrl = URL.createObjectURL(gamekitWorkerBLOB)
 
 export class SceneWorker implements ISceneWorker {
-  public readonly system = future<ScriptingHost>()
+  public system: IFuture<ScriptingHost> = future<ScriptingHost>()
 
   public engineAPI: RendererParcelSceneToScript
   public enabled = true
