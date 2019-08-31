@@ -9,11 +9,10 @@ import {
   ComponentDisposedPayload,
   ComponentUpdatedPayload
 } from '@dcl/utils'
-import { ISceneRunningScript } from '../interface/ISceneRunningScript'
 
 const engineMethodMatches = /^(engine\.)/
 
-export function generateECSInterface(that: ISceneRunningScript) {
+export function generateECSInterface(that: { events: { type: string; tag?: string; payload: string }[] }) {
   return {
     addEntity(entityId: string) {
       if (entityId === '0') {
