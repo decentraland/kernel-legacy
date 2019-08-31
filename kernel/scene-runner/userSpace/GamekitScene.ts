@@ -8,6 +8,7 @@ import { BuildECSInterface } from './DCLInterface/BuildECSInterface'
 import { loadGamekitEntrypoint } from './loadGamekitEntrypoint'
 import { customEval, getES5Context } from './sandbox'
 import { IRendererParcelSceneToScript } from '../kernelSpace/IRendererParcelSceneToScript'
+import { ISceneRunningScript } from '../interface/ISceneRunningScript'
 
 const LOADING = 'loading'
 const AWAKE = 'awake'
@@ -16,8 +17,10 @@ const RUNNING = 'running'
 /**
  * Scripts contain custom logic that is executed outside of the context of the ScriptingHost. They can run either
  * locally using the Webworker transport, or in another server through HTTP Requests/Web Sockets.
+ *
+ * This is the class that runs all the magic (see `runFirstRound`)
  */
-export default class GamekitScene extends Script {
+export default class GamekitScene extends Script implements ISceneRunningScript {
   @inject('EngineAPI')
   engine: IRendererParcelSceneToScript
 

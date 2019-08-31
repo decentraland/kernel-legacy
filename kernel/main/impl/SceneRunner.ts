@@ -1,8 +1,9 @@
+import { ISceneManifest } from '@dcl/utils'
+
 import { SubsystemController } from '../subsystems'
+import { SceneWorkersManager } from '../../scene-runner/SceneWorkersManager'
 import { SceneLoader } from '../../loader/SceneLoader'
 import { SceneLoaderSystem } from './SceneLoader'
-import { SceneWorkersManager } from '../../scene-runner/SceneWorkersManager'
-import { ISceneManifest } from '@dcl/utils'
 
 class MemorySceneWorkersManager extends SceneWorkersManager {
   onSceneAwake(scene: ISceneManifest) {

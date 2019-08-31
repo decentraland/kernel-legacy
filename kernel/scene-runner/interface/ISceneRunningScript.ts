@@ -1,6 +1,8 @@
 import { EntityAction } from '@dcl/utils'
-import { EventSubscriber } from '@dcl/rpc/client'
 
+/**
+ * This can not be accessed from the kernel. It's the GamekitScript's Interface
+ */
 export interface ISceneRunningScript {
   onLog: (...args: any) => void
   onError: (...args: any) => void
@@ -8,6 +10,5 @@ export interface ISceneRunningScript {
   onEventFunctions: Function[]
   onStartFunctions: Function[]
   fireEvent: any
-  eventSubscriber: EventSubscriber
-  events: EntityAction[]
+  outboundEventQueue: EntityAction[]
 }

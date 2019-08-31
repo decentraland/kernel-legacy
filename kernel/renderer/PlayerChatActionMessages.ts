@@ -1,4 +1,4 @@
-import { AvatarMessageType } from './AvatarMessageType'
+import { AvatarMessageType } from '../comms/types/AvatarMessageType'
 
 export type PlayerChatAction = {
   type:

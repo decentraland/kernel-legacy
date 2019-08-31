@@ -60,8 +60,6 @@ export class BrokerConnection implements IBrokerConnection {
     this.connectRTC()
     this.connectWS()
 
-    // TODO: reconnect logic, handle disconnections
-
     setTimeout(() => {
       if (this.reliableFuture.isPending) {
         this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))

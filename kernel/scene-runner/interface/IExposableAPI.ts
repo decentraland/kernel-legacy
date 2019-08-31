@@ -1,5 +1,5 @@
-import { API } from "@dcl/rpc/common/API";
+import { API } from '@dcl/rpc/common/API'
 
 export interface IExposableAPI extends API {
-  _getExposedMethods(): Promise<string[]>;
+  _getExposedMethods(): Promise<string[]>
 }

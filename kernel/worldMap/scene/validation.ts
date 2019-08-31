@@ -12,7 +12,7 @@ import {
   YRotation,
   UnsanitizedSceneManifest
 } from '@dcl/utils/scene/SceneManifestTypes'
-import { Vector3 } from '../../scene-runner/userSpace/node_modules/@dcl/utils'
+import { Vector3 } from '@dcl/utils'
 
 export function getInvalidReason(arg: any) {
   if (!hasValidVersion(arg)) {
