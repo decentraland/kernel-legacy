@@ -1,6 +1,5 @@
 import { IScene, ILand, ParcelInfoResponse, error, defaultLogger } from '@dcl/utils'
 import { jsonFetch } from '@dcl/utils/network'
-
 import { SceneMappingResponse } from '../../scene-runner/types/SceneMappingResponse'
 
 export class SceneDataDownloadManager {
