@@ -269,7 +269,7 @@ export class BrokerConnection implements IBrokerConnection {
       const data = encoder.encode(JSON.stringify(event.candidate.toJSON()))
       msg.setData(data)
 
-      this.sendCoordinatorMessage((msg as any) as Message)
+      this.sendCoordinatorMessage(msg)
     } else {
       this.gotCandidatesFuture.resolve(this.webRtcConn!.localDescription!)
     }

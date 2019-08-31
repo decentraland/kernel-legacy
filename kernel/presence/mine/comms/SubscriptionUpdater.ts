@@ -2,8 +2,11 @@ import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
 import { MyPresence } from '../myPresence'
 import { sendUpdateSubscriptions } from './sendUpdateSubscriptions'
 import { getTopicForPosition } from '../getTopicForPosition'
+import { createLogger } from '@dcl/utils'
 
 export const POSITION_BEACON_INTERVAL = 100
+
+const logger = createLogger('Topic Subscriptions')
 
 export class SubscriptionUpdater {
   comms: WorldInstanceConnection
@@ -13,7 +16,7 @@ export class SubscriptionUpdater {
   positionListener = (pos: { x: number; y: number }) => {
     const topic = getTopicForPosition({ x: pos.x, y: 0, z: pos.y })
     sendUpdateSubscriptions(this.comms, topic)
-    console.log('sending on topic', topic, 'for coordinates', pos.x, pos.y)
+    logger.info(`Registering on topic ${topic} (${pos.x},${pos.y})`)
   }
 
   activate(comms: WorldInstanceConnection) {

@@ -6,7 +6,6 @@ import { sendTopicMessage } from './topic'
 export function sendParcelSceneCommsMessage(comms: WorldInstanceConnection, sceneId: string, message: string) {
   const topic = sceneId
 
-  // TODO: create its own class once we get the .proto file
   const d = new ChatData()
   d.setCategory(Category.SCENE_MESSAGE)
   d.setTime(Date.now())

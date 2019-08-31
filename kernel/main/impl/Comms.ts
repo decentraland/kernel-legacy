@@ -2,20 +2,24 @@ import { SubsystemController } from '../subsystems'
 import { connect } from '../../comms/connect'
 import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
 import { AuthSystem } from '../impl'
-import { intersectLogger } from '@dcl/utils'
+import { intersectLogger, createLogger, Observable } from '@dcl/utils'
 import future from 'fp-future'
+import { Category, MessageType } from '@dcl/protos'
 
 export const overridenEvents = intersectLogger('Broker: ')
+const logger = createLogger('Comms')
 
 export class CommsSystem extends SubsystemController {
-  worldInstanceConnection?: WorldInstanceConnection
+  connection?: WorldInstanceConnection
+  lastMessages: any[] = []
+  messageObservable = new Observable<any>()
 
   protected async onStart() {
     const auth: AuthSystem = this.deps.filter(dep => dep.name === 'Auth')[0] as AuthSystem
     if (!auth.auth.isLoggedIn) {
       return this.onError(new Error('Tried to start comms without being logged in'))
     }
-    this.worldInstanceConnection = await connect(auth.auth)
+    this.connection = await connect(auth.auth)
 
     const success = { unreliable: future<boolean>(), reliable: future<boolean>(), alias: '' }
 
@@ -57,6 +61,38 @@ export class CommsSystem extends SubsystemController {
         await retry()
       }
     }
+    this.setupLogger()
     return this.onSuccess()
+  }
+
+  setupLogger() {
+    function notify(message) {
+      this.lastMessages.push(message)
+      this.messageObservable.notifyObservers(message)
+    }
+    this.connection.on('' + Category.PROFILE, (data: any) => {
+      logger.info('Received Profile info', data)
+      notify({ type: 'Profile', data })
+    })
+
+    this.connection.on('' + MessageType.PING, (data: any) => {
+      logger.info('Received Ping', data)
+      notify({ type: 'Ping', data })
+    })
+
+    this.connection.on('' + Category.SCENE_MESSAGE, (data: any) => {
+      logger.info('Received Scene Message', data)
+      notify({ type: 'Scene Message', data })
+    })
+
+    this.connection.on('' + Category.CHAT, (data: any) => {
+      logger.info('Received Chat', data)
+      notify({ type: 'Chat', data })
+    })
+
+    this.connection.on('' + Category.POSITION, (data: any) => {
+      logger.info('Received Position', data)
+      notify({ type: 'Position', data })
+    })
   }
 }

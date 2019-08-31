@@ -1,6 +1,9 @@
 import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
 import { MyPresence } from '../myPresence'
 import { sendPosition } from '../../../comms/senders/position'
+import { createLogger } from '@dcl/utils'
+
+const logger = createLogger('BroadcastPresence')
 
 export const POSITION_BEACON_INTERVAL = 100
 
@@ -32,6 +35,7 @@ export class BroadcastPresence {
   checkAndAnnouncePosition() {
     if (this.shouldSendPositionBeacon()) {
       const topic = this.myPresence.getTopicForCurrentPosition()
+      logger.info('Broadcasting presence on channel', topic)
       sendPosition(this.comms, topic, this.myPresence.getPositionReport() as any)
     }
   }

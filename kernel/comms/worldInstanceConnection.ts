@@ -38,16 +38,20 @@ export class WorldInstanceConnection extends EventEmitter {
   }
 
   private sendReliableMessage(msg: Message) {
-    if (!this.connection.hasReliableChannel)
-      throw new Error('trying to send a topic message using null reliable channel')
+    if (!this.connection.hasReliableChannel) {
+      this.logger.error('trying to send a topic message using null reliable channel')
+      return
+    }
     const bytes = msg.serializeBinary()
     this.connection.sendReliable(bytes)
     return new SendResult(bytes.length)
   }
 
   private sendUnreliableMessage(msg: Message) {
-    if (!this.connection.hasUnreliableChannel)
-      throw new Error('trying to send a topic message using null unreliable channel')
+    if (!this.connection.hasUnreliableChannel) {
+      this.logger.error('trying to send a topic message using null unreliable channel')
+      return
+    }
     const bytes = msg.serializeBinary()
     this.connection.sendUnreliable(bytes)
     return new SendResult(bytes.length)
@@ -67,7 +71,7 @@ export class WorldInstanceConnection extends EventEmitter {
 
     switch (msgType) {
       case MessageType.UNKNOWN_MESSAGE_TYPE: {
-        this.logger.log('unsupported message')
+        this.logger.warn(`unsupported message: ${msgType}`)
         break
       }
       case MessageType.TOPIC_FW: {

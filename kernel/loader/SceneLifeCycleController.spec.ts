@@ -1,6 +1,6 @@
 import { ParcelSightController } from './ParcelSightController'
-import { SceneLifeCycleController } from '@dcl/kernel/loader/SceneLifeCycleController'
-import { DeltaParcelSightSeeingReport } from '@dcl/kernel/loader/ParcelSightController'
+import { SceneLifeCycleController } from './SceneLifeCycleController'
+import { DeltaParcelSightSeeingReport } from './ParcelSightController'
 import { EventEmitter } from 'events'
 import future from 'fp-future'
 

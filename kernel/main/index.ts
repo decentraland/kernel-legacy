@@ -59,8 +59,8 @@ export class MainControllerImpl {
     )
     const worldMap = this.newSystem('WorldMap', new WorldMapSystem([config]))
     const sceneLoader = this.newSystem('SceneLoader', new SceneLoaderSystem([worldMap, inworldAvatars]))
-    this.newSystem('MyPresence', new MyPresenceSystem([comms, sceneLoader]))
-    this.newSystem('SceneRunner', new SceneRunnerSystem([sceneLoader, inworldAvatars]))
+    const sceneRunner = this.newSystem('SceneRunner', new SceneRunnerSystem([sceneLoader, inworldAvatars]))
+    this.newSystem('MyPresence', new MyPresenceSystem([comms, sceneLoader, sceneRunner]))
 
     this.subsystems.forEach(subsystem => {
       Object.defineProperty(this, subsystem.name, {

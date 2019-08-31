@@ -25,8 +25,8 @@ export class MyPresenceSystem extends SubsystemController {
       this.broadcastPresence = new BroadcastPresence(this.myPresenceTracker)
       this.updateSubscriptions = new SubscriptionUpdater(this.myPresenceTracker)
 
-      this.broadcastPresence.activate(comms.worldInstanceConnection!)
-      this.updateSubscriptions.activate(comms.worldInstanceConnection!)
+      this.broadcastPresence.activate(comms.connection!)
+      this.updateSubscriptions.activate(comms.connection!)
 
       this.setupBroadcastTimer(LOW_PRIORITY_INTERVAL)
 
