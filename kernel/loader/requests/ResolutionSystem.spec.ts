@@ -2,7 +2,7 @@ import { ResolutionSystem } from './ResolutionSystem'
 import { EventEmitter } from 'events'
 import future from 'fp-future'
 
-class ResolutionTest extends ResolutionSystem<string, string[]> {
+class ResolutionTest extends ResolutionSystem<string> {
   emitter = new EventEmitter()
   release(data?: any) {
     this.emitter.emit('release', data)
@@ -11,16 +11,16 @@ class ResolutionTest extends ResolutionSystem<string, string[]> {
     this.emitter.emit('fail')
   }
   async executeResolution(key: string) {
-    const block = future<string[]>()
+    const block = future<string>()
     this.emitter.once('fail', (data: any) => block.reject(new Error(data)))
-    this.emitter.once('release', (data: any) => block.resolve(['a', 'b', 'c', 'd', data]))
+    this.emitter.once('release', (data: any) => block.resolve(data))
     return block
   }
-  processResolution(key: string, intermediate: string[]) {
-    if (intermediate[4] === 'runtime error') {
+  processResolution(key: string, intermediate: string) {
+    if (intermediate === 'runtime error') {
       ;(undefined as any)()
     }
-    return intermediate[4]
+    return intermediate
   }
 }
 
@@ -42,7 +42,7 @@ describe('ResulutionSystem', () => {
     myTest.resolve('1').then(result => {
       expect(myTest.record.get('1').data).toBe(undefined)
       expect(myTest.record.get('1').loading).toBe(false)
-      expect(myTest.record.get('1').error).toBe(true)
+      expect(myTest.record.get('1').error).toBeTruthy()
       expect(myTest.record.get('1').success).toBe(false)
       expect(myTest.record.get('1').promise.isPending).toBe(false)
       done()
@@ -64,9 +64,9 @@ describe('ResulutionSystem', () => {
   it('undefined is not a function', done => {
     const myTest = new ResolutionTest()
     myTest.resolve('1').then(() => {
-      expect(myTest.record.get('1').data).toBe(undefined)
+      expect(myTest.record.get('1').data).toBe('runtime error')
       expect(myTest.record.get('1').loading).toBe(false)
-      expect(myTest.record.get('1').error).toBe(true)
+      expect(myTest.record.get('1').error).toBeTruthy()
       expect(myTest.record.get('1').success).toBe(false)
       expect(myTest.record.get('1').promise.isPending).toBe(false)
       done()

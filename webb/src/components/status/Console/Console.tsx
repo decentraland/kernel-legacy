@@ -34,7 +34,7 @@ function makeCommands(that) {
         fn: function() {
           ;(async () => {
             const { x, z } = (client.MyPresence.myPresenceTracker as MyPresence).lastPlayerPosition
-            const [a, b] = worldToGrid({ x, z })
+            const [a, b] = worldToGrid({ x, y: 0, z })
             const { sceneId } = await (client.MyPresence.myPresenceTracker
               .loader as SceneLoader).getSceneForCoordinates(a, b)
             return term.terminal.current.pushToStdout(`You are at ${a},${b}: ${sceneId}`)

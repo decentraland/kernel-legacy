@@ -1,9 +1,5 @@
 import { AnyAction, Middleware, Store } from 'redux'
 
-import { intersectLogger } from '@dcl/utils'
-
-import { AuthRootState } from '~/modules/auth'
-
 export type CommsStateSummary =
   | 'Not initialized'
   | 'Starting'
@@ -48,47 +44,10 @@ export function commsReducer(state?: CommsState, action?: AnyAction): CommsState
   if (!action) {
     return state
   }
-  switch (action.type) {
-    case 'Waiting':
-      return { ...state, summary: 'Waiting for login...' }
-    case 'Connecting':
-      return { ...state, summary: 'Connecting...' }
-    case 'Info':
-      return state
-    case 'ICE Connection Established':
-      return { ...state, summary: 'Establishing data channels...' }
-    case 'Establishing ICE connection...':
-      return { ...state, summary: 'Establishing ICE connection...' }
-    case 'Connected!':
-      return { ...state, summary: 'Connected!' }
-    case 'Comms log':
-      return { ...state, log: [...state.log, action.payload[0]] }
-    case 'Error':
-      return { ...state, summary: 'Auth error' }
-  }
   return state
 }
 
-export const overridenEvents = intersectLogger('Broker: ')
-
-/**
- * State transitions that require side-effects
- */
-export const commsMiddleware: any = (store: Store<CommsRootState & AuthRootState>) => {
-  for (let key of ['debug', 'error', 'log', 'warn', 'info', 'debug', 'trace']) {
-    overridenEvents.on(key, (...args) => {
-      store.dispatch({ type: 'Comms log', payload: args })
-      if (args[0] === 'signaling state: stable') {
-        store.dispatch({ type: 'Establishing ICE connection...' })
-      }
-      if (args[0] === 'ice connection state: connected') {
-        store.dispatch({ type: 'ICE Connection Established' })
-      }
-      if (args[0] === 'DataChannel "reliable" has opened') {
-        store.dispatch({ type: 'Connected!' })
-      }
-    })
-  }
+export const commsMiddleware: any = (_: Store<CommsRootState>) => {
   return (next: Middleware) => (action: any) => {
     return next(action)
   }

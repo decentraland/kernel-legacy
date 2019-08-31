@@ -1,7 +1,7 @@
 import future from 'fp-future'
 import { Resolvable } from './Resolvable'
 
-export abstract class ResolutionSystem<T, R> {
+export abstract class ResolutionSystem<T> {
   record = new Map<string, Resolvable<T>>()
   hasStartedResolving(key: string) {
     return this.record.has(key)
@@ -12,6 +12,18 @@ export abstract class ResolutionSystem<T, R> {
       return false
     }
     return !record.loading
+  }
+  storeResolution(x: string, v: T) {
+    const promiseOfValue = future<T>()
+    promiseOfValue.resolve(v)
+    this.record.set(x, {
+      key: x,
+      loading: false,
+      error: false,
+      success: true,
+      data: v,
+      promise: promiseOfValue
+    })
   }
   resolve(x: string): Promise<T | undefined> {
     if (!this.record.has(x)) {
@@ -26,7 +38,8 @@ export abstract class ResolutionSystem<T, R> {
       this.record.set(x, resolvable)
       const handleError = (err: any) => {
         resolvable.loading = false
-        resolvable.error = true
+        resolvable.error = err
+        resolvable.success = false
         resolvable.promise.resolve(undefined)
       }
       const handleSuccess = (data: T) => {
@@ -40,10 +53,9 @@ export abstract class ResolutionSystem<T, R> {
           .then(d => {
             try {
               if (resolvable.promise.isPending) {
+                handleSuccess(d)
                 if (d) {
-                  handleSuccess(this.processResolution(x, d))
-                } else {
-                  handleSuccess(undefined)
+                  this.processResolution(x, d)
                 }
               }
             } catch (e) {
@@ -59,6 +71,6 @@ export abstract class ResolutionSystem<T, R> {
       return this.record.get(x).promise
     }
   }
-  abstract executeResolution(x: string): Promise<R | undefined>
-  abstract processResolution(x: string, r: R): T
+  abstract executeResolution(x: string): Promise<T | undefined>
+  abstract processResolution(x: string, r: T): void
 }

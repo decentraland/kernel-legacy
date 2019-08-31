@@ -7,7 +7,8 @@ import {
   Quaternion,
   ReadOnlyVector2,
   Vector3,
-  worldToGrid
+  worldToGrid,
+  Vector2
 } from '@dcl/utils'
 import { SceneLoader } from '../../loader/SceneLoader'
 import { migrateFromILand } from '../../worldMap/sceneCompatibility/migrateFromILand'
@@ -18,17 +19,28 @@ import { getTopicForPosition } from './getTopicForPosition'
 const temporaryVector2 = new MVector2()
 export class MyPresence {
   positionObservable = new Observable<Readonly<PositionReport>>()
+  parcelPositionObservable = new Observable<ReadOnlyVector2>()
   teleportObservable = new Observable<ReadOnlyVector2>()
 
   lastTeleport: ReadOnlyVector2
   lastPlayerPositionReport: PositionReport
   lastPlayerPosition: MVector3 = new MVector3()
+  lastPlayerParcel: Vector2 = { x: 0, y: 0 }
   lastTimeUpdatedUrl = 0
 
   constructor(public loader: SceneLoader, public history: History, public location: Location) {
     this.enablePositionWatch()
     this.enableUrlUpdates()
     this.enableNotifySceneLoader()
+    this.enableParcelPositionListeners()
+  }
+
+  parcelPositionTranslator = (event: PositionReport) => {
+    const [x, y] = worldToGrid(event.position)
+    if (x !== this.lastPlayerParcel.x || y !== this.lastPlayerParcel.y) {
+      this.lastPlayerParcel = { x, y }
+      this.parcelPositionObservable.notifyObservers(this.lastPlayerParcel)
+    }
   }
 
   copyPositionToLocalListener = event => {
@@ -107,5 +119,13 @@ export class MyPresence {
 
   disableNotifySceneLoader() {
     this.positionObservable.removeCallback(this.notifyLoaderListener)
+  }
+
+  enableParcelPositionListeners() {
+    this.positionObservable.add(this.parcelPositionTranslator)
+  }
+
+  disableParcelPositionListeners() {
+    this.positionObservable.removeCallback(this.parcelPositionTranslator)
   }
 }

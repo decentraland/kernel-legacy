@@ -2,8 +2,8 @@ import { SubscriptionMessage, MessageType, Format } from '@dcl/protos'
 
 import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
 
-export function updateSubscriptions(comms: WorldInstanceConnection, rawTopics: string) {
-  if (!this.connection.hasReliableChannel) {
+export function sendUpdateSubscriptions(comms: WorldInstanceConnection, rawTopics: string) {
+  if (!comms.connection.hasReliableChannel) {
     return
   }
   const subscriptionMessage = new SubscriptionMessage()
@@ -12,5 +12,5 @@ export function updateSubscriptions(comms: WorldInstanceConnection, rawTopics: s
   // TODO: use TextDecoder instead of Buffer, it is a native browser API, works faster
   subscriptionMessage.setTopics(Buffer.from(rawTopics, 'utf8'))
   const bytes = subscriptionMessage.serializeBinary()
-  this.connection.sendReliable(bytes)
+  comms.connection.sendReliable(bytes)
 }

@@ -10,6 +10,7 @@ import * as MainController from './main/index'
 export * from './passports/ProfileStore'
 export * from './passports/types'
 export * from './assets/wearables/base'
+export * from './loader/SceneLoader'
 export * from './presence'
 import * as Validations from './worldMap/scene/validation'
 

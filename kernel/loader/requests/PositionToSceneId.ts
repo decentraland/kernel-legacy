@@ -1,7 +1,7 @@
 import { SceneDataDownloadManager } from './SceneDataDownloadManager'
 import { ResolutionSystem } from './ResolutionSystem'
 
-export class PositionToSceneId extends ResolutionSystem<string, string> {
+export class PositionToSceneId extends ResolutionSystem<string> {
   constructor(public downloadManager: SceneDataDownloadManager) {
     super()
   }

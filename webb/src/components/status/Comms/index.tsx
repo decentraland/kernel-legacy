@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Grid, Segment } from 'decentraland-ui'
-import { default as CommsStatus } from './CommsStatus'
-import { BuildConnectedVisualizer } from '~/components/Reusable/BuildConnectedVisualizer'
+import { BuildConnectedVisualizer } from '../../Reusable/BuildConnectedVisualizer'
 
 export default class Comms extends React.PureComponent {
   render() {
@@ -9,9 +8,7 @@ export default class Comms extends React.PureComponent {
     return (
       <Grid>
         <Grid.Row>
-          <Grid.Column width={6}>
-            <CommsStatus />
-          </Grid.Column>
+          <Grid.Column width={6}></Grid.Column>
           <Grid.Column width={10}>
             <Segment>Placeholder logs</Segment>
           </Grid.Column>

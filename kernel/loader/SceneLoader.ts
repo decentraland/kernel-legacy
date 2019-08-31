@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 import { Vector2 } from '@dcl/utils'
 import { SceneDataDownloadManager } from './requests/SceneDataDownloadManager'
-import { ParcelSightController } from './ParcelSightController'
+import { ParcelSightController, DeltaParcelSightSeeingReport } from './ParcelSightController'
 import { SceneLifeCycleController } from './SceneLifeCycleController'
 import { PositionLifeCycleController } from './PositionLifecycleController'
 
@@ -43,9 +43,9 @@ export class SceneLoader extends EventEmitter {
       : new PositionLifeCycleController(this.parcelController, this.sceneController)
 
     // Internal hooks
-    this.parcelController.on('Parcel.sightChanges', (newScenes: string[], old: string[]) =>
-      this.sceneController.reportSightedParcels(newScenes, old)
-    )
+    this.parcelController.on('Parcel.sightChanges', (data: DeltaParcelSightSeeingReport) => {
+      this.sceneController.reportSightedParcels(data.sighted, data.lostSight)
+    })
     // External hooks
     this.sceneController.on('Parcel.showLoader', (...args) => this.emit('Parcel.showLoader', ...args))
     this.sceneController.on('Parcel.empty', (...args) => this.emit('Parcel.empty', ...args))
@@ -62,7 +62,7 @@ export class SceneLoader extends EventEmitter {
   }
 
   getSceneForCoordinates(x: number | string, y: number | string) {
-    return this.downloadManager.getSceneData(`${x},${y}`)
+    return this.downloadManager.getSceneDataForPosition(`${x},${y}`)
   }
 
   reportCurrentPosition(currentPosition: Vector2) {
