@@ -3,7 +3,7 @@ import { ISceneManifest } from '@dcl/utils'
 
 import { ISceneWorker } from './interface/ISceneWorker'
 
-export abstract class SceneWorkersManager {
+export abstract class GlobalScriptedScenesManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
 
@@ -29,7 +29,7 @@ export abstract class SceneWorkersManager {
     worker.dispose()
   }
 
-  loadScene(scene: ISceneManifest, transport: ScriptingTransport) {
+  loadScene(scene: ISceneManifest, transport: ScriptingTransport): ISceneWorker {
     const sceneId = scene.cannonicalCID
 
     let worker = this.loadedSceneWorkers.get(sceneId)

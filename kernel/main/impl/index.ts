@@ -6,9 +6,9 @@ import { InWorldAvatarSystem } from './InWorldAvatars'
 import { PassportSystem } from './Passport'
 import { PeerPresenceSystem } from './PeerPresence'
 import { SceneLoaderSystem } from './SceneLoader'
-import { SceneRunnerSystem } from './SceneRunner'
 import { SocialModerationSystem } from './SocialModeration'
 import { WorldMapSystem } from './WorldMap'
+import { SceneRunnerSystem } from './SceneRunner'
 
 export {
   AssetSystem,
@@ -19,7 +19,7 @@ export {
   PassportSystem,
   PeerPresenceSystem,
   SceneLoaderSystem,
-  SceneRunnerSystem,
+  SceneRunnerSystem as SceneRunner,
   SocialModerationSystem,
   WorldMapSystem
 }

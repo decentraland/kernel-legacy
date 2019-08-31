@@ -6,7 +6,8 @@ import { IRendererParcelSceneAPI } from '../interface/IRendererParcelSceneAPI'
 import { IRendererParcelSceneToScript } from './IRendererParcelSceneToScript'
 
 /**
- * The class formerly known as EngineAPI. It had pretty big name for a pretty dumb class like this one.
+ * The class formerly known as EngineAPI. Communicates the ParcelScene class on the Renderer with the corresponding
+ * Scene Scripts running on workers.
  */
 @registerAPI('EngineAPI')
 export class RendererParcelSceneToScript extends ExposableAPI implements IRendererParcelSceneToScript {

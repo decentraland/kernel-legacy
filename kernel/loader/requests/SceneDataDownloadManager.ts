@@ -1,6 +1,5 @@
 import { IScene, ILand, ParcelInfoResponse, error, defaultLogger } from '@dcl/utils'
 import { jsonFetch } from '@dcl/utils/network'
-import { SceneMappingResponse } from '../../scene-runner/types/SceneMappingResponse'
 
 export class SceneDataDownloadManager {
   constructor(
@@ -17,7 +16,7 @@ export class SceneDataDownloadManager {
       const responseContent = await jsonFetch(
         this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
       )
-      const contents = responseContent as SceneMappingResponse
+      const contents = responseContent as any
       if (!contents.data.length) {
         return null
       }

@@ -1,28 +1,8 @@
-import { ISceneManifest } from '@dcl/utils'
-
 import { SubsystemController } from '../subsystems'
 import { SceneLoader } from '../../loader/SceneLoader'
 import { SceneLoaderSystem } from './SceneLoader'
 
-import { SceneWorkersManager } from '../../scene-runner/SceneWorkersManager'
-
-class MemorySceneWorkersManager extends SceneWorkersManager {
-  onSceneAwake(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneWillStart(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneRunning(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneWillUnload(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneDidUnload(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-}
+import { MemorySceneWorkersManager } from '../../scene-runner/MemorySceneWorkersManager'
 
 export class SceneRunnerSystem extends SubsystemController {
   loader: SceneLoader
