@@ -134,5 +134,27 @@ describe('SceneLifeCycleController', () => {
     setPosition(0, 0)
     setPosition(1, 0)
   })
-  console.log(process.env)
+  it('hides loaders on Scene.loading', async () => {
+    const { resolveSceneId, scene, setPosition, resolvePosition } = setup()
+    setPosition(0, 0)
+    const result = { count: 5 }
+    scene.on('Parcel.hideLoader', () => {
+      result.count--
+    })
+    await resolvePosition(0, 0, 'A')
+    await resolvePosition(0, 1, 'A')
+    await resolvePosition(0, -1, 'A')
+    await resolvePosition(1, 0, 'A')
+    await resolvePosition(-1, 0, 'A')
+    scene.on('Scene.loading', () => {
+      scene.reportSceneFinishedFirstRound('A')
+    })
+    scene.on('Scene.awake', () => {
+      scene.reportSceneRunning('A')
+    })
+    scene.on('Scene.running', () => {
+      expect(result.count).toBe(0)
+    })
+    await resolveSceneId('A', fiveParcels)
+  })
 })

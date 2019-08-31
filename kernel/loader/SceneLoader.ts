@@ -11,27 +11,54 @@ export class SceneLoader extends EventEmitter {
   sceneController: SceneLifeCycleController
   positionController: PositionLifeCycleController
 
-  constructor(contentServer: string, lineOfSightRadius: number) {
+  constructor() {
     super()
-    this.downloadManager = new SceneDataDownloadManager({ contentServer })
-    this.parcelController = new ParcelSightController({ lineOfSightRadius })
-    this.sceneController = new SceneLifeCycleController(this.downloadManager, this.parcelController)
-    this.positionController = new PositionLifeCycleController(this.parcelController, this.sceneController)
+  }
+
+  setupInjecting(config: {
+    downloadManager?: SceneDataDownloadManager
+    parcelController?: ParcelSightController
+    sceneController?: SceneLifeCycleController
+    positionController?: PositionLifeCycleController
+    contentServer?: string
+    lineOfSightRadius?: number
+  }) {
+    if (!config.downloadManager && !config.contentServer) {
+      throw new Error('Must configure a content server')
+    }
+    if (!config.parcelController && !config.lineOfSightRadius) {
+      throw new Error('Must configure a parcel line of sight radius')
+    }
+    this.downloadManager = config.downloadManager
+      ? config.downloadManager
+      : new SceneDataDownloadManager({ contentServer: config.contentServer })
+    this.parcelController = config.parcelController
+      ? config.parcelController
+      : new ParcelSightController({ lineOfSightRadius: config.lineOfSightRadius })
+    this.sceneController = config.sceneController
+      ? config.sceneController
+      : new SceneLifeCycleController(this.downloadManager, this.parcelController)
+    this.positionController = config.positionController
+      ? config.positionController
+      : new PositionLifeCycleController(this.parcelController, this.sceneController)
+
     // Internal hooks
     this.parcelController.on('Parcel.sightChanges', (newScenes: string[], old: string[]) =>
       this.sceneController.reportSightedParcels(newScenes, old)
     )
     // External hooks
-
-    // Loading...
     this.sceneController.on('Parcel.showLoader', (...args) => this.emit('Parcel.showLoader', ...args))
     this.sceneController.on('Parcel.empty', (...args) => this.emit('Parcel.empty', ...args))
     this.sceneController.on('Parcel.hideLoader', (...args) => this.emit('Parcel.hideLoader', ...args))
     this.sceneController.on('Scene.loading', (...args) => this.emit('Scene.loading', ...args))
     this.sceneController.on('Scene.awake', (...args) => this.emit('Scene.awake', ...args))
-    this.sceneController.on('Scene.started', (...args) => this.emit('Scene.started', ...args))
-    this.sceneController.on('Scene.sleep', (...args) => this.emit('Scene.sleep', ...args))
+    this.sceneController.on('Scene.running', (...args) => this.emit('Scene.running', ...args))
+    this.sceneController.on('Scene.stop', (...args) => this.emit('Scene.stop', ...args))
     this.sceneController.on('Scene.error', (...args) => this.emit('Scene.error', ...args))
+  }
+
+  setup(contentServer: string, lineOfSightRadius: number) {
+    this.setupInjecting({ contentServer, lineOfSightRadius })
   }
 
   getSceneForCoordinates(x: number | string, y: number | string) {

@@ -108,14 +108,14 @@ export class SceneLifeCycleController extends EventEmitter {
     if (!status || !status.canLoad()) {
       logger.info(`Scene ${sceneId} asked to load but it can't: ${JSON.stringify(status)}`)
     }
-    this.emit('Scene.loading', { sceneId, scene: this.sceneIdToData.getScene(sceneId) })
     status.reportLoading()
+    this.emit('Scene.loading', { sceneId, scene: this.sceneIdToData.getScene(sceneId) })
   }
 
   private startAwake(sceneId: string) {
     const status = this.sceneIdToStatus.get(sceneId)
     if (!status || !status.canAwake()) {
-      logger.info(`Scene ${sceneId} asked to awake but it can't: ${JSON.stringify(status)}`)
+      logger.info(`Scene ${sceneId} asked to awake but it can't: ${status.toString()}`)
     }
     this.sceneIdToStatus.has(sceneId) && this.sceneIdToStatus.get(sceneId).reportAwake()
     this.emit('Scene.awake', { sceneId, scene: this.sceneIdToData.getScene(sceneId) })

@@ -31,7 +31,7 @@ describe('Position Lifecycle', () => {
     const { fakeScene, position, changePosition } = setup()
     changePosition(0, 0)
     fakeScene.isPositionWalkable = (pos: string) => true
-    fakeScene.emit('Parcel.active')
+    fakeScene.emit('Scene.running')
     expect(position.isSettled).toBe(true)
   })
   it('Hooks to parcel lifecycle for settlement', () => {

@@ -6,7 +6,7 @@ export class PositionLifeCycleController extends EventEmitter /* Position.settle
   isSettled: boolean = false
   constructor(public parcelController: ParcelSightController, public sceneController: SceneLifeCycleController) {
     super()
-    sceneController.on('Parcel.active', () => this.checkSettlement())
+    sceneController.on('Scene.running', () => this.checkSettlement())
     parcelController.on('Parcel.sightChanges', () => this.checkSettlement())
   }
 
