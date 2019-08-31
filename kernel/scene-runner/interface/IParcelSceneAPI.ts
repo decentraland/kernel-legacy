@@ -1,4 +1,4 @@
-import { EnvironmentData, EntityAction } from '@dcl/utils'
+import { EnvironmentData, EntityAction } from '../userSpace/node_modules/@dcl/utils'
 import { ISceneWorker } from './ISceneWorker'
 
 export interface IParcelSceneAPI {

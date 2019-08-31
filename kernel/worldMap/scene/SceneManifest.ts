@@ -12,7 +12,7 @@ import { stableStringify } from '@dcl/utils/pure/stableStringify'
 import { parcelLimits, getMinimum, parseCoordinate, decideFloat } from '@dcl/utils/scene'
 import { isValidSceneInput, getInvalidReason } from './validation'
 import { ISceneManifest } from '@dcl/utils/scene/ISceneManifest'
-import { sha256 } from '@dcl/utils'
+import { sha256 } from '../../scene-runner/userSpace/node_modules/@dcl/utils'
 
 export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest

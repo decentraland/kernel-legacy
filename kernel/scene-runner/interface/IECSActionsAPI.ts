@@ -1,4 +1,4 @@
-import { EntityAction } from '@dcl/utils'
+import { EntityAction } from '../userSpace/node_modules/@dcl/utils'
 
 export interface IECSActionsReporting {
   /**

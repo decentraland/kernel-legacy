@@ -1,5 +1,5 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-import { Observable } from '@dcl/utils'
+import { Observable } from '../userSpace/node_modules/@dcl/utils'
 
 import { SceneManifest } from '../../worldMap/scene/SceneManifest'
 

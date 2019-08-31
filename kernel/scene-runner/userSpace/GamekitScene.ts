@@ -2,13 +2,13 @@ import { EventSubscriber, inject, Script } from '@dcl/rpc/client'
 import { DecentralandInterface, DevTools, IECSEngine } from '@dcl/scene-api'
 import { EntityAction, defaultLogger } from '@dcl/utils'
 
-import { generateDCLInterface } from '../generateDCLInterface'
+import { generateDCLInterface } from '../kernelSpace'
 import { customEval, getES5Context } from './sandbox'
 import { resolveMapping } from './resolveMapping'
-import { getEthereumProvider } from '../../exposedApis/ethereumProvider'
+import { getEthereumProvider } from '../../scenes/runner/userSpace/ethereumProvider'
 import { UPDATE_INTERVAL } from './constants'
-import { SceneEventsManager } from '../../exposedApis/SceneEventsManager'
-import { ILifecycleAPI } from '../../exposedApis/ILifecycleAPI'
+import { SceneEventsManager } from '../kernelSpace/SubscriptionEvents'
+import { ILifecycleAPI } from '../interface/ILifecycleAPI'
 
 export default class GamekitScene extends Script {
   @inject('EngineAPI')

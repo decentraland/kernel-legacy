@@ -1,4 +1,4 @@
-import { IEventNames, IEvents } from '@dcl/scene-api'
+import { IEventNames, IEvents } from '../userSpace/node_modules/@dcl/scene-api'
 
 export interface IEventsManager {
   /**

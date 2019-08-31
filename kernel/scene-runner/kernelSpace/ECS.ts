@@ -9,7 +9,7 @@ import {
   ComponentDisposedPayload,
   ComponentUpdatedPayload
 } from '@dcl/utils'
-import { ISceneRunningScript } from '../../types/ISceneRunningScript'
+import { ISceneRunningScript } from '../interface/ISceneRunningScript'
 
 const engineMethodMatches = /^(engine\.)/
 

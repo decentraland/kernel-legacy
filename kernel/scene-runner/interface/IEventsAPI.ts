@@ -1,4 +1,4 @@
-import { IEventNames } from '@dcl/scene-api'
+import { IEventNames } from '../userSpace/node_modules/@dcl/scene-api'
 import { IECSActionsReporting } from './IECSActionsAPI'
 
 export interface IEventsAPI extends IECSActionsReporting {

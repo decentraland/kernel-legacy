@@ -1,4 +1,4 @@
-import { ReadOnlyVector3, ReadOnlyQuaternion } from '@dcl/utils'
+import { ReadOnlyVector3, ReadOnlyQuaternion } from '../../scene-runner/kernelSpace/node_modules/@dcl/utils'
 
 export type PositionReport = {
   /** Camera position, world space */

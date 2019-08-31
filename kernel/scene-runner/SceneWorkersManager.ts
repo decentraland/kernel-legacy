@@ -1,7 +1,7 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
 import { ISceneManifest } from '@dcl/utils'
 
-import { ISceneWorker } from '../types/ISceneWorker'
+import { ISceneWorker } from './interface/ISceneWorker'
 
 export abstract class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
