@@ -124,7 +124,6 @@ export class SceneDataDownloadManager {
 
   async getSceneData(position: string): Promise<ILand<any> | null> {
     const sceneId = await this.resolvePositionToSceneId(position)
-    console.log(`Resolved ${position} to ${sceneId}`)
     if (sceneId === null) {
       return null
     }

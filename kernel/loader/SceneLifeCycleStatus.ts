@@ -78,6 +78,6 @@ export class SceneLifeCycleStatus {
   }
 
   decreaseSight() {
-    this.count++
+    this.count--
   }
 }

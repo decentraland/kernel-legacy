@@ -71,6 +71,7 @@ ts_library(
 
 jasmine_node_test(
     name = "test",
+    coverage = True,
     deps = [
         ":kernel_spec",
         "@npm//jasmine",

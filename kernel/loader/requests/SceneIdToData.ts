@@ -15,8 +15,8 @@ export class SceneIdToData extends ResolutionSystem<ILand<any>, ILand<any>> {
   getScene(sceneId: string): ILand<any> | undefined {
     return this.record.has(sceneId) && this.record.get(sceneId).data
   }
-  async executeResolution(sceneId: string) {
-    return await this.downloadManager.getSceneDataForSceneId(sceneId)
+  executeResolution(sceneId: string) {
+    return this.downloadManager.getSceneDataForSceneId(sceneId)
   }
   processResolution(_: string, data: ILand<any>) {
     if (!data) {

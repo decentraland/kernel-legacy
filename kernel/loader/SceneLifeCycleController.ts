@@ -33,11 +33,8 @@ export class SceneLifeCycleController extends EventEmitter {
       if (!this.positionToSceneId.hasStartedResolving(position)) {
         this.showLoader(position)
         this.positionToSceneId.resolve(position).then(() => this.checkPosition(position))
-        return
-      }
-      if (this.positionToSceneId.hasFinishedResolving(position)) {
+      } else if (this.positionToSceneId.hasFinishedResolving(position)) {
         this.handleSceneMoreVisible(this.positionToSceneId.getScene(position))
-        return
       }
     })
     lostParcels.forEach(position => {
@@ -47,20 +44,24 @@ export class SceneLifeCycleController extends EventEmitter {
 
   checkPosition(position: string) {
     const sceneId = this.positionToSceneId.getScene(position)
-    if (sceneId && !this.sceneIdToData.hasStartedResolving(sceneId)) {
-      this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
-      return
-    }
     if (!sceneId && this.positionToSceneId.hasFinishedResolving(position)) {
-      // Handle empty parcel
       this.emit('Parcel.empty', position)
-      return
+    } else if (sceneId) {
+      if (!this.sceneIdToData.hasStartedResolving(sceneId)) {
+        this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
+      } else if (this.sceneIdToData.hasFinishedResolving(sceneId)) {
+        this.checkScene(sceneId)
+      }
     }
   }
 
   checkScene(sceneId: string) {
     const scene = this.sceneIdToData.getScene(sceneId)
-    if (!scene) {
+    if (!scene && !this.sceneIdToData.hasStartedResolving(sceneId)) {
+      this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
+      return
+    }
+    if (!scene || !this.sceneIdToData.hasFinishedResolving(sceneId)) {
       return
     }
     if (!this.sceneIdToStatus.has(sceneId)) {
@@ -76,8 +77,8 @@ export class SceneLifeCycleController extends EventEmitter {
   setupNewScene(sceneId: string) {
     const scene = this.sceneIdToData.getScene(sceneId)
     const parcels = (scene.scene as IScene).scene.parcels
-    parcels.reduce((count, position) => count + (this.parcelController.inSight(position) ? 1 : 0), 0)
-    const status = new SceneLifeCycleStatus(sceneId, 0)
+    const count = parcels.reduce((count, position) => count + (this.parcelController.inSight(position) ? 1 : 0), 0)
+    const status = new SceneLifeCycleStatus(sceneId, count)
     this.sceneIdToStatus.set(sceneId, status)
     parcels.forEach(position => this.positionToStatus.set(position, status))
     this.startLoading(sceneId)
@@ -147,6 +148,10 @@ export class SceneLifeCycleController extends EventEmitter {
     const status = this.sceneIdToStatus.get(sceneId)
     if (!status) {
       return
+    }
+    if (!status.isVisible()) {
+      status.reportStopped()
+      this.emit('Scene.stop', sceneId, this.sceneIdToData.getScene(sceneId))
     }
   }
 
