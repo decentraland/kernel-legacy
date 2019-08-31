@@ -52,8 +52,12 @@ function makeCommands(that) {
           if (!Validations.isValidCoordinateDefinition(`${x},${y}`)) {
             return 'Invalid coordinates, sample usage: "goto 4, -100"'
           }
-          client.MyPresence.myPresenceTracker.teleport(x, y)
-          return `Teleporting to ${x}, ${y}`
+          if (client.MyPresence.myPresenceTracker) {
+            client.MyPresence.myPresenceTracker.teleport(x, y)
+            return `Teleporting to ${x}, ${y}`
+          } else {
+            return `Still setting up comms...`
+          }
         }
       },
       list: {
@@ -72,7 +76,7 @@ function makeCommands(that) {
         fn: function() {
           ;(async () => {
             const { x, z } = (client.MyPresence.myPresenceTracker as MyPresence).lastPlayerPosition
-            const [a, b] = worldToGrid({ x, z })
+            const [a, b] = worldToGrid({ x, y: 0, z })
             const { sceneId } = await (client.MyPresence.myPresenceTracker
               .loader as SceneLoader).getSceneForCoordinates(a, b)
             return term.terminal.current.pushToStdout(`You are at ${a},${b}: ${sceneId}`)

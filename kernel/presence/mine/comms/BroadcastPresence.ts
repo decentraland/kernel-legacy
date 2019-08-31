@@ -34,6 +34,9 @@ export class BroadcastPresence {
 
   checkAndAnnouncePosition() {
     if (this.shouldSendPositionBeacon()) {
+      if (!this.myPresence.allowedToBroadcastPosition()) {
+        return
+      }
       const topic = this.myPresence.getTopicForCurrentPosition()
       logger.info('Broadcasting presence on channel', topic)
       sendPosition(this.comms, topic, this.myPresence.getPositionReport() as any)

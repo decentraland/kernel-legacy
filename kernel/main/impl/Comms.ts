@@ -66,32 +66,28 @@ export class CommsSystem extends SubsystemController {
   }
 
   setupLogger() {
-    function notify(message) {
+    const notify = (message: any) => {
+      logger.debug(message)
       this.lastMessages.push(message)
       this.messageObservable.notifyObservers(message)
     }
     this.connection.on('' + Category.PROFILE, (data: any) => {
-      logger.info('Received Profile info', data)
       notify({ type: 'Profile', data })
     })
 
     this.connection.on('' + MessageType.PING, (data: any) => {
-      logger.info('Received Ping', data)
       notify({ type: 'Ping', data })
     })
 
     this.connection.on('' + Category.SCENE_MESSAGE, (data: any) => {
-      logger.info('Received Scene Message', data)
       notify({ type: 'Scene Message', data })
     })
 
     this.connection.on('' + Category.CHAT, (data: any) => {
-      logger.info('Received Chat', data)
       notify({ type: 'Chat', data })
     })
 
     this.connection.on('' + Category.POSITION, (data: any) => {
-      logger.info('Received Position', data)
       notify({ type: 'Position', data })
     })
   }

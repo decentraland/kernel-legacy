@@ -97,6 +97,10 @@ export class MyPresence {
     return getTopicForPosition(this.lastPlayerPositionReport.position)
   }
 
+  allowedToBroadcastPosition() {
+    return !!this.lastPlayerPositionReport
+  }
+
   enablePositionWatch() {
     this.positionObservable.add(this.copyPositionToLocalListener)
   }
