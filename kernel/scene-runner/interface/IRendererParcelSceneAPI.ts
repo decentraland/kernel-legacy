@@ -1,7 +1,7 @@
-import { EnvironmentData, EntityAction } from '../userSpace/node_modules/@dcl/utils'
+import { EnvironmentData, EntityAction } from '@dcl/utils'
 import { ISceneWorker } from './ISceneWorker'
 
-export interface IParcelSceneAPI {
+export interface IRendererParcelSceneAPI {
   data: EnvironmentData<any>
   sendBatch(actions: EntityAction[]): void
   registerWorker(worker: ISceneWorker): void

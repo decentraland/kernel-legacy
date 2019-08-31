@@ -1,10 +1,8 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-import { Observable } from '../userSpace/node_modules/@dcl/utils'
-
-import { SceneManifest } from '../../worldMap/scene/SceneManifest'
+import { Observable, ISceneManifest } from '@dcl/utils'
 
 export interface ISceneWorker {
-  scene: SceneManifest
+  scene: ISceneManifest
   transport: ScriptingTransport
   persistent: boolean
   dispose: Function
