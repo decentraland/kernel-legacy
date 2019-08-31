@@ -1,12 +1,11 @@
 import { SubsystemController } from '../subsystems'
 import { SceneLoader } from '../../loader/SceneLoader'
 import { SceneLoaderSystem } from './SceneLoader'
-
-import { MemorySceneWorkersManager } from '../../scene-runner/MemorySceneWorkersManager'
+import { SceneWorkersManager } from '../../scene-runner/SceneWorkersManager'
 
 export class SceneRunnerSystem extends SubsystemController {
   loader: SceneLoader
-  workerManager: MemorySceneWorkersManager
+  workerManager: SceneWorkersManager
 
   protected async onStart() {
     this.loader = (this.deps.filter(dep => dep.name === 'SceneLoader')[0] as SceneLoaderSystem).sceneLoader

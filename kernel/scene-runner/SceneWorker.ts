@@ -12,11 +12,8 @@ import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
 
 const logger = createLogger('SceneWorker')
 
-const gamekitWorkerRaw = require('raw-loader!../../../static/systems/scene.system.js')
-const gamekitWorkerBLOB = new Blob([gamekitWorkerRaw])
-const gamekitWorkerUrl = URL.createObjectURL(gamekitWorkerBLOB)
-
 export class SceneWorker implements ISceneWorker {
+  private gamekitUrl: string
   public system: IFuture<ScriptingHost> = future<ScriptingHost>()
 
   public engineAPI: RendererParcelSceneToScript
@@ -31,12 +28,15 @@ export class SceneWorker implements ISceneWorker {
 
   constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport) {
     this.scene = parcelScene.scene
-    this.transport = transport!
     parcelScene.registerWorker(this)
 
     this.loadSystem(transport)
       .then($ => this.system.resolve($))
       .catch($ => this.system.reject($))
+  }
+
+  configureGamekitUrl(url: string) {
+    this.gamekitUrl = url
   }
 
   dispose() {
@@ -57,6 +57,7 @@ export class SceneWorker implements ISceneWorker {
 
   private async startSystem(transport: ScriptingTransport) {
     const system = await ScriptingHost.fromTransport(transport)
+    this.transport = transport
 
     this.engineAPI = (system.getAPIInstance('EngineAPI') as any) as RendererParcelSceneToScript
     this.engineAPI.rendererParcelSceneAPI = this.parcelScene
@@ -69,7 +70,7 @@ export class SceneWorker implements ISceneWorker {
   }
 
   private async loadSystem(transport?: ScriptingTransport): Promise<ScriptingHost> {
-    const worker = new (Worker as any)(gamekitWorkerUrl, {
+    const worker = new (Worker as any)(this.gamekitUrl, {
       name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
     })
     return this.startSystem(transport || WebWorkerTransport(worker))

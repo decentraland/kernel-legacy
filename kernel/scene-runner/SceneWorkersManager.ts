@@ -3,11 +3,11 @@ import { ISceneManifest } from '@dcl/utils'
 
 import { ISceneWorker } from './interface/ISceneWorker'
 
-export abstract class GlobalScriptedScenesManager {
+export class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
 
-  constructor(public bootstrapScene: (scene: ISceneManifest, transport: ScriptingTransport) => ISceneWorker) {}
+  constructor(public bootstrapScene: (scene: ISceneManifest, transport?: ScriptingTransport) => ISceneWorker) {}
 
   getSceneWorkerBySceneID(sceneId: string) {
     return this.loadedSceneWorkers.get(sceneId)
@@ -29,7 +29,7 @@ export abstract class GlobalScriptedScenesManager {
     worker.dispose()
   }
 
-  loadScene(scene: ISceneManifest, transport: ScriptingTransport): ISceneWorker {
+  loadScene(scene: ISceneManifest, transport?: ScriptingTransport): ISceneWorker {
     const sceneId = scene.cannonicalCID
 
     let worker = this.loadedSceneWorkers.get(sceneId)
@@ -43,9 +43,16 @@ export abstract class GlobalScriptedScenesManager {
     return worker
   }
 
-  abstract onSceneAwake(scene: ISceneManifest)
-  abstract onSceneWillStart(scene: ISceneManifest)
-  abstract onSceneRunning(scene: ISceneManifest)
-  abstract onSceneWillUnload(scene: ISceneManifest)
-  abstract onSceneDidUnload(scene: ISceneManifest)
+  onSceneLoadRequest(scene: ISceneManifest) {
+    this.loadScene(scene)
+  }
+  onSceneStartRequest(scene: ISceneManifest) {
+    throw new Error('Method not implemented.')
+  }
+  onSceneRunRequest(scene: ISceneManifest) {
+    throw new Error('Method not implemented.')
+  }
+  onSceneStopRequest(scene: ISceneManifest) {
+    throw new Error('Method not implemented.')
+  }
 }
