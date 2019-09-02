@@ -10,15 +10,11 @@ export class SocialModeration {
   public blockedUsersMap: Map<string, boolean> = new Map<string, boolean>()
   public mutedUsersMap: Map<string, boolean> = new Map<string, boolean>()
 
-  public peerModerationObservable: Observable<ModerationEvent> = new Observable<
-    ModerationEvent
-  >()
+  public peerModerationObservable: Observable<ModerationEvent> = new Observable<ModerationEvent>()
 
-  constructor() {
-    const blocked: Set<string> = new Set(
-      getFromLocalStorage('@dcl-blocked-users')
-    )
-    const muted: Set<string> = new Set(getFromLocalStorage('@dcl-muted-users'))
+  constructor(public getFromStorage = getFromLocalStorage, public saveToStorage = saveToLocalStorage) {
+    const blocked: Set<string> = new Set(this.getFromStorage('@dcl-blocked-users'))
+    const muted: Set<string> = new Set(this.getFromStorage('@dcl-muted-users'))
 
     for (let userId of blocked) {
       this.blockedUsersMap.set(userId, true)
@@ -61,10 +57,7 @@ export class SocialModeration {
   blockUser(userId: string) {
     if (!this.blockedUsersMap.has(userId)) {
       this.blockedUsersMap.set(userId, true)
-      saveToLocalStorage(
-        '@dcl-blocked-users',
-        Array.from(this.blockedUsersMap.keys())
-      )
+      this.saveToStorage('@dcl-blocked-users', Array.from(this.blockedUsersMap.keys()))
       this.peerModerationObservable.notifyObservers({
         type: 'BlockedUser',
         userId
@@ -78,10 +71,7 @@ export class SocialModeration {
   unblockUser(userId: string) {
     if (this.blockedUsersMap.has(userId)) {
       this.blockedUsersMap.delete(userId)
-      saveToLocalStorage(
-        '@dcl-blocked-users',
-        Array.from(this.blockedUsersMap.keys())
-      )
+      this.saveToStorage('@dcl-blocked-users', Array.from(this.blockedUsersMap.keys()))
       this.peerModerationObservable.notifyObservers({
         type: 'UnblockedUser',
         userId
@@ -96,10 +86,7 @@ export class SocialModeration {
   muteUser(userId: string) {
     if (!this.mutedUsersMap.has(userId)) {
       this.mutedUsersMap.set(userId, true)
-      saveToLocalStorage(
-        '@dcl-muted-users',
-        Array.from(this.mutedUsersMap.keys())
-      )
+      this.saveToStorage('@dcl-muted-users', Array.from(this.mutedUsersMap.keys()))
       this.peerModerationObservable.notifyObservers({
         type: 'MutedUser',
         userId
@@ -114,10 +101,7 @@ export class SocialModeration {
   unmuteUser(userId: string) {
     if (this.mutedUsersMap.has(userId)) {
       this.mutedUsersMap.delete(userId)
-      saveToLocalStorage(
-        '@dcl-muted-users',
-        Array.from(this.mutedUsersMap.keys())
-      )
+      this.saveToStorage('@dcl-muted-users', Array.from(this.mutedUsersMap.keys()))
       this.peerModerationObservable.notifyObservers({
         type: 'UnmutedUser',
         userId
