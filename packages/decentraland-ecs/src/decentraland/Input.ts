@@ -12,6 +12,7 @@ export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
  * @public
  */
 export enum Pointer {
+  CLICK = 'CLICK',
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY'
 }
@@ -76,12 +77,25 @@ export class Input {
     return this.internalState
   }
 
-  private subscriptions: Record<InputEventKind, Array<(e: LocalPointerEvent) => void>> = {
-    BUTTON_DOWN: [],
-    BUTTON_UP: []
+  private subscriptions: Record<Pointer, Record<InputEventKind, Array<(e: LocalPointerEvent) => void>>> = {
+    [Pointer.CLICK]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [Pointer.PRIMARY]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [Pointer.SECONDARY]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    }
   }
 
   private internalState: InputState = {
+    [Pointer.CLICK]: {
+      BUTTON_DOWN: false
+    },
     [Pointer.PRIMARY]: {
       BUTTON_DOWN: false
     },
@@ -103,22 +117,24 @@ export class Input {
    *
    * Returns a function that can be called to remove the subscription.
    * @param eventName - The name of the event (see InputEventKind).
+   * @param pointerId - The id of the button.
    * @param fn - A callback function to be called when the event is triggered.
    */
-  public subscribe(eventName: InputEventKind, fn: (e: LocalPointerEvent) => void) {
-    this.subscriptions[eventName].push(fn)
-    return () => this.unsubscribe(eventName, fn)
+  public subscribe(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void) {
+    this.subscriptions[pointerId][eventName].push(fn)
+    return () => this.unsubscribe(eventName, pointerId, fn)
   }
 
   /**
    * Removes an existing input event subscription.
    * @param eventName - The name of the event (see InputEventKind).
+   * @param pointerId - The id of the button
    * @param fn - The callback function used when subscribing to the event.
    */
-  public unsubscribe(eventName: InputEventKind, fn: (e: LocalPointerEvent) => void) {
-    const index = this.subscriptions[eventName].indexOf(fn)
+  public unsubscribe(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void) {
+    const index = this.subscriptions[pointerId][eventName].indexOf(fn)
     if (index > -1) {
-      return this.subscriptions[eventName].splice(index, 1)
+      return this.subscriptions[pointerId][eventName].splice(index, 1)
     }
     return false
   }
@@ -141,10 +157,10 @@ export class Input {
     }
 
     if (data.type === InputEventType.DOWN) {
-      this.internalState[Pointer.PRIMARY].BUTTON_DOWN = true
+      this.internalState[pointer].BUTTON_DOWN = true
 
-      for (let i = 0; i < this.subscriptions['BUTTON_DOWN'].length; i++) {
-        this.subscriptions['BUTTON_DOWN'][i](newData)
+      for (let i = 0; i < this.subscriptions[pointer]['BUTTON_DOWN'].length; i++) {
+        this.subscriptions[pointer]['BUTTON_DOWN'][i](newData)
       }
 
       if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
@@ -155,10 +171,10 @@ export class Input {
         }
       }
     } else {
-      this.internalState[Pointer.PRIMARY].BUTTON_DOWN = false
+      this.internalState[pointer].BUTTON_DOWN = false
 
-      for (let i = 0; i < this.subscriptions['BUTTON_UP'].length; i++) {
-        this.subscriptions['BUTTON_UP'][i](newData)
+      for (let i = 0; i < this.subscriptions[pointer]['BUTTON_UP'].length; i++) {
+        this.subscriptions[pointer]['BUTTON_UP'][i](newData)
       }
 
       if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
@@ -172,7 +188,8 @@ export class Input {
   }
 
   private getPointerById(id: number): Pointer {
-    if (id === 0) return Pointer.PRIMARY
+    if (id === 0) return Pointer.CLICK
+    else if (id === 1) return Pointer.PRIMARY
     return Pointer.SECONDARY
   }
 }
