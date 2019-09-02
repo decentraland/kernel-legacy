@@ -13,7 +13,6 @@ import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
 const logger = createLogger('SceneWorker')
 
 export class SceneWorker implements ISceneWorker {
-  private gamekitUrl: string
   public system: IFuture<ScriptingHost> = future<ScriptingHost>()
 
   public engineAPI: RendererParcelSceneToScript
@@ -26,17 +25,13 @@ export class SceneWorker implements ISceneWorker {
   public sceneState: SceneStatus = 'loading'
   public scene: ISceneManifest
 
-  constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport) {
+  constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport, gamekit?: string) {
     this.scene = parcelScene.scene
     parcelScene.registerWorker(this)
 
-    this.loadSystem(transport)
+    this.loadSystem(transport, gamekit)
       .then($ => this.system.resolve($))
       .catch($ => this.system.reject($))
-  }
-
-  configureGamekitUrl(url: string) {
-    this.gamekitUrl = url
   }
 
   dispose() {
@@ -69,8 +64,13 @@ export class SceneWorker implements ISceneWorker {
     return system
   }
 
-  private async loadSystem(transport?: ScriptingTransport): Promise<ScriptingHost> {
-    const worker = new (Worker as any)(this.gamekitUrl, {
+  private async loadSystem(transport?: ScriptingTransport, gamekit?: string): Promise<ScriptingHost> {
+    if (!gamekit) {
+      throw new Error(
+        `Can't create a SceneWorker without the Gamekit Entrypoint. See SceneWorker.ts for more information`
+      )
+    }
+    const worker = new (Worker as any)(gamekit, {
       name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
     })
     return this.startSystem(transport || WebWorkerTransport(worker))

@@ -2,12 +2,11 @@ import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
 import { ISceneManifest } from '@dcl/utils'
 
 import { ISceneWorker } from './interface/ISceneWorker'
+import { SceneWorkerFactory } from './SceneWorkerFactory'
 
 export class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
-
-  constructor(public bootstrapScene: (scene: ISceneManifest, transport?: ScriptingTransport) => ISceneWorker) {}
 
   getSceneWorkerBySceneID(sceneId: string) {
     return this.loadedSceneWorkers.get(sceneId)
@@ -34,7 +33,7 @@ export class SceneWorkersManager {
 
     let worker = this.loadedSceneWorkers.get(sceneId)
     if (!worker) {
-      worker = this.bootstrapScene(scene, transport)
+      worker = SceneWorkerFactory.newSceneWorker(scene, transport)
       this.loadedSceneWorkers.set(sceneId, worker)
       worker.onDisposeObservable.addOnce(() => {
         this.loadedSceneWorkers.delete(sceneId)

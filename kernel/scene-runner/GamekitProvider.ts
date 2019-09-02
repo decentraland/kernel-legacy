@@ -13,3 +13,7 @@ export function fsGamekit(path: string) {
   const fs = require('fs')
   return URL.createObjectURL(fs.readFileSync(path).toString())
 }
+
+export function urlGamekit() {
+  return './gamekit.js'
+}
