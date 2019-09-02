@@ -71,7 +71,8 @@ export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: n
 }
 
 configureShapeEntityPositions([new Vector3(-3, 1, -8), new Vector3(35, 1, -8)], 0.2, new NFTShape('ethereum://0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/558536'))
-configureShapeEntityPositions([new Vector3(16, 1, 16)], 0.8, new BoxShape())
+configureShapeEntityPositions([new Vector3(8, 50, 8)], 0, new BoxShape())
+configureShapeEntityPositions([new Vector3(16, 1, 16)], 0, new BoxShape())
 configureShapeEntityPositions([new Vector3(-1, 1, 8), new Vector3(17, 1, 8)], 0.8, new BoxShape())
 configureShapeEntityPositions([new Vector3(8, 1, 16),
           new Vector3(8, 1, 0),
@@ -142,7 +143,7 @@ sharkVisibilityTrigger.addComponent(
 engine.addEntity(sharkVisibilityTrigger)
 
 // PUSHABLE COLLIDING TREE
-let treeEntity = configureShapeEntityPositions([new Vector3(16, 0, 0)], 0.7, new GLTFShape('models/PalmTree_01.glb'))
+let treeEntity = configureShapeEntityPositions([new Vector3(15, 0, 0)], 0.7, new GLTFShape('models/PalmTree_01.glb'))
 
 let treeLeftMovementTrigger = new Entity()
 treeLeftMovementTrigger.addComponentOrReplace(new BoxShape());
