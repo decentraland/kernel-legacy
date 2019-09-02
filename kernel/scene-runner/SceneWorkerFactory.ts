@@ -3,7 +3,7 @@ import { ISceneManifest } from '@dcl/utils'
 import { IWorker } from '@dcl/rpc/common/transports/WebWorker'
 import { SceneWorker } from './SceneWorker'
 import { urlGamekit } from './GamekitProvider'
-import { IRendererParcelSceneAPI } from './interface/IRendererParcelSceneAPI'
+import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 
 export type RendererParcelSceneProvider = (scene: ISceneManifest) => IRendererParcelSceneAPI
 

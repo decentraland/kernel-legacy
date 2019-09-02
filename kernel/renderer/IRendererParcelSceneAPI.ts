@@ -1,6 +1,9 @@
 import { EnvironmentData, EntityAction, ISceneManifest } from '@dcl/utils'
-import { ISceneWorker } from './ISceneWorker'
+import { ISceneWorker } from '../scene-runner/interface/ISceneWorker'
 
+/**
+ * Renderer's API -- the kernel uses this interface to bootstrap a (RendererParcelScene) on the Renderer
+ */
 export interface IRendererParcelSceneAPI {
   data: EnvironmentData<any>
   scene: ISceneManifest

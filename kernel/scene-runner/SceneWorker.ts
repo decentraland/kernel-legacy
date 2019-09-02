@@ -4,7 +4,7 @@ import { ScriptingHost, ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
 import { Observable, ISceneManifest } from '@dcl/utils'
 import { createLogger } from '@dcl/utils'
 
-import { IRendererParcelSceneAPI } from './interface/IRendererParcelSceneAPI'
+import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
 import { SceneStatus } from './SceneStatus'
 import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'

@@ -1,5 +1,8 @@
 import { EntityAction } from '@dcl/utils'
 
+/**
+ * Interface used by the Renderer to communicate with the Script directly
+ */
 export interface IRendererParcelSceneToScript {
   /**
    * Subscribes to events dispatched by the EngineAPI

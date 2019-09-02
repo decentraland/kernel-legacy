@@ -2,7 +2,7 @@ import { ExposableAPI, registerAPI } from '@dcl/rpc'
 import { APIOptions, exposeMethod } from '@dcl/rpc/common/API'
 import { IEventNames, EntityAction, IEvents } from '@dcl/scene-api'
 
-import { IRendererParcelSceneAPI } from '../interface/IRendererParcelSceneAPI'
+import { IRendererParcelSceneAPI } from '../../renderer/IRendererParcelSceneAPI'
 import { IRendererParcelSceneToScript } from './IRendererParcelSceneToScript'
 
 /**
@@ -58,11 +58,11 @@ export class RendererParcelSceneToScript extends ExposableAPI implements IRender
   /**
    * Notify the Renderer of ECS Actions
    *
-   * +---------------+          +-------------------+          +------------+
-   * |               |          |     (kernel)      |          |            |
-   * |   Scene ECS   | -------> | sendBatch(action) | -------> |  Renderer  |
-   * |               |          |   (you are here)  |          |            |
-   * +---------------+          +-------------------+          +------------+
+   * +---------------+          +--------------------+          +------------+
+   * |               |          |     (kernel)       |          |            |
+   * |   Scene ECS   | -------> | sendBatch(actions) | -------> |  Renderer  |
+   * |               |          |   (you are here)   |          |            |
+   * +---------------+          +--------------------+          +------------+
    */
   @exposeMethod
   async sendBatch(actions: EntityAction[]): Promise<void> {
