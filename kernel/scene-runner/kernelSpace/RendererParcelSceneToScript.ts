@@ -55,6 +55,15 @@ export class RendererParcelSceneToScript extends ExposableAPI implements IRender
     }
   }
 
+  /**
+   * Notify the Renderer of ECS Actions
+   *
+   * +---------------+          +-------------------+          +------------+
+   * |               |          |     (kernel)      |          |            |
+   * |   Scene ECS   | -------> | sendBatch(action) | -------> |  Renderer  |
+   * |               |          |   (you are here)  |          |            |
+   * +---------------+          +-------------------+          +------------+
+   */
   @exposeMethod
   async sendBatch(actions: EntityAction[]): Promise<void> {
     this.rendererParcelSceneAPI.sendBatch(actions)
