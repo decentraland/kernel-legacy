@@ -55,7 +55,7 @@ export function BuildDCLInterface(that: any) {
     loadModule: async (moduleName: string) => {
       const moduleToLoad = moduleName.replace(/^@decentraland\//, '')
       try {
-        const proxy = (await this.loadAPIs([moduleToLoad]))[moduleToLoad]
+        const proxy = (await that.loadAPIs([moduleToLoad]))[moduleToLoad]
         const methods = await proxy._getExposedMethods()
         return {
           rpcHandle: moduleToLoad,
@@ -68,7 +68,7 @@ export function BuildDCLInterface(that: any) {
     },
 
     callRpc: (rpcHandle: string, methodName: string, args: any[]) => {
-      const api = this.loadedAPIs[rpcHandle]
+      const api = that.loadedAPIs[rpcHandle]
       if (!api) {
         throw new Error(`callRPC error: ${rpcHandle} has not been loaded. Did you forget to call \`loadModule\`?`)
       }

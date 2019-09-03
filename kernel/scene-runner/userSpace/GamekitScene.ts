@@ -20,7 +20,7 @@ const RUNNING = 'running'
  *
  * This is the class that runs all the magic (see `runFirstRound`)
  */
-export default class GamekitScene extends Script implements ISceneRunningScript {
+export class GamekitScene extends Script implements ISceneRunningScript {
   @inject('EngineAPI')
   engine: IRendererParcelSceneToScript
 
