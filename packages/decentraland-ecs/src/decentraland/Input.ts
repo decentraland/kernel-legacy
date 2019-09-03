@@ -62,6 +62,16 @@ export class GlobalPointerDown extends PointerEventComponent {}
 @Component('pointerUp')
 export class GlobalPointerUp extends PointerEventComponent {}
 
+export class Subscription {
+  public fn: (e: LocalPointerEvent) => void
+  public useRaycast: boolean
+
+  constructor(fn: (e: LocalPointerEvent) => void, useRaycast: boolean) {
+    this.fn = fn
+    this.useRaycast = useRaycast
+  }
+}
+
 /**
  * @public
  */
@@ -77,7 +87,7 @@ export class Input {
     return this.internalState
   }
 
-  private subscriptions: Record<Pointer, Record<InputEventKind, Array<(e: LocalPointerEvent) => void>>> = {
+  private subscriptions: Record<Pointer, Record<InputEventKind, Array<Subscription>>> = {
     [Pointer.CLICK]: {
       BUTTON_DOWN: [],
       BUTTON_UP: []
@@ -118,21 +128,27 @@ export class Input {
    * Returns a function that can be called to remove the subscription.
    * @param eventName - The name of the event (see InputEventKind).
    * @param pointerId - The id of the button.
+   * @param useRaycast - Enables raycast information.
    * @param fn - A callback function to be called when the event is triggered.
    */
-  public subscribe(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void) {
-    this.subscriptions[pointerId][eventName].push(fn)
+  public subscribe(
+    eventName: InputEventKind,
+    pointerId: Pointer,
+    useRaycast: boolean,
+    fn: (e: LocalPointerEvent) => void
+  ) {
+    this.subscriptions[pointerId][eventName].push(new Subscription(fn, useRaycast))
     return () => this.unsubscribe(eventName, pointerId, fn)
   }
 
   /**
    * Removes an existing input event subscription.
    * @param eventName - The name of the event (see InputEventKind).
-   * @param pointerId - The id of the button
+   * @param pointerId - The id of the button.
    * @param fn - The callback function used when subscribing to the event.
    */
   public unsubscribe(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void) {
-    const index = this.subscriptions[pointerId][eventName].indexOf(fn)
+    const index = this.getSubscriptionId(eventName, pointerId, fn)
     if (index > -1) {
       return this.subscriptions[pointerId][eventName].splice(index, 1)
     }
@@ -141,50 +157,83 @@ export class Input {
 
   public handlePointerEvent(data: GlobalInputEventResult) {
     const pointer = this.getPointerById(data.pointerId)
-    const newData: LocalPointerEvent = {
+
+    let eventResult: LocalPointerEvent = {
       ...data,
       pointer,
       direction: new Vector3().copyFrom(data.direction),
       origin: new Vector3().copyFrom(data.origin),
-      hit: data.hit
-        ? {
-            ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
-          }
-        : undefined
+      hit: undefined
     }
+
+    const hit = data.hit
+      ? {
+          ...data.hit,
+          hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
+          normal: new Vector3().copyFrom(data.hit.normal),
+          worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
+        }
+      : undefined
 
     if (data.type === InputEventType.DOWN) {
       this.internalState[pointer].BUTTON_DOWN = true
 
       for (let i = 0; i < this.subscriptions[pointer]['BUTTON_DOWN'].length; i++) {
-        this.subscriptions[pointer]['BUTTON_DOWN'][i](newData)
+        let subscription = this.subscriptions[pointer]['BUTTON_DOWN'][i]
+
+        // remove hit information when raycast is disabled
+        if (subscription.useRaycast) {
+          eventResult.hit = hit
+        } else {
+          eventResult.hit = undefined
+        }
+
+        subscription.fn(eventResult)
       }
 
-      if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-        const entity = DisposableComponent.engine.entities[newData.hit.entityId]
+      if (hit && hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[hit.entityId]
         const handler = entity && entity.getComponentOrNull(GlobalPointerDown)
         if (handler) {
-          handler.callback(newData)
+          eventResult.hit = hit
+          handler.callback(eventResult)
         }
       }
     } else {
       this.internalState[pointer].BUTTON_DOWN = false
 
       for (let i = 0; i < this.subscriptions[pointer]['BUTTON_UP'].length; i++) {
-        this.subscriptions[pointer]['BUTTON_UP'][i](newData)
+        let subscription = this.subscriptions[pointer]['BUTTON_UP'][i]
+
+        // remove hit information when raycast is disabled
+        if (subscription.useRaycast) {
+          eventResult.hit = hit
+        } else {
+          eventResult.hit = undefined
+        }
+
+        subscription.fn(eventResult)
       }
 
-      if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-        const entity = DisposableComponent.engine.entities[newData.hit.entityId]
+      if (hit && hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[hit.entityId]
         const handler = entity && entity.getComponentOrNull(GlobalPointerUp)
         if (handler) {
-          handler.callback(newData)
+          eventResult.hit = hit
+          handler.callback(eventResult)
         }
       }
     }
+  }
+
+  private getSubscriptionId(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void): number {
+    for (let i = 0; i < this.subscriptions[pointerId][eventName].length; i++) {
+      if (this.subscriptions[pointerId][eventName][i].fn === fn) {
+        return i
+      }
+    }
+
+    return -1
   }
 
   private getPointerById(id: number): Pointer {

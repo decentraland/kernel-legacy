@@ -131,23 +131,24 @@ class BubbleSystem implements ISystem {
       }
     }
 
-    if (input.state[Pointer.PRIMARY].BUTTON_DOWN) {
+    if (input.state[Pointer.CLICK].BUTTON_DOWN) {
       spawner.spawnBubble()
     }
   }
 }
 
-input.subscribe('BUTTON_UP', e => {
+input.subscribe('BUTTON_UP', Pointer.PRIMARY, true, e => {
   log('pointerUp works', e)
+
 })
 
-input.subscribe('BUTTON_DOWN', e => {
+input.subscribe('BUTTON_DOWN', Pointer.PRIMARY, true, e => {
   log('pointerDown works', e)
 })
 
 engine.addSystem(new BubbleSystem())
 
-dcl.onEvent(function(event: any) {
+dcl.onEvent(function (event: any) {
   log('event', event)
 })
 
