@@ -1,27 +1,6 @@
-import { ParcelSightController } from './ParcelSightController'
-import { PositionLifeCycleController } from './PositionLifecycleController'
-import { EventEmitter } from 'events'
+import { SetupPositionLifecycleController as setup } from './SetupPositionLifeCycleController.spec'
 
 describe('Position Lifecycle', () => {
-  function setup() {
-    const parcels = new ParcelSightController({ lineOfSightRadius: 1 })
-    const emitter = new EventEmitter()
-    const fakeScene = {
-      on: (event: string, callback: any) => emitter.on(event, callback),
-      emit: (event: string, ...args: any[]) => emitter.emit(event, ...args),
-      isPositionWalkable: (position: string) => false
-    }
-    const position = new PositionLifeCycleController(parcels, fakeScene as any)
-    const changePosition = (x: number, y: number) => {
-      parcels.reportCurrentPosition({ x, y })
-    }
-    return {
-      changePosition,
-      parcels,
-      fakeScene,
-      position
-    }
-  }
   it('Starts unsettled', () => {
     const { position, changePosition } = setup()
     changePosition(0, 0)

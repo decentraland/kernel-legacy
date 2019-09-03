@@ -33,7 +33,6 @@ export class MyPresenceSystem extends SubsystemController {
       await this.myPresenceTracker.teleport(x, y)
       return this.onSuccess()
     } catch (e) {
-      console.log(e.stack)
       return this.onError(e)
     }
   }

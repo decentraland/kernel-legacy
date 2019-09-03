@@ -1,40 +1,32 @@
-import { Observable, IScene, createLogger } from '@dcl/utils'
+import { createLogger } from '@dcl/utils'
 import { EventEmitter } from 'events'
-import { SceneLifeCycleStatus } from './SceneLifeCycleStatus'
-import { PositionToSceneId } from './requests/PositionToSceneId'
-import { SceneDataDownloadManager } from './requests/SceneDataDownloadManager'
-import { SceneIdToData } from './requests/SceneIdToData'
-import { ParcelSightController } from './ParcelSightController'
-
-export type SceneLifeCycleStatusReport = { sceneId: string; status: SceneLifeCycleStatus }
-
-export const sceneLifeCycleObservable = new Observable<Readonly<SceneLifeCycleStatusReport>>()
+import { SceneLifeCyleState } from './SceneStatus/SceneLifeCycle.types'
+import { SceneIdToSceneManifestState } from './SceneIdToSceneManifest/SceneIdToSceneManifest.types'
+import { PositionSettlementState } from './PositionSettlement/PositionSettlement.types'
 
 const logger = createLogger('SceneLifecycle')
 
 export class SceneLifeCycleController extends EventEmitter {
-  positionToSceneId: PositionToSceneId
-  sceneIdToData: SceneIdToData
-
-  // Position to Status
-  positionToStatus = new Map<string, SceneLifeCycleStatus>()
-  sceneIdToStatus = new Map<string, SceneLifeCycleStatus>()
-  parcelShowingLoad: { [position: string]: boolean } = {}
-
-  constructor(public downloadManager: SceneDataDownloadManager, public parcelController: ParcelSightController) {
-    super()
-    this.positionToSceneId = new PositionToSceneId(downloadManager)
-    this.sceneIdToData = new SceneIdToData(downloadManager, this.positionToSceneId)
-  }
+  _sceneLifeCycle: SceneLifeCyleState
+  _scenesById: SceneIdToSceneManifestState
+  _positionSettlement: PositionSettlementState
 
   reportSightedParcels(newParcels: string[], lostParcels: string[]) {
     this.updateSceneSightCount(newParcels, lostParcels)
     newParcels.forEach(position => {
-      if (!this.positionToSceneId.hasStartedResolving(position)) {
+      // console.log(`updating position to ${position} -- ${newParcels}`)
+      if (!this.isPositionWalkable(position)) {
         this.showLoader(position)
-        this.positionToSceneId.resolve(position).then(() => this.checkPosition(position))
+      }
+      if (!this.positionToSceneId.hasStartedResolving(position)) {
+        const promise = this.positionToSceneId.requestResolution(position)
+        // console.log(`updating ${position} got into a promise to resolve: ${promise}`)
+        promise.then(() => this.checkPosition(position))
       } else if (this.positionToSceneId.hasFinishedResolving(position)) {
-        this.handleSceneMoreVisible(this.positionToSceneId.getScene(position))
+        // console.log('Checking scene for', position, this.positionToSceneId.getScene(position))
+        if (this.positionToSceneId.hasScene(position)) {
+          this.checkScene(this.positionToSceneId.getScene(position))
+        }
       }
     })
     lostParcels.forEach(position => {
@@ -48,7 +40,7 @@ export class SceneLifeCycleController extends EventEmitter {
       this.emit('Parcel.empty', position)
     } else if (sceneId) {
       if (!this.sceneIdToData.hasStartedResolving(sceneId)) {
-        this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
+        this.sceneIdToData.requestResolution(sceneId).then(() => this.checkScene(sceneId))
       } else if (this.sceneIdToData.hasFinishedResolving(sceneId)) {
         this.checkScene(sceneId)
       }
@@ -58,25 +50,27 @@ export class SceneLifeCycleController extends EventEmitter {
   checkScene(sceneId: string) {
     const scene = this.sceneIdToData.getScene(sceneId)
     if (!scene && !this.sceneIdToData.hasStartedResolving(sceneId)) {
-      this.sceneIdToData.resolve(sceneId).then(() => this.checkScene(sceneId))
+      this.sceneIdToData.requestResolution(sceneId).then(() => this.checkScene(sceneId))
       return
     }
     if (!scene || !this.sceneIdToData.hasFinishedResolving(sceneId)) {
       return
     }
-    if (!this.sceneIdToStatus.has(sceneId)) {
-      this.setupNewScene(sceneId)
-    } else {
-      const status = this.sceneIdToStatus.get(sceneId)
-      if (status.canLoad()) {
-        this.startLoading(sceneId)
+    if (this.sceneIdToData.hasFinishedResolving(sceneId)) {
+      if (!this.sceneIdToStatus.has(sceneId)) {
+        this.setupNewScene(sceneId)
+      } else {
+        const status = this.sceneIdToStatus.get(sceneId)
+        if (status.canLoad()) {
+          this.startLoading(sceneId)
+        }
       }
     }
   }
 
   setupNewScene(sceneId: string) {
     const scene = this.sceneIdToData.getScene(sceneId)
-    const parcels = (scene.scene as IScene).scene.parcels
+    const parcels = scene.positionStrings
     const count = parcels.reduce((count, position) => count + (this.parcelController.inSight(position) ? 1 : 0), 0)
     const status = new SceneLifeCycleStatus(sceneId, count)
     this.sceneIdToStatus.set(sceneId, status)
@@ -94,7 +88,7 @@ export class SceneLifeCycleController extends EventEmitter {
       logger.info(`Scene ${sceneId} asked to run but it can't: ${JSON.stringify(status)}`)
     }
     const scene = this.sceneIdToData.getScene(sceneId)
-    ;(scene.scene as IScene).scene.parcels.forEach(pos => this.hideLoader(pos))
+    scene.positionStrings.forEach(pos => this.hideLoader(pos))
     status.reportRunning()
     this.emit('Scene.running', { sceneId, scene })
   }
@@ -167,6 +161,9 @@ export class SceneLifeCycleController extends EventEmitter {
   }
 
   updateSceneSightCount(newParcels: string[], lostParcels: string[]) {
+    if (!Array.isArray(newParcels) || !Array.isArray(lostParcels)) {
+      throw new Error('newParcels and lostParcels must be arrays')
+    }
     newParcels.filter(_ => this.positionToStatus.has(_)).forEach(_ => this.positionToStatus.get(_).increaseSight())
     lostParcels.filter(_ => this.positionToStatus.has(_)).forEach(_ => this.positionToStatus.get(_).decreaseSight())
   }

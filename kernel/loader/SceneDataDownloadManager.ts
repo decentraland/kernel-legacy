@@ -58,12 +58,4 @@ export class SceneDataDownloadManager {
       throw ret
     }
   }
-
-  async getSceneDataForPosition(position: string): Promise<ILand<any> | null> {
-    const sceneId = await this.resolvePositionToSceneId(position)
-    if (sceneId === null) {
-      return null
-    }
-    return this.getSceneDataForSceneId(sceneId)
-  }
 }

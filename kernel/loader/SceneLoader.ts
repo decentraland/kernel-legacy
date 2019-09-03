@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 import { Vector2 } from '@dcl/utils'
-import { SceneDataDownloadManager } from './requests/SceneDataDownloadManager'
-import { ParcelSightController, DeltaParcelSightSeeingReport } from './ParcelSightController'
+import { SceneDataDownloadManager } from './SceneDataDownloadManager'
+import { ParcelSightController } from './ParcelSightController'
 import { SceneLifeCycleController } from './SceneLifeCycleController'
 import { PositionLifeCycleController } from './PositionLifecycleController'
 
@@ -41,11 +41,6 @@ export class SceneLoader extends EventEmitter {
     this.positionController = config.positionController
       ? config.positionController
       : new PositionLifeCycleController(this.parcelController, this.sceneController)
-
-    // Internal hooks
-    this.parcelController.on('Parcel.sightChanges', (data: DeltaParcelSightSeeingReport) => {
-      this.sceneController.reportSightedParcels(data.sighted, data.lostSight)
-    })
     // External hooks
     this.sceneController.on('Parcel.showLoader', (...args) => this.emit('Parcel.showLoader', ...args))
     this.sceneController.on('Parcel.empty', (...args) => this.emit('Parcel.empty', ...args))
@@ -66,6 +61,32 @@ export class SceneLoader extends EventEmitter {
   }
 
   reportCurrentPosition(currentPosition: Vector2) {
-    return this.parcelController.reportCurrentPosition(currentPosition)
+    const sceneSightUpdates = this.parcelController.reportCurrentPosition(currentPosition)
+    this.sceneController.reportSightedParcels(sceneSightUpdates.sighted, sceneSightUpdates.lostSight)
+    return sceneSightUpdates
+  }
+
+  get currentLoadingParcelPositions() {
+    return Object.keys(this.sceneController.parcelShowingLoad).filter(
+      position => !!this.sceneController.parcelShowingLoad[position]
+    )
+  }
+  filterScenes(what: string) {
+    return Object.keys(this.sceneController.sceneIdToStatus)
+      .filter(sceneId => this.sceneController.sceneIdToStatus.has(sceneId))
+      .filter(sceneId => this.sceneController.sceneIdToStatus.get(sceneId)[what]())
+      .map(sceneId => this.sceneController.sceneIdToData[sceneId])
+  }
+  get currentLoadingScenes() {
+    return this.filterScenes('isLoading')
+  }
+  get currentAwakeScenes() {
+    return this.filterScenes('isAwake')
+  }
+  get currentRunningScenes() {
+    return this.filterScenes('isRunning')
+  }
+  get currentVisibleScenes() {
+    return this.filterScenes('isVisible')
   }
 }

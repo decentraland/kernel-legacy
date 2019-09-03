@@ -1,49 +1,32 @@
 import { EventEmitter } from 'events'
-import { Vector2 } from '@dcl/utils'
-import { parcelsInScope } from './scope/parcelsInScope'
+import { Vector2, encodeParcelPosition } from '@dcl/utils'
+import { ParcelSightState, configureLineOfSightRadius, setPosition } from './ParcelSight/ParcelSight.types'
+import { ParcelSightReducer } from './ParcelSight/ParcelSight.reducer'
+import { inSight } from './ParcelSight/ParcelSight.selectors'
 
-export type DeltaParcelSightSeeingReport = {
-  sighted: string[]
-  lostSight: string[]
-  inSight: string[]
-}
-
-type MapPositionToBoolean = { [pos: string]: boolean }
-
-export class ParcelSightController extends EventEmitter /*<'Parcel.sightChanges'>*/ {
-  currentPosition?: Vector2
-  isTargetPlaced: boolean = false
-  currentlySightedList = []
-  currentlySightedMap = {}
-
-  constructor(public config: { lineOfSightRadius: number }) {
+export class ParcelSightController extends EventEmitter {
+  state: ParcelSightState
+  constructor(config?: { lineOfSightRadius: number }) {
     super()
-  }
-
-  reportCurrentPosition(position: Vector2) {
-    if (this.currentPosition && this.currentPosition.x === position.x && this.currentPosition.y === position.y) {
-      return
+    this.state = ParcelSightReducer(undefined)
+    if (config) {
+      this.state = ParcelSightReducer(this.state, configureLineOfSightRadius(config.lineOfSightRadius))
     }
-    this.currentPosition = position
-
-    this.isTargetPlaced = true
-    const sightedParcels = parcelsInScope(this.config.lineOfSightRadius, position)
-    const newSightMap: MapPositionToBoolean = {}
-    sightedParcels.forEach(pos => (newSightMap[pos] = true))
-
-    const newlySightedParcels = sightedParcels.filter(parcel => !this.currentlySightedMap[parcel])
-    const newlyHiddenParcels = this.currentlySightedList.filter(parcel => !newSightMap[parcel])
-    this.currentlySightedList = sightedParcels
-    this.currentlySightedMap = newSightMap
-
-    this.emit('Parcel.sightChanges', {
-      sighted: newlySightedParcels,
-      lostSight: newlyHiddenParcels,
-      inSight: this.currentlySightedList
-    })
   }
-
-  inSight(parcel: string) {
-    return !!this.currentlySightedMap[parcel]
+  reportCurrentPosition(position: Vector2) {
+    const newState = ParcelSightReducer(this.state, setPosition(position))
+    if (newState.delta.sighted.length || newState.delta.lostSight.length) {
+      this.emit('Parcel.sightChanges', newState.delta)
+    }
+    return newState.delta
+  }
+  get currentlySightedList() {
+    return this.state.currentlySightedList
+  }
+  inSight(position: Vector2 | string) {
+    if (typeof position === 'string') {
+      return inSight(this.state, position)
+    }
+    return inSight(this.state, encodeParcelPosition(position))
   }
 }

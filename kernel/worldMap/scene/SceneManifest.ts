@@ -9,7 +9,7 @@ import {
 } from '@dcl/utils/scene/SceneManifestTypes'
 
 import { stableStringify } from '@dcl/utils/pure/stableStringify'
-import { parcelLimits, getMinimum, parseCoordinate, decideFloat } from '@dcl/utils/scene'
+import { parcelLimits, getMinimum, parseCoordinate, decideFloat, encodeParcelPosition } from '@dcl/utils/scene'
 import { isValidSceneInput, getInvalidReason } from './validation'
 import { ISceneManifest } from '@dcl/utils/scene/ISceneManifest'
 import { sha256 } from '@dcl/utils'
@@ -22,6 +22,7 @@ export class SceneManifest implements ISceneManifest {
   private _requiredTags?: string[]
   private _spawnPoints?: [SpawnPointDefinition, ...SpawnPointDefinition[]]
   private _parcels?: NonEmptyCoordinateArray
+  private _positionStrings?: string[]
   private _baseParcel?: Coordinate
   private _version?: number
   private _cannonicalCID?: string
@@ -33,8 +34,19 @@ export class SceneManifest implements ISceneManifest {
     this.raw = raw
   }
 
+  get id(): string {
+    return this.cannonicalSerialization
+  }
+
   get sceneCID(): string {
     return this.cannonicalSerialization
+  }
+
+  get positionStrings(): string[] {
+    if (!this._positionStrings) {
+      this._positionStrings = this.raw.parcels.map(parseCoordinate).map(encodeParcelPosition) as string[]
+    }
+    return this._positionStrings
   }
 
   get parcels(): NonEmptyCoordinateArray {

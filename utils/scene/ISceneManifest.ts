@@ -10,6 +10,7 @@ import {
 
 export interface ISceneManifest {
   version: number
+  id: string
   assets: AssetDefinition[]
   assetTags: AssetTagDefinition[]
   requiredAssets: AssetDefinition[]
@@ -17,6 +18,7 @@ export interface ISceneManifest {
   main: string
   referenceSystem: ReferenceSystem
   parcels: NonEmptyCoordinateArray
+  positionStrings: string[]
   baseParcel: Coordinate
   spawnPoints: SpawnPointDefinition[]
   pickSpawnPoint: () => SpawnPointSelection

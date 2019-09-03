@@ -39,6 +39,7 @@ ts_library(
         "@npm//decentraland-auth-protocol",
         "@npm//devtools-protocol",
         "@npm//fp-future",
+        "@npm//typesafe-actions",
         "@npm//google-protobuf",
         "@npm//webrtc-adapter",
     ],
@@ -53,6 +54,7 @@ ts_library(
     ]),
     deps = [
         ":kernel",
+        "//utils",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//fp-future",
@@ -64,6 +66,7 @@ jasmine_node_test(
     coverage = True,
     deps = [
         ":kernel_spec",
+        "//utils",
         "@npm//jasmine",
     ],
 )

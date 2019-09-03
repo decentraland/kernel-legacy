@@ -1,4 +1,5 @@
-import { ParcelSightController, DeltaParcelSightSeeingReport } from './ParcelSightController'
+import { ParcelSightController } from './ParcelSightController'
+import { DeltaParcelSightSeeingReport } from './ParcelSight/ParcelSight.types'
 
 describe('Parcel lifecycle', () => {
   function setupController(radius: number): [ParcelSightController, DeltaParcelSightSeeingReport[]] {
@@ -39,7 +40,7 @@ describe('Parcel lifecycle', () => {
     const [controller, result] = setupController(1)
     controller.reportCurrentPosition({ x: 0, y: 0 })
     controller.reportCurrentPosition({ x: 100, y: 0 })
-    expect(result[1].inSight).toEqual(result[1].sighted)
+    expect(result[1].sighted).toEqual(result[1].sighted)
   })
   it("teleport isn't a special case", () => {
     const [controller, result] = setupController(1)
