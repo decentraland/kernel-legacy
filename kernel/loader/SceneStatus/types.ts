@@ -1,5 +1,5 @@
 import { action } from 'typesafe-actions'
-import { booleanMap } from '../PositionToSceneId/PositionToSceneId.types'
+import { booleanMap } from '../PositionToSceneId/types'
 
 export type SceneLifeCyleState = {
   loading: booleanMap

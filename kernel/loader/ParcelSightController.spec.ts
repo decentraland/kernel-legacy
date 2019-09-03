@@ -1,5 +1,5 @@
 import { ParcelSightController } from './ParcelSightController'
-import { DeltaParcelSightSeeingReport } from './ParcelSight/ParcelSight.types'
+import { DeltaParcelSightSeeingReport } from './ParcelSight/types'
 
 describe('Parcel lifecycle', () => {
   function setupController(radius: number): [ParcelSightController, DeltaParcelSightSeeingReport[]] {

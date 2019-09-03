@@ -2,7 +2,7 @@ import * as Auth from './auth/api'
 import * as AuthTypes from './auth/types'
 import * as Comms from './comms/connect'
 import * as WorldScene from './worldMap/scene'
-import * as WorldSceneV1 from './worldMap/sceneCompatibility/migrateFromILand'
+import * as WorldSceneV1 from './worldMap/sceneTransforms/migrateFromILand'
 
 import * as Systems from './main/impl/index'
 import * as MainController from './main/index'

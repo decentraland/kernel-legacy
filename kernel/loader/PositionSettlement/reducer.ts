@@ -3,7 +3,7 @@ import {
   PositionSettlementAction,
   SETTLE_POSITION,
   UNSETTLE_POSITION
-} from './PositionSettlement.types'
+} from './types'
 
 export const INITIAL_POSITION_SETTLEMENT_STATE: PositionSettlementState = {
   isSettled: false

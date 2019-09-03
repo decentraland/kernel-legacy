@@ -8,8 +8,8 @@ import {
   SCENE_RUNNING,
   SCENE_RENDERER_FATAL_ERROR,
   SCENE_SCRIPT_SOURCED_FATAL_ERROR
-} from './SceneLifeCycle.types'
-import { booleanMap } from '../PositionToSceneId/PositionToSceneId.types'
+} from './types'
+import { booleanMap } from '../PositionToSceneId/types'
 
 export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCyleState = {
   loading: {} as booleanMap,

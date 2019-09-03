@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events'
 import { Vector2, encodeParcelPosition } from '@dcl/utils'
-import { ParcelSightState, configureLineOfSightRadius, setPosition } from './ParcelSight/ParcelSight.types'
-import { ParcelSightReducer } from './ParcelSight/ParcelSight.reducer'
-import { inSight } from './ParcelSight/ParcelSight.selectors'
+import { ParcelSightState, configureLineOfSightRadius, setPosition } from './ParcelSight/types'
+import { ParcelSightReducer } from './ParcelSight/reducer'
+import { inSight } from './ParcelSight/selectors'
 
 export class ParcelSightController extends EventEmitter {
   state: ParcelSightState

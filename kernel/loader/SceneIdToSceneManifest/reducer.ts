@@ -4,7 +4,7 @@ import {
   SCENE_BY_ID_REQUEST,
   SCENE_BY_ID_SUCCESS,
   SCENE_BY_ID_FAILURE
-} from './SceneIdToSceneManifest.types'
+} from './types'
 import { ISceneManifest } from '@dcl/utils'
 
 export const INITIAL_SCENEID_TO_MANIFEST_STATE: SceneIdToSceneManifestState = {

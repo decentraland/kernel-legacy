@@ -11,7 +11,7 @@ import {
   Vector2
 } from '@dcl/utils'
 import { SceneLoader } from '../../loader/SceneLoader'
-import { migrateFromILand } from '../../worldMap/sceneCompatibility/migrateFromILand'
+import { migrateFromILand } from '../../worldMap/sceneTransforms/migrateFromILand'
 import { PositionReport } from '../types/PositionReport'
 import { getPositionReport } from '../getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'

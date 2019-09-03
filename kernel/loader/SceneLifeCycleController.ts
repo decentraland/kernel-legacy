@@ -1,8 +1,8 @@
 import { createLogger } from '@dcl/utils'
 import { EventEmitter } from 'events'
-import { SceneLifeCyleState } from './SceneStatus/SceneLifeCycle.types'
-import { SceneIdToSceneManifestState } from './SceneIdToSceneManifest/SceneIdToSceneManifest.types'
-import { PositionSettlementState } from './PositionSettlement/PositionSettlement.types'
+import { SceneLifeCyleState } from './SceneStatus/types'
+import { SceneIdToSceneManifestState } from './SceneIdToSceneManifest/types'
+import { PositionSettlementState } from './PositionSettlement/types'
 
 const logger = createLogger('SceneLifecycle')
 

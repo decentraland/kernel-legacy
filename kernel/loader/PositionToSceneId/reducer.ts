@@ -7,7 +7,7 @@ import {
   SET_POSITION_AS_ERROR,
   SET_POSITION_AS_RESOLVED,
   FORGET_POSITION
-} from './PositionToSceneId.types'
+} from './types'
 
 export const INITIAL_POSITION_TO_SCENEID_STATE: PositionToSceneIdState = {
   loadingPositionCoordinates: {} as booleanMap,

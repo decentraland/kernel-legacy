@@ -1,4 +1,4 @@
-import { ParcelSightState, ParcelSightAction, SET_POSITION, CONFIGURE_LOS } from './ParcelSight.types'
+import { ParcelSightState, ParcelSightAction, SET_POSITION, CONFIGURE_LINE_OF_SIGHT_RADIUS } from './types'
 import { parcelsInScope } from './parcelsInScope'
 
 export const INITIAL_PARCEL_SIGHT_STATE: ParcelSightState = {
@@ -23,7 +23,7 @@ export function ParcelSightReducer(state?: ParcelSightState, action?: ParcelSigh
   let lineOfSightRadius = state.lineOfSightRadius
   let newPosition = state.currentPosition
   switch (action.type) {
-    case CONFIGURE_LOS:
+    case CONFIGURE_LINE_OF_SIGHT_RADIUS:
       if (state.lineOfSightRadius === action.payload) {
         return state
       }
