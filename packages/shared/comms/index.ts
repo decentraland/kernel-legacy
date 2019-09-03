@@ -295,8 +295,8 @@ export function onPositionUpdate(context: Context, p: Position) {
   context.currentPosition = p
   var now = new Date().getTime()
   if (now - lastNetworkUpdatePosition > 100) {
-    worldConnection.sendPositionMessage(p)
     lastNetworkUpdatePosition = now
+    worldConnection.sendPositionMessage(p)
   }
 }
 
