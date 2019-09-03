@@ -8,7 +8,7 @@ import {
   PlaneShape,
   Component,
   Vector3,
-  Pointer,
+  ActionButton,
   OnPointerDown,
   Billboard,
   log,
@@ -131,18 +131,18 @@ class BubbleSystem implements ISystem {
       }
     }
 
-    if (input.state[Pointer.CLICK].BUTTON_DOWN) {
+    if (input.state[ActionButton.POINTER].BUTTON_DOWN) {
       spawner.spawnBubble()
     }
   }
 }
 
-input.subscribe('BUTTON_UP', Pointer.PRIMARY, true, e => {
+input.subscribe('BUTTON_UP', ActionButton.PRIMARY, true, e => {
   log('pointerUp works', e)
 
 })
 
-input.subscribe('BUTTON_DOWN', Pointer.PRIMARY, true, e => {
+input.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, true, e => {
   log('pointerDown works', e)
 })
 

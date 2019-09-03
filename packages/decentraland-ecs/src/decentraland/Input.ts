@@ -11,15 +11,15 @@ export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
 /**
  * @public
  */
-export enum Pointer {
-  CLICK = 'CLICK',
+export enum ActionButton {
+  POINTER = 'POINTER',
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY'
 }
 
 /** @public */
 export type InputState = Record<
-  Pointer,
+  ActionButton,
   {
     BUTTON_DOWN: boolean
   }
@@ -29,7 +29,7 @@ export type InputState = Record<
 export type LocalPointerEvent = GlobalInputEventResult & {
   origin: Vector3
   direction: Vector3
-  pointer: Pointer
+  pointer: ActionButton
   hit?: GlobalInputEventResult['hit'] & {
     hitPoint: Vector3
     normal: Vector3
@@ -87,29 +87,29 @@ export class Input {
     return this.internalState
   }
 
-  private subscriptions: Record<Pointer, Record<InputEventKind, Array<Subscription>>> = {
-    [Pointer.CLICK]: {
+  private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> = {
+    [ActionButton.POINTER]: {
       BUTTON_DOWN: [],
       BUTTON_UP: []
     },
-    [Pointer.PRIMARY]: {
+    [ActionButton.PRIMARY]: {
       BUTTON_DOWN: [],
       BUTTON_UP: []
     },
-    [Pointer.SECONDARY]: {
+    [ActionButton.SECONDARY]: {
       BUTTON_DOWN: [],
       BUTTON_UP: []
     }
   }
 
   private internalState: InputState = {
-    [Pointer.CLICK]: {
+    [ActionButton.POINTER]: {
       BUTTON_DOWN: false
     },
-    [Pointer.PRIMARY]: {
+    [ActionButton.PRIMARY]: {
       BUTTON_DOWN: false
     },
-    [Pointer.SECONDARY]: {
+    [ActionButton.SECONDARY]: {
       BUTTON_DOWN: false
     }
   }
@@ -128,12 +128,12 @@ export class Input {
    * Returns a function that can be called to remove the subscription.
    * @param eventName - The name of the event (see InputEventKind).
    * @param pointerId - The id of the button.
-   * @param useRaycast - Enables raycast information.
+   * @param useRaycast - Enables getting raycast information.
    * @param fn - A callback function to be called when the event is triggered.
    */
   public subscribe(
     eventName: InputEventKind,
-    pointerId: Pointer,
+    pointerId: ActionButton,
     useRaycast: boolean,
     fn: (e: LocalPointerEvent) => void
   ) {
@@ -147,7 +147,7 @@ export class Input {
    * @param pointerId - The id of the button.
    * @param fn - The callback function used when subscribing to the event.
    */
-  public unsubscribe(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void) {
+  public unsubscribe(eventName: InputEventKind, pointerId: ActionButton, fn: (e: LocalPointerEvent) => void) {
     const index = this.getSubscriptionId(eventName, pointerId, fn)
     if (index > -1) {
       return this.subscriptions[pointerId][eventName].splice(index, 1)
@@ -226,7 +226,11 @@ export class Input {
     }
   }
 
-  private getSubscriptionId(eventName: InputEventKind, pointerId: Pointer, fn: (e: LocalPointerEvent) => void): number {
+  private getSubscriptionId(
+    eventName: InputEventKind,
+    pointerId: ActionButton,
+    fn: (e: LocalPointerEvent) => void
+  ): number {
     for (let i = 0; i < this.subscriptions[pointerId][eventName].length; i++) {
       if (this.subscriptions[pointerId][eventName][i].fn === fn) {
         return i
@@ -236,9 +240,9 @@ export class Input {
     return -1
   }
 
-  private getPointerById(id: number): Pointer {
-    if (id === 0) return Pointer.CLICK
-    else if (id === 1) return Pointer.PRIMARY
-    return Pointer.SECONDARY
+  private getPointerById(id: number): ActionButton {
+    if (id === 0) return ActionButton.POINTER
+    else if (id === 1) return ActionButton.PRIMARY
+    return ActionButton.SECONDARY
   }
 }

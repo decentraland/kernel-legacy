@@ -15,7 +15,7 @@ import {
   Material,
   Color3,
   Gizmos,
-  Pointer
+  ActionButton
 } from 'decentraland-ecs/src'
 
 const g = new Gizmos()
@@ -144,7 +144,7 @@ function playNote(fruit: Entity) {
   }
 }
 
-Input.instance.subscribe('BUTTON_DOWN', Pointer.CLICK, true, evt => {
+Input.instance.subscribe('BUTTON_DOWN', ActionButton.POINTER, true, evt => {
   log(evt)
 
   if (evt.hit) {
