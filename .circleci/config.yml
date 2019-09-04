@@ -69,13 +69,19 @@ jobs:
       - run:
           name: Build scenes
           command: |
+              find scene-cache -name '*.js' -exec cp -r {} -t public/
               make test-scenes
+      - run:
+          name: Build cache of test scenes
+          command: |
+              mkdir -p scene-cache
+              find public -name '*.js' -exec cp -r {} -t scene-cache/
       - save_cache:
           name: Store cached test scenes
           paths:
             - packages/decentraland-ecs/dist/index.d.ts
             - static/systems/scene.system.js
-            - public
+            - scene-cache
           key: compiled-scenes-{{ checksum ".compiled-scene-checksum" }}
       - run:
           name: Run tests
