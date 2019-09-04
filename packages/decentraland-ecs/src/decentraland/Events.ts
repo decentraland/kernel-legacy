@@ -19,3 +19,11 @@ export class RaycastResponse {
     }
   ) {}
 }
+
+/**
+ * @public
+ */
+@EventConstructor()
+export class PointerEvent<GlobalInputEventResult> {
+  constructor(public readonly payload: GlobalInputEventResult) {}
+}
