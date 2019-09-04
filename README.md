@@ -32,7 +32,7 @@ To spawn in a specific set of coordinates append the following query paramter:
 
 ## Running tests
 
-To run all test (and save new screenshots), run:
+To run all the tests (and save new screenshots), run:
 
     make generate-images
 
