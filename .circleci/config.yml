@@ -71,12 +71,12 @@ jobs:
       - run:
           name: Build scenes
           command: |
-              find scene-cache -name '*.js' -exec cp -r {} -t public/
+              cd scene-cache && find . -name '*.js' | xargs -I{} cp -i -t ../public/ --parents {}; cd ..
               make test-scenes
       - run:
           name: Build cache of test scenes
           command: |
-              find public -name '*.js' -exec cp -r {} -t scene-cache/
+              cd public && find . -name '*.js' | xargs -I{} cp -i -t ../scene-cache/ --parents {}; cd ..
       - save_cache:
           name: Store cached test scenes
           paths:
