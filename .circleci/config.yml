@@ -62,7 +62,7 @@ jobs:
           command: |
               make build-essentials
               mkdir -p scene-cache
-              cd scene-cache && find . -name '*.js' | xargs -I{} cp -i -t ../public/ --parents {}; cd ..
+              cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
               find public -name *.ts | xargs shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js | sort > .compiled-scene-checksum
       - restore_cache:
           name: Restore cached test scenes
@@ -71,12 +71,13 @@ jobs:
       - run:
           name: Build scenes
           command: |
-              cd scene-cache && find . -name '*.js' | xargs -I{} cp -i -t ../public/ --parents {}; cd ..
+              cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
+              find public -name '*.js' | xargs touch
               make test-scenes
       - run:
           name: Build cache of test scenes
           command: |
-              cd public && find . -name '*.js' | xargs -I{} cp -i -t ../scene-cache/ --parents {}; cd ..
+              cd public && find . -name '*.js' | xargs -I{} cp -f -t ../scene-cache/ --parents {}; cd ..
       - save_cache:
           name: Store cached test scenes
           paths:
