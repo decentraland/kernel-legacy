@@ -1,8 +1,4 @@
-[![CircleCI](https://circleci.com/gh/decentraland/explorer.svg?style=svg)](https://circleci.com/gh/decentraland/explorer)
-
-# Decentraland Client
-
-This client is fully front-end, but uses a [WebRTC Signalling Server](https://github.com/decentraland/rendezvous) to establish connections to other users.
+# Decentraland Kernel
 
 ## Contributing
 
