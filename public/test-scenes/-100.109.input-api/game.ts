@@ -131,7 +131,7 @@ class BubbleSystem implements ISystem {
       }
     }
 
-    if (input.state[ActionButton.POINTER].BUTTON_DOWN) {
+    if (input.isButtonPressed(ActionButton.POINTER)) {
       spawner.spawnBubble()
     }
   }
