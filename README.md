@@ -60,14 +60,6 @@ describe('My example test', function() {
   // ...
 ```
 
-# To update babylon version
-
-Run `./scripts/updateBabylon.sh VERSION`, usually to develop we run `./scripts/updateBabylon.sh preview`
-
-For releases we should run `./scripts/updateBabylon.sh latest` before.
-
-> Requires `jq` install using `brew install jq`
-
 ## Copyright info
 
 This repository is protected with a standard Apache 2 license. See the terms and conditions in the [LICENSE](https://github.com/decentraland/client/blob/master/LICENSE) file.
