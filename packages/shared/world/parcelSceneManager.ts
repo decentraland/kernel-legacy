@@ -89,9 +89,9 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
 
     const observer = sceneLifeCycleObservable.add(sceneStatus => {
       if (sceneStatus.sceneId === sceneId) {
+        sceneLifeCycleObservable.remove(observer)
         ret.notify('Scene.status', sceneStatus)
       }
-      sceneLifeCycleObservable.remove(observer)
     })
 
     // tell the engine to load the parcel scene
@@ -105,7 +105,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
         sceneLifeCycleObservable.remove(observer)
         ret.notify('Scene.status', { sceneId, status: 'failed' })
       }
-    }, 30000)
+    }, 60000)
   })
 
   ret.on('Scene.shouldUnload', async (opts: { sceneId: string }) => {
