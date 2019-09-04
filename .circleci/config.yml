@@ -72,7 +72,7 @@ jobs:
           name: Build scenes
           command: |
               cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
-              find public -name '*.js' | xargs touch
+              for compiled in `find public -name '*.js'`; do touch $compiled; done
               make test-scenes
       - run:
           name: Build cache of test scenes
