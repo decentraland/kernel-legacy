@@ -1,7 +1,8 @@
 const SEND_ICON = './images/send-icon.png'
 
 const ui = new UICanvas()
-const uiEntity = new Entity()
+const _Entity = new Entity()
+const uiEntity = _Entity
 uiEntity.addComponentOrReplace(ui)
 engine.addEntity(uiEntity)
 
