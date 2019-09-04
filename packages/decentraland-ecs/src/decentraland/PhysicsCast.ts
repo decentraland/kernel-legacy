@@ -2,7 +2,7 @@ import { ReadOnlyVector3 } from './math'
 
 export interface RaycastQuery {
   queryId: string
-  queryType: 'hitFirst' | 'hitAll' | 'hitFirstAvatar' | 'hitAllAvatars'
+  queryType: 'HitFirst' | 'HitAll' | 'HitFirstAvatar' | 'HitAllAvatars'
   ray: Ray
 }
 
