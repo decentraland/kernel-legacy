@@ -61,6 +61,8 @@ jobs:
           name: Build decentraland-ecs
           command: |
               make build-essentials
+              mkdir -p scene-cache
+              cd scene-cache && find . -name '*.js' | xargs cp -i -t ../public/ --parents {}; cd ..
               find public -name *.ts | xargs shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js | sort > .compiled-scene-checksum
       - restore_cache:
           name: Restore cached test scenes
@@ -74,7 +76,6 @@ jobs:
       - run:
           name: Build cache of test scenes
           command: |
-              mkdir -p scene-cache
               find public -name '*.js' -exec cp -r {} -t scene-cache/
       - save_cache:
           name: Store cached test scenes
