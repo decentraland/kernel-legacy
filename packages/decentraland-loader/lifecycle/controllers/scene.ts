@@ -129,11 +129,7 @@ export class SceneLifeCycleController extends EventEmitter {
         const land = await this.downloadManager.getParcelData(position)
 
         if (!land) {
-          if (this.enabledEmpty) {
-            this.futureOfPositionToSceneId.get(position)!.resolve('empty-' + position)
-          } else {
-            this.futureOfPositionToSceneId.get(position)!.resolve(undefined)
-          }
+          this.futureOfPositionToSceneId.get(position)!.resolve(this.enabledEmpty ? 'empty-' + position : undefined)
           return this.futureOfPositionToSceneId.get(position)!
         }
 

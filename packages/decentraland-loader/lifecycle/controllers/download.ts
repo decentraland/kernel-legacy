@@ -120,10 +120,10 @@ export class SceneDataDownloadManager {
     this.sceneIdToLandData.set(sceneId, promised)
 
     if (sceneId.startsWith('empty-')) {
-      const promisedPos = future<string>()
+      const promisedPos = future<string | null>()
       const pos = sceneId.replace('empty-', '')
       promisedPos.resolve(pos)
-      this.positionToSceneId.set(pos, promisedPos as any)
+      this.positionToSceneId.set(pos, promisedPos)
       const scene = this.createFakeILand(sceneId)
       promised.resolve(scene)
       return promised
