@@ -99,7 +99,10 @@ export class BrokerConnection implements IBrokerConnection {
       this.webRtcConn.oniceconnectionstatechange = null
       this.webRtcConn.onicecandidate = null
       this.webRtcConn.ondatachannel = null
-      this.webRtcConn.close()
+      if (this.webRtcConn.close) {
+        // TODO - added for tests to run, fix this - moliva - 05/09/2019
+        this.webRtcConn.close()
+      }
       this.webRtcConn = null
     }
 
