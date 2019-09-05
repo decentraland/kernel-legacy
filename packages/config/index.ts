@@ -120,17 +120,7 @@ export namespace commConfigurations {
       urls: 'stun:stun4.l.google.com:19302'
     },
     {
-      urls: 'turn:18.212.100.131:3478',
-      credential: 'passworddcl',
-      username: 'usernamedcl'
-    },
-    {
-      urls: 'turn:54.156.44.154:3478',
-      credential: 'passworddcl',
-      username: 'usernamedcl'
-    },
-    {
-      urls: 'turn:3.219.30.175:3478',
+      urls: 'turn:stun.decentraland.org:3478',
       credential: 'passworddcl',
       username: 'usernamedcl'
     }
@@ -176,6 +166,8 @@ function getDefaultTLD() {
 
   return TLD
 }
+
+export const ENABLE_EMPTY_SCENES = !DEBUG || knownTLDs.includes(getTLD())
 
 export function getServerConfigurations() {
   const TLDDefault = getDefaultTLD()
