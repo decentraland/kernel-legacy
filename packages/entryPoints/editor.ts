@@ -263,7 +263,6 @@ namespace editor {
   export function takeScreenshot(mime?: string): IFuture<string> {
     const id = uuid()
     futures[id] = future()
-    console.log('explorer: takeScreenshot ' + id)
     takeScreenshotBuilder(id)
     return futures[id]
   }

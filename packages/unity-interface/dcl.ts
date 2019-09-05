@@ -112,7 +112,6 @@ const browserInterface = {
   },
 
   SendScreenshot(data: { id: string; encodedTexture: string }) {
-    defaultLogger.log('explorer: SendScreenshot ' + data.id + ' encode ' + data.encodedTexture)
     futures[data.id].resolve(data.encodedTexture)
   }
 }
