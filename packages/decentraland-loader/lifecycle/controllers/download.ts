@@ -4,6 +4,8 @@ import { ILand, IScene, ParcelInfoResponse } from 'shared/types'
 import { jsonFetch } from 'atomicHelpers/jsonFetch'
 import { createLogger } from 'shared/logger'
 
+const origin = globalThis.origin
+
 const emptyScenes = require('./emptyScenes.json')
 
 const logger = createLogger('loader')
@@ -75,12 +77,12 @@ export class SceneDataDownloadManager {
 
   createFakeILand(sceneId: string) {
     const coordinates = sceneId.replace('empty-', '')
-    const pick = ((coordinates.split(',').reduce((prev, next) => prev + parseInt(next, 10), 0) % 12) + 1)
+    const pick = ((((coordinates.split(',').reduce((prev, next) => prev + parseInt(next, 10), 0) % 12) + 13) % 12) + 1)
       .toString()
       .padStart(2, '0')
     return {
       sceneId: sceneId,
-      baseUrl: 'http://localhost:8080/loader/empty-scenes/Tile1M_' + pick,
+      baseUrl: origin + '/loader/empty-scenes/Tile1M_' + pick + '/',
       scene: {
         display: { title: 'Empty parcel' },
         owner: '',
@@ -95,8 +97,12 @@ export class SceneDataDownloadManager {
         parcel_id: coordinates,
         contents: [
           {
-            file: 'bin/gamepad.js',
-            hash: 'http://localhost:8080/loader/empty-scenes/Tile1M_' + pick + 'bin/game.js'
+            file: 'scene.json',
+            hash: 'scene.json'
+          },
+          {
+            file: 'bin/game.js',
+            hash: 'bin/game.js'
           }
         ].concat(emptyScenes[pick]),
         root_cid: sceneId,
@@ -114,7 +120,13 @@ export class SceneDataDownloadManager {
     this.sceneIdToLandData.set(sceneId, promised)
 
     if (sceneId.startsWith('empty-')) {
-      return this.createFakeILand(sceneId)
+      const promisedPos = future<string>()
+      const pos = sceneId.replace('empty-', '')
+      promisedPos.resolve(pos)
+      this.positionToSceneId.set(pos, promisedPos as any)
+      const scene = this.createFakeILand(sceneId)
+      promised.resolve(scene)
+      return promised
     }
 
     const actualResponse = await fetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
