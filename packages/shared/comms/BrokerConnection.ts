@@ -68,6 +68,10 @@ export class BrokerConnection implements IBrokerConnection {
         this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
         this.stats && this.stats.printDebugInformation()
       }
+      if (this.unreliableFuture.isPending) {
+        this.unreliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
+        this.stats && this.stats.printDebugInformation()
+      }
     }, 60000)
   }
 

@@ -97,11 +97,24 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   }
 
   console['group']('connect#comms')
-  await connect(
-    userId,
-    net,
-    auth
-  )
+  const maxTries = 5
+  for (let i = 1; ; ++i) {
+    try {
+      defaultLogger.info(`Try number ${i}...`)
+      await connect(
+        userId,
+        net,
+        auth
+      )
+      break
+    } catch (e) {
+      if (!e.message.startsWith('Communications link') || i === maxTries) {
+        // max number of tries reached, rethrow error
+        defaultLogger.info(`Max number of tries reached (${maxTries}), unsuccessful connection`)
+        throw e
+      }
+    }
+  }
   console['groupEnd']()
 
   // initialize profile
