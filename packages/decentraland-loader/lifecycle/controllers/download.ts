@@ -77,7 +77,7 @@ export class SceneDataDownloadManager {
 
   createFakeILand(sceneId: string) {
     const coordinates = sceneId.replace('empty-', '')
-    const pick = coordinates.split(',').reduce((prev, next) => prev + Math.abs(parseInt(next, 10), 0) % 12)
+    const pick = coordinates.split(',').reduce((prev, next) => prev + Math.abs(parseInt(next, 10)), 0) % 12
       .toString()
       .padStart(2, '0')
     return {
