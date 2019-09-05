@@ -110,7 +110,10 @@ export class BrokerConnection implements IBrokerConnection {
       this.ws.onmessage = null
       this.ws.onerror = null
       this.ws.onclose = null
-      this.ws.close()
+      if (this.ws.close) {
+        // TODO - added for tests to run, fix this - moliva - 05/09/2019
+        this.ws.close()
+      }
     }
   }
 
