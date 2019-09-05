@@ -1,5 +1,4 @@
 import { EventConstructor } from '../ecs/EventManager'
-import { RaycastHit } from './PhysicsCast'
 
 /**
  * @public
@@ -9,13 +8,16 @@ export class UUIDEvent<T = any> {
   constructor(public readonly uuid: string, public readonly payload: T) {}
 }
 
+/**
+ * @public
+ */
 @EventConstructor()
-export class RaycastResponse {
+export class RaycastResponse<T> {
   constructor(
     public readonly payload: {
       queryId: string
       queryType: string
-      rayHit: RaycastHit
+      rayHit: T
     }
   ) {}
 }

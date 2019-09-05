@@ -1,6 +1,7 @@
 import { parseParcelPosition } from 'atomicHelpers/parcelScenePositions'
 import { Wearable } from '../decentraland-ecs/src/decentraland/AvatarShape'
 import { Vector3Component } from '../atomicHelpers/landHelpers'
+import { QueryType } from 'decentraland-ecs/src/decentraland/PhysicsCast'
 
 export type MappingsResponse = {
   parcel_id: string
@@ -400,7 +401,7 @@ export type Ray = {
 
 export type RayQuery = {
   queryId: string
-  queryType: 'hitFirst' | 'hitAll' | 'hitFirstAvatar' | 'hitAllAvatars'
+  queryType: QueryType
 } & Ray
 
 export function normalizeContentMappings(

@@ -1,11 +1,39 @@
 import { Engine } from '../ecs/Engine'
-import { UUIDEvent, PointerEvent } from './Events'
+import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
 import { DecentralandInterface, GlobalInputEventResult } from './Types'
 import { OnUUIDEvent } from './Components'
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
 import { Input } from './Input'
+import { PhysicsCast } from './PhysicsCast'
+import { log } from '../ecs/helpers'
 
 declare var dcl: DecentralandInterface | void
+
+/**
+ * @public
+ */
+export class RaycastEventSystem implements ISystem {
+  activate(engine: Engine) {
+    log('activate raycast event system')
+    engine.eventManager.addListener(RaycastResponse, this, event => {
+      log('RaycastResponse', event)
+      PhysicsCast.instance.handleRaycastResponse(event)
+    })
+
+    if (typeof dcl !== 'undefined') {
+      dcl.subscribe('raycastResponse')
+    }
+  }
+
+  deactivate() {
+    if (typeof dcl !== 'undefined') {
+      dcl.unsubscribe('raycastResponse')
+    }
+  }
+}
+
+/** @internal */
+export const raycastEventSystem = new RaycastEventSystem()
 
 /**
  * @public

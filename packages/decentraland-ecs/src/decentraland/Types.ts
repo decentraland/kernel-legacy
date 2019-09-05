@@ -170,7 +170,7 @@ export interface IEvents {
   /**
    * `raycastResponse` is triggered in response to a raycast query
    */
-  raycastResponse: RaycastResponse
+  raycastResponse: RaycastResponse<any>
 
   /**
    * `chatMessage` is triggered when the user sends a message through chat entity.

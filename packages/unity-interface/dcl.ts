@@ -15,7 +15,6 @@ import {
   MappingsResponse,
   ILand,
   Profile,
-  Ray,
   RayQuery
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
@@ -46,6 +45,8 @@ import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
 import { Vector3Component } from '../atomicHelpers/landHelpers'
+import { physicsCastObservable } from '../decentraland-ecs/src/decentraland/PhysicsCast'
+import { log } from '../decentraland-ecs/src/ecs/helpers'
 
 let gameInstance!: GameInstance
 
@@ -151,6 +152,8 @@ const unityInterface = {
   },
 
   RaycastQuery(ray: RayQuery) {
+    log('RaycastQuery: ' + ray)
+
     const parameters = [
       ray.queryId,
       ray.origin.x,
@@ -161,6 +164,7 @@ const unityInterface = {
       ray.direction.z,
       ray.distance
     ]
+
     gameInstance.SendMessage(`PhysicsCast`, ray.queryType, parameters.join('\t'))
   },
 
@@ -396,6 +400,20 @@ worldRunningObservable.add(isRunning => {
     setLoadingScreenVisible(false)
   }
 })
+
+log('adding physics cast observable listener')
+
+physicsCastObservable.add(query => {
+  unityInterface.RaycastQuery({
+    queryId: query.queryId,
+    queryType: query.queryType,
+    direction: query.ray.direction,
+    origin: query.ray.origin,
+    distance: query.ray.distance
+  })
+})
+
+log('hasObservers: ' + physicsCastObservable.hasObservers())
 
 window['messages'] = (e: any) => chatObservable.notifyObservers(e)
 
