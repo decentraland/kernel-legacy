@@ -109,6 +109,11 @@ const browserInterface = {
         break
       }
     }
+  },
+
+  SendScreenshot(data: { id: string; encodedTexture: string }) {
+    defaultLogger.log('explorer: SendScreenshot ' + data.id + ' encode ' + data.encodedTexture)
+    futures[data.id].resolve(data.encodedTexture)
   }
 }
 
@@ -393,12 +398,20 @@ export function getMousePositionBuilder(x: string, y: string, id: string) {
   unityInterface.sendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
 }
 
-export function takeScreenshotBuilder(mime?: string) {
-  unityInterface.sendBuilderMessage('TakeScreenshot', mime ? mime : '')
+export function takeScreenshotBuilder(id: string) {
+  unityInterface.sendBuilderMessage('TakeScreenshot', id)
 }
 
 export function ActivateRendering() {
   unityInterface.ActivateRendering()
+}
+
+export function DeactivateRendering() {
+  unityInterface.DeactivateRendering()
+}
+
+export function UnloadScene(sceneId: string) {
+  unityInterface.UnloadScene(sceneId)
 }
 
 let currentLoadedScene: SceneWorker
@@ -475,6 +488,10 @@ export function loadBuilderScene(sceneData: ILand) {
 
 export function readyBuilderScene() {
   unityInterface.SetBuilderReady()
+}
+
+export function resetBuilderScene() {
+  unityInterface.sendBuilderMessage('ResetBuilderScene')
 }
 
 export function updateBuilderScene(sceneData: ILand) {

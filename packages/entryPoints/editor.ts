@@ -26,7 +26,10 @@ import {
   getMousePositionBuilder,
   takeScreenshotBuilder,
   futures,
-  ActivateRendering
+  ActivateRendering,
+  DeactivateRendering,
+  resetBuilderScene,
+  UnloadScene
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -43,6 +46,7 @@ let unityScene: UnityParcelScene
  * It creates the builder scene, bind the scene events and stub the content mappings
  */
 async function createBuilderScene(scene: IScene & { baseUrl: string }) {
+  const isFirstRun = unityScene === undefined
   const sceneData = await getSceneData(scene)
   unityScene = loadBuilderScene(sceneData)
   bindSceneEvents()
@@ -60,7 +64,12 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
     await sleep(10)
   }
 
-  readyBuilderScene()
+  if (isFirstRun) {
+    readyBuilderScene()
+  } else {
+    resetBuilderScene()
+  }
+
   evtEmitter.emit('ready', {})
 }
 
@@ -150,16 +159,15 @@ namespace editor {
    * Function executed by builder which is the first function of the entry point
    */
   export async function initEngine(container: HTMLElement) {
-    initializeUnity(container)
-      .then(async () => {
-        defaultLogger.log('Engine initialized.')
-        initializedEngine.resolve()
-      })
-      .catch(err => {
-        defaultLogger.error('Error loading Unity', err)
-        initializedEngine.reject(err)
-        throw err
-      })
+    try {
+      await initializeUnity(container)
+      defaultLogger.log('Engine initialized.')
+      initializedEngine.resolve()
+    } catch (err) {
+      defaultLogger.error('Error loading Unity', err)
+      initializedEngine.reject(err)
+      throw err
+    }
   }
 
   export async function handleMessage(message: any) {
@@ -175,14 +183,17 @@ namespace editor {
     console.log('selectEntity')
   }
   export function getDCLCanvas() {
-    return document.getElementById('gameContainer')
+    return document.getElementById('#canvas')
   }
 
   export function getScenes(): Set<SceneWorker> {
     return new Set(loadedSceneWorkers.values())
   }
   export async function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
-    if (unityScene) {
+    if (action.type === 'Close editor') {
+      UnloadScene(unityScene.data.sceneId)
+      DeactivateRendering()
+    } else if (unityScene) {
       const { worker } = unityScene
       if (action.payload.mappings) {
         var scene = action.payload.scene
@@ -249,9 +260,12 @@ namespace editor {
   export function getLoadingEntity() {
     console.log('getLoadingEntity')
   }
-  export function takeScreenshot(mime?: string) {
-    console.log('takeScreenshot')
-    takeScreenshotBuilder(mime)
+  export function takeScreenshot(mime?: string): IFuture<string> {
+    const id = uuid()
+    futures[id] = future()
+    console.log('explorer: takeScreenshot ' + id)
+    takeScreenshotBuilder(id)
+    return futures[id]
   }
 
   export function setCameraPosition(position: string) {
