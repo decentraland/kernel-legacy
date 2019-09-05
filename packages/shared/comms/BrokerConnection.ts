@@ -66,11 +66,11 @@ export class BrokerConnection implements IBrokerConnection {
     setTimeout(() => {
       if (this.reliableFuture.isPending) {
         this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
-        this.stats && this.stats.printDebugInformation()
+        this.onConnectionTimeout()
       }
       if (this.unreliableFuture.isPending) {
         this.unreliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
-        this.stats && this.stats.printDebugInformation()
+        this.onConnectionTimeout()
       }
     }, 60000)
   }
@@ -128,7 +128,7 @@ export class BrokerConnection implements IBrokerConnection {
         if (this.stats) {
           this.stats.others.incrementRecv(msgSize)
         }
-        this.logger.log('unsopported message')
+        this.logger.log('unsupported message')
         break
       }
       case MessageType.WELCOME: {
@@ -231,6 +231,11 @@ export class BrokerConnection implements IBrokerConnection {
         break
       }
     }
+  }
+
+  private onConnectionTimeout() {
+    this.stats && this.stats.printDebugInformation()
+    this.close()
   }
 
   private sendCoordinatorMessage = (msg: Message) => {
