@@ -64,13 +64,8 @@ export class BrokerConnection implements IBrokerConnection {
     // TODO: reconnect logic, handle disconnections
 
     setTimeout(() => {
-      if (this.reliableFuture.isPending) {
-        this.reliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
-        this.onConnectionTimeout()
-      }
-      if (this.unreliableFuture.isPending) {
-        this.unreliableFuture.reject(new Error('Communications link cannot be established (Timeout)'))
-        this.onConnectionTimeout()
+      if (this.reliableFuture.isPending || this.unreliableFuture.isPending) {
+        this.onConnectionError(new Error('Communications link cannot be established (Timeout)'))
       }
     }, 60000)
   }
@@ -148,7 +143,9 @@ export class BrokerConnection implements IBrokerConnection {
         const availableServers = message.getAvailableServersList()
 
         if (availableServers.length === 0) {
-          throw new Error('no available servers')
+          const error = new Error('Communications link cannot be established (no available servers)')
+          this.onConnectionError(error)
+          throw error
         }
 
         const serverAlias = availableServers[0]
@@ -233,7 +230,13 @@ export class BrokerConnection implements IBrokerConnection {
     }
   }
 
-  private onConnectionTimeout() {
+  private onConnectionError(error: Error) {
+    if (this.reliableFuture.isPending) {
+      this.reliableFuture.reject(error)
+    }
+    if (this.unreliableFuture.isPending) {
+      this.unreliableFuture.reject(error)
+    }
     this.stats && this.stats.printDebugInformation()
     this.close()
   }
