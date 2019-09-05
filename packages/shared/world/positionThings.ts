@@ -10,6 +10,7 @@ import {
 import { Observable } from 'decentraland-ecs/src/ecs/Observable'
 import { ILand } from 'shared/types'
 import { Vector3Component } from '../../atomicHelpers/landHelpers'
+import { playerConfigurations } from 'config'
 
 declare var location: any
 declare var history: any
@@ -74,6 +75,7 @@ export function initializeUrlPositionObserver() {
       gridToWorld(parseFloat(parcelCoords[0]), parseFloat(parcelCoords[1]), lastPlayerPosition)
     } else {
       lastPlayerPosition.x = Math.round(Math.random() * 10) - 5
+      lastPlayerPosition.y = playerConfigurations.height
       lastPlayerPosition.z = 0
     }
   }
@@ -126,7 +128,7 @@ function getSpawnpoint(land: ILand): { position: Vector3Component; cameraTarget?
   return {
     position: {
       x: computeComponentValue(position.x),
-      y: computeComponentValue(position.y),
+      y: computeComponentValue(position.y) + playerConfigurations.height,
       z: computeComponentValue(position.z)
     },
     cameraTarget
