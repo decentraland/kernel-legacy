@@ -183,7 +183,12 @@ function getDefaultTLD() {
 }
 
 export function getLoginConfigurationForCurrentDomain() {
-  let tld: 'org' | 'zone' = getDefaultTLD()
+  let tld: 'org' | 'zone' | 'today' = getDefaultTLD()
+  // Use `.org` auth for `.today`
+  if (tld === 'today') {
+    tld = 'org'
+  }
+  // Use `.today` auth for any localhost or other edge case
   if (tld !== 'org' && tld !== 'zone') {
     tld = 'zone'
   }
