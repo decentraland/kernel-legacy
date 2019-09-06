@@ -60,5 +60,6 @@ export * from './decentraland/UIShapes'
 export * from './decentraland/AvatarShape'
 export * from './decentraland/UIEvents'
 export * from './decentraland/MessageBus'
+export * from './decentraland/PhysicsCast'
 
 export { engine }
