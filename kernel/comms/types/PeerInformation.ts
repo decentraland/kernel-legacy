@@ -1,4 +1,4 @@
-import { UserInformation } from './UserInformation'
+import { StoredProfile } from '../../passports/types'
 
 type UUID = string
 
@@ -15,5 +15,5 @@ export type PeerInformation = {
     muted?: boolean
   }
 
-  user?: UserInformation
+  user?: StoredProfile
 }

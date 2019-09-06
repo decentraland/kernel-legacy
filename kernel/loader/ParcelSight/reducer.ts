@@ -1,4 +1,5 @@
-import { ParcelSightState, ParcelSightAction, SET_POSITION, CONFIGURE_LINE_OF_SIGHT_RADIUS } from './types'
+import { ParcelSightState } from './types'
+import { ParcelSightAction, SET_POSITION, CONFIGURE_LINE_OF_SIGHT_RADIUS } from './actions'
 import { parcelsInScope } from './parcelsInScope'
 
 export const INITIAL_PARCEL_SIGHT_STATE: ParcelSightState = {
@@ -13,7 +14,7 @@ export const INITIAL_PARCEL_SIGHT_STATE: ParcelSightState = {
     currentlyInSight: []
   }
 }
-export function ParcelSightReducer(state?: ParcelSightState, action?: ParcelSightAction): ParcelSightState {
+export function parcelSightReducer(state?: ParcelSightState, action?: ParcelSightAction): ParcelSightState {
   if (!state) {
     return INITIAL_PARCEL_SIGHT_STATE
   }

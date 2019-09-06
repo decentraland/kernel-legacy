@@ -1,8 +1,8 @@
 import { SubscriptionMessage, MessageType, Format } from '@dcl/protos'
 
-import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
+import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
 
-export function sendUpdateSubscriptions(comms: WorldInstanceConnection, rawTopics: string) {
+export function sendUpdateSubscriptions(comms: ProtocolConnection, rawTopics: string) {
   if (!comms.connection.hasReliableChannel) {
     return
   }

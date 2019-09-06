@@ -88,6 +88,9 @@ export function decodeParcelSceneBoundaries(boundaries: string) {
 export function encodeParcelPosition(base: Vector2) {
   return `${base.x | 0},${base.y | 0}`
 }
+export function encodeParcelPositionFromCoordinates(x: number, y: number) {
+  return `${x},${y}`
+}
 export function encodeParcelSceneBoundaries(base: Vector2, parcels: Vector2[]) {
   let str = encodeParcelPosition(base)
 

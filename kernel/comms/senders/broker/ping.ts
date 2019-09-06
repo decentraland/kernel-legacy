@@ -1,5 +1,5 @@
 import { PingMessage, MessageType } from '@dcl/protos'
-import { IBrokerConnection } from '../brokers/IBrokerConnection'
+import { IBrokerConnection } from '../../brokers/IBrokerConnection'
 
 /**
  * Returns true if the ping was sent successfully, false otherwise

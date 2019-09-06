@@ -1,11 +1,11 @@
-import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
+import { ProtocolConnection } from '../../comms/brokers/ProtocolConnection'
 import { PeerPresenceManager } from '../../presence/peers/peerPresence'
 import { SubsystemController } from '../subsystems'
 import { CommsSystem } from './Comms'
 
 export class PeerPresenceSystem extends SubsystemController {
   peerPresence?: PeerPresenceManager
-  connection?: WorldInstanceConnection
+  connection?: ProtocolConnection
 
   lastMessages: any[] = []
 

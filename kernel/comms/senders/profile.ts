@@ -1,15 +1,10 @@
 import { ProfileData, Category } from '@dcl/protos'
 
-import { UserInformation } from '../types/UserInformation'
-import { WorldInstanceConnection } from '../worldInstanceConnection'
+import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicIdentityMessage } from './topicIdentity'
+import { StoredProfile } from '../../passports/types'
 
-export function sendProfileMessage(
-  comms: WorldInstanceConnection,
-  topic: string,
-  p: Position,
-  userProfile: UserInformation
-) {
+export function sendProfileMessage(comms: ProtocolConnection, topic: string, p: Position, userProfile: StoredProfile) {
   const d = new ProfileData()
   d.setCategory(Category.PROFILE)
   d.setTime(Date.now())

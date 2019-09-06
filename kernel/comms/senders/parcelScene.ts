@@ -1,9 +1,9 @@
 import { ChatData, Category } from '@dcl/protos'
 
-import { WorldInstanceConnection } from '../worldInstanceConnection'
+import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicMessage } from './topic'
 
-export function sendParcelSceneCommsMessage(comms: WorldInstanceConnection, sceneId: string, message: string) {
+export function sendParcelSceneMessage(comms: ProtocolConnection, sceneId: string, message: string) {
   const topic = sceneId
 
   const d = new ChatData()

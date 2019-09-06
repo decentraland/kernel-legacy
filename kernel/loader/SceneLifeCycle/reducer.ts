@@ -1,22 +1,21 @@
 import {
-  SceneLifeCyleState,
   SceneLifeCycleAction,
-  SCENE_START,
-  SCENE_SCRIPT_SENT_AWAKE,
-  SCENE_SCRIPT_AWAKE_TIMEOUT,
+  SceneLifeCyleState,
+  SCENE_LOADING,
+  SCENE_RENDERER_FATAL_ERROR,
   SCENE_RENDERER_SENT_START_SIGNAL,
   SCENE_RUNNING,
-  SCENE_RENDERER_FATAL_ERROR,
+  SCENE_SCRIPT_AWAKE_TIMEOUT,
+  SCENE_SCRIPT_SENT_AWAKE,
   SCENE_SCRIPT_SOURCED_FATAL_ERROR
 } from './types'
-import { booleanMap } from '../PositionToSceneId/types'
 
 export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCyleState = {
-  loading: {} as booleanMap,
-  awake: {} as booleanMap,
-  started: {} as booleanMap,
-  running: {} as booleanMap,
-  error: {} as booleanMap
+  loading: {},
+  awake: {},
+  started: {},
+  running: {},
+  error: {}
 }
 
 type KEY = 'loading' | 'awake' | 'started' | 'running' | 'error'
@@ -38,7 +37,7 @@ export function sceneLifeCycleReducer(state?: SceneLifeCyleState, action?: Scene
   }
   const sceneId = action.payload.sceneId
   switch (action.type) {
-    case SCENE_START:
+    case SCENE_LOADING:
       return { ...state, loading: { ...state.loading, [action.payload.sceneId]: true } }
     case SCENE_SCRIPT_SENT_AWAKE:
       return transition(state, action.payload.sceneId, 'loading', 'awake')

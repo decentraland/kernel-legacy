@@ -1,92 +1,128 @@
 import { EventEmitter } from 'events'
-import { Vector2 } from '@dcl/utils'
-import { SceneDataDownloadManager } from './SceneDataDownloadManager'
-import { ParcelSightController } from './ParcelSightController'
-import { SceneLifeCycleController } from './SceneLifeCycleController'
-import { PositionLifeCycleController } from './PositionLifecycleController'
+import future from 'fp-future'
+import { combineReducers, createStore, Store } from 'redux'
+
+import { encodeParcelPositionFromCoordinates, ISceneManifest, Vector2, encodeParcelPosition } from '@dcl/utils'
+
+import { ParcelLoadingActionType } from './ParcelLoading/actions'
+import { parcelLoadingReducer as parcelLoading } from './ParcelLoading/reducer'
+import { RootParcelLoadingState } from './ParcelLoading/types'
+import { configureLineOfSightRadius, ParcelSightAction, setPosition } from './ParcelSight/actions'
+import { parcelSightReducer as parcelSight } from './ParcelSight/reducer'
+import { RootParcelSightState } from './ParcelSight/types'
+import { PositionSettlementAction, teleport } from './PositionSettlement/actions'
+import { positionSettlementReducer as positionSettlement } from './PositionSettlement/reducer'
+import { RootPositionSettlementState } from './PositionSettlement/types'
+import {
+  configureDownloadServer as configureSceneIdServer,
+  positionLoadingRequest,
+  PositionToSceneIdAction
+} from './PositionToSceneId/actions'
+import { positionToSceneIdReducer as positionToSceneId } from './PositionToSceneId/reducer'
+import { getEmptyStatus, getPositionError, getSceneIdForPosition } from './PositionToSceneId/selectors'
+import { RootPositionToSceneIdState } from './PositionToSceneId/types'
+import { sceneIdToSceneManifestReducer as sceneIdToManifest } from './SceneIdToSceneManifest/reducer'
+import { getSceneError, getSceneManifest } from './SceneIdToSceneManifest/selectors'
+import {
+  configureDownloadServer as configureManifestServer,
+  RootSceneIdToSceneManifestState,
+  SceneByIdAction,
+  sceneByIdRequest
+} from './SceneIdToSceneManifest/types'
+import { sceneLifeCycleReducer as sceneLifeCycle } from './SceneLifeCycle/reducer'
+import { RootSceneLifeCyleState, SceneLifeCycleAction } from './SceneLifeCycle/types'
+
+export type RootState = RootParcelLoadingState &
+  RootParcelSightState &
+  RootPositionSettlementState &
+  RootPositionToSceneIdState &
+  RootSceneIdToSceneManifestState &
+  RootSceneLifeCyleState
+
+export type RootAction =
+  | ParcelLoadingActionType
+  | ParcelSightAction
+  | PositionToSceneIdAction
+  | PositionSettlementAction
+  | SceneByIdAction
+  | SceneLifeCycleAction
 
 export class SceneLoader extends EventEmitter {
-  downloadManager: SceneDataDownloadManager
-  parcelController: ParcelSightController
-  sceneController: SceneLifeCycleController
-  positionController: PositionLifeCycleController
-
-  constructor() {
-    super()
+  store: Store<RootState>
+  setup(downloadServer: string, lineOfSight: number) {
+    const store = (this.store = createStore(
+      combineReducers({
+        parcelLoading,
+        parcelSight,
+        positionSettlement,
+        positionToSceneId,
+        sceneIdToManifest,
+        sceneLifeCycle
+      })
+    ))
+    store.dispatch(configureLineOfSightRadius(lineOfSight))
+    store.dispatch(configureSceneIdServer(downloadServer))
+    store.dispatch(configureManifestServer(downloadServer))
   }
 
-  setupInjecting(config: {
-    downloadManager?: SceneDataDownloadManager
-    parcelController?: ParcelSightController
-    sceneController?: SceneLifeCycleController
-    positionController?: PositionLifeCycleController
-    contentServer?: string
-    lineOfSightRadius?: number
-  }) {
-    if (!config.downloadManager && !config.contentServer) {
-      throw new Error('Must configure a content server')
+  async getSceneForCoordinates(x: number, y: number): Promise<ISceneManifest> {
+    const sceneId = await this.getSceneIdByCoordinates(x, y)
+    return this.getSceneById(sceneId)
+  }
+
+  reportCurrentPosition(position: Vector2) {
+    this.store.dispatch(setPosition(position))
+  }
+
+  teleport(position: Vector2) {
+    this.store.dispatch(teleport(encodeParcelPosition(position)))
+  }
+
+  protected getSceneById(sceneId: string): Promise<ISceneManifest> {
+    const resolved = getSceneManifest(this.store.getState(), sceneId)
+    if (resolved) {
+      return Promise.resolve(resolved)
     }
-    if (!config.parcelController && !config.lineOfSightRadius) {
-      throw new Error('Must configure a parcel line of sight radius')
+    const promise = future<ISceneManifest>()
+    const unsubscribe = this.store.subscribe(() => {
+      const sceneManifest = getSceneManifest(this.store.getState(), sceneId)
+      const sceneError = getSceneError(this.store.getState(), sceneId)
+      if (sceneManifest || sceneError) {
+        if (sceneManifest) {
+          promise.resolve(sceneManifest)
+        } else if (sceneError) {
+          promise.reject(sceneError)
+        }
+        unsubscribe()
+      }
+    })
+    this.store.dispatch(sceneByIdRequest(sceneId))
+    return promise
+  }
+
+  protected getSceneIdByCoordinates(x: number, y: number): Promise<string> {
+    const position = encodeParcelPositionFromCoordinates(x, y)
+    const resolved = getSceneIdForPosition(this.store.getState(), position)
+    if (resolved) {
+      return Promise.resolve(resolved)
     }
-    this.downloadManager = config.downloadManager
-      ? config.downloadManager
-      : new SceneDataDownloadManager({ contentServer: config.contentServer })
-    this.parcelController = config.parcelController
-      ? config.parcelController
-      : new ParcelSightController({ lineOfSightRadius: config.lineOfSightRadius })
-    this.sceneController = config.sceneController
-      ? config.sceneController
-      : new SceneLifeCycleController(this.downloadManager, this.parcelController)
-    this.positionController = config.positionController
-      ? config.positionController
-      : new PositionLifeCycleController(this.parcelController, this.sceneController)
-    // External hooks
-    this.sceneController.on('Parcel.showLoader', (...args) => this.emit('Parcel.showLoader', ...args))
-    this.sceneController.on('Parcel.empty', (...args) => this.emit('Parcel.empty', ...args))
-    this.sceneController.on('Parcel.hideLoader', (...args) => this.emit('Parcel.hideLoader', ...args))
-    this.sceneController.on('Scene.loading', (...args) => this.emit('Scene.loading', ...args))
-    this.sceneController.on('Scene.awake', (...args) => this.emit('Scene.awake', ...args))
-    this.sceneController.on('Scene.running', (...args) => this.emit('Scene.running', ...args))
-    this.sceneController.on('Scene.stop', (...args) => this.emit('Scene.stop', ...args))
-    this.sceneController.on('Scene.error', (...args) => this.emit('Scene.error', ...args))
-  }
-
-  setup(contentServer: string, lineOfSightRadius: number) {
-    this.setupInjecting({ contentServer, lineOfSightRadius })
-  }
-
-  getSceneForCoordinates(x: number | string, y: number | string) {
-    return this.downloadManager.getSceneDataForPosition(`${x},${y}`)
-  }
-
-  reportCurrentPosition(currentPosition: Vector2) {
-    const sceneSightUpdates = this.parcelController.reportCurrentPosition(currentPosition)
-    this.sceneController.reportSightedParcels(sceneSightUpdates.sighted, sceneSightUpdates.lostSight)
-    return sceneSightUpdates
-  }
-
-  get currentLoadingParcelPositions() {
-    return Object.keys(this.sceneController.parcelShowingLoad).filter(
-      position => !!this.sceneController.parcelShowingLoad[position]
-    )
-  }
-  filterScenes(what: string) {
-    return Object.keys(this.sceneController.sceneIdToStatus)
-      .filter(sceneId => this.sceneController.sceneIdToStatus.has(sceneId))
-      .filter(sceneId => this.sceneController.sceneIdToStatus.get(sceneId)[what]())
-      .map(sceneId => this.sceneController.sceneIdToData[sceneId])
-  }
-  get currentLoadingScenes() {
-    return this.filterScenes('isLoading')
-  }
-  get currentAwakeScenes() {
-    return this.filterScenes('isAwake')
-  }
-  get currentRunningScenes() {
-    return this.filterScenes('isRunning')
-  }
-  get currentVisibleScenes() {
-    return this.filterScenes('isVisible')
+    const promise = future<string>()
+    const unsubscribe = this.store.subscribe(() => {
+      const sceneId = getSceneIdForPosition(this.store.getState(), position)
+      const idError = getPositionError(this.store.getState(), position)
+      const emptyStatus = getEmptyStatus(this.store.getState(), position)
+      if (sceneId || idError || emptyStatus) {
+        if (sceneId) {
+          promise.resolve(sceneId)
+        } else if (idError) {
+          promise.reject(new Error(`Invalid response for ${position}`))
+        } else if (emptyStatus) {
+          promise.resolve(undefined)
+        }
+        unsubscribe()
+      }
+    })
+    this.store.dispatch(positionLoadingRequest([position]))
+    return promise
   }
 }

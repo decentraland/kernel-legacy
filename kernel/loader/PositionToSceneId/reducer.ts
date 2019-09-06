@@ -1,19 +1,21 @@
 import {
+  CONFIGURE_DOWNLOAD_SERVER,
+  FORGET_POSITION,
   PositionToSceneIdAction,
-  PositionToSceneIdState,
-  SET_POSITION_AS_LOADING,
-  booleanMap,
   SET_POSITION_AS_EMPTY,
   SET_POSITION_AS_ERROR,
-  SET_POSITION_AS_RESOLVED,
-  FORGET_POSITION
-} from './types'
+  POSITION_LOADING_REQUEST,
+  SET_POSITION_AS_RESOLVED
+} from './actions'
+import { PositionToSceneIdState } from './types'
 
 export const INITIAL_POSITION_TO_SCENEID_STATE: PositionToSceneIdState = {
-  loadingPositionCoordinates: {} as booleanMap,
-  resolvedPositionToScene: {} as { [key: string]: string },
-  errorPositions: {} as booleanMap,
-  emptyPositions: {} as booleanMap
+  downloadServer: '',
+  loadingPositionCoordinates: {},
+  sceneIdToPositions: {},
+  resolvedPositionToScene: {},
+  errorPositions: {},
+  emptyPositions: {}
 }
 
 function setIn<T>(thing: Record<string, T>, filter: string[], value: T) {
@@ -36,7 +38,7 @@ export function positionToSceneIdReducer(
   }
   var targets: string[] = []
   switch (action.type) {
-    case SET_POSITION_AS_LOADING:
+    case POSITION_LOADING_REQUEST:
       // Do not overwrite coordinates that already have data
       targets = action.payload.positions.filter(
         position =>
@@ -68,6 +70,7 @@ export function positionToSceneIdReducer(
     case SET_POSITION_AS_RESOLVED:
       return {
         ...state,
+        sceneIdToPositions: { ...state.sceneIdToPositions, [action.payload.sceneId]: action.payload.positions },
         resolvedPositionToScene: setIn(state.resolvedPositionToScene, action.payload.positions, action.payload.sceneId),
         loadingPositionCoordinates: setIn(state.loadingPositionCoordinates, action.payload.positions, undefined),
         errorPositions: setIn(state.errorPositions, action.payload.positions, undefined),
@@ -80,6 +83,11 @@ export function positionToSceneIdReducer(
         loadingPositionCoordinates: setIn(state.loadingPositionCoordinates, action.payload.positions, undefined),
         errorPositions: setIn(state.errorPositions, action.payload.positions, undefined),
         emptyPositions: setIn(state.emptyPositions, action.payload.positions, undefined)
+      }
+    case CONFIGURE_DOWNLOAD_SERVER:
+      return {
+        ...state,
+        downloadServer: action.payload.downloadServer
       }
     default:
       return state

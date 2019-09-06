@@ -1,4 +1,4 @@
-import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
+import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
 import { MyPresence } from '../myPresence'
 import { sendPosition } from '../../../comms/senders/position'
 import { createLogger } from '@dcl/utils'
@@ -11,11 +11,11 @@ export class BroadcastPresence {
   time: number = 0
   lastPositionSentTimestamp: number = 0
 
-  comms: WorldInstanceConnection
+  comms: ProtocolConnection
 
   constructor(public myPresence: MyPresence) {}
 
-  activate(comms: WorldInstanceConnection) {
+  activate(comms: ProtocolConnection) {
     this.comms = comms
     this.time = 0
   }

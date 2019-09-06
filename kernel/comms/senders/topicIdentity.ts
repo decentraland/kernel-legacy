@@ -2,11 +2,11 @@ import { Message } from 'google-protobuf'
 
 import { TopicIdentityMessage, MessageType } from '@dcl/protos'
 
-import { WorldInstanceConnection } from '../worldInstanceConnection'
+import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { SendResult } from '../types/SendResult'
 
 export function sendTopicIdentityMessage(
-  comms: WorldInstanceConnection,
+  comms: ProtocolConnection,
   reliable: boolean,
   topic: string,
   body: Message

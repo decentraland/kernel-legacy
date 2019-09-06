@@ -1,4 +1,3 @@
-import { action } from 'typesafe-actions'
 import { Vector2 } from '@dcl/utils'
 
 export interface ParcelSightState {
@@ -10,6 +9,10 @@ export interface ParcelSightState {
   lineOfSightRadius: number
 }
 
+export interface RootParcelSightState {
+  parcelSight: ParcelSightState
+}
+
 export type DeltaParcelSightSeeingReport = {
   sighted: string[]
   lostSight: string[]
@@ -17,14 +20,3 @@ export type DeltaParcelSightSeeingReport = {
 }
 
 export type MapPositionToBoolean = { [pos: string]: boolean }
-
-export const SET_POSITION = 'Set Position'
-export const setPosition = (position: Vector2) => action(SET_POSITION, position)
-export type SetPositionAction = ReturnType<typeof setPosition>
-
-export const CONFIGURE_LINE_OF_SIGHT_RADIUS = 'Configure Line of Sight Radius'
-export const configureLineOfSightRadius = (lineOfSightRadius: number) =>
-  action(CONFIGURE_LINE_OF_SIGHT_RADIUS, lineOfSightRadius)
-export type ConfigureLineOfSightRadiusAction = ReturnType<typeof configureLineOfSightRadius>
-
-export type ParcelSightAction = SetPositionAction | ConfigureLineOfSightRadiusAction

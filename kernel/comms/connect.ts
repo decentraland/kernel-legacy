@@ -1,7 +1,7 @@
 import { USE_LOCAL_COMMS, getServerConfigurations } from '@dcl/config'
 import { defaultLogger } from '@dcl/utils'
 
-import { WorldInstanceConnection } from './worldInstanceConnection'
+import { ProtocolConnection } from './brokers/ProtocolConnection'
 
 import { BrokerConnection } from './brokers/BrokerConnection'
 import { CliBrokerConnection } from './brokers/CliBrokerConnection'
@@ -34,5 +34,5 @@ export async function connect(auth: Auth) {
     commsBroker = new BrokerConnection(url.toString(), auth)
   }
 
-  return new WorldInstanceConnection(commsBroker)
+  return new ProtocolConnection(commsBroker)
 }

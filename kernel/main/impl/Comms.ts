@@ -1,6 +1,6 @@
 import { SubsystemController } from '../subsystems'
 import { connect } from '../../comms/connect'
-import { WorldInstanceConnection } from '../../comms/worldInstanceConnection'
+import { ProtocolConnection } from '../../comms/brokers/ProtocolConnection'
 import { AuthSystem } from '../impl'
 import { intersectLogger, createLogger, Observable } from '@dcl/utils'
 import future from 'fp-future'
@@ -10,7 +10,7 @@ export const overridenEvents = intersectLogger('Broker: ')
 const logger = createLogger('Comms')
 
 export class CommsSystem extends SubsystemController {
-  connection?: WorldInstanceConnection
+  connection?: ProtocolConnection
   lastMessages: any[] = []
   messageObservable = new Observable<any>()
 
@@ -37,7 +37,7 @@ export class CommsSystem extends SubsystemController {
             success.unreliable.resolve(true)
           }
           if (arg.includes('error') || arg.includes('timed out') || arg.includes('could not')) {
-            success.reliable.reject(args[0])
+            success.reliable.reject(new Error(args[0]))
           }
         }
       })

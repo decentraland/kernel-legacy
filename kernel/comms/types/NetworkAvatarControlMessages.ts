@@ -1,11 +1,11 @@
+import { StoredProfile } from '../../passports/types'
 import { AvatarMessageType } from './AvatarMessageType'
 import { Pose } from './Pose'
-import { UserInformation } from './UserInformation'
 
 export type ReceiveUserDataMessage = {
   type: AvatarMessageType.USER_DATA
   uuid: string
-  data: Partial<UserInformation>
+  data: Partial<StoredProfile>
 }
 
 export type ReceiveUserVisibleMessage = {

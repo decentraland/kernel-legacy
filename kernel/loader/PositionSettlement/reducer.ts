@@ -1,11 +1,8 @@
-import {
-  PositionSettlementState,
-  PositionSettlementAction,
-  SETTLE_POSITION,
-  UNSETTLE_POSITION
-} from './types'
+import { PositionSettlementState } from './types'
+import { PositionSettlementAction, SETTLE_POSITION, UNSETTLE_POSITION, TELEPORT } from './actions'
 
 export const INITIAL_POSITION_SETTLEMENT_STATE: PositionSettlementState = {
+  isTeleporting: false,
   isSettled: false
 }
 
@@ -22,10 +19,17 @@ export function positionSettlementReducer(
   switch (action.type) {
     case SETTLE_POSITION:
       return {
+        isTeleporting: false,
         isSettled: true
+      }
+    case TELEPORT:
+      return {
+        isTeleporting: true,
+        isSettled: false
       }
     case UNSETTLE_POSITION:
       return {
+        isTeleporting: state.isTeleporting,
         isSettled: false
       }
     default:

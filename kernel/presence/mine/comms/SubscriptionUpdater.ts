@@ -1,4 +1,4 @@
-import { WorldInstanceConnection } from '../../../comms/worldInstanceConnection'
+import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
 import { MyPresence } from '../myPresence'
 import { sendUpdateSubscriptions } from './sendUpdateSubscriptions'
 import { getTopicForPosition } from '../getTopicForPosition'
@@ -9,7 +9,7 @@ export const POSITION_BEACON_INTERVAL = 100
 const logger = createLogger('Topic Subscriptions')
 
 export class SubscriptionUpdater {
-  comms: WorldInstanceConnection
+  comms: ProtocolConnection
 
   constructor(public myPresence: MyPresence) {}
 
@@ -19,7 +19,7 @@ export class SubscriptionUpdater {
     logger.info(`Registering on topic ${topic} (${pos.x},${pos.y})`)
   }
 
-  activate(comms: WorldInstanceConnection) {
+  activate(comms: ProtocolConnection) {
     this.comms = comms
     this.myPresence.parcelPositionObservable.add(this.positionListener)
   }

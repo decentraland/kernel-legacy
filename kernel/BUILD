@@ -39,8 +39,10 @@ ts_library(
         "@npm//decentraland-auth-protocol",
         "@npm//devtools-protocol",
         "@npm//fp-future",
-        "@npm//typesafe-actions",
         "@npm//google-protobuf",
+        "@npm//redux",
+        "@npm//redux-saga",
+        "@npm//typesafe-actions",
         "@npm//webrtc-adapter",
     ],
 )

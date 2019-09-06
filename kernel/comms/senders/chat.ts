@@ -1,8 +1,8 @@
 import { ChatData, Category } from '@dcl/protos'
 import { sendTopicMessage } from './topic'
-import { WorldInstanceConnection } from '../worldInstanceConnection'
+import { ProtocolConnection } from '../brokers/ProtocolConnection'
 
-export function sendChatMessage(comms: WorldInstanceConnection, topic: string, messageId: string, text: string) {
+export function sendChatMessage(comms: ProtocolConnection, topic: string, messageId: string, text: string) {
   const d = new ChatData()
   d.setCategory(Category.CHAT)
   d.setTime(Date.now())

@@ -1,5 +1,7 @@
-import { ParcelLoadingState, ParcelLoadingActionType, SHOW_PARCEL_LOADING } from './types'
 import { encodeParcelPosition } from '@dcl/utils'
+
+import { ParcelLoadingState } from './types'
+import { ParcelLoadingActionType, SHOW_PARCEL_LOADING } from './actions'
 
 export const INITIAL_PARCEL_LOADING_STATE: ParcelLoadingState = {
   parcelCurrentlyLoading: {}
@@ -14,6 +16,10 @@ export function parcelLoadingReducer(state?: ParcelLoadingState, action?: Parcel
   }
   switch (action.type) {
     case SHOW_PARCEL_LOADING:
-      return { parcelCurrentlyLoading: { ...state.parcelCurrentlyLoading, [encodeParcelPosition(action.payload)]: true } }
+      return {
+        parcelCurrentlyLoading: { ...state.parcelCurrentlyLoading, [encodeParcelPosition(action.payload)]: true }
+      }
+    default:
+      return state
   }
 }

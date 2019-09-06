@@ -1,10 +1,10 @@
 import { Category, PositionData } from '@dcl/protos'
 
 import { Pose } from '../types/Pose'
-import { WorldInstanceConnection } from '../worldInstanceConnection'
+import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicMessage } from './topic'
 
-export function sendPosition(comms: WorldInstanceConnection, topic: string, p: Pose) {
+export function sendPosition(comms: ProtocolConnection, topic: string, p: Pose) {
   const d = new PositionData()
   d.setCategory(Category.POSITION)
   d.setTime(Date.now())
