@@ -1,16 +1,12 @@
-import * as React from 'react'
-
-import { Route, Switch, Redirect } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
-
-import { default as Auth } from '~/components/auth'
-import Status from '~/components/status/StatusFrame'
-
-import { history } from '~/store'
-import Navbar from '~/components/navbar'
+import * as React from 'react'
+import { Route, Switch } from 'react-router'
 import Atlas from '~/components/atlas'
 import ParcelInfo from '~/components/atlas/ParcelInfo'
+import Navbar from '~/components/navbar'
 import Scene from '~/components/scene'
+import Status from '~/components/status/StatusFrame'
+import { history } from '~/store'
 
 export const Routes = (
   <>
@@ -18,10 +14,6 @@ export const Routes = (
       <>
         <Navbar />
         <Switch>
-          <Redirect to='/' path='/callback' />
-          <Route exact path='/login' component={Auth} />
-          <Route exact path='/auth/login' component={Auth} />
-
           <Route exact path='/map' component={Atlas} />
           <Route exact path='/map1' component={Atlas} />
 

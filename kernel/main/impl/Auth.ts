@@ -10,6 +10,7 @@ export class AuthSystem extends SubsystemController {
   protected async onStart() {
     try {
       this.auth = new Auth()
+      this.auth.setup()
       this.statusObservable.notifyObservers('UserWaiting')
       this.callback = future<boolean>()
       if (await this.callback) {

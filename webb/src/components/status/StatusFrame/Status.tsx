@@ -11,6 +11,7 @@ import { BuildConnectedVisualizer } from '~/components/Reusable/BuildConnectedVi
 import Config from '../Config'
 import WorldStatus from '~/components/world/World'
 import MyPresence from '../MyPresence'
+import Auth from '../Auth/Auth'
 
 export default (_: RootState) => (
   <Page>
@@ -25,7 +26,7 @@ export default (_: RootState) => (
             <Route path='/status/Config' component={Config} />
             <Route path='/status/PeerPresence' component={BuildConnectedVisualizer('PeerPresence')} />
             <Route path='/status/Assets' component={BuildConnectedVisualizer('Assets')} />
-            <Route path='/status/Auth' component={BuildConnectedVisualizer('Auth')} />
+            <Route path='/status/Auth' component={Auth} />
             <Route path='/status/Passports' component={BuildConnectedVisualizer('Passports')} />
             <Route path='/status/SocialModeration' component={BuildConnectedVisualizer('SocialModeration')} />
             <Route path='/status/InWorldAvatars' component={BuildConnectedVisualizer('InWorldAvatars')} />
