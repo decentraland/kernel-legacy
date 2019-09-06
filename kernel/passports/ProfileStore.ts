@@ -5,7 +5,6 @@ import { getServerConfigurations } from '@dcl/config'
 import { StoredProfile } from './types/StoredProfile'
 import { ResolvedProfile } from './types/ResolvedProfile'
 import { Catalog } from '../assets/wearables/base'
-import Auth from '../auth'
 
 export class ProfileStore {
   public avatarCatalog: Catalog
@@ -30,14 +29,14 @@ export class ProfileStore {
     return result
   }
 
-  async getStoredProfile(auth: Auth, userId: string, versionHint?: string): Promise<StoredProfile> {
+  async getStoredProfile(token: string, userId: string, versionHint?: string): Promise<StoredProfile> {
     const returnValue = future<StoredProfile>()
     if (this.profileMap.has(userId) && this.profileMap.get(userId)!.version === versionHint) {
       returnValue.resolve(this.profileMap.get(userId)!)
       return returnValue
     } else {
       try {
-        const profileRequest = await getStoredPassportForUser(auth, userId)
+        const profileRequest = await getStoredPassportForUser(token, userId)
         const profileResponse = await profileRequest.json()
         if (!profileResponse['ok']) {
           throw new Error(`Profile not found for id ${userId}`)
@@ -52,15 +51,15 @@ export class ProfileStore {
     }
   }
 
-  async getResolvedProfile(auth: Auth, userId: string, versionHint?: string): Promise<ResolvedProfile> {
+  async getResolvedProfile(token: string, userId: string, versionHint?: string): Promise<ResolvedProfile> {
     try {
       const returnValue = future<ResolvedProfile>()
       if ((this.resolvedMap.has(userId) && !versionHint) || this.resolvedMap.get(userId)!.version === versionHint) {
         returnValue.resolve(this.resolvedMap.get(userId)!)
         return returnValue
       } else {
-        const profile = await this.getStoredProfile(auth, userId, versionHint)
-        const resolved = await this.resolve(profile)
+        const profile = await this.getStoredProfile(token, userId, versionHint)
+        const resolved = this.resolve(profile)
         returnValue.resolve(resolved)
         return returnValue
       }
@@ -149,10 +148,10 @@ function parseColorRGBObject(object: { color: { r: number; g: number; b: number 
   return new Color4(object.color.r, object.color.g, object.color.b)
 }
 
-async function getStoredPassportForUser(auth: Auth, userId: string) {
+async function getStoredPassportForUser(token: string, userId: string) {
   return fetch(`https://avatars-api.decentraland.org/api/profile/${userId}`, {
     headers: {
-      Authorization: 'Bearer ' + auth.userToken
+      Authorization: 'Bearer ' + token
     }
   })
 }
