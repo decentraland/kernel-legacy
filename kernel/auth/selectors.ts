@@ -14,16 +14,16 @@ export const isLoggingIn = (state: RootState) => state.loading.includes(AUTH_REQ
 export const getIdToken = createSelector<RootState, AuthState['data'], string | null>(
   getData,
   data => (data ? data.idToken : null)
-)
+) as (store: any) => string
 export const getAccessToken = createSelector<RootState, AuthState['data'], string | null>(
   getData,
   data => (data ? data.accessToken : null)
-)
+) as (store: any) => string
 export const isExpired = createSelector<RootState, AuthState['data'], boolean>(
   getData,
   data => !!data && isTokenExpired(data.expiresAt)
-)
+) as (store: any) => boolean
 export const getSub = createSelector<RootState, AuthState['data'], string | null>(
   getData,
   data => (data ? data.sub : null)
-)
+) as (store: any) => string

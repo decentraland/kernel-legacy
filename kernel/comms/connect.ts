@@ -6,7 +6,7 @@ import { ProtocolConnection } from './brokers/ProtocolConnection'
 import { BrokerConnection } from './brokers/BrokerConnection'
 import { CliBrokerConnection } from './brokers/CliBrokerConnection'
 import { IBrokerConnection } from './brokers/IBrokerConnection'
-import { Auth } from '../auth/Auth'
+import { Auth } from '../auth'
 
 export async function connect(auth: Auth) {
   let commsBroker: IBrokerConnection

@@ -42,7 +42,9 @@ ts_library(
         "@npm//google-protobuf",
         "@npm//redux",
         "@npm//redux-saga",
+        "@npm//reselect",
         "@npm//typesafe-actions",
+        "@npm//uuid",
         "@npm//webrtc-adapter",
     ],
 )

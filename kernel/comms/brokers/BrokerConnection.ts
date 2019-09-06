@@ -18,7 +18,7 @@ import {
 
 import { SocketReadyState } from '../types/SocketReadyState'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
-import Auth from '../../auth'
+import { Auth } from '../../auth'
 
 export class BrokerConnection implements IBrokerConnection {
   public alias: string | null = null

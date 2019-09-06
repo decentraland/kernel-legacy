@@ -2,17 +2,14 @@ import auth0 from 'auth0-js'
 import uuid from 'uuid'
 
 import { AuthData } from './types'
-
-const env = {
-  get: (key: string) => ''
-}
+import { getConfiguration } from '@dcl/config'
 
 export const webAuth = new auth0.WebAuth({
-  clientID: env.get('REACT_APP_AUTH0_CLIENT_ID'),
-  domain: env.get('REACT_APP_AUTH0_DOMAIN'),
-  redirectUri: env.get('REACT_APP_AUTH0_REDIRECT'),
+  clientID: getConfiguration('AUTH0_CLIENT_ID'),
+  domain: getConfiguration('AUTH0_DOMAIN'),
+  redirectUri: getConfiguration('AUTH0_REDIRECT'),
   responseType: 'token id_token',
-  audience: env.get('REACT_APP_AUTH0_AUDIENCE'),
+  audience: getConfiguration('AUTH0_AUDIENCE'),
   scope: 'openid email'
 })
 

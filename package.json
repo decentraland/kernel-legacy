@@ -54,6 +54,7 @@
         "tslint": "^5.18.0",
         "typesafe-actions": "^4.4.2",
         "typescript": "^3.5.3",
+        "uuid": "^3.3.3",
         "webrtc-adapter": "^7.2.8",
         "yargs": "^13.3.0"
     }

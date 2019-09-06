@@ -4,12 +4,12 @@ import { needsResolutionToManifest, getDownloadServer } from './selectors'
 import { getKeysMappingToTrue, booleanMap, jsonFetch, defaultLogger, IScene, ParcelInfoResponse } from '@dcl/utils'
 import { sceneByIdRequest, SCENE_BY_ID_REQUEST, SceneByIdRequest, sceneByIdFailure, sceneByIdSuccess } from './types'
 
-export function* sceneIdToManifestSaga() {
+export function* sceneIdToManifestSaga(): any {
   yield takeLatest(SET_POSITION_AS_RESOLVED, fetchMissingSceneManifest)
   yield takeLatest(SCENE_BY_ID_REQUEST, handleFetchRequest)
 }
 
-export function* fetchMissingSceneManifest(resolvedPosition: SetPositionsAsResolvedAction) {
+export function* fetchMissingSceneManifest(resolvedPosition: SetPositionsAsResolvedAction): any {
   const needsResolution = (yield select(needsResolutionToManifest, resolvedPosition.payload.positions)) as booleanMap
   const missingSceneIds = getKeysMappingToTrue(needsResolution)
   for (let sceneId of missingSceneIds) {
@@ -17,7 +17,7 @@ export function* fetchMissingSceneManifest(resolvedPosition: SetPositionsAsResol
   }
 }
 
-export function* handleFetchRequest(action: SceneByIdRequest) {
+export function* handleFetchRequest(action: SceneByIdRequest): any {
   const downloadServer = yield select(getDownloadServer)
   const { sceneId } = action.payload
   try {

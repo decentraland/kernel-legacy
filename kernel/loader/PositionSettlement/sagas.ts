@@ -6,12 +6,12 @@ import { getAwakeScenes, getLoadingScenes, getStartingScenes } from '../SceneLif
 import { SCENE_RUNNING } from '../SceneLifeCycle/types'
 import { TELEPORT, TeleportAction, settlePosition } from './actions'
 
-export function* positionSettlementSaga() {
+export function* positionSettlementSaga(): any {
   yield takeLatest(TELEPORT, handleTeleport)
   yield takeLatest(SCENE_RUNNING, handleRunningScene)
 }
 
-export function* canPositionSettle() {
+export function* canPositionSettle(): any {
   const pending = yield all({
     loading: select(getLoadingScenes),
     awake: select(getAwakeScenes),
@@ -22,12 +22,12 @@ export function* canPositionSettle() {
   }
 }
 
-export function* handleTeleport(action: TeleportAction) {
+export function* handleTeleport(action: TeleportAction): any {
   const positionAsVector = parseParcelPosition(action.payload.position)
   yield put(setPosition(positionAsVector))
 }
 
-export function* handleRunningScene() {
+export function* handleRunningScene(): any {
   const canSettle = yield call(canPositionSettle)
   if (canSettle) {
     yield put(settlePosition())

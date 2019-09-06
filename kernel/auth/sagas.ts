@@ -5,7 +5,7 @@ import { login, logout, handleCallback, restoreSession, CallbackResult } from '.
 import { isExpired } from './selectors'
 import { AuthData } from './types'
 
-export function* authSaga() {
+export function* authSaga(): any {
   yield fork(handleRestoreSession)
   yield all([
     takeLatest(LOGIN, handleLogin),
@@ -14,26 +14,26 @@ export function* authSaga() {
   ])
 }
 
-export function* handleLogin(action: LoginAction) {
+export function* handleLogin(action: LoginAction): any {
   yield call(login, action.payload.redirectUrl)
 }
 
-function* handleLogout() {
+function* handleLogout(): any {
   yield call(logout)
 }
 
-export function* handleRestoreSession() {
+export function* handleRestoreSession(): any {
   yield put(authRequest())
 }
 
-export function* checkExpiredSession() {
+export function* checkExpiredSession(): any {
   const hasExpired = yield select(isExpired)
   if (hasExpired) {
     yield put(authRequest())
   }
 }
 
-export function* handleAuthRequest() {
+export function* handleAuthRequest(): any {
   let data: AuthData
   let redirectUrl: string | null = null
   try {

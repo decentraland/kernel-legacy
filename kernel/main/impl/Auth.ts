@@ -1,8 +1,6 @@
-import { getServerConfigurations } from '@dcl/config'
 import future, { IFuture } from 'fp-future'
-
+import { Auth } from '../../auth'
 import { SubsystemController } from '../subsystems'
-import Auth from '../../auth'
 
 export class AuthSystem extends SubsystemController {
   auth: Auth
@@ -11,11 +9,7 @@ export class AuthSystem extends SubsystemController {
 
   protected async onStart() {
     try {
-      this.auth = new Auth({
-        api: {
-          baseURL: getServerConfigurations().auth
-        }
-      })
+      this.auth = new Auth()
       this.statusObservable.notifyObservers('UserWaiting')
       this.callback = future<boolean>()
       if (await this.callback) {

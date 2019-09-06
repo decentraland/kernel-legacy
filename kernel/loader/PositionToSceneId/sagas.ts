@@ -14,19 +14,19 @@ import {
 } from './actions'
 import { multipleNeedsResolution, getDownloadServer } from './selectors'
 
-export function* positionToSceneIdSaga() {
+export function* positionToSceneIdSaga(): any {
   yield takeLatest(SET_POSITION, fetchMissingSceneIdMappings)
   yield takeLatest(POSITION_LOADING_REQUEST, handleLoadPositionMapping)
 }
 
-export function* fetchMissingSceneIdMappings() {
+export function* fetchMissingSceneIdMappings(): any {
   const delta = yield select(allInSight)
   const needsResolution = yield select(multipleNeedsResolution, delta)
   const missingParcels = getKeysMappingToTrue(needsResolution)
   yield put(positionLoadingRequest(missingParcels))
 }
 
-export function* handleLoadPositionMapping(action: PositionLoadingRequest) {
+export function* handleLoadPositionMapping(action: PositionLoadingRequest): any {
   const { positions } = action.payload
   const downloadServer = yield select(getDownloadServer)
   for (let position of positions) {

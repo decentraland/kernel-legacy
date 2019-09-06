@@ -1,1 +1,1 @@
-export function* rootSceneLifecycleSaga() {}
+export function* rootSceneLifecycleSaga(): any {}

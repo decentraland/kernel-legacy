@@ -1,4 +1,4 @@
-import * as Auth from './auth/api'
+import { Auth } from './auth'
 import * as AuthTypes from './auth/types'
 import * as Comms from './comms/connect'
 import * as WorldScene from './worldMap/scene'
