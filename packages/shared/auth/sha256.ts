@@ -5,7 +5,8 @@ export function sha256asString(data: string) {
     return hash.toString('hex')
   } else {
     return Array.from(hash)
-      .map(b => (b as number).toString(16).padStart(2, '0'))
+      .map(b => (b as number).toString(16))
+      .map(b => (b.length < 2 ? '0' + b : b))
       .join('')
   }
 }

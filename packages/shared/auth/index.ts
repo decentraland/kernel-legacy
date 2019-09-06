@@ -2,11 +2,9 @@ import future from 'fp-future'
 import { createStore, Store, applyMiddleware, combineReducers, compose } from 'redux'
 import auth0 from 'auth0-js'
 import { v4 as uuid } from 'uuid'
+import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
 
 import { CommsAuth } from './CommsAuth'
-import { BasicEphemeralKey } from './EphemeralKey/BasicEphemeralKey'
-import { EphemeralKey } from './EphemeralKey/EphemeralKey'
-import { MessageInput } from './EphemeralKey/MessageInput'
 import { authReducer } from './reducer'
 import { getAccessToken, isLoggedIn, getData, getSub } from './selectors'
 import { AuthState, AuthData } from './types'
@@ -24,7 +22,7 @@ export function isTokenExpired(expiresAt: number) {
 
 export class Auth {
   store: Store<{ auth: AuthState }>
-  ephemeralKey?: EphemeralKey
+  ephemeralKey?: BasicEphemeralKey
 
   webAuth: auth0.WebAuth
   sagaMiddleware: any
