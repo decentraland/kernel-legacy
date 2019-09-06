@@ -189,7 +189,7 @@ export function getLoginConfigurationForCurrentDomain() {
   if (tld === 'today') {
     tld = 'org'
   }
-  // Use `.today` auth for any localhost or other edge case
+  // Use `.zone` auth for any localhost or other edge case
   if (tld !== 'org' && tld !== 'zone') {
     tld = 'zone'
   }
