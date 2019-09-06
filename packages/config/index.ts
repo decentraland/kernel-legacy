@@ -40,6 +40,7 @@ export namespace parcelLimits {
   export const centimeter = 0.01
 
   export const visibleRadius = 4
+  export const secureRadius = 4
 
   export const maxX = 3000
   export const maxZ = 3000
@@ -166,6 +167,8 @@ function getDefaultTLD() {
 
   return TLD
 }
+
+export const ENABLE_EMPTY_SCENES = !DEBUG || knownTLDs.includes(getTLD())
 
 export function getServerConfigurations() {
   const TLDDefault = getDefaultTLD()
