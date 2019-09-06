@@ -4,7 +4,7 @@ import { History } from 'history'
 
 import { authReducer } from '~/modules/auth'
 import { commsReducer } from '~/modules/comms'
-import { passportsReducer } from '~/modules/passports'
+import { passportsReducer } from "~/modules/passportsReducer"
 import { worldReducer } from '~/modules/world'
 import { systemsReducer } from './modules/systems'
 

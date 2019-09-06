@@ -4,7 +4,7 @@ import { createBrowserHistory } from 'history'
 
 import { AuthState, authMiddleware } from '~/modules/auth'
 import { commsMiddleware, CommsState } from '~/modules/comms'
-import { passportsMiddleware } from '~/modules/passports'
+import { passportsMiddleware } from '~/../../kernel/passports/passports'
 import { systemsMiddleware } from '~/modules/systems'
 import { worldMiddleware, WorldState } from '~/modules/world'
 

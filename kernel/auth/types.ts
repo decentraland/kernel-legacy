@@ -1,5 +1,3 @@
-import { StoredProfile } from '../passports/types'
-
 export type AuthState = {
   loading: string[]
   data: AuthData | null
@@ -13,5 +11,4 @@ export type AuthData = {
   idToken: string
   accessToken: string
   expiresAt: number
-  user?: StoredProfile
 }
