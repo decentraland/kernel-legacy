@@ -134,14 +134,14 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   if (!PREVIEW) {
     let response
     try {
-      response = await fetchProfile(await auth.getAccessToken())
+      response = await fetchProfile(await auth.getAccessToken(), '')
     } catch (e) {
       defaultLogger.error(`Not able to fetch profile for current user`)
     }
 
     let spec: ProfileSpec
     if (!response || !response.ok) {
-      const legacy = await fetchLegacy(await auth.getAccessToken())
+      const legacy = await fetchLegacy(await auth.getAccessToken(), '')
       if (legacy.ok) {
         spec = legacyToSpec((await legacy.json()).data)
       } else {
@@ -163,7 +163,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
         defaultLogger.error(e)
       }
     }
-    const profile = await resolveProfileSpec(await auth.getAccessToken(), localProfileUUID!, spec!)
+    const profile = await resolveProfileSpec(localProfileUUID!, spec!)
     persistCurrentUser({ userId: localProfileUUID!, version: profile.version, profile })
   }
   console['groupEnd']()

@@ -27,10 +27,10 @@ export async function resolveProfile(accessToken: string, uuid: string = ''): Pr
     }
   }
 
-  return resolveProfileSpec(accessToken, uuid, spec)
+  return resolveProfileSpec(uuid, spec)
 }
 
-export async function resolveProfileSpec(accessToken: string, uuid: string, spec: ProfileSpec): Promise<Profile> {
+export async function resolveProfileSpec(uuid: string, spec: ProfileSpec): Promise<Profile> {
   const avatar = await mapSpecToAvatar(spec.avatar)
 
   // TODO - fetch name from claim server - moliva - 22/07/2019
@@ -149,7 +149,7 @@ async function mapSpecToAvatar(avatar: AvatarSpec): Promise<Avatar> {
   return shape as Avatar
 }
 
-export async function fetchLegacy(accessToken: string, uuid: string = '') {
+export async function fetchLegacy(accessToken: string, uuid: string) {
   const authHeader = {
     headers: {
       Authorization: 'Bearer ' + accessToken
@@ -173,7 +173,7 @@ export function legacyToSpec(legacy: any) {
   }
 }
 
-export async function fetchProfile(accessToken: string, uuid: string = '') {
+export async function fetchProfile(accessToken: string, uuid: string) {
   const authHeader = {
     headers: {
       Authorization: 'Bearer ' + accessToken
