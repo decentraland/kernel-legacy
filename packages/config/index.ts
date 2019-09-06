@@ -133,8 +133,8 @@ export const loginConfig = {
     client_id: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG'
   },
   today: {
-    domain: 'decentraland.auth0.com',
-    client_id: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG'
+    domain: 'dcl-stg.auth0.com',
+    client_id: '0UB0I7w6QA3AgSvbXh9rGvDuhKrJV1C0'
   },
   zone: {
     domain: 'dcl-test.auth0.com',
@@ -185,12 +185,8 @@ function getDefaultTLD() {
 
 export function getLoginConfigurationForCurrentDomain() {
   let tld: 'org' | 'zone' | 'today' = getDefaultTLD()
-  // Use `.org` auth for `.today`
-  if (tld === 'today') {
-    tld = 'org'
-  }
   // Use `.today` auth for any localhost or other edge case
-  if (tld !== 'org' && tld !== 'zone') {
+  if ((tld as any) !== 'org' || (tld as any) !== 'zone' || (tld as any) !== 'today') {
     tld = 'zone'
   }
   return {
