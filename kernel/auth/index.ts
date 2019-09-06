@@ -1,18 +1,18 @@
 import future from 'fp-future'
-import { createStore, Store } from 'redux'
+import { createStore, Store, combineReducers } from 'redux'
 
 import { getConfiguration } from '@dcl/config'
 
 import { BasicEphemeralKey, EphemeralKey, MessageInput } from './ephemeral'
 import { authReducer } from './reducer'
-import { getAccessToken, isLoggedIn } from './selectors'
-import { AuthState } from './types'
+import { getAccessToken, isLoggedIn, RootAuthState, getCommsToken } from './selectors'
+import { tokenRequest } from './actions'
 
 export class Auth {
-  store: Store<AuthState>
+  store: Store<RootAuthState>
   ephemeralKey: EphemeralKey
   setup() {
-    this.store = createStore(authReducer)
+    this.store = createStore(combineReducers({ auth: authReducer }))
   }
 
   getAccessToken() {
@@ -30,6 +30,23 @@ export class Auth {
     return result
   }
 
+  getCommsToken() {
+    const token = getCommsToken(this.store.getState())
+    if (token) {
+      return Promise.resolve(token)
+    }
+    const result = future<string>()
+    const unsubscribe = this.store.subscribe(() => {
+      const state = this.store.getState()
+      if (getCommsToken(state)) {
+        result.resolve(getCommsToken(state))
+        unsubscribe()
+      }
+    })
+    this.store.dispatch(tokenRequest(this.getEphemeralKey()))
+    return result
+  }
+
   isLoggedIn() {
     return isLoggedIn(this.store.getState())
   }
@@ -44,8 +61,7 @@ export class Auth {
   async getMessageCredentials(message: string | null) {
     const msg = message === null ? null : Buffer.from(message)
     const input = MessageInput.fromMessage(msg)
-    const accessToken = await this.getAccessToken()
-
+    const accessToken = await this.getCommsToken()
     const credentials = await this.getEphemeralKey().makeMessageCredentials(input, accessToken)
 
     let result: Record<string, string> = {}

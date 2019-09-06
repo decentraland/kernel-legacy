@@ -1,8 +1,21 @@
 import { fork, call, all, takeLatest, put, select } from 'redux-saga/effects'
 
-import { AUTH_REQUEST, LOGIN, LOGOUT, authRequest, authSuccess, authFailure, LoginAction } from './actions'
-import { login, logout, handleCallback, restoreSession, CallbackResult } from './utils'
-import { isExpired } from './selectors'
+import {
+  AUTH_REQUEST,
+  LOGIN,
+  LOGOUT,
+  authRequest,
+  authSuccess,
+  authFailure,
+  LoginAction,
+  AUTH_FAILURE,
+  TOKEN_REQUEST,
+  TokenRequestAction,
+  tokenFailure,
+  tokenSuccess
+} from './actions'
+import { login, logout, handleCallback, restoreSession, CallbackResult, fetchToken } from './utils'
+import { isExpired, getAccessToken } from './selectors'
 import { AuthData } from './types'
 
 export function* authSaga(): any {
@@ -10,7 +23,9 @@ export function* authSaga(): any {
   yield all([
     takeLatest(LOGIN, handleLogin),
     takeLatest(LOGOUT, handleLogout),
-    takeLatest(AUTH_REQUEST, handleAuthRequest)
+    takeLatest(AUTH_REQUEST, handleAuthRequest),
+    takeLatest(TOKEN_REQUEST, handleTokenRequest),
+    takeLatest(AUTH_FAILURE, triggerLogin)
   ])
 }
 
@@ -26,11 +41,26 @@ export function* handleRestoreSession(): any {
   yield put(authRequest())
 }
 
+export function* handleTokenRequest(action: TokenRequestAction): any {
+  const accessToken = yield select(getAccessToken)
+  const { ephemeral } = action.payload
+  try {
+    const request = yield call(fetchToken, accessToken, ephemeral)
+    yield put(tokenSuccess(request))
+  } catch (error) {
+    yield put(tokenFailure(error.message))
+  }
+}
+
 export function* checkExpiredSession(): any {
   const hasExpired = yield select(isExpired)
   if (hasExpired) {
     yield put(authRequest())
   }
+}
+
+export function* triggerLogin(): any {
+  yield put(authRequest())
 }
 
 export function* handleAuthRequest(): any {

@@ -4,12 +4,19 @@ import {
   AuthFailureAction,
   AUTH_REQUEST,
   AUTH_SUCCESS,
-  AUTH_FAILURE
+  AUTH_FAILURE,
+  TOKEN_REQUEST,
+  TokenRequestAction,
+  TokenSuccessAction,
+  TokenFailureAction,
+  TOKEN_SUCCESS,
+  TOKEN_FAILURE
 } from './actions'
 import { AuthState } from './types'
 
 export const INITIAL_STATE: AuthState = {
   loading: [],
+  commsToken: null,
   data: null,
   error: null
 }
@@ -48,9 +55,15 @@ function loadingReducer(state: any, action: any) {
   }
 }
 
-export type AuthReducerAction = AuthRequestAction | AuthSuccessAction | AuthFailureAction
+export type AuthReducerAction =
+  | AuthRequestAction
+  | AuthSuccessAction
+  | AuthFailureAction
+  | TokenRequestAction
+  | TokenSuccessAction
+  | TokenFailureAction
 
-export function authReducer(state: AuthState = INITIAL_STATE, action: AuthReducerAction) {
+export function authReducer(state: AuthState = INITIAL_STATE, action: AuthReducerAction): AuthState {
   switch (action.type) {
     case AUTH_REQUEST: {
       return {
@@ -70,6 +83,27 @@ export function authReducer(state: AuthState = INITIAL_STATE, action: AuthReduce
       return {
         ...state,
         data: null,
+        loading: loadingReducer(state.loading, action),
+        error: action.payload.error
+      }
+    }
+    case TOKEN_REQUEST: {
+      return {
+        ...state,
+        commsToken: null,
+        loading: loadingReducer(state.loading, action)
+      }
+    }
+    case TOKEN_SUCCESS: {
+      return {
+        ...state,
+        commsToken: action.payload.commsToken,
+        loading: loadingReducer(state.loading, action)
+      }
+    }
+    case TOKEN_FAILURE: {
+      return {
+        ...state,
         loading: loadingReducer(state.loading, action),
         error: action.payload.error
       }

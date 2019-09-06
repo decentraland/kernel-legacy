@@ -2,7 +2,8 @@ import auth0 from 'auth0-js'
 import uuid from 'uuid'
 
 import { AuthData } from './types'
-import { getConfiguration } from '@dcl/config'
+import { getConfiguration, getServerConfigurations } from '@dcl/config'
+import { EphemeralKey } from './ephemeral'
 
 export const webAuth = new auth0.WebAuth({
   clientID: getConfiguration('AUTH0_CLIENT_ID'),
@@ -101,4 +102,28 @@ export function createHeaders(idToken: string) {
     Authorization: `Bearer ${idToken}`
   }
   return headers
+}
+
+export async function fetchServerPublicKey() {
+  return await (await fetch(getServerConfigurations().auth + '/public_key')).text()
+}
+
+export async function fetchToken(userToken: string, ephemeral: EphemeralKey) {
+  const publicKey = await fetchServerPublicKey()
+  const response = await fetch(getServerConfigurations().auth + '/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_token: userToken, pub_key: publicKey })
+  })
+  if (!response.ok) {
+    throw new Error('Invalid request to auth/token')
+  }
+  const token = await response.json()
+  if (token.error) {
+    throw new Error('Error parsing json response from auth/token')
+  }
+  if (token.ephemeral_key !== ephemeral.key.publicKeyAsHexString()) {
+    throw new Error('Returned ephemeral key does not match our public key')
+  }
+  return token.access_token
 }

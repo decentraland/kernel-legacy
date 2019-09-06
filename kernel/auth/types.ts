@@ -3,6 +3,7 @@ import { StoredProfile } from '../passports/types'
 export type AuthState = {
   loading: string[]
   data: AuthData | null
+  commsToken: string | null
   error: string | null
 }
 

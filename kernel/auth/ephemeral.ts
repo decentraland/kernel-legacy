@@ -13,6 +13,7 @@ export function getExpirationDate(ttl: number): Date {
 }
 
 export interface EphemeralKey {
+  key: EcdsaKeyPair
   makeMessageCredentials(params: MessageInput, accessToken: string): Promise<Map<string, string>>
   hasExpired(): boolean
 }
