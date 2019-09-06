@@ -46,6 +46,7 @@ export async function initializeAnalytics(userId: string) {
 export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
   const auth = new Auth({
     ...getLoginConfigurationForCurrentDomain(),
+    redirectUri: window.location.href,
     ephemeralKeyTTL: 24 * 60 * 60 * 1000
   })
 
