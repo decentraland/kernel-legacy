@@ -1,6 +1,4 @@
 import { Message } from 'google-protobuf'
-import { EventEmitter } from 'events'
-
 import { createLogger, ILogger } from '@dcl/utils'
 
 import {
@@ -17,13 +15,12 @@ import {
 
 import { SendResult } from '../types/SendResult'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
+import { protocolPosition, protocolChat, protocolProfile, protocolPing, protocolUnknown } from '../actions'
 
-export class ProtocolConnection extends EventEmitter {
+export class ProtocolConnection {
   logger: ILogger
-  // TODO(@eordano, 26/Aug/2019): add stats reporting back
 
-  constructor(public connection: IBrokerConnection) {
-    super()
+  constructor(public connection: IBrokerConnection, public dispatcher: (action: any) => void) {
     this.logger = createLogger('ProtocolConnection')
     this.connection.onMessageObservable.add(this.handleMessage.bind(this))
   }
@@ -72,15 +69,15 @@ export class ProtocolConnection extends EventEmitter {
           switch (category) {
             case Category.POSITION:
               let positionData = PositionData.deserializeBinary(body)
-              this.emit('' + Category.POSITION, positionData)
+              this.dispatcher(protocolPosition(positionData))
               break
             case Category.CHAT:
             case Category.SCENE_MESSAGE:
               let chatData = ChatData.deserializeBinary(body)
-              this.emit('' + category, chatData)
+              this.dispatcher(protocolChat(chatData))
               break
             default:
-              this.emit('' + category, body)
+              this.dispatcher(protocolUnknown(body))
               break
           }
           break
@@ -95,13 +92,13 @@ export class ProtocolConnection extends EventEmitter {
           switch (category) {
             case Category.PROFILE:
               const profileData = ProfileData.deserializeBinary(body)
-              this.emit('' + Category.PROFILE, { ...profileData, alias, userId })
+              this.dispatcher(protocolProfile(alias, userId, profileData))
               break
           }
           break
         case MessageType.PING:
           const pingMessage = PingMessage.deserializeBinary(message.data)
-          this.emit('' + MessageType.PING, pingMessage)
+          this.dispatcher(protocolPing(pingMessage))
           break
       }
     } catch (e) {

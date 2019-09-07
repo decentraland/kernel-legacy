@@ -10,11 +10,13 @@ import {
   positionLoadingRequest,
   PositionLoadingRequest,
   setPositionsAsResolved,
-  POSITION_LOADING_REQUEST
+  POSITION_LOADING_REQUEST,
+  FORGET_POSITION
 } from './actions'
 import { multipleNeedsResolution, getDownloadServer } from './selectors'
 
 export function* positionToSceneIdSaga(): any {
+  yield takeLatest(FORGET_POSITION, fetchMissingSceneIdMappings)
   yield takeLatest(SET_POSITION, fetchMissingSceneIdMappings)
   yield takeLatest(POSITION_LOADING_REQUEST, handleLoadPositionMapping)
 }

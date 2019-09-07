@@ -34,5 +34,5 @@ export async function connect(auth: Auth) {
     commsBroker = new BrokerConnection(url.toString(), auth)
   }
 
-  return new ProtocolConnection(commsBroker)
+  return new ProtocolConnection(commsBroker, action => {})
 }

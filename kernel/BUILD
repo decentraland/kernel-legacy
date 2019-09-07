@@ -61,7 +61,10 @@ ts_library(
         "//utils",
         "@npm//@types/jasmine",
         "@npm//@types/node",
+        "@npm//@types/sinon",
         "@npm//fp-future",
+        "@npm//redux-saga",
+        "@npm//sinon",
     ],
 )
 

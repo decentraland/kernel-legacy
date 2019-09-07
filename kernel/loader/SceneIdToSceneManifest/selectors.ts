@@ -1,11 +1,11 @@
 import { RootSceneIdToSceneManifestState, SceneIdToSceneManifestState } from './types'
-import { booleanMap } from '@dcl/utils'
 
-export function needsResolutionToManifest(state: RootSceneIdToSceneManifestState, positions: string[]): booleanMap {
-  return positions.reduce((cumm, position) => {
-    cumm[position] = internalNeedsResolution(state.sceneIdToManifest, position)
-    return cumm
-  }, {})
+export function needsResolutionToManifest(state: RootSceneIdToSceneManifestState, sceneId: string): boolean {
+  return (
+    !state.sceneIdToManifest.scenesById[sceneId] &&
+    !state.sceneIdToManifest.loading[sceneId] &&
+    !state.sceneIdToManifest.errors[sceneId]
+  )
 }
 
 export function internalNeedsResolution(state: SceneIdToSceneManifestState, position: string) {

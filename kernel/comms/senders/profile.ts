@@ -1,8 +1,8 @@
 import { ProfileData, Category } from '@dcl/protos'
 
+import { StoredProfile } from '../../passports/types/StoredProfile'
 import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicIdentityMessage } from './topicIdentity'
-import { StoredProfile } from '../../passports/types'
 
 export function sendProfileMessage(comms: ProtocolConnection, topic: string, p: Position, userProfile: StoredProfile) {
   const d = new ProfileData()

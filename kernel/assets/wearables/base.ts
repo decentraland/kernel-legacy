@@ -1,5 +1,4 @@
 import { jsonFetch } from '@dcl/utils'
-import { AvatarAsset } from '../../passports/types'
 
 export function getBaseWearables() {
   return jsonFetch('https://avatar-assets.now.sh')
@@ -7,7 +6,7 @@ export function getBaseWearables() {
 
 export type Catalog = {
   [body_type: string]: {
-    [wearable_name: string]: AvatarAsset
+    [wearable_name: string]: any // AvatarAsset
   }
 }
 

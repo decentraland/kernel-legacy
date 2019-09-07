@@ -1,7 +1,7 @@
 import { action } from 'typesafe-actions'
 
 export const POSITION_LOADING_REQUEST = 'Position loading request'
-export const SET_POSITION_AS_RESOLVED = 'Set mappongs of positions to a sceneId'
+export const SET_POSITION_AS_RESOLVED = 'Set mappings of positions to a sceneId'
 export const SET_POSITION_AS_ERROR = 'Set positions as error'
 export const SET_POSITION_AS_EMPTY = 'Set positions as empty'
 export const FORGET_POSITION = 'Erase position information for parcels'
