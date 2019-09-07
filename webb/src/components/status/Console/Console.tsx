@@ -7,6 +7,7 @@ import { SceneLoader } from '~/kernel/loader/SceneLoader'
 import { passportRequest } from '~/kernel/passports/actions'
 import { SceneWorkersManager } from '~/kernel/scene-runner/SceneWorkersManager'
 import { store } from '~/kernel/store'
+import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
 const Terminal = require('react-console-emulator').default
 
 const auth = new Auth()
@@ -68,7 +69,7 @@ function makeCommands(that) {
         usage: 'goto <x> <y>',
         fn: function(x, y) {
           try {
-            store.dispatch(teleport(x + ','+ y))
+            store.dispatch(teleport(x + ',' + y))
             return `Teleporting to ${x}, ${y}`
           } catch (e) {
             return `Error on teleport: ${e.stack}`
@@ -82,7 +83,7 @@ function makeCommands(that) {
           try {
             Loader.getSceneForCoordinates(x, y).then(scene => {
               try {
-                sceneManager.loadScene(scene)
+                sceneManager.loadScene(migrateFromILand(scene))
               } catch (e) {
                 console.log(e)
               }

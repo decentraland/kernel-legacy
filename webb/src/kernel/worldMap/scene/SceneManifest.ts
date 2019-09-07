@@ -18,6 +18,7 @@ export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest
   private _cannonicalRepresentation?: string
   private _requiredAssets?: AssetDefinition[]
+  private _legacyMappings?: { file: string; hash: string }[]
   private _referenceSystem?: ReferenceSystem
   private _requiredTags?: string[]
   private _spawnPoints?: [SpawnPointDefinition, ...SpawnPointDefinition[]]
@@ -108,6 +109,14 @@ export class SceneManifest implements ISceneManifest {
     return this._requiredAssets
   }
 
+  /** @deprecated */
+  get legacyMappings(): { file: string; hash: string }[] {
+    if (!this._legacyMappings) {
+      this._legacyMappings = this.assets.map((asset: any) => ({ file: asset.name, hash: asset.hash || asset.uri }))
+    }
+    return this._legacyMappings
+  }
+
   get spawnPoints(): [SpawnPointDefinition, ...SpawnPointDefinition[]] {
     if (!this._spawnPoints) {
       if (!this.raw.spawnPoints) {
@@ -151,14 +160,16 @@ export class SceneManifest implements ISceneManifest {
   get cannonicalSerialization(): string {
     if (!this._cannonicalRepresentation) {
       this._cannonicalRepresentation = stableStringify({
-        parcels: this.parcels,
-        version: this.version,
-        display: this.raw.display || {},
-        main: this.main,
-        assets: this.assets,
-        assetTags: this.assetTags,
-        spawnPoints: this.spawnPoints,
-        referenceSystem: this.referenceSystem
+        obj: {
+          parcels: this.parcels,
+          version: this.version,
+          display: this.raw.display || {},
+          main: this.main,
+          assets: this.assets,
+          assetTags: this.assetTags,
+          spawnPoints: this.spawnPoints,
+          referenceSystem: this.referenceSystem
+        }
       } as any)
     }
     return this._cannonicalRepresentation

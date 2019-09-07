@@ -12,6 +12,7 @@ export interface ISceneManifest {
   version: number
   id: string
   assets: AssetDefinition[]
+  legacyMappings: { file: string; hash: string }[]
   assetTags: AssetTagDefinition[]
   requiredAssets: AssetDefinition[]
   cannonicalCID: string

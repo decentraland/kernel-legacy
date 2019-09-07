@@ -1,10 +1,15 @@
 import { registerAPI, ExposableAPI } from '@dcl/rpc/host'
-import { EnvironmentData } from '@dcl/utils'
+import { ISceneManifest } from '@dcl/utils'
 import { exposeMethod } from '@dcl/rpc/common/API'
+
+export type GamekitRequiredBootstrapInfo = {
+  main: string
+  mappings: { file: string; hash: string }[]
+}
 
 @registerAPI('EnvironmentAPI')
 export class EnvironmentAPI extends ExposableAPI {
-  data!: EnvironmentData<any>
+  data: ISceneManifest
   constructor(options: any) {
     super(options)
   }
@@ -12,7 +17,11 @@ export class EnvironmentAPI extends ExposableAPI {
    * Returns the coordinates and the definition of a parcel
    */
   @exposeMethod
-  async getBootstrapData(): Promise<EnvironmentData<any>> {
-    return this.data
+  async getBootstrapData(): Promise<GamekitRequiredBootstrapInfo> {
+    return Promise.resolve({
+      ...JSON.parse((this.data as any)['_cannonicalRepresentation']),
+      mappings: this.data.legacyMappings,
+      baseUrl: 'https://content.decentraland.org/contents/'
+    })
   }
 }
