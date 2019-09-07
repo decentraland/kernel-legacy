@@ -74,7 +74,7 @@ export class GamekitScene extends Script implements ISceneRunningScript {
     }
 
     try {
-      await customEval(source, getES5Context({ dcl }))
+      await customEval(source, getES5Context({ dcl: this.dcl }))
     } catch (e) {
       throw new Error(e)
     }

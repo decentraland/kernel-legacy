@@ -26,10 +26,10 @@ export class SceneWorker implements ISceneWorker {
 
   public transport: ScriptingTransport
   public sceneState: SceneStatus = 'loading'
-  public scene: ISceneManifest
+  public sceneManifest: ISceneManifest
 
   constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport, gamekit?: string) {
-    this.scene = parcelScene.scene
+    this.sceneManifest = parcelScene.sceneManifest
     parcelScene.registerWorker(this)
 
     this.loadSystem(transport, gamekit)
@@ -49,18 +49,18 @@ export class SceneWorker implements ISceneWorker {
 
       this.parcelScene.dispose()
 
-      this.onDisposeObservable.notifyObservers(this.scene.cannonicalCID)
+      this.onDisposeObservable.notifyObservers(this.sceneManifest.cannonicalCID)
     }
   }
 
   private async startSystem(transport: ScriptingTransport) {
     const system = await ScriptingHost.fromTransport(transport)
     this.transport = transport
-    // (system.getAPIInstance('EngineAPI') as any) as RendererParcelSceneToScript
-    // this.engineAPI = new RendererParcelSceneToScript({})
-    this.engineAPI = system.getAPIInstance('EngineAPI')
 
-    system.getAPIInstance(EnvironmentAPI).data = this.parcelScene.data
+    this.engineAPI = system.getAPIInstance('EngineAPI')
+    this.engineAPI.rendererParcelSceneAPI = this.parcelScene
+
+    system.getAPIInstance(EnvironmentAPI).sceneManifest = this.parcelScene.sceneManifest
 
     system.enable()
 
@@ -74,7 +74,7 @@ export class SceneWorker implements ISceneWorker {
       )
     }
     const worker = new (Worker as any)(gamekit, {
-      name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
+      name: `ParcelSceneWorker(${this.parcelScene.sceneManifest.sceneId})`
     })
     return this.startSystem(transport || WebWorkerTransport(worker))
   }

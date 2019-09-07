@@ -9,7 +9,7 @@ export type GamekitRequiredBootstrapInfo = {
 
 @registerAPI('EnvironmentAPI')
 export class EnvironmentAPI extends ExposableAPI {
-  data: ISceneManifest
+  sceneManifest: ISceneManifest
   constructor(options: any) {
     super(options)
   }
@@ -19,8 +19,8 @@ export class EnvironmentAPI extends ExposableAPI {
   @exposeMethod
   async getBootstrapData(): Promise<GamekitRequiredBootstrapInfo> {
     return Promise.resolve({
-      ...JSON.parse((this.data as any)['_cannonicalRepresentation']),
-      mappings: this.data.legacyMappings,
+      ...JSON.parse((this.sceneManifest as any)['_cannonicalRepresentation']),
+      mappings: this.sceneManifest.legacyMappings,
       baseUrl: 'https://content.decentraland.org/contents/'
     })
   }

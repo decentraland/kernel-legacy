@@ -6,8 +6,7 @@ import { IRendererParcelSceneAPI } from './IRendererParcelSceneAPI'
  */
 export class MemoryRendererParcelScene implements IRendererParcelSceneAPI {
   public worker: ISceneWorker
-  public scene: any
-  data: any
+  public sceneManifest: any
   sendBatch(actions: any[]): void {
     console.log(actions)
   }
@@ -25,7 +24,6 @@ export class MemoryRendererParcelScene implements IRendererParcelSceneAPI {
     console.log('Unregister event', event)
   }
   constructor(scene: any) {
-    this.scene = scene
-    this.data = scene
+    this.sceneManifest = scene
   }
 }

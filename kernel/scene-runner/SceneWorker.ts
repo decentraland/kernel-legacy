@@ -1,14 +1,11 @@
-import future, { IFuture } from 'fp-future'
-
 import { ScriptingHost, ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
-import { Observable, ISceneManifest } from '@dcl/utils'
-import { createLogger } from '@dcl/utils'
-
+import { createLogger, ISceneManifest, Observable } from '@dcl/utils'
+import future, { IFuture } from 'fp-future'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
-import { SceneStatus } from './SceneStatus'
-import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
 import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
+import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
+import { SceneStatus } from './SceneStatus'
 
 const logger = createLogger('SceneWorker')
 
@@ -23,10 +20,10 @@ export class SceneWorker implements ISceneWorker {
 
   public transport: ScriptingTransport
   public sceneState: SceneStatus = 'loading'
-  public scene: ISceneManifest
+  public sceneManifest: ISceneManifest
 
   constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport, gamekit?: string) {
-    this.scene = parcelScene.scene
+    this.sceneManifest = parcelScene.sceneManifest
     parcelScene.registerWorker(this)
 
     this.loadSystem(transport, gamekit)
@@ -46,7 +43,7 @@ export class SceneWorker implements ISceneWorker {
 
       this.parcelScene.dispose()
 
-      this.onDisposeObservable.notifyObservers(this.scene.cannonicalCID)
+      this.onDisposeObservable.notifyObservers(this.sceneManifest.cannonicalCID)
     }
   }
 
@@ -57,7 +54,7 @@ export class SceneWorker implements ISceneWorker {
     this.engineAPI = (system.getAPIInstance('EngineAPI') as any) as RendererParcelSceneToScript
     this.engineAPI.rendererParcelSceneAPI = this.parcelScene
 
-    system.getAPIInstance(EnvironmentAPI).data = this.parcelScene.data
+    system.getAPIInstance(EnvironmentAPI).sceneManifest = this.parcelScene.sceneManifest
 
     system.enable()
 
@@ -71,7 +68,7 @@ export class SceneWorker implements ISceneWorker {
       )
     }
     const worker = new (Worker as any)(gamekit, {
-      name: `ParcelSceneWorker(${this.parcelScene.data.sceneId})`
+      name: `ParcelSceneWorker(${this.parcelScene.sceneManifest.cannonicalCID})`
     })
     return this.startSystem(transport || WebWorkerTransport(worker))
   }

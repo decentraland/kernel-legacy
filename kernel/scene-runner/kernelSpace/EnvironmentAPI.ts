@@ -1,15 +1,15 @@
 import { registerAPI, ExposableAPI } from '@dcl/rpc/host'
-import { EnvironmentData } from '@dcl/utils'
+import { ISceneManifest } from '@dcl/utils'
 import { exposeMethod } from '@dcl/rpc/common/API'
 
 @registerAPI('EnvironmentAPI')
 export class EnvironmentAPI extends ExposableAPI {
-  data!: EnvironmentData<any>
+  sceneManifest!: ISceneManifest
   /**
    * Returns the coordinates and the definition of a parcel
    */
   @exposeMethod
-  async getBootstrapData(): Promise<EnvironmentData<any>> {
-    return this.data
+  async getBootstrapData(): Promise<ISceneManifest> {
+    return this.sceneManifest
   }
 }
