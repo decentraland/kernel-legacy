@@ -161,7 +161,9 @@ export async function fetchServerPublicKey() {
 }
 
 export async function fetchToken(userToken: string, ephemeral: EphemeralKey) {
-  const publicKey = ephemeral.key.publicKeyAsHexString()
+  const publicKey = ephemeral.key.publicKeyAsHexString
+    ? ephemeral.key.publicKeyAsHexString()
+    : ephemeral.key.publicKey.toString('hex')
   const response = await fetch(getServerConfigurations().auth + '/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

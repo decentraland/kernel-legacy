@@ -5,8 +5,16 @@ import { AUTH_REQUEST } from './actions'
 
 export type RootAuthState = { auth: AuthState; loading: any }
 
-export function isTokenExpired(expiresAt: number) {
-  return expiresAt > 0 && expiresAt < Date.now()
+export function isTokenExpired(expiresAt: number | Date | string) {
+  const value =
+    typeof expiresAt === 'number'
+      ? expiresAt
+      : typeof expiresAt === 'string'
+      ? new Date(expiresAt).getTime()
+      : expiresAt.getTime
+      ? expiresAt.getTime()
+      : expiresAt
+  return value > 0 && value < Date.now()
 }
 
 export const getState = (state: RootAuthState) => state.auth
