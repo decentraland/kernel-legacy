@@ -5,5 +5,5 @@ import { setStatefulModules } from './hmr'
 import 'index.css'
 import 'decentraland-ui/lib/styles.css'
 
-setStatefulModules('hmr', 'App', 'store', 'modules')
+setStatefulModules('hmr', 'App', 'store')
 App()

@@ -1,22 +1,12 @@
-import { RouterState, routerMiddleware } from 'connected-react-router'
-import { createStore, applyMiddleware, compose } from 'redux'
+import { routerMiddleware, RouterState } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
-
-import { AuthState, authMiddleware } from '~/modules/auth'
-import { commsMiddleware, CommsState } from '~/modules/comms'
-import { passportsMiddleware } from '~/../../kernel/passports/passports'
-import { systemsMiddleware } from '~/modules/systems'
-import { worldMiddleware, WorldState } from '~/modules/world'
-
+import { applyMiddleware, compose, createStore } from 'redux'
 import { createReducer } from '~/reducers'
 
 export const history: any = createBrowserHistory()
 
 export type RootState = {
   router: RouterState
-  auth: AuthState
-  comms: CommsState
-  world: WorldState
 }
 
 declare var window: any
@@ -28,19 +18,6 @@ const enhance =
     : compose
 
 export const configureStore: any = (state?: RootState) => {
-  const store = createStore(
-    createReducer(history),
-    state,
-    enhance(
-      applyMiddleware(
-        routerMiddleware(history),
-        authMiddleware as any,
-        commsMiddleware as any,
-        worldMiddleware as any,
-        systemsMiddleware as any,
-        passportsMiddleware as any
-      )
-    )
-  )
+  const store = createStore(createReducer(history), state, enhance(applyMiddleware(routerMiddleware(history))))
   return store
 }

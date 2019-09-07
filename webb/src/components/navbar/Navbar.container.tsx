@@ -5,13 +5,12 @@ import { Navbar } from './Navbar'
 import { RootState } from '~/store'
 
 function mapState(state: RootState) {
-  const isLoggedIn = state.auth.summary === 'Logged in'
   return {
     currentPage: state.router.location.pathname,
-    isLoggingIn: state.auth.summary !== 'Not logged in',
-    isLoggedIn,
+    isLoggingIn: false,
+    isLoggedIn: false,
     profileLoaded: false,
-    userId: isLoggedIn ? state.auth.userId : ''
+    userId: ''
   }
 }
 
