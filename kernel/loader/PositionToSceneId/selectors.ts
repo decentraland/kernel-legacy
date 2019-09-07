@@ -16,7 +16,12 @@ export function needsResolution(state: RootPositionToSceneIdState, position: str
 }
 
 export function internalNeedsResolution(state: PositionToSceneIdState, position: string) {
-  return state.resolvedPositionToScene[position] && !state.errorPositions[position] && !state.emptyPositions[position]
+  return (
+    !state.resolvedPositionToScene[position] &&
+    !state.errorPositions[position] &&
+    !state.emptyPositions[position] &&
+    !state.loadingPositionCoordinates[position]
+  )
 }
 
 export function getDownloadServer(state: RootPositionToSceneIdState) {

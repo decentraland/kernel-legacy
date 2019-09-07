@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import future from 'fp-future'
-import { combineReducers, createStore, Store } from 'redux'
+import { combineReducers, createStore, Store, applyMiddleware } from 'redux'
 
 import { encodeParcelPositionFromCoordinates, ISceneManifest, Vector2, encodeParcelPosition } from '@dcl/utils'
 
@@ -31,6 +31,12 @@ import {
 } from './SceneIdToSceneManifest/types'
 import { sceneLifeCycleReducer as sceneLifeCycle } from './SceneLifeCycle/reducer'
 import { RootSceneLifeCyleState, SceneLifeCycleAction } from './SceneLifeCycle/types'
+import { rootSceneLifecycleSaga } from './SceneLifeCycle/sagas'
+import createSagaMiddleware, { Task } from 'redux-saga'
+import { fork } from 'redux-saga/effects'
+import { sceneIdToManifestSaga } from './SceneIdToSceneManifest/sagas'
+import { positionToSceneIdSaga } from './PositionToSceneId/sagas'
+import { positionSettlementSaga } from './PositionSettlement/sagas'
 
 export type RootState = RootParcelLoadingState &
   RootParcelSightState &
@@ -47,9 +53,18 @@ export type RootAction =
   | SceneByIdAction
   | SceneLifeCycleAction
 
+function* rootSaga() {
+  yield fork(rootSceneLifecycleSaga)
+  yield fork(sceneIdToManifestSaga)
+  yield fork(positionToSceneIdSaga)
+  yield fork(positionSettlementSaga)
+}
+
 export class SceneLoader extends EventEmitter {
   store: Store<RootState>
+  saga: Task
   setup(downloadServer: string, lineOfSight: number) {
+    const sagaMiddleware = createSagaMiddleware()
     const store = (this.store = createStore(
       combineReducers({
         parcelLoading,
@@ -58,8 +73,10 @@ export class SceneLoader extends EventEmitter {
         positionToSceneId,
         sceneIdToManifest,
         sceneLifeCycle
-      })
+      }),
+      applyMiddleware(sagaMiddleware)
     ))
+    this.saga = sagaMiddleware.run(rootSaga)
     store.dispatch(configureLineOfSightRadius(lineOfSight))
     store.dispatch(configureSceneIdServer(downloadServer))
     store.dispatch(configureManifestServer(downloadServer))

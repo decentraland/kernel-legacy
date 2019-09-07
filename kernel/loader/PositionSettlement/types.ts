@@ -4,5 +4,5 @@ export type PositionSettlementState = {
 }
 
 export type RootPositionSettlementState = {
-  positionSettlementState: PositionSettlementState
+  positionSettlement: PositionSettlementState
 }

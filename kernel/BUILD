@@ -64,6 +64,7 @@ ts_library(
         "@npm//@types/sinon",
         "@npm//fp-future",
         "@npm//redux-saga",
+        "@npm//redux-saga-test-plan",
         "@npm//sinon",
     ],
 )
