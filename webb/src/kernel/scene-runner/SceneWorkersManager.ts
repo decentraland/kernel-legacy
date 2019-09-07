@@ -1,17 +1,22 @@
-import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
-import { WebWorkerTransport } from '@dcl/rpc/common/transports/WebWorker'
+import { ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
+import { IWorker } from '@dcl/rpc/common/transports/WebWorker'
 import { ISceneManifest } from '@dcl/utils'
-
+import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
+import { MemoryRendererParcelScene } from '../renderer/mockRendererParcelScene'
 import { ISceneWorker } from './interface/ISceneWorker'
 import { SceneWorker } from './SceneWorker'
-import { MemoryRendererParcelScene } from '../renderer/mockRendererParcelScene'
+
+export type Data<T extends IWorker, R extends IRendererParcelSceneAPI> = {
+  getWorker(): T
+  getScene(): R
+}
 
 export class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
 
   newSceneWorker(scene: ISceneManifest, transport?: ScriptingTransport) {
-    return new SceneWorker(new MemoryRendererParcelScene(scene), transport || new WebWorkerTransport(), './gamekit.js')
+    return new SceneWorker(new MemoryRendererParcelScene(scene), transport, './gamekit.js')
   }
 
   getSceneWorkerBySceneID(sceneId: string) {

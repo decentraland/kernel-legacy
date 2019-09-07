@@ -1,15 +1,13 @@
-import future, { IFuture } from 'fp-future'
-
 import { ScriptingHost, ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
-import { Observable, ISceneManifest } from '@dcl/utils'
-import { createLogger } from '@dcl/utils'
-
+import { createLogger, ISceneManifest, Observable } from '@dcl/utils'
+import future, { IFuture } from 'fp-future'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
-import { SceneStatus } from './SceneStatus'
+import { DevTools } from './kernelSpace/DevTools'
 import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
 import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
-import { DevTools } from './kernelSpace/DevTools'
+import { SceneStatus } from './SceneStatus'
+
 console.log('Loaded', RendererParcelSceneToScript.name)
 console.log('Loaded', DevTools.name)
 
@@ -28,7 +26,7 @@ export class SceneWorker implements ISceneWorker {
   public sceneState: SceneStatus = 'loading'
   public sceneManifest: ISceneManifest
 
-  constructor(public parcelScene: IRendererParcelSceneAPI, transport?: ScriptingTransport, gamekit?: string) {
+  constructor(public parcelScene: IRendererParcelSceneAPI, transport: ScriptingTransport, gamekit?: string) {
     this.sceneManifest = parcelScene.sceneManifest
     parcelScene.registerWorker(this)
 
