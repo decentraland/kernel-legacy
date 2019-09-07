@@ -7,6 +7,11 @@ export type GamekitRequiredBootstrapInfo = {
   mappings: { file: string; hash: string }[]
 }
 
+/**
+ * One of the first steps in the Gamekit is to request this API and call `getBootstrapData`.
+ *
+ * The CLI could override the resulting `baseUrl` and `mappings` to load different scenes or files.
+ */
 @registerAPI('EnvironmentAPI')
 export class EnvironmentAPI extends ExposableAPI {
   sceneManifest: ISceneManifest

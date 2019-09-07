@@ -1,7 +1,9 @@
 import { EntityAction } from '@dcl/utils'
 
 /**
- * This can not be accessed from the kernel. It's the GamekitScript's Interface, meaning, this is called by the scene.
+ * We make this interface explicit not because we need it, but because changing it might make some users to report that
+ * their scenes stopped working. Remember that the Gamekit is code that we provide on each new build -- and the scene
+ * script is likely to remain over time. That's also the reason for this to be outside of the `userSpace` folder.
  */
 export interface ISceneRunningScript {
   onLog: (...args: any) => void
