@@ -5,6 +5,9 @@ import { exposeMethod } from '@dcl/rpc/common/API'
 @registerAPI('EnvironmentAPI')
 export class EnvironmentAPI extends ExposableAPI {
   data!: EnvironmentData<any>
+  constructor(options: any) {
+    super(options)
+  }
   /**
    * Returns the coordinates and the definition of a parcel
    */

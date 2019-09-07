@@ -1,16 +1,14 @@
-import { ExposableAPI, registerAPI } from '@dcl/rpc'
-import { APIOptions, exposeMethod } from '@dcl/rpc/common/API'
-import { IEventNames, EntityAction, IEvents } from '@dcl/scene-api'
-
-import { IRendererParcelSceneAPI } from '../../renderer/IRendererParcelSceneAPI'
-import { IRendererParcelSceneToScript } from './IRendererParcelSceneToScript'
+import { ExposableAPI, registerAPI } from '@dcl/rpc/host'
+import { exposeMethod } from '@dcl/rpc/common/API'
+import { EntityAction, IEventNames, IEvents } from '@dcl/scene-api'
+import { IRendererParcelSceneAPI } from '~/kernel/renderer/IRendererParcelSceneAPI'
 
 /**
  * The class formerly known as EngineAPI. Communicates the ParcelScene class on the Renderer with the corresponding
  * Scene Scripts running on workers and viceversa.
  */
 @registerAPI('EngineAPI')
-export class RendererParcelSceneToScript extends ExposableAPI implements IRendererParcelSceneToScript {
+export class RendererParcelSceneToScript extends ExposableAPI {
   /**
    * Interface against the renderer
    */
@@ -18,15 +16,11 @@ export class RendererParcelSceneToScript extends ExposableAPI implements IRender
   /**
    * List of subscribed events
    */
-  subscribedEvents: { [event: string]: number } = {}
+  subscribedEvents: Record<IEventNames, number> = {}
   /**
    * The listener associated with each event
    */
   listener: { [event: string]: (event: string, ...args: any[]) => void } = {}
-
-  constructor(options: APIOptions) {
-    super(options)
-  }
 
   @exposeMethod
   async subscribe(event: IEventNames) {
@@ -86,10 +80,7 @@ export class RendererParcelSceneToScript extends ExposableAPI implements IRender
    */
   sendSubscriptionEvent<K extends IEventNames>(event: K, data: IEvents[K]) {
     if (this.subscribedEvents[event]) {
-      this.options.notify('SubscribedEvent', {
-        event,
-        data
-      })
+      super.notify('SubscribedEvent', { event, data })
     }
   }
 

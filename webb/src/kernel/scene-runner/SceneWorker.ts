@@ -7,8 +7,11 @@ import { createLogger } from '@dcl/utils'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
 import { SceneStatus } from './SceneStatus'
-import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
 import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
+import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
+import { DevTools } from './kernelSpace/DevTools'
+console.log('Loaded', RendererParcelSceneToScript.name)
+console.log('Loaded', DevTools.name)
 
 const logger = createLogger('SceneWorker')
 
@@ -53,9 +56,9 @@ export class SceneWorker implements ISceneWorker {
   private async startSystem(transport: ScriptingTransport) {
     const system = await ScriptingHost.fromTransport(transport)
     this.transport = transport
-
-    this.engineAPI = (system.getAPIInstance('EngineAPI') as any) as RendererParcelSceneToScript
-    this.engineAPI.rendererParcelSceneAPI = this.parcelScene
+    // (system.getAPIInstance('EngineAPI') as any) as RendererParcelSceneToScript
+    // this.engineAPI = new RendererParcelSceneToScript({})
+    this.engineAPI = system.getAPIInstance('EngineAPI')
 
     system.getAPIInstance(EnvironmentAPI).data = this.parcelScene.data
 
