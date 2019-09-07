@@ -1,4 +1,4 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects'
+import { call, all, put, select, takeLatest } from 'redux-saga/effects'
 
 import { defaultLogger, getKeysMappingToTrue, memoize } from '@dcl/utils'
 
@@ -31,16 +31,18 @@ export function* fetchMissingSceneIdMappings(): any {
 export function* handleLoadPositionMapping(action: PositionLoadingRequest): any {
   const { positions } = action.payload
   const downloadServer = yield select(getDownloadServer)
-  for (let position of positions) {
-    try {
-      const sceneId = yield call(resolvePositionToSceneId, downloadServer, position)
-      if (!sceneId) {
-        yield put(setPositionsAsEmpty([position]))
-      }
-      yield put(setPositionsAsResolved([position], sceneId))
-    } catch (error) {
-      yield put(setPositionsAsError([position], error))
+  yield all(positions.map(position => call(resolvePositionMapping, downloadServer, position)))
+}
+
+export function* resolvePositionMapping(downloadServer: string, position: string): any {
+  try {
+    const sceneId = yield call(resolvePositionToSceneId, downloadServer, position)
+    if (!sceneId) {
+      yield put(setPositionsAsEmpty([position]))
     }
+    yield put(setPositionsAsResolved([position], sceneId))
+  } catch (error) {
+    yield put(setPositionsAsError([position], error))
   }
 }
 

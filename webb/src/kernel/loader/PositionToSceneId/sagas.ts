@@ -1,20 +1,17 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects'
-
 import { defaultLogger, getKeysMappingToTrue, memoize } from '@dcl/utils'
-
+import { all, call, put, select, takeLatest } from 'redux-saga/effects'
 import { SET_POSITION } from '../ParcelSight/actions'
 import { allInSight } from '../ParcelSight/selectors'
 import {
+  FORGET_POSITION,
+  PositionLoadRequest,
+  positionLoadRequest,
+  POSITION_LOADING_REQUEST,
   setPositionsAsEmpty,
   setPositionsAsError,
-  PositionLoadRequest,
-  setPositionsAsResolved,
-  POSITION_LOADING_REQUEST,
-  FORGET_POSITION,
-  positionLoadRequest,
-  setPositionAsLoading
+  setPositionsAsResolved
 } from './actions'
-import { multipleNeedsResolution, needsResolution, getDownloadServer } from './selectors'
+import { getDownloadServer, multipleNeedsResolution } from './selectors'
 
 export function* positionToSceneIdSaga(): any {
   yield takeLatest(FORGET_POSITION, fetchMissingSceneIdMappings)
@@ -32,19 +29,18 @@ export function* fetchMissingSceneIdMappings(): any {
 export function* handleLoadPositionMapping(action: PositionLoadRequest): any {
   const { positions } = action.payload
   const downloadServer = yield select(getDownloadServer)
-  for (let position of positions) {
-    try {
-      if (yield select(needsResolution, position)) {
-        yield put(setPositionAsLoading(position))
-        const sceneId = yield call(resolvePositionToSceneId, downloadServer, position)
-        if (!sceneId) {
-          yield put(setPositionsAsEmpty([position]))
-        }
-        yield put(setPositionsAsResolved([position], sceneId))
-      }
-    } catch (error) {
-      yield put(setPositionsAsError([position], error))
+  yield all(positions.map(position => call(resolvePositionMapping, downloadServer, position)))
+}
+
+export function* resolvePositionMapping(downloadServer: string, position: string): any {
+  try {
+    const sceneId = yield call(resolvePositionToSceneId, downloadServer, position)
+    if (!sceneId) {
+      yield put(setPositionsAsEmpty([position]))
     }
+    yield put(setPositionsAsResolved([position], sceneId))
+  } catch (error) {
+    yield put(setPositionsAsError([position], error))
   }
 }
 
