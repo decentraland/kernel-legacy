@@ -1,12 +1,18 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
+import { WebWorkerTransport } from '@dcl/rpc/common/transports/WebWorker'
 import { ISceneManifest } from '@dcl/utils'
 
 import { ISceneWorker } from './interface/ISceneWorker'
-import { SceneWorkerFactory } from './SceneWorkerFactory'
+import { SceneWorker } from './SceneWorker'
+import { MemoryRendererParcelScene } from '../renderer/mockRendererParcelScene'
 
 export class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
+
+  newSceneWorker(scene: ISceneManifest, transport?: ScriptingTransport) {
+    return new SceneWorker(new MemoryRendererParcelScene(scene), transport || new WebWorkerTransport(), './gamekit.js')
+  }
 
   getSceneWorkerBySceneID(sceneId: string) {
     return this.loadedSceneWorkers.get(sceneId)
@@ -33,7 +39,7 @@ export class SceneWorkersManager {
 
     let worker = this.loadedSceneWorkers.get(sceneId)
     if (!worker) {
-      worker = SceneWorkerFactory.newSceneWorker(scene, transport)
+      worker = this.newSceneWorker(scene, transport)
       this.loadedSceneWorkers.set(sceneId, worker)
       worker.onDisposeObservable.addOnce(() => {
         this.loadedSceneWorkers.delete(sceneId)
