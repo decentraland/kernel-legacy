@@ -62,6 +62,11 @@ fuse.register('@dcl/protos', {
   main: 'index.js',
   instructions: '../protos/package/**'
 })
+fuse.register('@dcl/rpc', {
+  homeDir: '../rpc/package',
+  main: 'index.js',
+  instructions: '../rpc/package/**'
+})
 
 fuse.dev({ root: 'dist/', port: 3000, fallback: '/index.html' }) // launch http server
 

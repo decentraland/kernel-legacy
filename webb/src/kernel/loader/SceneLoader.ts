@@ -16,7 +16,7 @@ import { positionSettlementSaga } from './PositionSettlement/sagas'
 import { RootPositionSettlementState } from './PositionSettlement/types'
 import {
   configureDownloadServer as configureSceneIdServer,
-  positionLoadingRequest,
+  positionLoadRequest,
   PositionToSceneIdAction
 } from './PositionToSceneId/actions'
 import { positionToSceneIdReducer as positionToSceneId } from './PositionToSceneId/reducer'
@@ -141,7 +141,7 @@ export class SceneLoader extends EventEmitter {
         unsubscribe()
       }
     })
-    this.store.dispatch(positionLoadingRequest([position]))
+    this.store.dispatch(positionLoadRequest([position]))
     return promise
   }
 }

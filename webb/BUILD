@@ -46,11 +46,13 @@ nodejs_binary(
         ":tsconfig.json",
         # Other modules
         "//kernel",
+        "//rpc",
         "//utils",
         "//config",
         "//protos",
         "//kernel:package",
         "//utils:package",
+        "//rpc:package",
         "//config:package",
         "//protos:package",
         # App Dependencies

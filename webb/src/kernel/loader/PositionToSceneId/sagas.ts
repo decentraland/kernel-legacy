@@ -7,7 +7,7 @@ import { allInSight } from '../ParcelSight/selectors'
 import {
   setPositionsAsEmpty,
   setPositionsAsError,
-  PositionLoadingRequest,
+  PositionLoadRequest,
   setPositionsAsResolved,
   POSITION_LOADING_REQUEST,
   FORGET_POSITION,
@@ -29,7 +29,7 @@ export function* fetchMissingSceneIdMappings(): any {
   yield put(positionLoadRequest(missingParcels))
 }
 
-export function* handleLoadPositionMapping(action: PositionLoadingRequest): any {
+export function* handleLoadPositionMapping(action: PositionLoadRequest): any {
   const { positions } = action.payload
   const downloadServer = yield select(getDownloadServer)
   for (let position of positions) {

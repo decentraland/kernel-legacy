@@ -1,9 +1,10 @@
-import { WebWorkerTransport, ScriptingTransport } from '@dcl/rpc'
-import { ISceneManifest } from '@dcl/utils'
+import { ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
 import { IWorker } from '@dcl/rpc/common/transports/WebWorker'
-import { SceneWorker } from './SceneWorker'
-import { urlGamekit } from './GamekitProvider'
+import { ISceneManifest } from '@dcl/utils'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
+import { MemoryRendererParcelScene } from '../renderer/mockRendererParcelScene'
+import { urlGamekit } from './GamekitProvider'
+import { SceneWorker } from './SceneWorker'
 
 export type RendererParcelSceneProvider = (scene: ISceneManifest) => IRendererParcelSceneAPI
 
@@ -14,7 +15,7 @@ export const settings: {
 } = {
   gamekitProvider: urlGamekit,
   transportProvider: (worker: IWorker) => WebWorkerTransport(worker),
-  rendererParcelScene: null
+  rendererParcelScene: scene => new MemoryRendererParcelScene(scene)
 }
 
 export const SceneWorkerFactory = {

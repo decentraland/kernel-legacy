@@ -4,9 +4,8 @@ import {
   PositionToSceneIdAction,
   SET_POSITION_AS_EMPTY,
   SET_POSITION_AS_ERROR,
-  POSITION_LOADING_REQUEST,
-  SET_POSITION_AS_RESOLVED,
-  SET_POSITION_AS_LOADING
+  SET_POSITION_AS_LOADING,
+  SET_POSITION_AS_RESOLVED
 } from './actions'
 import { PositionToSceneIdState } from './types'
 
@@ -67,7 +66,10 @@ export function positionToSceneIdReducer(
       const previous = state.sceneIdToPositions[action.payload.sceneId] || []
       return {
         ...state,
-        sceneIdToPositions: { ...state.sceneIdToPositions, [action.payload.sceneId]: [...previous, ...action.payload.positions] },
+        sceneIdToPositions: {
+          ...state.sceneIdToPositions,
+          [action.payload.sceneId]: [...previous, ...action.payload.positions]
+        },
         resolvedPositionToScene: setIn(state.resolvedPositionToScene, action.payload.positions, action.payload.sceneId),
         loadingPositionCoordinates: setIn(state.loadingPositionCoordinates, action.payload.positions, undefined),
         errorPositions: setIn(state.errorPositions, action.payload.positions, undefined),

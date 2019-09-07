@@ -1,11 +1,12 @@
 import { Segment } from 'decentraland-ui'
 import React from 'react'
-import { store } from '~/kernel/store'
-import { teleport } from '~/kernel/loader/PositionSettlement/actions'
-import { passportRequest } from '~/kernel/passports/actions'
-import { tokenRequest } from '~/kernel/auth/actions'
 import { Auth } from '~/kernel/auth'
 import { commsStarted } from '~/kernel/comms/actions'
+import { teleport } from '~/kernel/loader/PositionSettlement/actions'
+import { SceneLoader } from '~/kernel/loader/SceneLoader'
+import { passportRequest } from '~/kernel/passports/actions'
+import { SceneWorkersManager } from '~/kernel/scene-runner/SceneWorkersManager'
+import { store } from '~/kernel/store'
 const Terminal = require('react-console-emulator').default
 
 const auth = new Auth()
@@ -13,6 +14,10 @@ var term = null
 var commands = {}
 function makeCommands(that) {
   auth.store = store
+  const sceneManager = new SceneWorkersManager()
+  const Loader = new SceneLoader()
+  Loader.store = store
+
   if (!term) {
     term = that
     Object.assign(commands, {
@@ -53,7 +58,9 @@ function makeCommands(that) {
         description: 'Print your position and the current scene',
         usage: 'status',
         fn: function() {
-          return 'Not implemented'
+          const c = store.getState().parcelSight.currentPosition
+          const sceneId = store.getState().positionToSceneId.resolvedPositionToScene[`${c.x},${c.y}`]
+          return `${c.x},${c.y}: ${sceneId}`
         }
       },
       goto: {
@@ -63,6 +70,24 @@ function makeCommands(that) {
           try {
             store.dispatch(teleport(x + ','+ y))
             return `Teleporting to ${x}, ${y}`
+          } catch (e) {
+            return `Error on teleport: ${e.stack}`
+          }
+        }
+      },
+      run: {
+        description: 'Run scene at coordinates',
+        usage: 'run <x> <y>',
+        fn: function(x, y) {
+          try {
+            Loader.getSceneForCoordinates(x, y).then(scene => {
+              try {
+                sceneManager.loadScene(scene)
+              } catch (e) {
+                console.log(e)
+              }
+            })
+            return `Loading scene at ${x}, ${y}...`
           } catch (e) {
             return `Error on teleport: ${e.stack}`
           }

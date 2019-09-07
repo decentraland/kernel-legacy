@@ -20,7 +20,7 @@ export const setPositionsAsEmpty = (positions: string[]) => action(SET_POSITION_
 export const forgetPositions = (positions: string[]) => action(FORGET_POSITION, { positions })
 export const configureDownloadServer = (downloadServer: string) => action(CONFIGURE_DOWNLOAD_SERVER, { downloadServer })
 
-export type PositionLoadingRequest = ReturnType<typeof positionLoadRequest>
+export type PositionLoadRequest = ReturnType<typeof positionLoadRequest>
 export type SetPositionAsLoadingAction = ReturnType<typeof setPositionAsLoading>
 export type SetPositionsAsResolvedAction = ReturnType<typeof setPositionsAsResolved>
 export type SetPositionsAsEmptyAction = ReturnType<typeof setPositionsAsEmpty>
@@ -32,7 +32,7 @@ export type PositionToSceneIdAction =
   | SetPositionsAsEmptyAction
   | SetPositionAsLoadingAction
   | SetPositionsAsErrorAction
-  | PositionLoadingRequest
+  | PositionLoadRequest
   | SetPositionsAsResolvedAction
   | ForgetPositionsAction
   | ConfigureDownloadServerAction
