@@ -3,7 +3,7 @@ import future from 'fp-future'
 import { Store } from 'redux'
 import { tokenRequest } from './actions'
 import { BasicEphemeralKey, EphemeralKey, MessageInput } from './ephemeral'
-import { getAccessToken, getCommsToken, isLoggedIn, RootAuthState, getEphemeralKey } from './selectors'
+import { getAccessToken, getCommsToken, getEphemeralKey, isLoggedIn, RootAuthState } from './selectors'
 
 export class Auth {
   store: Store<RootAuthState>

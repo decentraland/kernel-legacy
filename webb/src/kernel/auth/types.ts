@@ -1,4 +1,8 @@
-import { EphemeralKey } from "./ephemeral"
+import { EphemeralKey } from './ephemeral'
+
+export type RootAuthState = {
+  auth: AuthState
+}
 
 export type AuthState = {
   loading: string[]
