@@ -4,7 +4,7 @@ import {
   SceneLifeCycleState,
   SCENE_LOADING,
   SCENE_RENDERER_FATAL_ERROR,
-  SCENE_RENDERER_SENT_START_SIGNAL,
+  SCENE_RENDERER_SENT_LOADED,
   SCENE_RUNNING,
   SCENE_SCRIPT_AWAKE_TIMEOUT,
   SCENE_SCRIPT_SENT_AWAKE,
@@ -46,7 +46,7 @@ export function sceneLifeCycleReducer(state?: SceneLifeCycleState, action?: Scen
       return transition(state, action.payload.sceneId, 'loading', 'awake')
     case SCENE_SCRIPT_AWAKE_TIMEOUT:
       return transition(state, action.payload.sceneId, 'loading', 'awake')
-    case SCENE_RENDERER_SENT_START_SIGNAL:
+    case SCENE_RENDERER_SENT_LOADED:
       return transition(state, action.payload.sceneId, 'awake', 'started')
     case SCENE_RUNNING:
       return transition(state, action.payload.sceneId, 'started', 'running')

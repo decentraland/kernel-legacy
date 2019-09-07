@@ -1,6 +1,6 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 
-import { defaultLogger, getKeysMappingToTrue, jsonFetch } from '@dcl/utils'
+import { defaultLogger, getKeysMappingToTrue, memoize } from '@dcl/utils'
 
 import { SET_POSITION } from '../ParcelSight/actions'
 import { allInSight } from '../ParcelSight/selectors'
@@ -47,7 +47,9 @@ export function* handleLoadPositionMapping(action: PositionLoadingRequest): any 
 async function resolvePositionToSceneId(downloadServer: string, pos: string): Promise<string | null> {
   const nw = pos.split(',').map($ => parseInt($, 10))
   try {
-    const responseContent = await jsonFetch(downloadServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`)
+    const responseContent = await memoize(downloadServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`)(
+      fetch
+    )
     const contents = responseContent as any
     if (!contents.data.length) {
       return null

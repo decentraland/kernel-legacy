@@ -16,6 +16,8 @@ export * from './Vector'
 
 export * from './math'
 
+export * from './memoize'
+
 export * from './network'
 
 export * from './pure'

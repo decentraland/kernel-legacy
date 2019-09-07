@@ -1,4 +1,4 @@
-import { booleanMap, defaultLogger, IScene, jsonFetch, ParcelInfoResponse } from '@dcl/utils'
+import { booleanMap, defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
 import { getDownloadServer, needsResolutionToManifest } from './selectors'
@@ -29,7 +29,7 @@ export function* handleFetchRequest(action: SceneByIdRequest): any {
 
 export async function fetchManifestForSceneId(downloadServer: string, sceneId: string) {
   try {
-    const actualResponse = await jsonFetch(downloadServer + `/parcel_info?cids=${sceneId}`)
+    const actualResponse = await memoize(downloadServer + `/parcel_info?cids=${sceneId}`)(fetch)
     const mappings = actualResponse as {
       data: ParcelInfoResponse[]
     }
@@ -44,7 +44,7 @@ export async function fetchManifestForSceneId(downloadServer: string, sceneId: s
       return null
     }
     const baseUrl = downloadServer + '/contents/'
-    const scene = (await jsonFetch(baseUrl + sceneJsonMapping.hash)) as IScene
+    const scene = (await memoize(baseUrl + sceneJsonMapping.hash)(fetch)) as IScene
     return {
       sceneId: sceneId,
       baseUrl,
