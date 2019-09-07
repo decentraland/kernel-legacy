@@ -1,7 +1,7 @@
 import { Grid, Page } from 'decentraland-ui'
 import React from 'react'
 import { Route, Switch } from 'react-router'
-import { RootState } from '~/store'
+import { RootState } from '~/kernel/store'
 import Console from '../Console'
 import { StatusNav } from '../StatusNav'
 

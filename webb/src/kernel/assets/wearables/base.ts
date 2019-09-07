@@ -1,0 +1,24 @@
+import { memoize } from '@dcl/utils'
+
+export function getBaseWearables() {
+  return memoize('https://avatar-assets.now.sh')(fetch)
+}
+
+export type Catalog = {
+  [body_type: string]: {
+    [wearable_name: string]: any // AvatarAsset
+  }
+}
+
+export async function getBaseCatalog() {
+  const assets = await getBaseWearables()
+  const result: Catalog = {}
+  for (let asset of assets.data) {
+    for (let main of asset.main) {
+      const type = main.type
+      result[type] = result[type] || {}
+      result[type][asset.name] = { ...asset, main }
+    }
+  }
+  return result
+}

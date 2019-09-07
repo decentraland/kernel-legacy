@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Route, Switch } from 'react-router'
 import Navbar from '~/components/navbar'
 import Status from '~/components/status/StatusFrame'
-import { history } from '~/store'
+import { history } from '~/kernel/store'
 
 export const Routes = (
   <>

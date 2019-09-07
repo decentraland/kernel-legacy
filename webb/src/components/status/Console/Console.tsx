@@ -1,18 +1,52 @@
 import { Segment } from 'decentraland-ui'
 import React from 'react'
+import { store } from '~/kernel/store'
+import { teleport } from '~/kernel/loader/PositionSettlement/actions'
+import { passportRequest } from '~/kernel/passports/actions'
+import { tokenRequest } from '~/kernel/auth/actions'
+import { Auth } from '~/kernel/auth'
+import { commsStarted } from '~/kernel/comms/actions'
 const Terminal = require('react-console-emulator').default
 
+const auth = new Auth()
 var term = null
 var commands = {}
 function makeCommands(that) {
+  auth.store = store
   if (!term) {
     term = that
     Object.assign(commands, {
+      dispatch: {
+        description: 'Dispatch an action to the store',
+        usage: 'dispatch',
+        fn: function(...args: any[]) {
+          const type = args[0]
+          if (type) {
+            try {
+              store.dispatch({ type: args[0], payload: args.slice(1) })
+            } catch (e) {
+              return 'Error!' + e.stack
+            }
+            return 'dispatching ' + JSON.stringify(args)
+          } else {
+            return 'no type provided'
+          }
+        }
+      },
       getProfile: {
         description: 'Get a profile using a userId',
         usage: 'getProfile <userId>',
         fn: function(userId: string) {
+          store.dispatch(passportRequest(userId))
           return 'Fetching profile for user ' + userId + '...'
+        }
+      },
+      connect: {
+        description: 'Connect to the comms server',
+        usage: 'status',
+        fn: function() {
+          store.dispatch(commsStarted())
+          return 'Getting comms access token'
         }
       },
       status: {
@@ -25,8 +59,13 @@ function makeCommands(that) {
       goto: {
         description: 'Teleport to another position',
         usage: 'goto <x> <y>',
-        fn: function() {
-          return 'Not implemented'
+        fn: function(x, y) {
+          try {
+            store.dispatch(teleport(x + ','+ y))
+            return `Teleporting to ${x}, ${y}`
+          } catch (e) {
+            return `Error on teleport: ${e.stack}`
+          }
         }
       },
       list: {

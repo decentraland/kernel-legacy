@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "assets": [
+    { "name": "scene.js", "hash": "QmZ1d5v83XSM7xbKDVuF5UtYrjMtFt6d6b" },
+    { "name": "door_model", "hash": "QmZ1dDVAdFgS1PZmCzxuF5UtYrjMtFt6d6b" },
+    { "name": "background_music", "hash": "QmZ1d5v83XSM7xbKDVAdFjMtFt6d6b" },
+    { "name": "glass_texture", "hash": "QmZ1d5v83XSM7xbKDVAdFgSFt6d6b" },
+    { "name": "top_north_west_snapshot", "hash": "QmZ1d5v83XSM7xbKDVd6b" },
+    { "name": "lod50_model", "hash": "QmZ1d5v83XSM32517xbKDVAdFgSFt6d6b" },
+    { "name": "Grass_01", "uri": "dcl://mini-town/Grass_01" }
+  ],
+  "assetTags": [
+    { "name": "required", "assets": ["scene.js"] },
+    { "name": "userRequired", "assets": ["Grass_01", "door_model"] }
+  ],
+  "requiredTags": ["required", "userRequired"],
+  "main": "scene.js",
+  "referenceSystem": {
+    "rotation": { "y": 90 },
+    "translation": { "x": 16, "y": 0, "z": 0 }
+  },
+  "parcels": ["1,2", "1,3", "1,4", "2,2", "2,3", "2,4", "3,2", "3,3", "3,4"],
+  "contact": {
+    "name": "John Doe",
+    "email": "john@doe.com"
+  },
+  "spawnPoints": [
+    {
+      "name": "defaultSpawn",
+      "position": {
+        "x": 1.3,
+        "y": 1.4,
+        "z": 18.34
+      },
+      "camera": {
+        "x": 0,
+        "y": 180,
+        "z": 0,
+        "w": 0
+      },
+      "default": true
+    },
+    {
+      "name": "spacewarp_target",
+      "position": {
+        "x": [1.3, 2.5],
+        "y": 0,
+        "z": [20, 21]
+      },
+      "camera": {
+        "x": [0, 0.5],
+        "y": 180,
+        "z": 0,
+        "w": 0.4
+      }
+    }
+  ],
+  "display": {
+    "title": "My Land",
+    "snapshot": "top_north_west_snapshot",
+    "lod50": "lod50_model"
+  }
+}
