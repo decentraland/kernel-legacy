@@ -1,5 +1,5 @@
 import { action } from 'typesafe-actions'
-import { StoredProfile } from './types'
+import { StoredProfile } from './passportTypes'
 
 export const PASSPORT_REQUEST = '[Request] Passport fetch'
 export const PASSPORT_SUCCESS = '[Success] Passport fetch'
