@@ -37,11 +37,7 @@ export function* handleCommsStart() {
     const msg = Buffer.from(body)
     const input = MessageInput.fromMessage(msg)
     yield call(async () => {
-      const credentials = await ephemeral.makeMessageCredentials(
-        input,
-        accessToken
-      )
-      debugger
+      const credentials = await ephemeral.makeMessageCredentials(input, accessToken)
 
       const qs = new URLSearchParams({
         signature: credentials.get('x-signature'),
@@ -58,5 +54,4 @@ export function* handleCommsStart() {
       return new ProtocolConnection(commsBroker, action => {})
     })
   }
-
 }
