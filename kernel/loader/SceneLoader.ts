@@ -1,9 +1,9 @@
+import { encodeParcelPosition, encodeParcelPositionFromCoordinates, ISceneManifest, Vector2 } from '@dcl/utils'
 import { EventEmitter } from 'events'
 import future from 'fp-future'
-import { combineReducers, createStore, Store, applyMiddleware } from 'redux'
-
-import { encodeParcelPositionFromCoordinates, ISceneManifest, Vector2, encodeParcelPosition } from '@dcl/utils'
-
+import { applyMiddleware, combineReducers, createStore, Store } from 'redux'
+import createSagaMiddleware, { SagaMiddleware, Task } from 'redux-saga'
+import { fork } from 'redux-saga/effects'
 import { ParcelLoadingActionType } from './ParcelLoading/actions'
 import { parcelLoadingReducer as parcelLoading } from './ParcelLoading/reducer'
 import { RootParcelLoadingState } from './ParcelLoading/types'
@@ -12,6 +12,7 @@ import { parcelSightReducer as parcelSight } from './ParcelSight/reducer'
 import { RootParcelSightState } from './ParcelSight/types'
 import { PositionSettlementAction, teleport } from './PositionSettlement/actions'
 import { positionSettlementReducer as positionSettlement } from './PositionSettlement/reducer'
+import { positionSettlementSaga } from './PositionSettlement/sagas'
 import { RootPositionSettlementState } from './PositionSettlement/types'
 import {
   configureDownloadServer as configureSceneIdServer,
@@ -19,9 +20,11 @@ import {
   PositionToSceneIdAction
 } from './PositionToSceneId/actions'
 import { positionToSceneIdReducer as positionToSceneId } from './PositionToSceneId/reducer'
+import { positionToSceneIdSaga } from './PositionToSceneId/sagas'
 import { getEmptyStatus, getPositionError, getSceneIdForPosition } from './PositionToSceneId/selectors'
 import { RootPositionToSceneIdState } from './PositionToSceneId/types'
 import { sceneIdToSceneManifestReducer as sceneIdToManifest } from './SceneIdToSceneManifest/reducer'
+import { sceneIdToManifestSaga } from './SceneIdToSceneManifest/sagas'
 import { getSceneError, getSceneManifest } from './SceneIdToSceneManifest/selectors'
 import {
   configureDownloadServer as configureManifestServer,
@@ -30,20 +33,15 @@ import {
   sceneByIdRequest
 } from './SceneIdToSceneManifest/types'
 import { sceneLifeCycleReducer as sceneLifeCycle } from './SceneLifeCycle/reducer'
-import { RootSceneLifeCyleState, SceneLifeCycleAction } from './SceneLifeCycle/types'
 import { rootSceneLifecycleSaga } from './SceneLifeCycle/sagas'
-import createSagaMiddleware, { Task } from 'redux-saga'
-import { fork } from 'redux-saga/effects'
-import { sceneIdToManifestSaga } from './SceneIdToSceneManifest/sagas'
-import { positionToSceneIdSaga } from './PositionToSceneId/sagas'
-import { positionSettlementSaga } from './PositionSettlement/sagas'
+import { RootSceneLifeCycleState, SceneLifeCycleAction } from './SceneLifeCycle/types'
 
 export type RootState = RootParcelLoadingState &
   RootParcelSightState &
   RootPositionSettlementState &
   RootPositionToSceneIdState &
   RootSceneIdToSceneManifestState &
-  RootSceneLifeCyleState
+  RootSceneLifeCycleState
 
 export type RootAction =
   | ParcelLoadingActionType
@@ -62,10 +60,11 @@ function* rootSaga() {
 
 export class SceneLoader extends EventEmitter {
   store: Store<RootState>
+  sagaMiddleware: SagaMiddleware
   saga: Task
   setup(downloadServer: string, lineOfSight: number) {
-    const sagaMiddleware = createSagaMiddleware()
-    const store = (this.store = createStore(
+    this.sagaMiddleware = createSagaMiddleware()
+    this.store = createStore(
       combineReducers({
         parcelLoading,
         parcelSight,
@@ -74,12 +73,15 @@ export class SceneLoader extends EventEmitter {
         sceneIdToManifest,
         sceneLifeCycle
       }),
-      applyMiddleware(sagaMiddleware)
-    ))
-    this.saga = sagaMiddleware.run(rootSaga)
-    store.dispatch(configureLineOfSightRadius(lineOfSight))
-    store.dispatch(configureSceneIdServer(downloadServer))
-    store.dispatch(configureManifestServer(downloadServer))
+      applyMiddleware(this.sagaMiddleware)
+    )
+    this.store.dispatch(configureLineOfSightRadius(lineOfSight))
+    this.store.dispatch(configureSceneIdServer(downloadServer))
+    this.store.dispatch(configureManifestServer(downloadServer))
+  }
+
+  start() {
+    this.saga = this.sagaMiddleware.run(rootSaga)
   }
 
   async getSceneForCoordinates(x: number, y: number): Promise<ISceneManifest> {

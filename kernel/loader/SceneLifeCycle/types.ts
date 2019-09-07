@@ -1,7 +1,7 @@
 import { action } from 'typesafe-actions'
 import { booleanMap } from '@dcl/utils'
 
-export type SceneLifeCyleState = {
+export type SceneLifeCycleState = {
   loading: booleanMap
   awake: booleanMap
   started: booleanMap
@@ -9,8 +9,8 @@ export type SceneLifeCyleState = {
   error: booleanMap
 }
 
-export type RootSceneLifeCyleState = {
-  sceneLifeCycle: SceneLifeCyleState
+export type RootSceneLifeCycleState = {
+  sceneLifeCycle: SceneLifeCycleState
 }
 
 export const SCENE_LOADING = 'Scene started loading'

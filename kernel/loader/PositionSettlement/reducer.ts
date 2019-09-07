@@ -25,7 +25,7 @@ export function positionSettlementReducer(
     case TELEPORT:
       return {
         isTeleporting: true,
-        isSettled: false
+        isSettled: state.isSettled
       }
     case UNSETTLE_POSITION:
       return {

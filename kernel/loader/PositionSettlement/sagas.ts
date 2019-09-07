@@ -1,35 +1,41 @@
-import { all, put, select, takeLatest, call } from 'redux-saga/effects'
-import { parseParcelPosition } from '@dcl/utils'
-
-import { setPosition } from '../ParcelSight/actions'
-import { getAwakeScenes, getLoadingScenes, getStartingScenes } from '../SceneLifeCycle/selectors'
-import { SCENE_RUNNING } from '../SceneLifeCycle/types'
-import { TELEPORT, TeleportAction, settlePosition } from './actions'
+import { call, put, select, takeLatest } from 'redux-saga/effects'
+import { SET_POSITION } from '../ParcelSight/actions'
+import { allInSight } from '../ParcelSight/selectors'
+import { getSceneLifeCycle, getSceneStatusByPosition } from '../SceneLifeCycle/selectors'
+import { SceneLifeCycleState, SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR } from '../SceneLifeCycle/types'
+import { settlePosition, TELEPORT, TeleportAction, unsettlePosition } from './actions'
+import { isPositionSettled } from './selectors'
 
 export function* positionSettlementSaga(): any {
   yield takeLatest(TELEPORT, handleTeleport)
-  yield takeLatest(SCENE_RUNNING, handleRunningScene)
+  yield takeLatest(SET_POSITION, tryToSettle)
+  yield takeLatest(SCENE_RUNNING, tryToSettle)
+  yield takeLatest(SCENE_SCRIPT_SOURCED_FATAL_ERROR, tryToSettle)
 }
 
-export function* canPositionSettle(): any {
-  const pending = yield all({
-    loading: select(getLoadingScenes),
-    awake: select(getAwakeScenes),
-    started: select(getStartingScenes)
-  })
-  if (pending.loading.length || pending.awake.length || pending.started.length) {
-    return false
+export function* tryToSettle(): any {
+  const hasSettled = yield select(isPositionSettled)
+  if (!hasSettled) {
+    if (yield call(canPositionSettle)) {
+      yield put(settlePosition())
+    }
   }
 }
 
-export function* handleTeleport(action: TeleportAction): any {
-  const positionAsVector = parseParcelPosition(action.payload.position)
-  yield put(setPosition(positionAsVector))
+export function* canPositionSettle(): any {
+  const allSighted: string[] = yield select(allInSight)
+  const currentSceneStatus: SceneLifeCycleState = yield select(getSceneLifeCycle)
+  for (let position of allSighted) {
+    if (!currentSceneStatus.running[position] && !currentSceneStatus.error[position]) {
+      return false
+    }
+  }
+  return true
 }
 
-export function* handleRunningScene(): any {
-  const canSettle = yield call(canPositionSettle)
-  if (canSettle) {
-    yield put(settlePosition())
+export function* handleTeleport(action: TeleportAction): any {
+  const status: string = yield select(getSceneStatusByPosition, action.payload.position)
+  if (status !== 'running' && status !== 'error') {
+    yield put(unsettlePosition())
   }
 }

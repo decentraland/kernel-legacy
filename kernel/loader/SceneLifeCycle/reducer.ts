@@ -1,6 +1,7 @@
+import { internalGetSceneStatus } from './selectors'
 import {
   SceneLifeCycleAction,
-  SceneLifeCyleState,
+  SceneLifeCycleState,
   SCENE_LOADING,
   SCENE_RENDERER_FATAL_ERROR,
   SCENE_RENDERER_SENT_START_SIGNAL,
@@ -10,9 +11,8 @@ import {
   SCENE_SCRIPT_SOURCED_FATAL_ERROR,
   SCENE_STOP
 } from './types'
-import { getSceneStatus } from './selectors'
 
-export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCyleState = {
+export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCycleState = {
   loading: {},
   awake: {},
   started: {},
@@ -22,7 +22,7 @@ export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCyleState = {
 
 type KEY = 'loading' | 'awake' | 'started' | 'running' | 'error'
 
-function transition(state: SceneLifeCyleState, sceneId: string, from: KEY, to: KEY) {
+function transition(state: SceneLifeCycleState, sceneId: string, from: KEY, to: KEY) {
   return {
     ...state,
     [from]: { ...state[from], [sceneId]: undefined },
@@ -30,7 +30,7 @@ function transition(state: SceneLifeCyleState, sceneId: string, from: KEY, to: K
   }
 }
 
-export function sceneLifeCycleReducer(state?: SceneLifeCyleState, action?: SceneLifeCycleAction): SceneLifeCyleState {
+export function sceneLifeCycleReducer(state?: SceneLifeCycleState, action?: SceneLifeCycleAction): SceneLifeCycleState {
   if (!state) {
     return INITIAL_SCENE_LIFECYCLE_STATUS
   }
@@ -38,7 +38,7 @@ export function sceneLifeCycleReducer(state?: SceneLifeCyleState, action?: Scene
     return state
   }
   const sceneId = action.payload.sceneId
-  const previousState = getSceneStatus(state, sceneId)
+  const previousState = internalGetSceneStatus(state, sceneId)
   switch (action.type) {
     case SCENE_LOADING:
       return { ...state, loading: { ...state.loading, [action.payload.sceneId]: true } }

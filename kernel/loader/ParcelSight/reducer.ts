@@ -32,6 +32,7 @@ export function parcelSightReducer(state?: ParcelSightState, action?: ParcelSigh
       break
     case SET_POSITION:
       if (
+        state.isTargetPlaced &&
         state.currentPosition &&
         state.currentPosition.x === action.payload.x &&
         state.currentPosition.y === action.payload.y
