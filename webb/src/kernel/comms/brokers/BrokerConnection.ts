@@ -31,7 +31,9 @@ import {
   commsWebrtcIceState,
   commsWebrtcError,
   commsDatachannelReliableLost,
-  commsDatachannelUnreliableLost
+  commsDatachannelUnreliableLost,
+  commsDatachannelReliable,
+  commsDatachannelUnreliable
 } from '../actions'
 
 export class BrokerConnection implements IBrokerConnection {
@@ -314,14 +316,14 @@ export class BrokerConnection implements IBrokerConnection {
     let dc = e.channel
 
     dc.onclose = () => {
-      store.dispatch(dc.label === 'reliable' ? commsDatachannelReliableLost : commsDatachannelReliableLost(e))
-      store.dispatch(dc.label === 'unreliable' ? commsDatachannelReliableLost : commsDatachannelUnreliableLost(e))
+      store.dispatch(dc.label === 'reliable' ? commsDatachannelReliableLost(e) : commsDatachannelUnreliableLost(e))
       this.logger.log(`DataChannel ${JSON.stringify(dc.label)} has closed`)
     }
 
-    dc.onopen = async () => {
+    dc.onopen = async (e: any) => {
       const label = dc.label
       this.logger.log(`DataChannel ${JSON.stringify(dc.label)} has opened`)
+      store.dispatch(label === 'reliable' ? commsDatachannelReliable(e) : commsDatachannelUnreliable(e))
 
       if (label === 'reliable') {
         this.reliableDataChannel = dc

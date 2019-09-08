@@ -1,5 +1,6 @@
 import { action } from 'typesafe-actions'
-import { PositionData, ChatData, PingMessage, ProfileData } from '@dcl/protos'
+import { ChatData, PingMessage, ProfileData } from '@dcl/protos'
+import { PositionReport } from '../presence/types/PositionReport'
 
 export const COMMS_STARTED = '[Comms] Starting connection'
 export const COMMS_TIMEOUT = '[Comms] Connection timed out'
@@ -46,13 +47,13 @@ export const commsWebrtcIceState = (payload: any) => action(COMMS_WEBRTC_ICE_STA
 export type CommsWebrtcIceStateAction = ReturnType<typeof commsWebrtcIceState>
 export const commsWebrtcError = (payload: any) => action(COMMS_WEBRTC_ERROR, payload)
 export type CommsWebrtcErrorAction = ReturnType<typeof commsWebrtcError>
-export const commsDatachannelReliable = () => action(COMMS_DATACHANNEL_RELIABLE)
+export const commsDatachannelReliable = (payload: any) => action(COMMS_DATACHANNEL_RELIABLE, payload)
 export type CommsDatachannelReliableAction = ReturnType<typeof commsDatachannelReliable>
-export const commsDatachannelUnreliable = () => action(COMMS_DATACHANNEL_UNRELIABLE)
+export const commsDatachannelUnreliable = (payload: any) => action(COMMS_DATACHANNEL_UNRELIABLE, payload)
 export type CommsDatachannelUnreliableAction = ReturnType<typeof commsDatachannelUnreliable>
-export const commsDatachannelReliableLost = () => action(COMMS_DATACHANNEL_RELIABLE_LOST)
+export const commsDatachannelReliableLost = (payload: any) => action(COMMS_DATACHANNEL_RELIABLE_LOST, payload)
 export type CommsDatachannelReliableLostAction = ReturnType<typeof commsDatachannelReliableLost>
-export const commsDatachannelUnreliableLost = () => action(COMMS_DATACHANNEL_UNRELIABLE_LOST)
+export const commsDatachannelUnreliableLost = (payload: any) => action(COMMS_DATACHANNEL_UNRELIABLE_LOST, payload)
 export type CommsDatachannelUnreliableLostAction = ReturnType<typeof commsDatachannelUnreliableLost>
 export const commsCredentialsRequest = () => action(COMMS_CREDENTIALS_REQUEST)
 export type CommsCredentialsRequestAction = ReturnType<typeof commsCredentialsRequest>
@@ -119,25 +120,33 @@ export type ProtocolInActionType =
 export const PROTOCOL_OUT_POSITION = '[Protocol:Out] Position update'
 export const PROTOCOL_OUT_PROFILE = '[Protocol:Out] Profile update'
 export const PROTOCOL_OUT_PING = '[Protocol:Out] Ping'
+export const PROTOCOL_OUT_YELL = '[Protocol:Out] Public message in current position'
+export const PROTOCOL_OUT_PRIVATE_MESSAGE = '[Protocol:Out] Private message to target user'
 export const PROTOCOL_OUT_CHAT = '[Protocol:Out] Chat message'
 export const PROTOCOL_OUT_SCENE = '[Protocol:Out] Scene event'
 
-export const protocolOutPosition = (positionData: PositionData) => action(PROTOCOL_OUT_POSITION, positionData)
+export const protocolOutPosition = (positionData: PositionReport) => action(PROTOCOL_OUT_POSITION, positionData)
 export type ProtocolOutPositionAction = ReturnType<typeof protocolOutPosition>
-export const protocolOutProfile = (alias: string, userId: string, profile: ProfileData) =>
-  action(PROTOCOL_OUT_PROFILE, { alias, userId, profile })
+export const protocolOutProfile = () => action(PROTOCOL_OUT_PROFILE)
 export type ProtocolOutProfileAction = ReturnType<typeof protocolOutProfile>
-export const protocolOutPing = (ping: PingMessage) => action(PROTOCOL_OUT_PING, { ping })
+export const protocolOutPing = () => action(PROTOCOL_OUT_PING)
 export type ProtocolOutPingAction = ReturnType<typeof protocolOutPing>
-export const protocolOutChat = (chatData: ChatData) => action(PROTOCOL_OUT_CHAT, { chatData })
+export const protocolOutYell = (message: string) => action(PROTOCOL_OUT_YELL, { message })
+export type ProtocolOutYellAction = ReturnType<typeof protocolOutYell>
+export const protocolOutPrivateMessage = (to: string, message: string) =>
+  action(PROTOCOL_OUT_PRIVATE_MESSAGE, { to, message })
+export type ProtocolOutPrivateMessageAction = ReturnType<typeof protocolOutPrivateMessage>
+export const protocolOutChat = (topic: string, message: string) => action(PROTOCOL_OUT_CHAT, { topic, message })
 export type ProtocolOutChatAction = ReturnType<typeof protocolOutChat>
-export const protocolOutScene = (chatData: ChatData) => action(PROTOCOL_OUT_SCENE, { message: chatData })
+export const protocolOutScene = (sceneId: string, message: string) => action(PROTOCOL_OUT_SCENE, { sceneId, message })
 export type ProtocolOutSceneAction = ReturnType<typeof protocolOutScene>
 export type ProtocolOutActionType =
   | ProtocolOutPositionAction
   | ProtocolOutProfileAction
   | ProtocolOutPingAction
   | ProtocolOutChatAction
+  | ProtocolOutYellAction
+  | ProtocolOutPrivateMessageAction
   | ProtocolOutSceneAction
 
 export const PROTOCOL_SUBSCRIPTION = '[Protocol] Requesting topic subscription'

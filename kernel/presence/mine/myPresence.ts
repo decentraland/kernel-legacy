@@ -13,8 +13,8 @@ import {
 import { SceneLoader } from '../../loader/SceneLoader'
 import { migrateFromILand } from '../../worldMap/sceneTransforms/migrateFromILand'
 import { PositionReport } from '../types/PositionReport'
-import { getPositionReport } from '../getPositionReport'
 import { getTopicForPosition } from './getTopicForPosition'
+import { marshalPositionReport } from '../marshalPositionReport'
 
 const temporaryVector2 = new MVector2()
 export class MyPresence {
@@ -90,7 +90,7 @@ export class MyPresence {
   }
 
   getPositionReport() {
-    return getPositionReport(this.lastPlayerPositionReport)
+    return marshalPositionReport(this.lastPlayerPositionReport)
   }
 
   getTopicForCurrentPosition() {

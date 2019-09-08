@@ -16,6 +16,7 @@ import {
 import { SendResult } from '../types/SendResult'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { protocolPosition, protocolChat, protocolProfile, protocolPing, protocolUnknown } from '../actions'
+import { store } from '~/kernel/store'
 
 export class ProtocolConnection {
   logger: ILogger
@@ -59,6 +60,7 @@ export class ProtocolConnection {
       let dataMessage, body, dataHeader, category
       switch (msgType) {
         case MessageType.UNKNOWN_MESSAGE_TYPE:
+          store.dispatch(protocolUnknown(msgType))
           this.logger.warn(`Unsupported message type: ${msgType}`)
           return
         case MessageType.TOPIC_FW:
@@ -69,15 +71,15 @@ export class ProtocolConnection {
           switch (category) {
             case Category.POSITION:
               let positionData = PositionData.deserializeBinary(body)
-              this.dispatcher(protocolPosition(positionData))
+              store.dispatch(protocolPosition(positionData))
               break
             case Category.CHAT:
             case Category.SCENE_MESSAGE:
               let chatData = ChatData.deserializeBinary(body)
-              this.dispatcher(protocolChat(chatData))
+              store.dispatch(protocolChat(chatData))
               break
             default:
-              this.dispatcher(protocolUnknown(body))
+              store.dispatch(protocolUnknown(body))
               break
           }
           break
@@ -92,13 +94,13 @@ export class ProtocolConnection {
           switch (category) {
             case Category.PROFILE:
               const profileData = ProfileData.deserializeBinary(body)
-              this.dispatcher(protocolProfile(alias, userId, profileData))
+              store.dispatch(protocolProfile(alias, userId, profileData))
               break
           }
           break
         case MessageType.PING:
           const pingMessage = PingMessage.deserializeBinary(message.data)
-          this.dispatcher(protocolPing(pingMessage))
+          store.dispatch(protocolPing(pingMessage))
           break
       }
     } catch (e) {

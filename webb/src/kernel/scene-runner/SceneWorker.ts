@@ -3,13 +3,17 @@ import { createLogger, ISceneManifest, Observable } from '@dcl/utils'
 import future, { IFuture } from 'fp-future'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
+import { SceneStatus } from './SceneStatus'
+
 import { DevTools } from './kernelSpace/DevTools'
 import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
 import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
-import { SceneStatus } from './SceneStatus'
 
-console.log('Loaded', RendererParcelSceneToScript.name)
-console.log('Loaded', DevTools.name)
+{
+  ;[EnvironmentAPI, RendererParcelSceneToScript, DevTools].map(api =>
+    console.log('Loaded API accessible by scripts:', api.name, name)
+  )
+}
 
 const logger = createLogger('SceneWorker')
 

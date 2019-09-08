@@ -1,9 +1,7 @@
 import { createSelector } from 'reselect'
 
-import { AuthState } from './types'
+import { AuthState, RootAuthState } from './types'
 import { AUTH_REQUEST } from './actions'
-
-export type RootAuthState = { auth: AuthState; loading: any }
 
 export function isTokenExpired(expiresAt: number | Date | string) {
   const value =
@@ -22,6 +20,8 @@ export const getData = (state: RootAuthState) => state.auth.data
 export const getLoading = (state: RootAuthState) => state.auth.loading
 export const isLoggedIn = (state: RootAuthState) => getData(state) !== null
 export const isLoggingIn = (state: RootAuthState) => state.loading.includes(AUTH_REQUEST)
+
+export const getMyCurrentUserId = (state: RootAuthState) => (isLoggedIn(state) ? getSub(state) : null)
 
 /**
  * Accessors for the actual tokens used in requests and by the user

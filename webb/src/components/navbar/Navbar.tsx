@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Navbar as UINavbar, Menu, Button } from '../liteui/dcl'
+import { Navbar as UINavbar, Menu, Button, Segment } from '../liteui/dcl'
 
 export type NavbarProps = {
   currentPage: string
@@ -37,43 +37,6 @@ export class Navbar extends React.PureComponent<NavbarProps> {
       : this.links.get(key)
 
   render() {
-    return (
-      <UINavbar
-        isFullscreen
-        leftMenu={
-          <>
-            <Menu.Item
-              link={true}
-              onClick={this.goTo('/')}
-              active={this.props.currentPage === '/' || this.props.currentPage.startsWith('/status')}
-            >
-              Status
-            </Menu.Item>
-            <Menu.Item
-              link={true}
-              onClick={this.goTo('/map')}
-              active={this.props.currentPage === '/map' || this.props.currentPage.startsWith('/parcel')}
-            >
-              World
-            </Menu.Item>
-          </>
-        }
-        rightMenu={
-          <>
-            {this.props.isLoggedIn ? (
-              <Picture userId={this.props.userId!} />
-            ) : this.props.currentPage === '/login' ? (
-              ''
-            ) : this.props.isLoggingIn ? (
-              <span>Loading...</span>
-            ) : (
-              <Button size="small" primary onClick={this.props.login}>
-                Log in
-              </Button>
-            )}
-          </>
-        }
-      />
-    )
+    return <></>
   }
 }

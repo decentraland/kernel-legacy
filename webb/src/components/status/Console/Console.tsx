@@ -1,7 +1,7 @@
 import React from 'react'
 import { Auth } from '~/kernel/auth'
 import { commsStarted } from '~/kernel/comms/actions'
-import { teleport } from '~/kernel/loader/PositionSettlement/actions'
+import { teleport } from '~/kernel/userLocation/PositionSettlement/actions'
 import { SceneLoader } from '~/kernel/loader/SceneLoader'
 import { passportRequest } from '~/kernel/passports/actions'
 import { SceneWorkersManager } from '~/kernel/scene-runner/SceneWorkersManager'

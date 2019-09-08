@@ -1,5 +1,6 @@
 import { PositionSettlementState } from './types'
-import { PositionSettlementAction, SETTLE_POSITION, UNSETTLE_POSITION, TELEPORT } from './actions'
+import { PositionSettlementAction } from './actions'
+import { SETTLE_POSITION, UNSETTLE_POSITION, TELEPORT } from './types'
 
 export const INITIAL_POSITION_SETTLEMENT_STATE: PositionSettlementState = {
   isTeleporting: false,

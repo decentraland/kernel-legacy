@@ -1,8 +1,6 @@
 import { BasicEphemeralKey } from './ephemeral'
 
-export type RootAuthState = {
-  auth: AuthState
-}
+export type RootAuthState = { auth: AuthState; loading: any }
 
 export type AuthState = {
   loading: string[]

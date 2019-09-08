@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
-import { allInSight } from '../ParcelSight/selectors'
+import { allInSight } from '../../userLocation/ParcelSight/selectors'
 import { positionLoadRequest } from './actions'
 import { fetchMissingSceneIdMappings } from './sagas'
 import { multipleNeedsResolution } from './selectors'

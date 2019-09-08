@@ -1,7 +1,7 @@
 import { defaultLogger, getKeysMappingToTrue, memoize } from '@dcl/utils'
 import { all, call, put, select, takeLatest } from 'redux-saga/effects'
-import { SET_POSITION } from '../ParcelSight/actions'
-import { allInSight } from '../ParcelSight/selectors'
+import { SET_POSITION } from '../../userLocation/ParcelSight/actions'
+import { allInSight } from '../../userLocation/ParcelSight/selectors'
 import {
   FORGET_POSITION,
   PositionLoadRequest,
