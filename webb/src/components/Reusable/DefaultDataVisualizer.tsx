@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Segment } from 'decentraland-ui'
 import { JSONTheme } from '~/components/Reusable/theme'
+import { Segment } from '../liteui/dcl'
 const JSONTree = require('react-json-tree').default
 
 export class DefaultDataVisualizer extends React.PureComponent<{ data: any; shouldExpandNode?: any }> {

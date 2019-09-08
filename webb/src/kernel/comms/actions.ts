@@ -30,19 +30,21 @@ export const commsRetry = () => action(COMMS_RETRY)
 export type CommsRetryAction = ReturnType<typeof commsRetry>
 export const commsClosed = () => action(COMMS_CLOSED)
 export type CommsClosedAction = ReturnType<typeof commsClosed>
-export const commsWelcome = () => action(COMMS_WELCOME)
+export const commsWelcome = (payload: { alias: number; serverAlias: number; availableServers: any }) =>
+  action(COMMS_WELCOME, payload)
 export type CommsWelcomeAction = ReturnType<typeof commsWelcome>
-export const commsWebrtcIceCandidate = () => action(COMMS_WEBRTC_ICE_CANDIDATE)
+export const commsWebrtcIceCandidate = (candidate: any) => action(COMMS_WEBRTC_ICE_CANDIDATE, { candidate })
 export type CommsWebrtcIceCandidateAction = ReturnType<typeof commsWebrtcIceCandidate>
-export const commsWebrtcIceOffer = () => action(COMMS_WEBRTC_ICE_OFFER)
+export const commsWebrtcIceOffer = (payload: { serverAlias: number; sessionData: string; localDescription: string }) =>
+  action(COMMS_WEBRTC_ICE_OFFER, payload)
 export type CommsWebrtcIceOfferAction = ReturnType<typeof commsWebrtcIceOffer>
-export const commsWebrtcIceAnswer = () => action(COMMS_WEBRTC_ICE_ANSWER)
+export const commsWebrtcIceAnswer = (answer: any) => action(COMMS_WEBRTC_ICE_ANSWER, { answer })
 export type CommsWebrtcIceAnswerAction = ReturnType<typeof commsWebrtcIceAnswer>
-export const commsWebrtcSignalingState = () => action(COMMS_WEBRTC_SIGNALING_STATE)
+export const commsWebrtcSignalingState = (payload: any) => action(COMMS_WEBRTC_SIGNALING_STATE, payload)
 export type CommsWebrtcSignalingStateAction = ReturnType<typeof commsWebrtcSignalingState>
-export const commsWebrtcIceState = () => action(COMMS_WEBRTC_ICE_STATE)
+export const commsWebrtcIceState = (payload: any) => action(COMMS_WEBRTC_ICE_STATE, payload)
 export type CommsWebrtcIceStateAction = ReturnType<typeof commsWebrtcIceState>
-export const commsWebrtcError = () => action(COMMS_WEBRTC_ERROR)
+export const commsWebrtcError = (payload: any) => action(COMMS_WEBRTC_ERROR, payload)
 export type CommsWebrtcErrorAction = ReturnType<typeof commsWebrtcError>
 export const commsDatachannelReliable = () => action(COMMS_DATACHANNEL_RELIABLE)
 export type CommsDatachannelReliableAction = ReturnType<typeof commsDatachannelReliable>

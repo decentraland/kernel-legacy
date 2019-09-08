@@ -1,7 +1,5 @@
-import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
-import { MyPresence } from '../myPresence'
-import { sendPosition } from '../../../comms/senders/position'
 import { createLogger } from '@dcl/utils'
+import { ProtocolConnection } from '~/kernel/comms/brokers/ProtocolConnection'
 
 const logger = createLogger('BroadcastPresence')
 
@@ -12,8 +10,6 @@ export class BroadcastPresence {
   lastPositionSentTimestamp: number = 0
 
   comms: ProtocolConnection
-
-  constructor(public myPresence: MyPresence) {}
 
   activate(comms: ProtocolConnection) {
     this.comms = comms
@@ -34,12 +30,12 @@ export class BroadcastPresence {
 
   checkAndAnnouncePosition() {
     if (this.shouldSendPositionBeacon()) {
-      if (!this.myPresence.allowedToBroadcastPosition()) {
-        return
-      }
-      const topic = this.myPresence.getTopicForCurrentPosition()
-      logger.info('Broadcasting presence on channel', topic)
-      sendPosition(this.comms, topic, this.myPresence.getPositionReport() as any)
+      // if (!this.myPresence.allowedToBroadcastPosition()) {
+      //   return
+      // }
+      // const topic = this.myPresence.getTopicForCurrentPosition()
+      // logger.info('Broadcasting presence on channel', topic)
+      // sendPosition(this.comms, topic, this.myPresence.getPositionReport() as any)
     }
   }
 

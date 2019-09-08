@@ -10,8 +10,8 @@ export function* profileResolverSaga(): any {
 }
 
 export function* fetchProfile(action: PassportRequestAction) {
+  const userId = action.payload.userId
   try {
-    const userId = action.payload.userId
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(httpProfileRequest, serverUrl, accessToken, userId)

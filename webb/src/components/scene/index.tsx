@@ -1,5 +1,5 @@
 import React from 'react'
-import { Page, Segment, Grid, Hero, Center, Button, Header, HeaderMenu, Icon } from 'decentraland-ui'
+import { Page, Segment, Grid, Hero, Center, Button, Header, HeaderMenu, Icon } from '~/components/liteui/dcl
 
 export default class Scene extends React.Component {
 

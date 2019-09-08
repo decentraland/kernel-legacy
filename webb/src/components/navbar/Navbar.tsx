@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Navbar as UINavbar, Menu, Button } from 'decentraland-ui'
+import { Navbar as UINavbar, Menu, Button } from '../liteui/dcl'
 
 export type NavbarProps = {
   currentPage: string
@@ -21,7 +21,7 @@ export class Picture extends React.PureComponent<{ userId: string }> {
     return (
       <img
         src={`https://s3.amazonaws.com/avatars-storage.decentraland.org/${this.props.userId}/face.png`}
-        alt='Face'
+        alt="Face"
         style={{ width: '32px', height: '32px', borderRadius: '40px' }}
       />
     )
@@ -67,7 +67,7 @@ export class Navbar extends React.PureComponent<NavbarProps> {
             ) : this.props.isLoggingIn ? (
               <span>Loading...</span>
             ) : (
-              <Button size='small' primary onClick={this.props.login}>
+              <Button size="small" primary onClick={this.props.login}>
                 Log in
               </Button>
             )}

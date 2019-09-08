@@ -1,4 +1,3 @@
-import { Segment } from 'decentraland-ui'
 import React from 'react'
 import { Auth } from '~/kernel/auth'
 import { commsStarted } from '~/kernel/comms/actions'
@@ -8,6 +7,7 @@ import { passportRequest } from '~/kernel/passports/actions'
 import { SceneWorkersManager } from '~/kernel/scene-runner/SceneWorkersManager'
 import { store } from '~/kernel/store'
 import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
+import { Segment } from '~/components/liteui/dcl'
 const Terminal = require('react-console-emulator').default
 
 const auth = new Auth()

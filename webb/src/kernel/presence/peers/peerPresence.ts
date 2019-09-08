@@ -11,6 +11,8 @@ export type PeerPresence = {
   position: Vector3
   rotation: ReadOnlyQuaternion
   reportedVisible: boolean
+  hasData: boolean
+  shouldRender: boolean
   /**
    * For future reference
    *  animation: string
@@ -32,7 +34,9 @@ export class PeerPresenceManager {
       profileVersion: 0,
       position: { x: 0, y: 0, z: 0 },
       rotation: { x: 0, y: 0, z: 0, w: 0 },
-      reportedVisible: true
+      reportedVisible: true,
+      hasData: false,
+      shouldRender: false
     }
     this.presenceByPeer.set(userId, presence)
     this.presenceByAlias.set(peerAlias, presence)
