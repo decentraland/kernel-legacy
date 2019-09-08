@@ -9,7 +9,7 @@ const requestCache: Map<string, any> = new Map()
  * @param url
  */
 export function memoize(jsonUrl) {
-  return function(fetch): Promise<any> {
+  return function(fetch, options?): Promise<any> {
     if (requestCache.has(jsonUrl)) {
       return requestCache.get(jsonUrl)
     }
@@ -17,7 +17,7 @@ export function memoize(jsonUrl) {
 
     requestCache.set(jsonUrl, futureCache)
 
-    fetch(jsonUrl)
+    fetch(jsonUrl, options)
       .then(
         async $ => {
           if (!$.ok) {

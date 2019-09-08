@@ -7,6 +7,7 @@ import { configureDownloadServer as configureSceneIdServer } from './loader/Posi
 import { configureDownloadServer as configureManifestServer } from './loader/SceneIdToSceneManifest/types'
 import createSagaMiddleware from 'redux-saga'
 import { rootSaga } from './rootSaga'
+import { setProfileServer } from './passports/actions'
 
 export const history: any = createBrowserHistory()
 
@@ -26,10 +27,15 @@ export var store
 
 export const configureStore: any = (state?: RootState) => {
   const sagasMiddleware = createSagaMiddleware()
-  store = createStore(createReducer(history), state, enhance(applyMiddleware(routerMiddleware(history), sagasMiddleware)))
+  store = createStore(
+    createReducer(history),
+    state,
+    enhance(applyMiddleware(routerMiddleware(history), sagasMiddleware))
+  )
   store.dispatch(configureLineOfSightRadius(4))
   store.dispatch(configureSceneIdServer('https://content.decentraland.org/'))
   store.dispatch(configureManifestServer('https://content.decentraland.org/'))
+  store.dispatch(setProfileServer('https://avatars-api.decentraland.org/'))
   sagasMiddleware.run(rootSaga)
   return store
 }
