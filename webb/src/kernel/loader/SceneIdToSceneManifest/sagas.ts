@@ -1,11 +1,7 @@
 import { defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
-import {
-  setPositionsAsResolved,
-  SetPositionsAsResolvedAction,
-  SET_POSITION_AS_RESOLVED
-} from '../PositionToSceneId/actions'
-import { getDownloadServer, needsResolutionToManifest, isMappingResolved } from './selectors'
+import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
+import { getDownloadServer, isMappingResolved, needsResolutionToManifest } from './selectors'
 import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
 
 export function* sceneIdToManifestSaga(): any {

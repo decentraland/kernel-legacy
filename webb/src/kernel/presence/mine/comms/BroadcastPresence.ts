@@ -1,5 +1,5 @@
 import { createLogger } from '@dcl/utils'
-import { ProtocolConnection } from '~/kernel/comms/brokers/ProtocolConnection'
+import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
 
 const logger = createLogger('BroadcastPresence')
 

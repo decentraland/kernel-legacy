@@ -1,7 +1,7 @@
 import { ExposableAPI, registerAPI } from '@dcl/rpc/host'
 import { exposeMethod } from '@dcl/rpc/common/API'
 import { EntityAction, IEventNames, IEvents } from '@dcl/scene-api'
-import { IRendererParcelSceneAPI } from '~/kernel/renderer/IRendererParcelSceneAPI'
+import { IRendererParcelSceneAPI } from '../../renderer/IRendererParcelSceneAPI'
 
 /**
  * The class formerly known as EngineAPI. Communicates the ParcelScene class on the Renderer with the corresponding

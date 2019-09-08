@@ -1,5 +1,5 @@
 import { Category, ProfileData } from '@dcl/protos'
-import { getTopicForPosition } from '~/kernel/presence/mine/getTopicForPosition'
+import { getTopicForPosition } from '../../presence/mine/getTopicForPosition'
 import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicIdentityMessage } from './topicIdentity'
 

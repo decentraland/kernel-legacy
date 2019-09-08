@@ -13,9 +13,9 @@ import {
 } from './actions'
 import {
   getDownloadServer,
-  needsResolution,
+  hasFinishedLoadingPositionMapping,
   multipleNeedsResolution,
-  hasFinishedLoadingPositionMapping
+  needsResolution
 } from './selectors'
 
 export function* positionToSceneIdSaga(): any {

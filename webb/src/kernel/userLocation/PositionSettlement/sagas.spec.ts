@@ -1,10 +1,10 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
+import { getSceneLifeCycle, getSceneStatusByPosition } from '../../scene-runner/selectors'
 import { allInSight } from '../ParcelSight/selectors'
 import { settlePosition, teleport, unsettlePosition } from './actions'
 import { handleTeleport, tryToSettle } from './sagas'
 import { isPositionSettled } from './selectors'
-import { getSceneLifeCycle, getSceneStatusByPosition } from '~/kernel/scene-runner/selectors'
 
 describe('position settlement saga', () => {
   it('dispatches settlements', () => {

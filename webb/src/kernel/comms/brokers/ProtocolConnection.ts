@@ -16,7 +16,7 @@ import {
 import { SendResult } from '../types/SendResult'
 import { IBrokerConnection, BrokerMessage } from './IBrokerConnection'
 import { protocolPosition, protocolChat, protocolProfile, protocolPing, protocolUnknown } from '../actions'
-import { store } from '~/kernel/store'
+import { store } from '../../store'
 
 export class ProtocolConnection {
   logger: ILogger

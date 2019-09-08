@@ -1,12 +1,12 @@
 import { parseParcelPosition } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
-import { SET_POSITION, setPosition } from '../ParcelSight/actions'
+import { getSceneLifeCycle, getSceneStatusByPosition } from '../../scene-runner/selectors'
+import { SceneLifeCycleState, SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR } from '../../scene-runner/types'
+import { setPosition, SET_POSITION } from '../ParcelSight/actions'
 import { allInSight } from '../ParcelSight/selectors'
-import { TELEPORT } from './types'
 import { settlePosition, TeleportAction, unsettlePosition } from './actions'
 import { isPositionSettled } from './selectors'
-import { SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR, SceneLifeCycleState } from '~/kernel/scene-runner/types'
-import { getSceneLifeCycle, getSceneStatusByPosition } from '~/kernel/scene-runner/selectors'
+import { TELEPORT } from './types'
 
 export function* positionSettlementSaga(): any {
   yield takeLatest(TELEPORT, handleTeleport)
