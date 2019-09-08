@@ -3,7 +3,6 @@ import { call, put, select, takeLatest } from 'redux-saga/effects'
 import { getAccessToken } from '../auth/selectors'
 import { PassportRequestAction, passportSuccess, PASSPORT_REQUEST, passportFailure } from './actions'
 import { getProfileDownloadServer } from './selectors'
-import { userInfo } from 'os'
 
 export function* profileResolverSaga(): any {
   yield takeLatest(PASSPORT_REQUEST, fetchProfile)

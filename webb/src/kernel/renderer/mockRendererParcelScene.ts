@@ -1,4 +1,4 @@
-import { ISceneWorker } from '../scene-runner/interface/ISceneWorker'
+import { ISceneWorker } from '../scene-scripts/interface/ISceneWorker'
 import { IRendererParcelSceneAPI } from './IRendererParcelSceneAPI'
 
 /**

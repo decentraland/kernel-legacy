@@ -4,12 +4,8 @@ import { allInSight } from '../ParcelSight/selectors'
 import { TELEPORT } from './types'
 import { settlePosition, TeleportAction, unsettlePosition } from './actions'
 import { isPositionSettled } from './selectors'
-import {
-  SCENE_RUNNING,
-  SCENE_SCRIPT_SOURCED_FATAL_ERROR,
-  SceneLifeCycleState
-} from '~/kernel/loader/SceneLifeCycle/types'
-import { getSceneLifeCycle, getSceneStatusByPosition } from '~/kernel/loader/SceneLifeCycle/selectors'
+import { SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR, SceneLifeCycleState } from '~/kernel/scene-runner/types'
+import { getSceneLifeCycle, getSceneStatusByPosition } from '~/kernel/scene-runner/selectors'
 
 export function* positionSettlementSaga(): any {
   yield takeLatest(TELEPORT, handleTeleport)

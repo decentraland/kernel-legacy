@@ -1,5 +1,5 @@
 import { action } from 'typesafe-actions'
-import { ChatData, PingMessage, ProfileData } from '@dcl/protos'
+import { ChatData, PingMessage, ProfileData, PositionData } from '@dcl/protos'
 import { PositionReport } from '../presence/types/PositionReport'
 
 export const COMMS_STARTED = '[Comms] Starting connection'

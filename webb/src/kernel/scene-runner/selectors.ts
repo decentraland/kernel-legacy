@@ -1,5 +1,5 @@
 import { getKeysMappingToTrue } from '@dcl/utils'
-import { RootPositionToSceneIdState } from '../PositionToSceneId/types'
+import { RootPositionToSceneIdState } from '../loader/PositionToSceneId/types'
 import { RootSceneLifeCycleState, SceneLifeCycleState } from './types'
 
 export const getLoadingScenes = (state: RootSceneLifeCycleState) => getKeysMappingToTrue(state.sceneLifeCycle.loading)
