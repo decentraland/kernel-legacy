@@ -11,6 +11,18 @@ export function getSceneStatus(state: RootSceneLifeCycleState, sceneId: string) 
   return internalGetSceneStatus(state.sceneLifeCycle, sceneId)
 }
 
+export function shouldStartLoadScene(state: RootSceneLifeCycleState, sceneId: string) {
+  const status = internalGetSceneStatus(state.sceneLifeCycle, sceneId)
+  if (status === 'loading' || status === 'awake' || status === 'started') {
+    return false
+  }
+  return true
+}
+
+export function shouldTriggerLoading(state: RootSceneLifeCycleState, sceneId: string) {
+  return internalGetSceneStatus(state.sceneLifeCycle, sceneId) === undefined
+}
+
 export function internalGetSceneStatus(state: SceneLifeCycleState, sceneId: string) {
   return state.loading[sceneId]
     ? 'loading'

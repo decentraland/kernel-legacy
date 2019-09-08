@@ -52,17 +52,4 @@ export class SceneWorkersManager {
     }
     return worker
   }
-
-  onSceneLoadRequest(scene: ISceneManifest) {
-    this.loadScene(scene)
-  }
-  onSceneStartRequest(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneRunRequest(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
-  onSceneStopRequest(scene: ISceneManifest) {
-    throw new Error('Method not implemented.')
-  }
 }

@@ -1,5 +1,15 @@
 import { RootParcelSightState } from './types'
 
+export function isAnyParcelInSight(state: RootParcelSightState, parcels: string[]) {
+  const currentlySighted = state.parcelSight.currentlySightedMap
+  for (let parcel of parcels) {
+    if (currentlySighted[parcel]) {
+      return true
+    }
+  }
+  return false
+}
+
 export function isParcelInSight(state: RootParcelSightState, parcel: string) {
   return state.parcelSight.currentlySightedMap[parcel]
 }

@@ -3,6 +3,7 @@ import { call, put, select, takeLatest } from 'redux-saga/effects'
 import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
 import { getDownloadServer, isMappingResolved, needsResolutionToManifest } from './selectors'
 import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
+import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
 
 export function* sceneIdToManifestSaga(): any {
   yield takeLatest(SET_POSITION_AS_RESOLVED, fetchMissingSceneManifest)
@@ -47,13 +48,10 @@ export async function fetchManifestForSceneId(downloadServer: string, sceneId: s
       return null
     }
     const baseUrl = downloadServer + '/contents/'
-    const scene = (await memoize(baseUrl + sceneJsonMapping.hash)(fetch)) as IScene
-    return {
-      sceneId: sceneId,
-      baseUrl,
-      scene,
-      mappingsResponse: content.content
-    }
+    const sceneData = (await memoize(baseUrl + sceneJsonMapping.hash)(fetch)) as IScene
+    const scene = migrateFromILand(sceneData, mappings)
+    scene.id = sceneId
+    return scene
   } catch (error) {
     defaultLogger.error(`Error in ${downloadServer}/parcel_info response!`, error.stack)
     throw error

@@ -83,7 +83,7 @@ function makeCommands(that) {
           try {
             Loader.getSceneForCoordinates(x, y).then(scene => {
               try {
-                sceneManager.loadScene(migrateFromILand(scene))
+                sceneManager.loadScene(scene)
               } catch (e) {
                 console.log(e)
               }

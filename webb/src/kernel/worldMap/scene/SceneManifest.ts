@@ -16,6 +16,7 @@ import { sha256 } from '@dcl/utils'
 
 export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest
+  private _id: string
   private _cannonicalRepresentation?: string
   private _requiredAssets?: AssetDefinition[]
   private _legacyMappings?: { file: string; hash: string }[]
@@ -36,7 +37,13 @@ export class SceneManifest implements ISceneManifest {
   }
 
   get id(): string {
-    return this.cannonicalSerialization
+    if (!this._id) {
+      this._id = this.cannonicalCID
+    }
+    return this._id
+  }
+  set id(value: string) {
+    this._id = value
   }
 
   get sceneCID(): string {
