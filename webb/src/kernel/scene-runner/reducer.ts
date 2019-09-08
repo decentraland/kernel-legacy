@@ -1,7 +1,6 @@
+import { SCENE_SIGHT_DELTA } from './actions'
 import { internalGetSceneStatus } from './selectors'
 import {
-  SceneLifeCycleAction,
-  SceneLifeCycleState,
   SCENE_LOADING,
   SCENE_RENDERER_FATAL_ERROR,
   SCENE_RENDERER_SENT_LOADED,
@@ -10,9 +9,11 @@ import {
   SCENE_SCRIPT_SENT_AWAKE,
   SCENE_SCRIPT_SOURCED_FATAL_ERROR,
   SCENE_STOP
-} from './types'
+} from './actions'
+import { SceneLifeCycleAction, SceneLifeCycleState } from './types'
 
 export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCycleState = {
+  sightCount: {},
   loading: {},
   awake: {},
   started: {},
@@ -37,9 +38,12 @@ export function sceneLifeCycleReducer(state?: SceneLifeCycleState, action?: Scen
   if (!action) {
     return state
   }
+  if (action.type === SCENE_SIGHT_DELTA) {
+    return { ...state, sightCount: { ...state.sightCount, ...action.payload.updatedSightCount } }
+  }
   if (action && action.payload && action.payload.sceneId) {
     const sceneId = action.payload.sceneId
-    const previousState = internalGetSceneStatus(state, sceneId)
+    const previousState = internalGetSceneStatus(state, sceneId as string)
     switch (action.type) {
       case SCENE_LOADING:
         return { ...state, loading: { ...state.loading, [action.payload.sceneId]: true } }

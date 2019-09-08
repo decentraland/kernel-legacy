@@ -36,6 +36,22 @@ export function getSceneIdForPositionVector(state: RootPositionToSceneIdState, x
   return getSceneIdForPosition(state, encodeParcelPositionFromCoordinates(x, y))
 }
 
+export function getSceneCountForPosition(state: RootPositionToSceneIdState, positions: string[]) {
+  return positions.reduce((cumm, position) => {
+    const sceneId = state.positionToSceneId.resolvedPositionToScene[position]
+    if (cumm[sceneId] === undefined) {
+      cumm[sceneId] = 1
+    } else {
+      cumm[sceneId]++
+    }
+    return cumm
+  }, {})
+}
+
+export function getSceneIdForPositions(state: RootPositionToSceneIdState, positions: string[]) {
+  return Object.keys(getSceneCountForPosition(state, positions))
+}
+
 export function getSceneIdForPosition(state: RootPositionToSceneIdState, position: string) {
   return state.positionToSceneId.resolvedPositionToScene[position]
 }

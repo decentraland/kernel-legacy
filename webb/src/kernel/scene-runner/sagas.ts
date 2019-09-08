@@ -1,20 +1,26 @@
-import future from 'fp-future'
 import { ISceneManifest } from '@dcl/utils'
-import { call, put, race, select, takeLatest, fork, take } from 'redux-saga/effects'
+import future from 'fp-future'
+import { call, fork, put, race, select, take, takeLatest } from 'redux-saga/effects'
+import { getSceneManifest } from '../loader/SceneIdToSceneManifest/selectors'
 import { SceneByIdSuccess, SCENE_BY_ID_SUCCESS } from '../loader/SceneIdToSceneManifest/types'
 import { ISceneWorker } from '../scene-scripts/interface/ISceneWorker'
 import { SceneWorkersManager } from '../scene-scripts/SceneWorkersManager'
-import { SET_POSITION } from '../userLocation/ParcelSight/actions'
+import { ParcelSightChangedAction, PARCEL_SIGHT_DELTA } from '../userLocation/ParcelSight/actions'
 import { isAnyParcelInSight } from '../userLocation/ParcelSight/selectors'
-import { UNSETTLE_POSITION } from '../userLocation/PositionSettlement/types'
-import { shouldTriggerLoading } from './selectors'
-import { sceneLoading, SCENE_STOP, StopScene } from './types'
+import { reportSceneSightDelta, sceneLoading, SCENE_SIGHT_DELTA, SCENE_STOP, stopScene } from './actions'
+import { getSceneDeltaPositionReport, shouldTriggerLoading } from './selectors'
+import { StopScene } from './types'
 
 export function* rootSceneLifecycleSaga(): any {
   yield takeLatest(SCENE_BY_ID_SUCCESS, evaluateStartScene)
-  yield takeLatest(SET_POSITION, evaluateStartScenesAroundNewPosition)
-  yield takeLatest(SET_POSITION, evaluateUnloadScenes)
-  yield takeLatest(UNSETTLE_POSITION, evaluateUnloadScenes)
+  yield takeLatest(PARCEL_SIGHT_DELTA, triggerSceneSightDelta)
+  yield takeLatest(SCENE_SIGHT_DELTA, evaluateStartScenesAroundNewPosition)
+  yield takeLatest(SCENE_SIGHT_DELTA, evaluateUnloadScenes)
+}
+
+function* triggerSceneSightDelta() {
+  const { updatedSightCount, newlySeenScenes, lostSightScenes } = yield select(getSceneDeltaPositionReport)
+  yield put(reportSceneSightDelta({ updatedSightCount, newlySeenScenes, lostSightScenes }))
 }
 
 export const sceneManager = new SceneWorkersManager()
@@ -42,8 +48,19 @@ function* sceneRunner(scene: ISceneManifest) {
   }
 }
 
-function* evaluateStartScenesAroundNewPosition(action: SceneByIdSuccess) {}
-function* evaluateUnloadScenes(action: SceneByIdSuccess) {}
+function* evaluateStartScenesAroundNewPosition(action: ParcelSightChangedAction) {
+  for (let sceneId in action.payload.sighted) {
+    if (yield select(shouldTriggerLoading, sceneId)) {
+      const scene = yield select(getSceneManifest, sceneId)
+      yield fork(sceneRunner, scene)
+    }
+  }
+}
+function* evaluateUnloadScenes(action: ParcelSightChangedAction) {
+  for (let sceneId in action.payload.lostSight) {
+    yield put(stopScene(sceneId))
+  }
+}
 
 async function watchForSceneDispose(sceneId: string, worker: ISceneWorker) {
   const stop = future<void>()

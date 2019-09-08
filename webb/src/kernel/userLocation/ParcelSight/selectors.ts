@@ -18,6 +18,10 @@ export function getCurrentPosition(state: RootParcelSightState) {
   return state.parcelSight.isTargetPlaced ? state.parcelSight.currentPosition! : null
 }
 
+export function deltaSighted(state: RootParcelSightState) {
+  return state.parcelSight.delta
+}
+
 export function newlySighted(state: RootParcelSightState) {
   return state.parcelSight.delta.sighted
 }

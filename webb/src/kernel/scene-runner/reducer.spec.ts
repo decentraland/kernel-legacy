@@ -1,5 +1,5 @@
 import { INITIAL_SCENE_LIFECYCLE_STATUS, sceneLifeCycleReducer } from './reducer'
-import { rendererSentLoaded, sceneLoading, sceneRunning, sceneScriptError, scriptSentAwake } from './types'
+import { rendererSentLoaded, sceneLoading, sceneRunning, sceneScriptError, scriptSentAwake } from './actions'
 
 describe('simple reducer for scene lifecycle', () => {
   it('works as expected', () => {

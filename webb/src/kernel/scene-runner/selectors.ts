@@ -1,5 +1,8 @@
 import { getKeysMappingToTrue } from '@dcl/utils'
+import { getSceneCountForPosition } from '../loader/PositionToSceneId/selectors'
 import { RootPositionToSceneIdState } from '../loader/PositionToSceneId/types'
+import { allInSight } from '../userLocation/ParcelSight/selectors'
+import { RootParcelSightState } from '../userLocation/ParcelSight/types'
 import { RootSceneLifeCycleState, SceneLifeCycleState } from './types'
 
 export const getLoadingScenes = (state: RootSceneLifeCycleState) => getKeysMappingToTrue(state.sceneLifeCycle.loading)
@@ -17,6 +20,34 @@ export function shouldStartLoadScene(state: RootSceneLifeCycleState, sceneId: st
     return false
   }
   return true
+}
+
+export function getSceneDeltaPositionReport(
+  state: RootSceneLifeCycleState & RootParcelSightState & RootPositionToSceneIdState
+) {
+  const currentlySeenParcels = allInSight(state)
+  const updatedSightCount = getSceneCountForPosition(state, currentlySeenParcels)
+  const oldSceneSightCount = state.sceneLifeCycle.sightCount
+  const oldScenes = Object.keys(oldSceneSightCount)
+  const newScenes = Object.keys(updatedSightCount)
+
+  const seenBefore = {}
+  const lostSightScenes = []
+  for (let sceneId of oldScenes) {
+    seenBefore[sceneId] = true
+    if (!updatedSightCount[sceneId]) {
+      lostSightScenes.push(sceneId)
+      updatedSightCount[sceneId] = undefined
+    }
+  }
+  const newlySeenScenes = []
+  for (let sceneId of newScenes) {
+    if (!seenBefore[sceneId]) {
+      newlySeenScenes.push(sceneId)
+    }
+  }
+
+  return { updatedSightCount, newlySeenScenes, lostSightScenes }
 }
 
 export function shouldTriggerLoading(state: RootSceneLifeCycleState, sceneId: string) {

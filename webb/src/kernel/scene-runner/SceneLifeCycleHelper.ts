@@ -11,7 +11,7 @@ import { RootSceneIdToSceneManifestState, sceneByIdRequest } from '../loader/Sce
 import { RootParcelSightState } from '../userLocation/ParcelSight/types'
 import { teleport } from '../userLocation/PositionSettlement/actions'
 import { RootPositionSettlementState } from '../userLocation/PositionSettlement/types'
-import { RootSceneLifeCycleState } from './types'
+import { RootSceneLifeCycleState } from './actions'
 
 export type RootState = RootParcelLoadingState &
   RootParcelSightState &
