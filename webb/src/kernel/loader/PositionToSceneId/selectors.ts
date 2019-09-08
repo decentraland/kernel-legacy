@@ -34,6 +34,9 @@ export function getSceneIdForPositionVector(state: RootPositionToSceneIdState, x
 export function getSceneCountForPosition(state: RootPositionToSceneIdState, positions: string[]) {
   return positions.reduce((cumm, position) => {
     const sceneId = state.positionToSceneId.positionToScene[position]
+    if (sceneId === 'error') {
+      return cumm
+    }
     if (!sceneId) {
       return cumm
     }

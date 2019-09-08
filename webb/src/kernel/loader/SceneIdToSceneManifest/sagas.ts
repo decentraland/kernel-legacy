@@ -24,9 +24,11 @@ export function* handleFetchRequest(action: SceneByIdRequest): any {
   const { sceneId } = action.payload
   try {
     const mapping = yield call(fetchManifestForSceneId, downloadServer, sceneId)
-    const someoneUpdatedItAlready = yield select(isMappingResolved, sceneId)
-    if (!someoneUpdatedItAlready) {
+    const hasData = yield select(isMappingResolved, sceneId)
+    if (!hasData) {
       yield put(sceneByIdSuccess(sceneId, mapping))
+    } else {
+      debugger
     }
   } catch (error) {
     yield put(sceneByIdFailure(sceneId, error))

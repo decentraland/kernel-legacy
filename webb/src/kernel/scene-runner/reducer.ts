@@ -24,6 +24,12 @@ export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCycleState = {
 type KEY = 'loading' | 'awake' | 'started' | 'running' | 'error'
 
 function transition(state: SceneLifeCycleState, sceneId: string, from: KEY, to: KEY) {
+  if (to === undefined) {
+    return {
+      ...state,
+      [from]: { ...state[from], [sceneId]: undefined }
+    }
+  }
   return {
     ...state,
     [from]: { ...state[from], [sceneId]: undefined },
@@ -56,7 +62,7 @@ export function sceneLifeCycleReducer(state?: SceneLifeCycleState, action?: Scen
       case SCENE_RUNNING:
         return transition(state, action.payload.sceneId, 'started', 'running')
       case SCENE_STOP:
-        return transition(state, action.payload.sceneId, previousState, 'running')
+        return transition(state, action.payload.sceneId, previousState, undefined)
       case SCENE_RENDERER_FATAL_ERROR:
         return transition(state, action.payload.sceneId, previousState, 'error')
       case SCENE_SCRIPT_SOURCED_FATAL_ERROR:

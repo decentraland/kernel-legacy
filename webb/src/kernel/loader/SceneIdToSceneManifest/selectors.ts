@@ -1,16 +1,11 @@
 import { RootSceneIdToSceneManifestState, SceneIdToSceneManifestState } from './types'
 
 export function needsResolutionToManifest(state: RootSceneIdToSceneManifestState, sceneId: string): boolean {
-  return (
-    !!sceneId &&
-    !state.sceneIdToManifest.scenesById[sceneId] &&
-    !state.sceneIdToManifest.loading[sceneId] &&
-    !state.sceneIdToManifest.errors[sceneId]
-  )
+  return !!sceneId && !state.sceneIdToManifest.scenesById[sceneId] && !state.sceneIdToManifest.errors[sceneId]
 }
 
 export function isMappingResolved(state: RootSceneIdToSceneManifestState, sceneId: string): boolean {
-  return !state.sceneIdToManifest.loading[sceneId]
+  return !!state.sceneIdToManifest.scenesById[sceneId]
 }
 
 export function internalNeedsResolution(state: SceneIdToSceneManifestState, position: string) {
