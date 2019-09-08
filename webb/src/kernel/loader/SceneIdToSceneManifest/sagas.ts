@@ -1,7 +1,11 @@
-import { booleanMap, defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
+import { defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
-import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED, setPositionsAsResolved } from '../PositionToSceneId/actions'
-import { getDownloadServer, needsResolutionToManifest } from './selectors'
+import {
+  setPositionsAsResolved,
+  SetPositionsAsResolvedAction,
+  SET_POSITION_AS_RESOLVED
+} from '../PositionToSceneId/actions'
+import { getDownloadServer, needsResolutionToManifest, isMappingResolved } from './selectors'
 import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
 
 export function* sceneIdToManifestSaga(): any {
@@ -21,8 +25,10 @@ export function* handleFetchRequest(action: SceneByIdRequest): any {
   const { sceneId } = action.payload
   try {
     const mapping = yield call(fetchManifestForSceneId, downloadServer, sceneId)
-    yield put(sceneByIdSuccess(sceneId, mapping))
-    yield put(setPositionsAsResolved(mapping.scene.scene.parcels, sceneId))
+    const someoneUpdatedItAlready = yield select(isMappingResolved, sceneId)
+    if (!someoneUpdatedItAlready) {
+      yield put(sceneByIdSuccess(sceneId, mapping))
+    }
   } catch (error) {
     yield put(sceneByIdFailure(sceneId, error))
   }

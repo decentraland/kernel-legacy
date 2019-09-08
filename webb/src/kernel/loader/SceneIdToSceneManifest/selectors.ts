@@ -8,6 +8,10 @@ export function needsResolutionToManifest(state: RootSceneIdToSceneManifestState
   )
 }
 
+export function isMappingResolved(state: RootSceneIdToSceneManifestState, sceneId: string): boolean {
+  return !state.sceneIdToManifest.loading[sceneId]
+}
+
 export function internalNeedsResolution(state: SceneIdToSceneManifestState, position: string) {
   return !state.scenesById[position] && !state.loading[position] && !state.errors[position]
 }

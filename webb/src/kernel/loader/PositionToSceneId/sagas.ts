@@ -11,7 +11,12 @@ import {
   setPositionsAsError,
   setPositionsAsResolved
 } from './actions'
-import { getDownloadServer, multipleNeedsResolution } from './selectors'
+import {
+  getDownloadServer,
+  needsResolution,
+  multipleNeedsResolution,
+  hasFinishedLoadingPositionMapping
+} from './selectors'
 
 export function* positionToSceneIdSaga(): any {
   yield takeLatest(FORGET_POSITION, fetchMissingSceneIdMappings)
@@ -23,28 +28,41 @@ export function* fetchMissingSceneIdMappings(): any {
   const delta = yield select(allInSight)
   const needsResolution = yield select(multipleNeedsResolution, delta)
   const missingParcels = getKeysMappingToTrue(needsResolution)
-  yield put(positionLoadRequest(missingParcels))
+  if (missingParcels.length) {
+    yield put(positionLoadRequest(missingParcels))
+  }
 }
 
 export function* handleLoadPositionMapping(action: PositionLoadRequest): any {
   const { positions } = action.payload
   const downloadServer = yield select(getDownloadServer)
-  yield all(positions.map(position => call(resolvePositionMapping, downloadServer, position)))
+  // Heuristically fetch the first parcel first, then the rest (spawning in center of plaza)
+  yield call(resolvePositionMapping, downloadServer, positions[0])
+  yield all(positions.slice(1).map(position => call(resolvePositionMapping, downloadServer, position)))
 }
 
 export function* resolvePositionMapping(downloadServer: string, position: string): any {
   try {
-    const sceneId = yield call(resolvePositionToSceneId, downloadServer, position)
-    if (!sceneId) {
-      yield put(setPositionsAsEmpty([position]))
+    const shouldUpdate = yield select(needsResolution, position)
+    if (shouldUpdate) {
+      const mapping = yield call(resolvePositionToSceneId, downloadServer, position)
+      const stillNeedsUpdate = yield select(hasFinishedLoadingPositionMapping, position)
+      if (stillNeedsUpdate) {
+        if (!mapping) {
+          yield put(setPositionsAsEmpty([position]))
+        }
+        yield put(setPositionsAsResolved(mapping.positions, mapping.sceneId))
+      }
     }
-    yield put(setPositionsAsResolved([position], sceneId))
   } catch (error) {
     yield put(setPositionsAsError([position], error))
   }
 }
 
-async function resolvePositionToSceneId(downloadServer: string, pos: string): Promise<string | null> {
+async function resolvePositionToSceneId(
+  downloadServer: string,
+  pos: string
+): Promise<{ sceneId: string; positions: string[] } | null> {
   const nw = pos.split(',').map($ => parseInt($, 10))
   try {
     const responseContent = await memoize(downloadServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`)(
@@ -54,7 +72,13 @@ async function resolvePositionToSceneId(downloadServer: string, pos: string): Pr
     if (!contents.data.length) {
       return null
     }
-    return contents.data[0].scene_cid
+    return {
+      sceneId: contents.data[0].scene_cid,
+      positions: contents.data.reduce((cumm: string[], data: { parcel_id: string }) => {
+        cumm.push(data.parcel_id)
+        return cumm
+      }, [])
+    }
   } catch (err) {
     defaultLogger.error(`Error in ${downloadServer}/scenes response!`, err.message)
     const ret = new Error(`Error in ${downloadServer}/scenes response!`)

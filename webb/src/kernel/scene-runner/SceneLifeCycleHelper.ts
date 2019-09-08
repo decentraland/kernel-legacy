@@ -2,17 +2,16 @@ import { encodeParcelPosition, encodeParcelPositionFromCoordinates, ISceneManife
 import { EventEmitter } from 'events'
 import future from 'fp-future'
 import { Store } from 'redux'
-import { RootSceneLifeCycleState } from './types'
-import { setPosition } from '../userLocation/ParcelSight/actions'
-import { RootParcelSightState } from '../userLocation/ParcelSight/types'
-import { teleport } from '../userLocation/PositionSettlement/actions'
-import { RootPositionSettlementState } from '../userLocation/PositionSettlement/types'
 import { RootParcelLoadingState } from '../loader/ParcelLoading/types'
 import { positionLoadRequest } from '../loader/PositionToSceneId/actions'
 import { getEmptyStatus, getPositionError, getSceneIdForPosition } from '../loader/PositionToSceneId/selectors'
 import { RootPositionToSceneIdState } from '../loader/PositionToSceneId/types'
 import { getSceneError, getSceneManifest } from '../loader/SceneIdToSceneManifest/selectors'
 import { RootSceneIdToSceneManifestState, sceneByIdRequest } from '../loader/SceneIdToSceneManifest/types'
+import { RootParcelSightState } from '../userLocation/ParcelSight/types'
+import { teleport } from '../userLocation/PositionSettlement/actions'
+import { RootPositionSettlementState } from '../userLocation/PositionSettlement/types'
+import { RootSceneLifeCycleState } from './types'
 
 export type RootState = RootParcelLoadingState &
   RootParcelSightState &
@@ -27,10 +26,6 @@ export class SceneLifeCycleHelper extends EventEmitter {
   async getSceneForCoordinates(x: number, y: number): Promise<ISceneManifest> {
     const sceneId = await this.getSceneIdByCoordinates(x, y)
     return this.getSceneById(sceneId)
-  }
-
-  reportCurrentPosition(position: Vector2) {
-    this.store.dispatch(setPosition(position))
   }
 
   teleport(position: Vector2) {

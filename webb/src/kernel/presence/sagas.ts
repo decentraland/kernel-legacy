@@ -33,6 +33,7 @@ function* handleIncomingPing(ping: ProtocolPingAction) {
 
 function* subscribeAround() {
   const { delta, currentlySighted } = yield select(allInSight)
+  return [delta, currentlySighted]
 }
 
 function* handleNeedToUnsubscribe() {}

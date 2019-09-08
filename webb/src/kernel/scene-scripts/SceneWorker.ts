@@ -3,7 +3,6 @@ import { createLogger, ISceneManifest, Observable } from '@dcl/utils'
 import future, { IFuture } from 'fp-future'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'
 import { ISceneWorker } from './interface/ISceneWorker'
-import { SceneStatus } from './SceneStatus'
 
 import { DevTools } from './kernelSpace/DevTools'
 import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
@@ -27,7 +26,6 @@ export class SceneWorker implements ISceneWorker {
   public readonly onDisposeObservable = new Observable<string>()
 
   public transport: ScriptingTransport
-  public sceneState: SceneStatus = 'loading'
   public sceneManifest: ISceneManifest
 
   constructor(public parcelScene: IRendererParcelSceneAPI, transport: ScriptingTransport, gamekit?: string) {
@@ -42,7 +40,6 @@ export class SceneWorker implements ISceneWorker {
   dispose() {
     if (this.enabled) {
       this.enabled = false
-      this.sceneState = 'stopped'
 
       // Unmount the system
       if (this.system) {

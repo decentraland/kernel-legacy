@@ -15,6 +15,10 @@ export function needsResolution(state: RootPositionToSceneIdState, position: str
   return internalNeedsResolution(state.positionToSceneId, position)
 }
 
+export function hasFinishedLoadingPositionMapping(state: RootPositionToSceneIdState, position: string) {
+  return !state.positionToSceneId.loadingPositionCoordinates[position]
+}
+
 export function internalNeedsResolution(state: PositionToSceneIdState, position: string) {
   return (
     !state.resolvedPositionToScene[position] &&
