@@ -2,9 +2,8 @@ import { parseParcelPosition } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import { SceneLifeCycleState } from '~/kernel/scene-runner/types'
 import { SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR } from '../../scene-runner/actions'
-import { getSceneLifeCycle, getSceneStatusByPosition } from '../../scene-runner/selectors'
+import { getSightedScenesRunningReport, isSceneAtPositionRendereable } from '../../scene-runner/selectors'
 import { setPosition, SET_POSITION } from '../ParcelSight/actions'
-import { allInSight } from '../ParcelSight/selectors'
 import { settlePosition, TeleportAction, unsettlePosition } from './actions'
 import { isPositionSettled } from './selectors'
 import { TELEPORT } from './types'
@@ -26,10 +25,13 @@ export function* tryToSettle(): any {
 }
 
 export function* canPositionSettle(): any {
-  const allSighted: string[] = yield select(allInSight)
-  const currentSceneStatus: SceneLifeCycleState = yield select(getSceneLifeCycle)
-  for (let position of allSighted) {
-    if (!currentSceneStatus.running[position] && !currentSceneStatus.error[position]) {
+  const currentSceneStatus: SceneLifeCycleState = yield select(getSightedScenesRunningReport)
+  const sighted = Object.keys(currentSceneStatus)
+  if (!sighted.length) {
+    return false
+  }
+  for (let sceneId of sighted) {
+    if (currentSceneStatus[sceneId] !== 'running' && currentSceneStatus[sceneId] !== 'error') {
       return false
     }
   }
@@ -37,8 +39,8 @@ export function* canPositionSettle(): any {
 }
 
 export function* handleTeleport(action: TeleportAction): any {
-  const status: string = yield select(getSceneStatusByPosition, action.payload.position)
-  if (status === 'running' || status === 'error') {
+  const isRendereable: string = yield select(isSceneAtPositionRendereable, action.payload.position)
+  if (isRendereable) {
     // What should we do here? We are teleporting to a scene that already loaded.
     //  - Nothing? Business as usual, similar to moving from one parcel to the other.
     //      This means waiting for other side-effects watchers to realize.

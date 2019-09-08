@@ -1,4 +1,5 @@
 import { ScriptingTransport } from '@dcl/rpc/common/json-rpc/types'
+import { ScriptingHost } from '@dcl/rpc/host'
 import { Observable, ISceneManifest } from '@dcl/utils'
 
 /**
@@ -9,6 +10,7 @@ export interface ISceneWorker {
   sceneManifest: ISceneManifest
   transport: ScriptingTransport
   persistent: boolean
+  system: ScriptingHost
   dispose: Function
   onDisposeObservable: Observable<string>
 }

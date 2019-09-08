@@ -11,8 +11,8 @@ import { PositionToSceneIdState } from './types'
 
 export const INITIAL_POSITION_TO_SCENEID_STATE: PositionToSceneIdState = {
   downloadServer: '',
-  positionToScene: {}
-  sceneIdToPositions: {},
+  positionToScene: {},
+  sceneIdToPositions: {}
 }
 
 function setIn<T>(thing: Record<string, T>, filter: string[], value: T) {
@@ -29,7 +29,6 @@ export function positionToSceneIdReducer(
   if (!action) {
     return state
   }
-  var targets: string[] = []
   switch (action.type) {
     case SET_POSITION_AS_LOADING:
       return {

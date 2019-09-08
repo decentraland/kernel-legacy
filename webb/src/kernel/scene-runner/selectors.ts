@@ -22,6 +22,18 @@ export function shouldStartLoadScene(state: RootSceneLifeCycleState, sceneId: st
   return true
 }
 
+export function getSightedScenesRunningReport(
+  state: RootSceneLifeCycleState & RootParcelSightState & RootPositionToSceneIdState
+) {
+  const currentlySeenParcels = allInSight(state)
+  const runningStatus = getSceneCountForPosition(state, currentlySeenParcels)
+  const currentlySeenScenes = Object.keys(runningStatus)
+  for (let scene of currentlySeenScenes) {
+    runningStatus[scene] = internalGetSceneStatus(state.sceneLifeCycle, scene)
+  }
+  return runningStatus
+}
+
 export function getSceneDeltaPositionReport(
   state: RootSceneLifeCycleState & RootParcelSightState & RootPositionToSceneIdState
 ) {
@@ -66,6 +78,15 @@ export function internalGetSceneStatus(state: SceneLifeCycleState, sceneId: stri
     : state.error[sceneId]
     ? 'error'
     : undefined
+}
+
+export function isSceneAtPositionRendereable(
+  state: RootSceneLifeCycleState & RootPositionToSceneIdState,
+  position: string
+) {
+  const sceneId = state.positionToSceneId.positionToScene[position]
+  const status = internalGetSceneStatus(state.sceneLifeCycle, sceneId)
+  return status === 'running' || status === 'error'
 }
 
 export function getSceneStatusByPosition(

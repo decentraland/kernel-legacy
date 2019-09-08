@@ -1,12 +1,23 @@
 import { ISceneManifest } from '@dcl/utils'
 import future from 'fp-future'
-import { all, call, fork, put, race, select, take, takeLatest } from 'redux-saga/effects'
+import { fork, call, spawn, put, race, select, take, takeLatest, delay } from 'redux-saga/effects'
 import { getSceneManifest } from '../loader/SceneIdToSceneManifest/selectors'
 import { SCENE_BY_ID_SUCCESS } from '../loader/SceneIdToSceneManifest/types'
 import { ISceneWorker } from '../scene-scripts/interface/ISceneWorker'
 import { SceneWorkersManager } from '../scene-scripts/SceneWorkersManager'
 import { PARCEL_SIGHT_DELTA } from '../userLocation/ParcelSight/actions'
-import { reportSceneSightDelta, sceneLoading, SCENE_SIGHT_DELTA, SCENE_STOP, stopScene } from './actions'
+import {
+  reportSceneSightDelta,
+  sceneLoading,
+  SCENE_SIGHT_DELTA,
+  SCENE_STOP,
+  stopScene,
+  scriptSentAwake,
+  scriptTimedout,
+  rendererSentLoaded,
+  sceneRendererError,
+  sceneRunning
+} from './actions'
 import { getSceneDeltaPositionReport, shouldTriggerLoading } from './selectors'
 import { SceneSightDeltaAction, StopScene } from './types'
 
@@ -45,6 +56,30 @@ function* sceneRunner(input: string | ISceneManifest) {
     yield put(sceneLoading(scene.id))
     const worker = sceneManager.loadScene(scene)
     const result = yield fork(function* racer() {
+      const scriptLoad: any = yield race({
+        awake: call(watchScriptForAwake, worker),
+        timeout: delay(10000)
+      })
+      if (scriptLoad.awake) {
+        yield put(scriptSentAwake(scene.id))
+      } else {
+        yield put(scriptTimedout(scene.id))
+        worker.dispose()
+        return
+      }
+      const rendererLoad: any = yield race({
+        load: call(watchRendererForLoaded, worker),
+        timeout: delay(10000)
+      })
+      if (rendererLoad.load) {
+        yield put(rendererSentLoaded(scene.id))
+      } else {
+        console.log('Scene rendering took too long', scene)
+        yield put(sceneRendererError(scene.id))
+        worker.dispose()
+        return
+      }
+      yield put(sceneRunning(scene.id))
       yield race({
         sceneError: call(watchForSceneDispose, scene.id, worker),
         stop: take(
@@ -59,10 +94,34 @@ function* sceneRunner(input: string | ISceneManifest) {
 }
 
 function* evaluateStartScenesAroundNewPosition(action: SceneSightDeltaAction) {
-  yield all(action.payload.newlySeenScenes.map(sceneId => fork(() => sceneRunner(sceneId))))
+  for (let scene of action.payload.newlySeenScenes) {
+    yield spawn(sceneRunner, scene)
+  }
 }
 function* evaluateUnloadScenes(action: SceneSightDeltaAction) {
-  yield all(action.payload.lostSightScenes.map(sceneId => put(stopScene(sceneId))))
+  for (let sceneId of action.payload.lostSightScenes) {
+    yield put(stopScene(sceneId))
+  }
+}
+
+async function watchScriptForAwake(worker: ISceneWorker) {
+  const awake = future<boolean>()
+  const system = await (worker as any).system
+  system.on('awake', () => {
+    console.log(worker.sceneManifest.id, 'awake')
+    awake.resolve(true)
+  })
+  return awake
+}
+
+async function watchRendererForLoaded(worker: ISceneWorker) {
+  const loaded = future<boolean>()
+  const system = await (worker as any).system
+  system.on('loaded', () => {
+    console.log(worker.sceneManifest.id, 'loaded')
+    loaded.resolve(true)
+  })
+  return loaded
 }
 
 async function watchForSceneDispose(sceneId: string, worker: ISceneWorker) {
