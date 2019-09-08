@@ -2,6 +2,7 @@ import { RootSceneIdToSceneManifestState, SceneIdToSceneManifestState } from './
 
 export function needsResolutionToManifest(state: RootSceneIdToSceneManifestState, sceneId: string): boolean {
   return (
+    !!sceneId &&
     !state.sceneIdToManifest.scenesById[sceneId] &&
     !state.sceneIdToManifest.loading[sceneId] &&
     !state.sceneIdToManifest.errors[sceneId]
@@ -13,7 +14,7 @@ export function isMappingResolved(state: RootSceneIdToSceneManifestState, sceneI
 }
 
 export function internalNeedsResolution(state: SceneIdToSceneManifestState, position: string) {
-  return !state.scenesById[position] && !state.loading[position] && !state.errors[position]
+  return !!position && !state.scenesById[position] && !state.loading[position] && !state.errors[position]
 }
 
 export function getDownloadServer(state: RootSceneIdToSceneManifestState) {
@@ -21,7 +22,7 @@ export function getDownloadServer(state: RootSceneIdToSceneManifestState) {
 }
 
 export function getSceneManifest(state: RootSceneIdToSceneManifestState, sceneId: string) {
-  return state.sceneIdToManifest.scenesById[sceneId]
+  return sceneId && state.sceneIdToManifest.scenesById[sceneId]
 }
 
 export function getSceneError(state: RootSceneIdToSceneManifestState, sceneId: string) {

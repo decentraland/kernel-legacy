@@ -73,7 +73,7 @@ export class SceneWorker implements ISceneWorker {
       )
     }
     const worker = new (Worker as any)(gamekit, {
-      name: `ParcelSceneWorker(${this.parcelScene.sceneManifest.sceneId})`
+      name: `ParcelSceneWorker(${this.parcelScene.sceneManifest.id})`
     })
     return this.startSystem(transport || WebWorkerTransport(worker))
   }

@@ -7,22 +7,16 @@ import { IRendererParcelSceneAPI } from './IRendererParcelSceneAPI'
 export class MemoryRendererParcelScene implements IRendererParcelSceneAPI {
   public worker: ISceneWorker
   public sceneManifest: any
-  sendBatch(actions: any[]): void {
-    console.log(actions)
-  }
+  sendBatch(actions: any[]): void {}
   registerWorker(worker: ISceneWorker): void {
     this.worker = worker
-    console.log('Registered worker', worker)
+    console.log('Registered worker', worker.sceneManifest.id)
   }
   dispose(): void {
     console.log('Disposing worker')
   }
-  on(event: string, cb: (event: any) => void): void {
-    console.log('Registering event', event)
-  }
-  off(event: string, cb: (event: any) => void): void {
-    console.log('Unregister event', event)
-  }
+  on(event: string, cb: (event: any) => void): void {}
+  off(event: string, cb: (event: any) => void): void {}
   constructor(scene: any) {
     this.sceneManifest = scene
   }

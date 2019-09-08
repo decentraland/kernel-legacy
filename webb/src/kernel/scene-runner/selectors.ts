@@ -1,5 +1,5 @@
 import { getKeysMappingToTrue } from '@dcl/utils'
-import { getSceneCountForPosition } from '../loader/PositionToSceneId/selectors'
+import { getSceneCountForPosition, getSceneIdForPosition } from '../loader/PositionToSceneId/selectors'
 import { RootPositionToSceneIdState } from '../loader/PositionToSceneId/types'
 import { allInSight } from '../userLocation/ParcelSight/selectors'
 import { RootParcelSightState } from '../userLocation/ParcelSight/types'
@@ -51,7 +51,7 @@ export function getSceneDeltaPositionReport(
 }
 
 export function shouldTriggerLoading(state: RootSceneLifeCycleState, sceneId: string) {
-  return internalGetSceneStatus(state.sceneLifeCycle, sceneId) === undefined
+  return !internalGetSceneStatus(state.sceneLifeCycle, sceneId)
 }
 
 export function internalGetSceneStatus(state: SceneLifeCycleState, sceneId: string) {
@@ -63,17 +63,19 @@ export function internalGetSceneStatus(state: SceneLifeCycleState, sceneId: stri
     ? 'started'
     : state.running[sceneId]
     ? 'running'
-    : 'error'
+    : state.error[sceneId]
+    ? 'error'
+    : undefined
 }
 
 export function getSceneStatusByPosition(
   state: RootSceneLifeCycleState & RootPositionToSceneIdState,
   position: string
 ) {
-  if (!state.positionToSceneId.resolvedPositionToScene[position]) {
+  if (!getSceneIdForPosition(state, position)) {
     return null
   }
-  return internalGetSceneStatus(state.sceneLifeCycle, state.positionToSceneId.resolvedPositionToScene[position])
+  return internalGetSceneStatus(state.sceneLifeCycle, state.positionToSceneId.positionToScene[position])
 }
 
 export const getSceneLifeCycle = (state: RootSceneLifeCycleState) => state.sceneLifeCycle

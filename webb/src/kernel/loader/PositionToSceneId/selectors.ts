@@ -16,16 +16,11 @@ export function needsResolution(state: RootPositionToSceneIdState, position: str
 }
 
 export function hasFinishedLoadingPositionMapping(state: RootPositionToSceneIdState, position: string) {
-  return !state.positionToSceneId.loadingPositionCoordinates[position]
+  return state.positionToSceneId.positionToScene[position] !== 'loading'
 }
 
 export function internalNeedsResolution(state: PositionToSceneIdState, position: string) {
-  return (
-    !state.resolvedPositionToScene[position] &&
-    !state.errorPositions[position] &&
-    !state.emptyPositions[position] &&
-    !state.loadingPositionCoordinates[position]
-  )
+  return state.positionToScene[position] === undefined
 }
 
 export function getDownloadServer(state: RootPositionToSceneIdState) {
@@ -38,7 +33,10 @@ export function getSceneIdForPositionVector(state: RootPositionToSceneIdState, x
 
 export function getSceneCountForPosition(state: RootPositionToSceneIdState, positions: string[]) {
   return positions.reduce((cumm, position) => {
-    const sceneId = state.positionToSceneId.resolvedPositionToScene[position]
+    const sceneId = state.positionToSceneId.positionToScene[position]
+    if (!sceneId) {
+      return cumm
+    }
     if (cumm[sceneId] === undefined) {
       cumm[sceneId] = 1
     } else {
@@ -53,13 +51,16 @@ export function getSceneIdForPositions(state: RootPositionToSceneIdState, positi
 }
 
 export function getSceneIdForPosition(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.resolvedPositionToScene[position]
+  const status = state.positionToSceneId.positionToScene[position]
+  if (status === 'loading' || status === 'empty' || status === 'error') {
+    return undefined
+  }
 }
 
 export function getPositionError(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.errorPositions[position]
+  return state.positionToSceneId.positionToScene[position] === 'error'
 }
 
 export function getEmptyStatus(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.emptyPositions[position]
+  return state.positionToSceneId.positionToScene[position] === 'empty'
 }

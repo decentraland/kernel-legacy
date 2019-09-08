@@ -5,7 +5,6 @@ import { isValidSceneInput, getInvalidReason } from '../scene/validation'
 export function migrateFromILand(scene: any, mappings?: any): ISceneManifest {
   const raw = scene.mappingsResponse ? _upgradeILandToSceneManifest(scene) : _upgradeToV2(scene, mappings)
   const manifest = new SceneManifest(raw)
-  console.log('created manifest', manifest, manifest.cannonicalCID)
   return manifest
 }
 function _upgradeILandToSceneManifest(scene: ILand<any>) {

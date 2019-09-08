@@ -1,5 +1,5 @@
 import { defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
-import { call, put, select, takeLatest } from 'redux-saga/effects'
+import { call, put, select, takeLatest, all } from 'redux-saga/effects'
 import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
 import { getDownloadServer, isMappingResolved, needsResolutionToManifest } from './selectors'
 import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
@@ -11,9 +11,11 @@ export function* sceneIdToManifestSaga(): any {
 }
 
 export function* fetchMissingSceneManifest(resolvedPosition: SetPositionsAsResolvedAction): any {
-  const needsResolution = yield select(needsResolutionToManifest, resolvedPosition.payload.sceneId)
-  if (needsResolution) {
-    yield put(sceneByIdRequest(resolvedPosition.payload.sceneId))
+  if (resolvedPosition.payload.sceneId) {
+    const needsResolution = yield select(needsResolutionToManifest, resolvedPosition.payload.sceneId)
+    if (needsResolution) {
+      yield put(sceneByIdRequest(resolvedPosition.payload.sceneId))
+    }
   }
 }
 
@@ -33,7 +35,7 @@ export function* handleFetchRequest(action: SceneByIdRequest): any {
 
 export async function fetchManifestForSceneId(downloadServer: string, sceneId: string) {
   try {
-    const actualResponse = await memoize(downloadServer + `/parcel_info?cids=${sceneId}`)(fetch)
+    const actualResponse = await memoize(downloadServer + `parcel_info?cids=${sceneId}`)(fetch)
     const mappings = actualResponse as {
       data: ParcelInfoResponse[]
     }
