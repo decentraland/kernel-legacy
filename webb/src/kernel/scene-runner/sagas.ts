@@ -1,22 +1,22 @@
 import { ISceneManifest } from '@dcl/utils'
 import future from 'fp-future'
-import { fork, call, spawn, put, race, select, take, takeLatest, delay } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { getSceneManifest } from '../loader/SceneIdToSceneManifest/selectors'
 import { SCENE_BY_ID_SUCCESS } from '../loader/SceneIdToSceneManifest/types'
 import { ISceneWorker } from '../scene-scripts/interface/ISceneWorker'
 import { SceneWorkersManager } from '../scene-scripts/SceneWorkersManager'
 import { PARCEL_SIGHT_DELTA } from '../userLocation/ParcelSight/actions'
 import {
+  rendererSentLoaded,
   reportSceneSightDelta,
   sceneLoading,
+  sceneRendererError,
+  sceneRunning,
   SCENE_SIGHT_DELTA,
   SCENE_STOP,
-  stopScene,
   scriptSentAwake,
   scriptTimedout,
-  rendererSentLoaded,
-  sceneRendererError,
-  sceneRunning
+  stopScene
 } from './actions'
 import { getSceneDeltaPositionReport, shouldTriggerLoading } from './selectors'
 import { SceneSightDeltaAction, StopScene } from './types'
@@ -44,18 +44,19 @@ function* sceneRunner(input: string | ISceneManifest) {
   const sceneId = typeof input === 'string' ? input : input.id
   const shouldtrigger = yield select(shouldTriggerLoading, sceneId)
   if (shouldtrigger) {
+    yield put(sceneLoading(sceneId))
     let scene
     if (typeof input === 'string') {
       scene = yield select(getSceneManifest, sceneId)
       if (!scene) {
-        return
+        const resolve = yield take(action => action.type === SCENE_BY_ID_SUCCESS && action.payload.sceneId === sceneId)
+        scene = resolve.payload.scene
       }
     } else {
       scene = input
     }
-    yield put(sceneLoading(scene.id))
-    const worker = sceneManager.loadScene(scene)
-    const result = yield fork(function* racer() {
+    return yield spawn(function* racer() {
+      const worker = yield call(() => sceneManager.loadScene(scene))
       const scriptLoad: any = yield race({
         awake: call(watchScriptForAwake, worker),
         timeout: delay(10000)

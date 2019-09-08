@@ -11,12 +11,7 @@ import {
   setPositionsAsError,
   setPositionsAsResolved
 } from './actions'
-import {
-  getDownloadServer,
-  hasFinishedLoadingPositionMapping,
-  multipleNeedsResolution,
-  needsResolution
-} from './selectors'
+import { getDownloadServer, multipleNeedsResolution, needsResolution } from './selectors'
 
 export function* positionToSceneIdSaga(): any {
   yield takeLatest(FORGET_POSITION, fetchMissingSceneIdMappings)
@@ -46,13 +41,10 @@ export function* resolvePositionMapping(downloadServer: string, position: string
     const shouldUpdate = yield select(needsResolution, position)
     if (shouldUpdate) {
       const mapping = yield call(resolvePositionToSceneId, downloadServer, position)
-      const stillNeedsUpdate = yield select(hasFinishedLoadingPositionMapping, position)
-      if (stillNeedsUpdate) {
-        if (!mapping) {
-          yield put(setPositionsAsEmpty([position]))
-        }
-        yield put(setPositionsAsResolved(mapping.positions, mapping.sceneId))
+      if (!mapping) {
+        yield put(setPositionsAsEmpty([position]))
       }
+      yield put(setPositionsAsResolved(mapping.positions, mapping.sceneId))
     }
   } catch (error) {
     yield put(setPositionsAsError([position], error))

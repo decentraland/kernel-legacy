@@ -1,21 +1,18 @@
 import { defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
-import { call, put, select, takeLatest, all } from 'redux-saga/effects'
-import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
-import { getDownloadServer, isMappingResolved, needsResolutionToManifest } from './selectors'
-import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
+import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects'
 import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
+import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
+import { getDownloadServer, isMappingResolved } from './selectors'
+import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'
 
 export function* sceneIdToManifestSaga(): any {
   yield takeLatest(SET_POSITION_AS_RESOLVED, fetchMissingSceneManifest)
-  yield takeLatest(SCENE_BY_ID_REQUEST, handleFetchRequest)
+  yield takeEvery(SCENE_BY_ID_REQUEST, handleFetchRequest)
 }
 
 export function* fetchMissingSceneManifest(resolvedPosition: SetPositionsAsResolvedAction): any {
   if (resolvedPosition.payload.sceneId) {
-    const needsResolution = yield select(needsResolutionToManifest, resolvedPosition.payload.sceneId)
-    if (needsResolution) {
-      yield put(sceneByIdRequest(resolvedPosition.payload.sceneId))
-    }
+    yield put(sceneByIdRequest(resolvedPosition.payload.sceneId))
   }
 }
 
@@ -23,14 +20,20 @@ export function* handleFetchRequest(action: SceneByIdRequest): any {
   const downloadServer = yield select(getDownloadServer)
   const { sceneId } = action.payload
   try {
-    const mapping = yield call(fetchManifestForSceneId, downloadServer, sceneId)
     const hasData = yield select(isMappingResolved, sceneId)
-    if (!hasData) {
+    if (hasData) {
+      return
+    }
+    const mapping = yield call(fetchManifestForSceneId, downloadServer, sceneId)
+    if (!mapping) {
+      yield put(sceneByIdFailure(sceneId, 'empty'))
+    }
+    const hasDataYet = yield select(isMappingResolved, sceneId)
+    if (!hasDataYet) {
       yield put(sceneByIdSuccess(sceneId, mapping))
-    } else {
-      debugger
     }
   } catch (error) {
+    console.log(error)
     yield put(sceneByIdFailure(sceneId, error))
   }
 }

@@ -1,5 +1,3 @@
-import { SCENE_SIGHT_DELTA } from './actions'
-import { internalGetSceneStatus } from './selectors'
 import {
   SCENE_LOADING,
   SCENE_RENDERER_FATAL_ERROR,
@@ -8,8 +6,10 @@ import {
   SCENE_SCRIPT_AWAKE_TIMEOUT,
   SCENE_SCRIPT_SENT_AWAKE,
   SCENE_SCRIPT_SOURCED_FATAL_ERROR,
+  SCENE_SIGHT_DELTA,
   SCENE_STOP
 } from './actions'
+import { internalGetSceneStatus } from './selectors'
 import { SceneLifeCycleAction, SceneLifeCycleState } from './types'
 
 export const INITIAL_SCENE_LIFECYCLE_STATUS: SceneLifeCycleState = {
