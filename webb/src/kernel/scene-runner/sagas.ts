@@ -81,7 +81,7 @@ function* sceneRunner(input: string | ISceneManifest) {
         return
       }
       yield put(sceneRunning(scene.id))
-      yield race({
+      const result = yield race({
         sceneError: call(watchForSceneDispose, scene.id, worker),
         stop: take(
           (action: any) => action && action.type === SCENE_STOP && (action as StopScene).payload.sceneId === scene.id
