@@ -16,7 +16,7 @@ export class RendererParcelSceneToScript extends ExposableAPI {
   /**
    * List of subscribed events
    */
-  subscribedEvents: Record<IEventNames, number> = {}
+  subscribedEvents: Record<IEventNames, number> = {} as any
   /**
    * The listener associated with each event
    */
@@ -80,7 +80,7 @@ export class RendererParcelSceneToScript extends ExposableAPI {
    */
   sendSubscriptionEvent<K extends IEventNames>(event: K, data: IEvents[K]) {
     if (this.subscribedEvents[event]) {
-      super.notify('SubscribedEvent', { event, data })
+      this.options.notify('SubscribedEvent', { event, data })
     }
   }
 

@@ -14,9 +14,10 @@ export type Data<T extends IWorker, R extends IRendererParcelSceneAPI> = {
 export class SceneWorkersManager {
   loadedSceneWorkers = new Map<string, ISceneWorker>()
   sceneManifests = new Map<string, ISceneManifest>()
+  parcelSceneClass: any = MemoryRendererParcelScene
 
   newSceneWorker(scene: ISceneManifest, transport?: ScriptingTransport) {
-    return new SceneWorker(new MemoryRendererParcelScene(scene), transport, './gamekit.js')
+    return new SceneWorker(new this.parcelSceneClass(scene), transport, './gamekit.js')
   }
 
   getSceneWorkerBySceneID(sceneId: string) {

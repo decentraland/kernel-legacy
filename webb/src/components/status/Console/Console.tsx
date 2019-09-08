@@ -1,13 +1,13 @@
 import React from 'react'
+import { Segment } from '~/components/liteui/dcl'
 import { Auth } from '~/kernel/auth'
 import { commsStarted } from '~/kernel/comms/actions'
-import { teleport } from '~/kernel/userLocation/PositionSettlement/actions'
-import { SceneLifeCycleHelper } from '~/kernel/scene-runner/SceneLifeCycleHelper'
 import { passportRequest } from '~/kernel/passports/actions'
+import { SceneLifeCycleHelper } from '~/kernel/scene-runner/SceneLifeCycleHelper'
 import { SceneWorkersManager } from '~/kernel/scene-scripts/SceneWorkersManager'
 import { store } from '~/kernel/store'
-import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
-import { Segment } from '~/components/liteui/dcl'
+import { teleport } from '~/kernel/userLocation/PositionSettlement/actions'
+import { initializeUnity } from '~/unity/incoming'
 const Terminal = require('react-console-emulator').default
 
 const auth = new Auth()
@@ -22,21 +22,12 @@ function makeCommands(that) {
   if (!term) {
     term = that
     Object.assign(commands, {
-      dispatch: {
-        description: 'Dispatch an action to the store',
-        usage: 'dispatch',
-        fn: function(...args: any[]) {
-          const type = args[0]
-          if (type) {
-            try {
-              store.dispatch({ type: args[0], payload: args.slice(1) })
-            } catch (e) {
-              return 'Error!' + e.stack
-            }
-            return 'dispatching ' + JSON.stringify(args)
-          } else {
-            return 'no type provided'
-          }
+      start: {
+        description: 'Start the unity renderer',
+        usage: 'start',
+        fn: function() {
+          initializeUnity(document.getElementById('renderer'))
+          document.getElementById('root').remove()
         }
       },
       getProfile: {

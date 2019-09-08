@@ -14,13 +14,7 @@
     "experimentalDecorators": true,
     "paths": {
       "~/*": ["./*"],
-      "@dcl/webb/*": ["./*"],
-      "@dcl/utils/*": ["../../utils/package/*"],
-      "@dcl/utils": ["../../utils/package"],
-      "@dcl/kernel": ["../../client/package"],
-      "@dcl/kernel/*": ["../../client/package/*"],
-      "@dcl/config": ["../../config/package"],
-      "@dcl/config/*": ["../../config/package/*"]
+      "@dcl/*": ["../../bazel-genfiles/*", "../../bazel-bin/*"]
     },
     "downlevelIteration": true
   }
