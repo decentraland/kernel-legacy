@@ -343,7 +343,7 @@ export class WorldInstanceConnection {
       this.stats.topic.incrementSent(1, bytes.length)
     }
     if (reliable) {
-      if (!this.connection.hasReliableChannel {
+      if (!this.connection.hasReliableChannel) {
         if (!this.fatalErrorSent) {
           this.fatalErrorSent = true
           throw new Error('trying to send a topic message using null reliable channel')
