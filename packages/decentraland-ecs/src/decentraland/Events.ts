@@ -17,7 +17,7 @@ export class RaycastResponse<T> {
     public readonly payload: {
       queryId: string
       queryType: string
-      rayHit: T
+      payload: T
     }
   ) {}
 }

@@ -4,7 +4,7 @@ import { DecentralandInterface, GlobalInputEventResult } from './Types'
 import { OnUUIDEvent } from './Components'
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
 import { Input } from './Input'
-import { PhysicsCast } from './PhysicsCast'
+import { PhysicsCast, RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
 import { log } from '../ecs/helpers'
 
 declare var dcl: DecentralandInterface | void
@@ -14,10 +14,13 @@ declare var dcl: DecentralandInterface | void
  */
 export class RaycastEventSystem implements ISystem {
   activate(engine: Engine) {
-    log('activate raycast event system')
     engine.eventManager.addListener(RaycastResponse, this, event => {
-      log('RaycastResponse', event)
-      PhysicsCast.instance.handleRaycastResponse(event)
+      log('event: ' + event.payload.queryType + ' - ' + event.payload.payload)
+      if (event.payload.queryType === 'HitFirst') {
+        PhysicsCast.instance.handleRaycastHitFirstResponse(event as RaycastResponse<RaycastHitEntity>)
+      } else if (event.payload.queryType === 'HitAll') {
+        PhysicsCast.instance.handleRaycastHitAllResponse(event as RaycastResponse<RaycastHitEntities>)
+      }
     })
 
     if (typeof dcl !== 'undefined') {

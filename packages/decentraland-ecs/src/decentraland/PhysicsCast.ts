@@ -5,14 +5,23 @@ import { uuid, log } from '../ecs/helpers'
 /** @internal */
 import { DecentralandInterface } from './Types'
 
+/**
+ * @internal
+ */
 export type QueryType = 'HitFirst' | 'HitAll' | 'HitFirstAvatar' | 'HitAllAvatars'
 
+/**
+ * @internal
+ */
 export interface RaycastQuery {
   queryId: string
   queryType: QueryType
   ray: Ray
 }
 
+/**
+ * @public
+ */
 export interface RaycastHit {
   didHit: boolean
   ray: Ray
@@ -20,38 +29,63 @@ export interface RaycastHit {
   hitNormal: ReadOnlyVector3
 }
 
+/**
+ * @public
+ */
 export interface Ray {
   origin: ReadOnlyVector3
   direction: ReadOnlyVector3
   distance: number
 }
 
+/**
+ * @public
+ */
 export interface HitEntityInfo {
+  isValid: boolean
   entityId: string
   meshName: string
 }
 
+/**
+ * @public
+ */
 export interface RaycastHitEntities extends RaycastHit {
   entities: HitEntityInfo[]
 }
 
+/**
+ * @public
+ */
 export interface RaycastHitEntity extends RaycastHit {
   entity: HitEntityInfo
 }
 
+/**
+ * @public
+ */
 export interface BasicAvatarInfo {
   userId: string
   name: string
 }
 
+/**
+ * @public
+ */
 export interface RaycastHitAvatar extends RaycastHit {
   avatar: BasicAvatarInfo
 }
 
+/**
+ * @public
+ */
 export interface RaycastHitAvatars extends RaycastHit {
   avatars: BasicAvatarInfo[]
 }
 
+/**
+ * @public
+ */
 export interface IPhysicsCast {
   hitFirst: (ray: Ray, hitCallback: (event: RaycastHitEntity) => void) => void
   hitAll: (ray: Ray, hitCallback: (event: RaycastHitEntities) => void) => void
@@ -62,9 +96,12 @@ export interface IPhysicsCast {
 /** @internal */
 declare let dcl: DecentralandInterface | void
 
+/**
+ * @public
+ */
 export class PhysicsCast implements IPhysicsCast {
   private static _instance: PhysicsCast
-  private queries: Record<string, (event: any) => void> = {}
+  private queries: Record<string, (event: RaycastHit) => void> = {}
 
   static get instance(): PhysicsCast {
     PhysicsCast.ensureInstance()
@@ -80,7 +117,7 @@ export class PhysicsCast implements IPhysicsCast {
   public hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void) {
     const queryId = uuid()
 
-    this.queries[queryId] = hitCallback as (event: any) => void
+    this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
     dcl && dcl.query('raycast', { queryId, queryType: 'HitFirst', ray })
   }
@@ -88,7 +125,7 @@ export class PhysicsCast implements IPhysicsCast {
   public hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void) {
     const queryId = uuid()
 
-    this.queries[queryId] = hitCallback as (event: any) => void
+    this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
     dcl && dcl.query('raycast', { queryId, queryType: 'HitAll', ray })
   }
@@ -101,11 +138,15 @@ export class PhysicsCast implements IPhysicsCast {
     log('not implemented yet')
   }
 
-  public handleRaycastResponse<T = RaycastHit>(response: RaycastResponse<T>) {
+  public handleRaycastHitFirstResponse(response: RaycastResponse<RaycastHitEntity>) {
+    log('handleRaycastResponse', response.payload.payload)
+    this.queries[response.payload.queryId](response.payload.payload)
+    delete this.queries[response.payload.queryId]
+  }
+
+  public handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>) {
     log('handleRaycastResponse', response)
-    if (response.payload.queryType === 'HitFirst') {
-      this.queries[response.payload.queryId](response.payload.rayHit)
-      delete this.queries[response.payload.queryId]
-    }
+    this.queries[response.payload.queryId](response.payload.payload)
+    delete this.queries[response.payload.queryId]
   }
 }
