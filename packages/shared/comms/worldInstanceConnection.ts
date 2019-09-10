@@ -46,7 +46,7 @@ export class WorldInstanceConnection {
   public sceneMessageHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   public ping: number = -1
 
-  private fatalErrorSent = false
+  public fatalErrorSent = false
 
   public stats: Stats | null = null
   private pingInterval: any = null
