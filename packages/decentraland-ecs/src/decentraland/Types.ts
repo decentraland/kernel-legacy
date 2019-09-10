@@ -52,6 +52,10 @@ export type DecentralandInterface = {
   /** set a new parent for the entity */
   setParent(entityId: string, parentId: string): void
 
+  // QUERY
+
+  query(system: string, config: any): void
+
   // COMPONENTS
 
   /** called after creating a component in the kernel  */

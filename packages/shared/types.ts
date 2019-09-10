@@ -57,7 +57,10 @@ export type EntityActionType =
   | 'ComponentDisposed'
   | 'ComponentRemoved'
   | 'ComponentUpdated'
+  | 'Query'
   | 'InitMessagesFinished'
+
+export type QueryPayload = { system: string; config: RayQuery }
 
 export type CreateEntityPayload = { id: string }
 
@@ -402,7 +405,8 @@ export type Ray = {
 export type RayQuery = {
   queryId: string
   queryType: QueryType
-} & Ray
+  ray: Ray
+}
 
 export function normalizeContentMappings(
   mappings: Record<string, string> | Array<ContentMapping>

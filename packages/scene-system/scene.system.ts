@@ -10,7 +10,8 @@ import {
   SetEntityParentPayload,
   ComponentCreatedPayload,
   ComponentDisposedPayload,
-  ComponentUpdatedPayload
+  ComponentUpdatedPayload,
+  QueryPayload
 } from 'shared/types'
 import { DecentralandInterface } from 'decentraland-ecs/src/decentraland/Types'
 import { defaultLogger } from 'shared/logger'
@@ -281,6 +282,17 @@ export default class GamekitScene extends Script {
               entityId,
               parentId
             } as SetEntityParentPayload)
+          })
+        },
+
+        /** queries for a specific system with a certain query configuration */
+        query(system: string, config: any) {
+          that.events.push({
+            type: 'Query',
+            payload: JSON.stringify({
+              system,
+              config
+            } as QueryPayload)
           })
         },
 

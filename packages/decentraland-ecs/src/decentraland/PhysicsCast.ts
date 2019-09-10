@@ -1,9 +1,9 @@
 import { ReadOnlyVector3 } from './math'
-import { Observable } from '../ecs/Observable'
 import { RaycastResponse } from './Events'
 import { uuid, log } from '../ecs/helpers'
 
-export const physicsCastObservable = new Observable<Readonly<RaycastQuery>>()
+/** @internal */
+import { DecentralandInterface } from './Types'
 
 export type QueryType = 'HitFirst' | 'HitAll' | 'HitFirstAvatar' | 'HitAllAvatars'
 
@@ -59,6 +59,9 @@ export interface IPhysicsCast {
   hitAllAvatars: (ray: Ray, hitCallback: (event: RaycastHitAvatars) => void) => void
 }
 
+/** @internal */
+declare let dcl: DecentralandInterface | void
+
 export class PhysicsCast implements IPhysicsCast {
   private static _instance: PhysicsCast
   private queries: Record<string, (event: any) => void> = {}
@@ -75,21 +78,19 @@ export class PhysicsCast implements IPhysicsCast {
   }
 
   public hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void) {
-    log('hit first', ray)
-    const uniqueId = uuid()
+    const queryId = uuid()
 
-    this.queries[uniqueId] = hitCallback as (event: any) => void
+    this.queries[queryId] = hitCallback as (event: any) => void
 
-    log('hasObservers: ' + physicsCastObservable.hasObservers())
-    physicsCastObservable.notifyObservers({
-      queryId: uniqueId,
-      queryType: 'HitFirst',
-      ray: ray
-    })
+    dcl && dcl.query('raycast', { queryId, queryType: 'HitFirst', ray })
   }
 
   public hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void) {
-    log('not implemented yet')
+    const queryId = uuid()
+
+    this.queries[queryId] = hitCallback as (event: any) => void
+
+    dcl && dcl.query('raycast', { queryId, queryType: 'HitAll', ray })
   }
 
   public hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void) {
