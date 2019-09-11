@@ -50,15 +50,15 @@ export interface HitEntityInfo {
 /**
  * @public
  */
-export interface RaycastHitEntities extends RaycastHit {
-  entities: HitEntityInfo[]
+export interface RaycastHitEntity extends RaycastHit {
+  entity: HitEntityInfo
 }
 
 /**
  * @public
  */
-export interface RaycastHitEntity extends RaycastHit {
-  entity: HitEntityInfo
+export interface RaycastHitEntities extends RaycastHit {
+  entities: RaycastHitEntity[]
 }
 
 /**
@@ -139,13 +139,11 @@ export class PhysicsCast implements IPhysicsCast {
   }
 
   public handleRaycastHitFirstResponse(response: RaycastResponse<RaycastHitEntity>) {
-    log('handleRaycastResponse', response.payload.payload)
     this.queries[response.payload.queryId](response.payload.payload)
     delete this.queries[response.payload.queryId]
   }
 
   public handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>) {
-    log('handleRaycastResponse', response)
     this.queries[response.payload.queryId](response.payload.payload)
     delete this.queries[response.payload.queryId]
   }

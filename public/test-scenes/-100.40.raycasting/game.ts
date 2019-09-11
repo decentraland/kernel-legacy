@@ -55,6 +55,10 @@ class TurningRedSystem implements ISystem {
         },
         event => {
           isCasting = false
+
+          if (!event.didHit || event.entities === undefined)
+            return
+
           // Clear all hits
           const hitteable = engine.getComponentGroup(Hitteable)
           for (let entity of hitteable.entities) {
@@ -62,8 +66,8 @@ class TurningRedSystem implements ISystem {
           }
           // Mark new hits
           event.entities
-            .filter(entity => engine.entities[entity.entityId].hasComponent('Hitteable'))
-            .forEach(entity => (engine.entities[entity.entityId].getComponent(Hitteable).hit = true))
+            .filter(entity => engine.entities[entity.entity.entityId].hasComponent('Hitteable'))
+            .forEach(entity => (engine.entities[entity.entity.entityId].getComponent(Hitteable).hit = true))
         }
       )
     }

@@ -14,7 +14,6 @@ import {
 
 import { DecentralandInterface } from './Types'
 import { RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
-import { log } from '../ecs/helpers'
 
 // This number is defined in the protocol ECS.SetEntityParent.3
 const ROOT_ENTITY_ID = '0'
@@ -52,7 +51,6 @@ export class DecentralandSynchronizationSystem implements ISystem {
           engine.eventManager.fireEvent(new UUIDEvent(data.uuid, data.payload))
           break
         case 'raycastResponse':
-          log(data.queryType)
           if (data.queryType === 'HitFirst') {
             engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntity>(data))
           } else if (data.queryType === 'HitAll') {
