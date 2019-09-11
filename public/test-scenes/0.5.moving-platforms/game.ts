@@ -34,7 +34,7 @@ export class PingPongMovementSystem implements ISystem {
       let transform = cubeEntity.getComponent(Transform)
       let movementData = cubeEntity.getComponent(PingPongMovement)
 
-      if (movementData.speed == 0 || movementData.waypoints.length < 2) continue
+      if (movementData.speed === 0 || movementData.waypoints.length < 2) continue
 
       movementData.lerpTime += dt * movementData.speed
 
