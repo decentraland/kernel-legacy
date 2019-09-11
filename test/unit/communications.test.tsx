@@ -111,6 +111,7 @@ describe('Communications', function() {
         setRemoteDescription: sinon.stub(),
         setLocalDescription: sinon.stub(),
         createAnswer: sinon.stub(),
+        remoteDescription: true,
         onicecandidate: connection.webRtcConn!.onicecandidate,
         ondatachannel: connection.webRtcConn!.ondatachannel
       }
@@ -245,7 +246,6 @@ describe('Communications', function() {
     describe('webrtc', () => {
       it('onicecandidate', () => {
         connection.commServerAlias = 1
-        connection['remoteDescription'] = true
         const sdp = 'candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8'
         const candidate = new RTCIceCandidate({ candidate: sdp, sdpMid: '0', sdpMLineIndex: 0 })
         const event = new RTCPeerConnectionIceEvent('icecandidate', { candidate })
