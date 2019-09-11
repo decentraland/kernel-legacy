@@ -15,7 +15,7 @@ import { initializeUnity } from '../unity-interface/initializer'
 import {
   UnityParcelScene,
   selectGizmoBuilder,
-  resetCameraBuilder,
+  //resetCameraBuilder,
   setCameraZoomDeltaBuilder,
   getCameraTargetBuilder,
   setPlayModeBuilder,
@@ -29,7 +29,10 @@ import {
   ActivateRendering,
   DeactivateRendering,
   resetBuilderScene,
-  UnloadScene
+  UnloadScene,
+  setCameraPositionBuilder,
+  setCameraRotationBuilder,
+  resetCameraZoomBuilder
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -227,7 +230,9 @@ namespace editor {
     return getCameraTargetBuilder()
   }
   export function resetCameraZoom() {
-    resetCameraBuilder()
+    console.log('resetCameraZoom')
+    //resetCameraBuilder()
+    resetCameraZoomBuilder()
   }
 
   export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
@@ -247,6 +252,8 @@ namespace editor {
     futures[id].resolve(value)
     // delete futures[id]
   }
+
+  //TODO: is this needed?
   export function loadImage() {
     console.log('loadImage')
   }
@@ -254,11 +261,13 @@ namespace editor {
     console.log('preloadFile ' + url)
     preloadFileBuilder(url)
   }
-  export function setCameraRotation() {
-    console.log('setCameraRotation')
+  export function setCameraRotation(alpha: number, beta: number) {
+    console.log('setCameraRotation ' + alpha + ',' + beta)
+    setCameraRotationBuilder(alpha, beta)
   }
   export function getLoadingEntity() {
     console.log('getLoadingEntity')
+    return null //TODO: code this!
   }
   export function takeScreenshot(mime?: string): IFuture<string> {
     const id = uuid()
@@ -267,8 +276,9 @@ namespace editor {
     return futures[id]
   }
 
-  export function setCameraPosition(position: string) {
+  export function setCameraPosition(position: Vector3) {
     console.log('setCameraPosition ' + position)
+    setCameraPositionBuilder(position)
   }
 
   export const envHelper = null

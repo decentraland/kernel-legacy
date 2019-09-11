@@ -401,6 +401,18 @@ export function takeScreenshotBuilder(id: string) {
   unityInterface.sendBuilderMessage('TakeScreenshot', id)
 }
 
+export function setCameraPositionBuilder(position: Vector3) {
+  unityInterface.sendBuilderMessage('SetBuilderCameraPosition', position.x + ',' + position.y + ',' + position.z)
+}
+
+export function setCameraRotationBuilder(aplha: number, beta: number) {
+  unityInterface.sendBuilderMessage('SetBuilderCameraRotation', aplha + ',' + beta)
+}
+
+export function resetCameraZoomBuilder() {
+  unityInterface.sendBuilderMessage('ResetBuilderCameraZoom')
+}
+
 export function ActivateRendering() {
   unityInterface.ActivateRendering()
 }
