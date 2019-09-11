@@ -1,4 +1,15 @@
-import { Entity, BoxShape, engine, Vector3, Transform, Component, ISystem, Shape, OnClick, Scalar} from 'decentraland-ecs/src'
+import {
+  Entity,
+  BoxShape,
+  engine,
+  Vector3,
+  Transform,
+  Component,
+  ISystem,
+  Shape,
+  OnClick,
+  Scalar
+} from 'decentraland-ecs/src'
 
 @Component('Movement')
 export class PingPongMovement {
@@ -17,29 +28,32 @@ export class PingPongMovement {
 
 let movingCubes = engine.getComponentGroup(PingPongMovement)
 
-export class PingPongMovementSystem implements ISystem
-{
+export class PingPongMovementSystem implements ISystem {
   update(dt: number) {
     for (let cubeEntity of movingCubes.entities) {
       let transform = cubeEntity.getComponent(Transform)
       let movementData = cubeEntity.getComponent(PingPongMovement)
 
-      if(movementData.speed == 0 || movementData.waypoints.length < 2) continue
+      if (movementData.speed == 0 || movementData.waypoints.length < 2) continue
 
       movementData.lerpTime += dt * movementData.speed
 
       let reachedDestination = movementData.lerpTime >= 1
-      if(reachedDestination){
+      if (reachedDestination) {
         movementData.lerpTime = 1
       }
 
-      transform.position = Vector3.Lerp(movementData.waypoints[movementData.currentWaypoint], movementData.waypoints[movementData.targetWaypoint], movementData.lerpTime)
+      transform.position = Vector3.Lerp(
+        movementData.waypoints[movementData.currentWaypoint],
+        movementData.waypoints[movementData.targetWaypoint],
+        movementData.lerpTime
+      )
 
-      if(reachedDestination) {
+      if (reachedDestination) {
         movementData.lerpTime = 0
         movementData.currentWaypoint = movementData.targetWaypoint
 
-        if(this.shouldSwitchDirection(movementData)) {
+        if (this.shouldSwitchDirection(movementData)) {
           movementData.goingForward = !movementData.goingForward
         }
 
@@ -48,21 +62,24 @@ export class PingPongMovementSystem implements ISystem
     }
   }
 
-  shouldSwitchDirection (movementData: PingPongMovement) {
-    return  (movementData.goingForward && movementData.currentWaypoint == movementData.waypoints.length - 1) ||
-            (!movementData.goingForward && movementData.currentWaypoint == 0)
+  shouldSwitchDirection(movementData: PingPongMovement) {
+    return (
+      (movementData.goingForward && movementData.currentWaypoint == movementData.waypoints.length - 1) ||
+      (!movementData.goingForward && movementData.currentWaypoint == 0)
+    )
   }
 }
 let movementSystem = new PingPongMovementSystem()
 engine.addSystem(movementSystem)
 
-export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: number, shape: Shape) : Entity {
+export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: number, shape: Shape): Entity {
   let entity = new Entity()
   entity.addComponentOrReplace(shape)
   entity.addComponentOrReplace(
     new Transform({
       position: waypointsPath[0]
-    }))
+    })
+  )
 
   entity.addComponentOrReplace(new PingPongMovement(waypointsPath, speed))
 
@@ -71,16 +88,16 @@ export function configureShapeEntityPositions(waypointsPath: Vector3[], speed: n
 }
 
 // Moving platform
-let movingPlatformEntity = configureShapeEntityPositions([new Vector3(1, 1, 1)
-  , new Vector3(1, 1, 15)
-  , new Vector3(15, 1, 15)
-  , new Vector3(15, 1, 1),
-  new Vector3(1, 1, 1)], 0.1, new BoxShape())
-movingPlatformEntity.getComponent(Transform).scale = new Vector3(2, 0.25, 2);
+let movingPlatformEntity = configureShapeEntityPositions(
+  [new Vector3(1, 1, 1), new Vector3(1, 1, 15), new Vector3(15, 1, 15), new Vector3(15, 1, 1), new Vector3(1, 1, 1)],
+  0.1,
+  new BoxShape()
+)
+movingPlatformEntity.getComponent(Transform).scale = new Vector3(2, 0.25, 2)
 
 // Elevator platform
-let elevatorEntity = configureShapeEntityPositions([new Vector3(24, 1, 8) , new Vector3(24, 10, 8)], 0.5, new BoxShape())
-elevatorEntity.getComponent(Transform).scale = new Vector3(2, 0.25, 2);
+let elevatorEntity = configureShapeEntityPositions([new Vector3(24, 1, 8), new Vector3(24, 10, 8)], 0.5, new BoxShape())
+elevatorEntity.getComponent(Transform).scale = new Vector3(2, 0.25, 2)
 
 // Rotating platform
 @Component('ObjectRotation')
@@ -95,20 +112,21 @@ export class ObjectRotation {
 }
 let rotatingCubes = engine.getComponentGroup(ObjectRotation)
 
-export class ObjectRotationSystem implements ISystem
-{
+export class ObjectRotationSystem implements ISystem {
   update(dt: number) {
     for (let cubeEntity of rotatingCubes.entities) {
       let rotationComponent = cubeEntity.getComponent(ObjectRotation)
 
       let transform = cubeEntity.getComponent(Transform)
-      transform.rotate(rotationComponent.rotationAxis, rotationComponent.speed * dt);
+      transform.rotate(rotationComponent.rotationAxis, rotationComponent.speed * dt)
     }
   }
 
-  shouldSwitchDirection (movementData: PingPongMovement) {
-    return  (movementData.goingForward && movementData.currentWaypoint == movementData.waypoints.length - 1) ||
-            (!movementData.goingForward && movementData.currentWaypoint == 0)
+  shouldSwitchDirection(movementData: PingPongMovement) {
+    return (
+      (movementData.goingForward && movementData.currentWaypoint == movementData.waypoints.length - 1) ||
+      (!movementData.goingForward && movementData.currentWaypoint == 0)
+    )
   }
 }
 let rotationSystem = new ObjectRotationSystem()
@@ -120,9 +138,10 @@ rotatingPlatformEntity.addComponentOrReplace(
   new Transform({
     position: new Vector3(8, 1, 24),
     scale: new Vector3(2, 0.25, 2)
-  }))
-rotatingPlatformEntity.addComponentOrReplace(new ObjectRotation(10, new Vector3(0, 1, 0)));
-engine.addEntity(rotatingPlatformEntity);
+  })
+)
+rotatingPlatformEntity.addComponentOrReplace(new ObjectRotation(10, new Vector3(0, 1, 0)))
+engine.addEntity(rotatingPlatformEntity)
 
 // "Pendulum" platform
 let pendulumPivotentity = new Entity()
@@ -131,7 +150,8 @@ engine.addEntity(pendulumPivotentity)
 pendulumPivotentity.addComponentOrReplace(
   new Transform({
     position: new Vector3(24, 4, 24)
-  }))
+  })
+)
 
 let pendulumPlatformtentity = new Entity()
 engine.addEntity(pendulumPlatformtentity)
@@ -142,11 +162,13 @@ pendulumPlatformtentity.addComponentOrReplace(
   new Transform({
     position: new Vector3(0, -3, 0),
     scale: new Vector3(2, 0.25, 2)
-  }))
+  })
+)
 pendulumPlatformtentity.addComponentOrReplace(
   new OnClick(e => {
-    pendulumPivotentity.addComponentOrReplace(new ObjectRotation(5, new Vector3(0, 0, 1)));
-  }))
+    pendulumPivotentity.addComponentOrReplace(new ObjectRotation(5, new Vector3(0, 0, 1)))
+  })
+)
 
 // Dynamically scaled platform
 @Component('ObjectScaling')
@@ -165,27 +187,30 @@ export class ObjectScaling {
 }
 let scalingCubes = engine.getComponentGroup(ObjectScaling)
 
-export class ObjectScalingSystem implements ISystem
-{
+export class ObjectScalingSystem implements ISystem {
   update(dt: number) {
     for (let cubeEntity of scalingCubes.entities) {
       let scalingComponent = cubeEntity.getComponent(ObjectScaling)
 
       let transform = cubeEntity.getComponent(Transform)
 
-      if(scalingComponent.speed == 0 || scalingComponent.initialScale == scalingComponent.targetScale) continue
+      if (scalingComponent.speed == 0 || scalingComponent.initialScale == scalingComponent.targetScale) continue
 
       scalingComponent.lerpTime += dt * scalingComponent.speed
 
       let reachedDestination = scalingComponent.lerpTime >= 1
-      if(reachedDestination){
+      if (reachedDestination) {
         scalingComponent.lerpTime = 1
       }
 
-      let currentScale = Scalar.Lerp(scalingComponent.initialScale, scalingComponent.targetScale, scalingComponent.lerpTime)
-      transform.scale = (transform.scale.normalize()).scale(currentScale)
+      let currentScale = Scalar.Lerp(
+        scalingComponent.initialScale,
+        scalingComponent.targetScale,
+        scalingComponent.lerpTime
+      )
+      transform.scale = transform.scale.normalize().scale(currentScale)
 
-      if(reachedDestination) {
+      if (reachedDestination) {
         // Invert target and initial scale when reached destination
         scalingComponent.lerpTime = 0
         let targetScale = scalingComponent.targetScale
@@ -205,5 +230,6 @@ scalingCubeEntity.addComponentOrReplace(
   new Transform({
     position: new Vector3(16, 1, 16),
     scale: new Vector3(2, 2, 2)
-  }))
-scalingCubeEntity.addComponentOrReplace(new ObjectScaling(2, 4, 1));
+  })
+)
+scalingCubeEntity.addComponentOrReplace(new ObjectScaling(2, 4, 1))
