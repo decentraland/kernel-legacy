@@ -392,6 +392,15 @@ export type AvatarAsset = {
   }>
 }
 
+export type Notification = {
+  type: number
+  message: string
+  buttonMessage: string
+  timer: number
+  scene: string
+  externalCallbackID: string
+}
+
 export function normalizeContentMappings(
   mappings: Record<string, string> | Array<ContentMapping>
 ): Array<ContentMapping> {
