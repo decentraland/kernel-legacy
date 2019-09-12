@@ -392,11 +392,17 @@ export type AvatarAsset = {
   }>
 }
 
+export enum NotificationType {
+  Generic = 0,
+  ScriptingError,
+  CommsError
+}
+
 export type Notification = {
-  type: number
+  type: NotificationType
   message: string
   buttonMessage: string
-  timer: number
+  timer: number // in seconds
   scene: string
   externalCallbackID: string
 }
