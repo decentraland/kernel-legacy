@@ -1,9 +1,10 @@
-import { ReadOnlyVector3 } from './math'
+import { ReadOnlyVector3, Vector3, Matrix } from './math'
 import { RaycastResponse } from './Events'
 import { uuid, log } from '../ecs/helpers'
 
 /** @internal */
 import { DecentralandInterface } from './Types'
+import { Camera } from './Camera'
 
 /**
  * @internal
@@ -103,7 +104,9 @@ export class PhysicsCast implements IPhysicsCast {
   private static _instance: PhysicsCast
   private queries: Record<string, (event: RaycastHit) => void> = {}
 
-  static get instance(): PhysicsCast {
+  private constructor() {}
+
+  public static get instance(): PhysicsCast {
     PhysicsCast.ensureInstance()
     return PhysicsCast._instance
   }
@@ -112,6 +115,33 @@ export class PhysicsCast implements IPhysicsCast {
     if (!PhysicsCast._instance) {
       PhysicsCast._instance = new PhysicsCast()
     }
+  }
+
+  public getRayFromCamera(distance: number) {
+    let rotation = Camera.instance.rotation
+    let rotationMat: Matrix = Matrix.Identity()
+    rotation.toRotationMatrix(rotationMat)
+    let direction = Vector3.TransformCoordinates(Vector3.Forward(), rotationMat)
+
+    const ray: Ray = {
+      origin: Camera.instance.worldPosition,
+      direction: direction,
+      distance: distance
+    }
+
+    return ray
+  }
+
+  public getRayFromPositions(from: Vector3, to: Vector3) {
+    const direction = to.subtract(from)
+
+    const ray: Ray = {
+      origin: from,
+      direction: direction.normalize(),
+      distance: direction.length()
+    }
+
+    return ray
   }
 
   public hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void) {
