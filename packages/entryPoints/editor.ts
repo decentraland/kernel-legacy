@@ -15,7 +15,6 @@ import { initializeUnity } from '../unity-interface/initializer'
 import {
   UnityParcelScene,
   selectGizmoBuilder,
-  //resetCameraBuilder,
   setCameraZoomDeltaBuilder,
   getCameraTargetBuilder,
   setPlayModeBuilder,
@@ -43,6 +42,7 @@ const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
 
 let unityScene: UnityParcelScene
+let loadingEntities: string[] = []
 
 /**
  * Function executed by builder secondly
@@ -134,6 +134,13 @@ function bindSceneEvents() {
         entityId: event.payload.entityId,
         transform: JSON.parse(event.payload.transform)
       })
+    } else if (type === 'onEntityLoading') {
+      loadingEntities.push(event.payload.entityId)
+    } else if (type === 'onEntityFinishLoading') {
+      let index = loadingEntities.indexOf(event.payload.entityId)
+      if (index >= 0) {
+        loadingEntities.splice(index, 1)
+      }
     }
   })
 
@@ -238,7 +245,7 @@ namespace editor {
   export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
     //getMousePositionBuilder({ x: 50, y: 50, z: 0 })
 
-    //return getMouseWorldPositionBuilder()
+    // return getMouseWorldPositionBuilder()
 
     // donde T depende de que estes devolviendo
     const id = uuid()
@@ -253,7 +260,7 @@ namespace editor {
     // delete futures[id]
   }
 
-  //TODO: is this needed?
+  // TODO: is this needed?
   export function loadImage() {
     console.log('loadImage')
   }
@@ -266,8 +273,12 @@ namespace editor {
     setCameraRotationBuilder(alpha, beta)
   }
   export function getLoadingEntity() {
-    console.log('getLoadingEntity')
-    return null //TODO: code this!
+    console.log('getLoadingEntity ' + loadingEntities.length)
+    if (loadingEntities.length === 0) {
+      return null
+    } else {
+      return loadingEntities[0]
+    }
   }
   export function takeScreenshot(mime?: string): IFuture<string> {
     const id = uuid()

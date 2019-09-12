@@ -359,7 +359,7 @@ async function initializeDecentralandUI() {
   unityInterface.LoadProfile(getUserProfile().profile)
 }
 
-//Builder functions
+// Builder functions
 
 export function selectGizmoBuilder(type: string) {
   unityInterface.sendBuilderMessage('SelectGizmo', type)
@@ -375,10 +375,6 @@ export function setCameraZoomDeltaBuilder(delta: number) {
 
 export function getCameraTargetBuilder() {
   return positionEvent.position
-}
-
-export function resetCameraBuilder() {
-  unityInterface.sendBuilderMessage('ResetCamera')
 }
 
 export function setPlayModeBuilder(on: string) {
