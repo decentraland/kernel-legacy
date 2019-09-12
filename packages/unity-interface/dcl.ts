@@ -14,7 +14,8 @@ import {
   IScene,
   MappingsResponse,
   ILand,
-  Profile
+  Profile,
+  AvatarAsset
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -163,6 +164,24 @@ const unityInterface = {
   },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+  AddWearableToCatalog(wearable: AvatarAsset[]){
+    gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
+  },
+  RemoveWearableFromCatalog(wearableIds: string[]){
+    gameInstance.SendMessage('SceneController', 'RemoveWearableToCatalog', JSON.stringify(wearableIds))
+  },
+  ClearWearableCatalog(){
+    gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
+  },
+  AddWearableNFTToCatalog(wearableNFT: AvatarAsset[]){
+    gameInstance.SendMessage('SceneController', 'AddWearableNTFToCatalog', JSON.stringify(wearableNFT))
+  },
+  RemoveWearableNFTFromCatalog(wearableNFTIds: string[]){
+    gameInstance.SendMessage('SceneController', 'RemoveWearableNFTToCatalog', JSON.stringify(wearableNFTIds))
+  },
+  ClearWearableNFTCatalog(){
+    gameInstance.SendMessage('SceneController', 'ClearWearableNFTCatalog')
   }
 }
 
