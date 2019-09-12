@@ -393,9 +393,9 @@ export type AvatarAsset = {
 }
 
 export enum NotificationType {
-  Generic = 0,
-  ScriptingError,
-  CommsError
+  GENERIC = 0,
+  SCRIPTING_ERROR = 1,
+  COMMS_ERROR = 2
 }
 
 export type Notification = {
