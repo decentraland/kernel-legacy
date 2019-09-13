@@ -31,7 +31,8 @@ import {
   UnloadScene,
   setCameraPositionBuilder,
   setCameraRotationBuilder,
-  resetCameraZoomBuilder
+  resetCameraZoomBuilder,
+  setBuilderGridResolution
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -43,6 +44,7 @@ const initializedEngine = future<void>()
 
 let unityScene: UnityParcelScene
 let loadingEntities: string[] = []
+let builderSceneLoaded: IFuture<boolean> = future()
 
 /**
  * Function executed by builder secondly
@@ -69,6 +71,7 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
 
   if (isFirstRun) {
     readyBuilderScene()
+    await builderSceneLoaded
   } else {
     resetBuilderScene()
   }
@@ -162,6 +165,11 @@ function bindSceneEvents() {
   unityScene.on('entityBackInScene', e => {
     evtEmitter.emit('entityBackInScene', e)
   })
+
+  unityScene.on('builderSceneStart', e => {
+    console.log('builderSceneStart evento llega')
+    builderSceneLoaded.resolve(true)
+  })
 }
 
 namespace editor {
@@ -186,8 +194,8 @@ namespace editor {
       await createBuilderScene(message.payload.scene)
     }
   }
-  export function setGridResolution() {
-    console.log('setGridResolution')
+  export function setGridResolution(position: number, rotation: number, scale: number) {
+    setBuilderGridResolution(position, rotation, scale)
   }
   export function selectEntity() {
     console.log('selectEntity')

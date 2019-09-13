@@ -156,7 +156,6 @@ export const unityInterface = {
       throw new Error('Only one scene at a time!')
     }
     gameInstance.SendMessage('SceneController', 'UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
-    this.sendBuilderMessage('UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
@@ -419,6 +418,13 @@ export function DeactivateRendering() {
 
 export function UnloadScene(sceneId: string) {
   unityInterface.UnloadScene(sceneId)
+}
+
+export function setBuilderGridResolution(position: number, rotation: number, scale: number) {
+  unityInterface.sendBuilderMessage(
+    'SetGridResolution',
+    JSON.stringify({ position: position, rotation: rotation, scale: scale })
+  )
 }
 
 let currentLoadedScene: SceneWorker
