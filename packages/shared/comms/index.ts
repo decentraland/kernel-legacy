@@ -52,7 +52,7 @@ export class PeerTrackingInfo {
     version: null
   }
 
-  public loadProfileIfNecessary(profileVersion: string) {
+  public loadProfileIfNecessary(auth: Auth, profileVersion: string) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
       if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
@@ -61,13 +61,15 @@ export class PeerTrackingInfo {
         }
       }
       this.profilePromise = {
-        promise: resolveProfile(this.identity).then(($: Profile) => {
-          const userInfo = this.userInfo || {}
-          userInfo.profile = $
-          userInfo.version = $.version
-          this.userInfo = userInfo
-          return
-        }),
+        promise: auth.getAccessToken().then((token: string) =>
+          resolveProfile(token, this.identity!).then(($: Profile) => {
+            const userInfo = this.userInfo || {}
+            userInfo.profile = $
+            userInfo.version = $.version
+            this.userInfo = userInfo
+            return
+          })
+        ),
         version: profileVersion
       }
     }
@@ -86,6 +88,10 @@ export class Context {
   public network: ETHEREUM_NETWORK | null
 
   public worldInstanceConnection: WorldInstanceConnection | null = null
+
+  profileInterval?: NodeJS.Timer
+  positionObserver: any
+  infoCollecterInterval?: NodeJS.Timer
 
   constructor(userInfo: UserInformation, network?: ETHEREUM_NETWORK) {
     this.userInfo = userInfo
@@ -202,7 +208,13 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
   }
 }
 
-export function processProfileMessage(context: Context, fromAlias: string, identity: string, data: ProfileData) {
+export function processProfileMessage(
+  auth: Auth,
+  context: Context,
+  fromAlias: string,
+  identity: string,
+  data: ProfileData
+) {
   const msgTimestamp = data.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -211,7 +223,7 @@ export function processProfileMessage(context: Context, fromAlias: string, ident
     const profileVersion = data.getProfileVersion()
 
     peerTrackingInfo.identity = identity
-    peerTrackingInfo.loadProfileIfNecessary(profileVersion)
+    peerTrackingInfo.loadProfileIfNecessary(auth, profileVersion)
 
     peerTrackingInfo.lastProfileUpdate = msgTimestamp
     peerTrackingInfo.lastUpdate = Date.now()
@@ -429,7 +441,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     processPositionMessage(context!, alias, data)
   }
   connection.profileHandler = (alias: string, identity: string, data: ProfileData) => {
-    processProfileMessage(context!, alias, identity, data)
+    processProfileMessage(auth, context!, alias, identity, data)
   }
   connection.chatHandler = (alias: string, data: ChatData) => {
     processChatMessage(context!, alias, data)
@@ -446,13 +458,13 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     commsBroker.stats = context.stats
   }
 
-  setInterval(() => {
+  context.profileInterval = setInterval(() => {
     if (context && context.currentPosition && context.worldInstanceConnection) {
       context.worldInstanceConnection.sendProfileMessage(context.currentPosition, context.userInfo)
     }
   }, 1000)
 
-  positionObservable.add((obj: Readonly<PositionReport>) => {
+  context.positionObserver = positionObservable.add((obj: Readonly<PositionReport>) => {
     const p = [
       obj.position.x,
       obj.position.y - obj.playerHeight,
@@ -468,11 +480,28 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     }
   })
 
-  setInterval(() => {
+  context.infoCollecterInterval = setInterval(() => {
     if (context) {
       collectInfo(context)
     }
   }, 100)
+}
+
+export function disconnect() {
+  if (context) {
+    if (context.profileInterval) {
+      clearInterval(context.profileInterval)
+    }
+    if (context.infoCollecterInterval) {
+      clearInterval(context.infoCollecterInterval)
+    }
+    if (context.positionObserver) {
+      positionObservable.remove(context.positionObserver)
+    }
+    if (context.worldInstanceConnection) {
+      context.worldInstanceConnection.close()
+    }
+  }
 }
 
 declare var global: any

@@ -40,6 +40,7 @@ export namespace parcelLimits {
   export const centimeter = 0.01
 
   export const visibleRadius = 4
+  export const secureRadius = 4
 
   export const maxX = 3000
   export const maxZ = 3000
@@ -126,6 +127,21 @@ export namespace commConfigurations {
     }
   ]
 }
+export const loginConfig = {
+  org: {
+    domain: 'decentraland.auth0.com',
+    client_id: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG'
+  },
+  today: {
+    domain: 'dcl-stg.auth0.com',
+    client_id: '0UB0I7w6QA3AgSvbXh9rGvDuhKrJV1C0'
+  },
+  zone: {
+    domain: 'dcl-test.auth0.com',
+    client_id: 'lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx'
+  },
+  audience: 'decentraland.org'
+}
 
 // take address from http://contracts.decentraland.org/addresses.json
 
@@ -167,12 +183,26 @@ function getDefaultTLD() {
   return TLD
 }
 
+export function getLoginConfigurationForCurrentDomain() {
+  let tld: 'org' | 'zone' | 'today' = getDefaultTLD()
+  // Use `.zone` auth for any localhost or other edge case
+  if ((tld as any) !== 'org' && (tld as any) !== 'zone' && (tld as any) !== 'today') {
+    tld = 'zone'
+  }
+  return {
+    clientId: loginConfig[tld].client_id,
+    domain: loginConfig[tld].domain,
+    redirectUri: window.location.origin + '/' + (ENV_OVERRIDE ? '?ENV=' + getTLD() : ''),
+    audience: loginConfig.audience
+  }
+}
+
 export function getServerConfigurations() {
   const TLDDefault = getDefaultTLD()
   return {
     auth: `https://auth.decentraland.${TLDDefault}/api/v1`,
     landApi: `https://api.decentraland.${TLDDefault}/v1`,
-    content: `https://content.decentraland.${TLDDefault}`,
+    content: `https://content.decentraland.${TLDDefault === 'today' ? 'org' : TLDDefault}`,
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
     profile: `https://profile.decentraland.${TLDDefault}/api/v1`,
     avatar: {
