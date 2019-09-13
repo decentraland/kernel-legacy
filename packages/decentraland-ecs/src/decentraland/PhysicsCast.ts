@@ -136,11 +136,12 @@ export class PhysicsCast implements IPhysicsCast {
 
   public getRayFromPositions(from: Vector3, to: Vector3) {
     const direction = to.subtract(from)
+    const length = direction.length()
 
     const ray: Ray = {
       origin: from,
       direction: direction.normalize(),
-      distance: direction.length()
+      distance: length
     }
 
     return ray
