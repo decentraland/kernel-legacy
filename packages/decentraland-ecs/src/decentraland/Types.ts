@@ -54,7 +54,7 @@ export type DecentralandInterface = {
 
   // QUERY
 
-  query(system: string, config: any): void
+  query(queryId: string, payload: any): void
 
   // COMPONENTS
 

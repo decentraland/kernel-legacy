@@ -7,7 +7,7 @@ import { DecentralandInterface } from './Types'
 import { Camera } from './Camera'
 
 /**
- * @internal
+ * @public
  */
 export type QueryType = 'HitFirst' | 'HitAll' | 'HitFirstAvatar' | 'HitAllAvatars'
 
@@ -90,7 +90,9 @@ export interface RaycastHitAvatars extends RaycastHit {
 export interface IPhysicsCast {
   hitFirst: (ray: Ray, hitCallback: (event: RaycastHitEntity) => void) => void
   hitAll: (ray: Ray, hitCallback: (event: RaycastHitEntities) => void) => void
+  /** @internal */
   hitFirstAvatar: (ray: Ray, hitCallback: (event: RaycastHitAvatar) => void) => void
+  /** @internal */
   hitAllAvatars: (ray: Ray, hitCallback: (event: RaycastHitAvatars) => void) => void
 }
 
@@ -124,7 +126,7 @@ export class PhysicsCast implements IPhysicsCast {
     let direction = Vector3.TransformCoordinates(Vector3.Forward(), rotationMat)
 
     const ray: Ray = {
-      origin: Camera.instance.worldPosition,
+      origin: Camera.instance.position,
       direction: direction,
       distance: distance
     }

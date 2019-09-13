@@ -60,7 +60,7 @@ export type EntityActionType =
   | 'Query'
   | 'InitMessagesFinished'
 
-export type QueryPayload = { system: string; config: RayQuery }
+export type QueryPayload = { queryId: string; payload: RayQuery }
 
 export type CreateEntityPayload = { id: string }
 
