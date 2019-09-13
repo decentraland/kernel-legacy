@@ -165,23 +165,14 @@ const unityInterface = {
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   },
-  AddWearableToCatalog(wearable: AvatarAsset[]){
-    gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
+  AddWearablesToCatalog(wearables: AvatarAsset[]){
+    gameInstance.SendMessage('SceneController', 'AddWearablesToCatalog', JSON.stringify(wearables))
   },
-  RemoveWearableFromCatalog(wearableIds: string[]){
-    gameInstance.SendMessage('SceneController', 'RemoveWearableToCatalog', JSON.stringify(wearableIds))
+  RemoveWearablesFromCatalog(wearableIds: string[]){
+    gameInstance.SendMessage('SceneController', 'RemoveWearablesToCatalog', JSON.stringify(wearableIds))
   },
-  ClearWearableCatalog(){
+  ClearWearableCatalog() {
     gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
-  },
-  AddWearableNFTToCatalog(wearableNFT: AvatarAsset[]){
-    gameInstance.SendMessage('SceneController', 'AddWearableNTFToCatalog', JSON.stringify(wearableNFT))
-  },
-  RemoveWearableNFTFromCatalog(wearableNFTIds: string[]){
-    gameInstance.SendMessage('SceneController', 'RemoveWearableNFTToCatalog', JSON.stringify(wearableNFTIds))
-  },
-  ClearWearableNFTCatalog(){
-    gameInstance.SendMessage('SceneController', 'ClearWearableNFTCatalog')
   }
 }
 
