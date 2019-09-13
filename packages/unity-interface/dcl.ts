@@ -169,7 +169,7 @@ const unityInterface = {
     gameInstance.SendMessage('SceneController', 'AddWearablesToCatalog', JSON.stringify(wearables))
   },
   RemoveWearablesFromCatalog(wearableIds: string[]){
-    gameInstance.SendMessage('SceneController', 'RemoveWearablesToCatalog', JSON.stringify(wearableIds))
+    gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
   },
   ClearWearableCatalog() {
     gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
