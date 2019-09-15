@@ -7,7 +7,7 @@ import { ParcelLifeCycleController } from './controllers/parcel'
 import { SceneLifeCycleController, SceneLifeCycleStatusReport } from './controllers/scene'
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
-import { ILand } from 'shared/types'
+import { ILand, InstancedSpawnPoint } from 'shared/types'
 import defaultLogger from 'shared/logger'
 
 const connector = new Adapter(WebWorkerTransport(self as any))
@@ -41,13 +41,13 @@ let downloadManager: SceneDataDownloadManager
         secureRadius: options.secureRadius
       })
       sceneController = new SceneLifeCycleController({ downloadManager })
-      positionController = new PositionLifecycleController(parcelController, sceneController)
+      positionController = new PositionLifecycleController(downloadManager, parcelController, sceneController)
 
       parcelController.on('Sighted', (parcels: string[]) => connector.notify('Parcel.sighted', { parcels }))
       parcelController.on('Lost sight', (parcels: string[]) => connector.notify('Parcel.lostSight', { parcels }))
 
-      positionController.on('Settled Position', (sceneId: string) => {
-        connector.notify('Position.settled', { sceneId })
+      positionController.on('Settled Position', (spawnPoint: InstancedSpawnPoint) => {
+        connector.notify('Position.settled', { spawnPoint })
       })
       positionController.on('Unsettled Position', () => {
         connector.notify('Position.unsettled')
