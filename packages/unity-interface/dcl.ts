@@ -300,8 +300,8 @@ export async function startUnityParcelLoading() {
       })
     },
     onPositionSettled: spawnPoint => {
-      unityInterface.ActivateRendering()
       unityInterface.Teleport(spawnPoint)
+      unityInterface.ActivateRendering()
     },
     onPositionUnsettled: () => {
       unityInterface.DeactivateRendering()
