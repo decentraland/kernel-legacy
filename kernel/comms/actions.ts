@@ -36,7 +36,7 @@ export const commsWelcome = (payload: { alias: number; serverAlias: number; avai
 export type CommsWelcomeAction = ReturnType<typeof commsWelcome>
 export const commsWebrtcIceCandidate = (candidate: any) => action(COMMS_WEBRTC_ICE_CANDIDATE, { candidate })
 export type CommsWebrtcIceCandidateAction = ReturnType<typeof commsWebrtcIceCandidate>
-export const commsWebrtcIceOffer = (payload: { serverAlias: number; sessionData: string; localDescription: string }) =>
+export const commsWebrtcIceOffer = (payload: { serverAlias: number; sessionData: string; localDescription: RTCSessionDescription }) =>
   action(COMMS_WEBRTC_ICE_OFFER, payload)
 export type CommsWebrtcIceOfferAction = ReturnType<typeof commsWebrtcIceOffer>
 export const commsWebrtcIceAnswer = (answer: any) => action(COMMS_WEBRTC_ICE_ANSWER, { answer })

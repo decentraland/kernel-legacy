@@ -32,10 +32,11 @@ export function presenceReducer(store?: PresenceStore, action?: any): PresenceSt
   }
   switch (action.type) {
     case PROTOCOL_PING:
-      ;(action as ProtocolPingAction).payload.ping
+      ; (action as ProtocolPingAction).payload.ping
       break
     case PROTOCOL_POSITION:
-      ;(action as ProtocolPositionAction).payload.break
+      ; (action as ProtocolPositionAction).payload
+      break
   }
   return store
 }

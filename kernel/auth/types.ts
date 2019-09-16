@@ -1,4 +1,4 @@
-import { BasicEphemeralKey } from './ephemeral'
+import { BasicEphemeralKey, EphemeralKey } from './ephemeral'
 
 export type RootAuthState = { auth: AuthState; loading: any }
 
@@ -6,7 +6,7 @@ export type AuthState = {
   loading: string[]
   data: AuthData | null
   commsToken: string | null
-  ephemeral: BasicEphemeralKey
+  ephemeral: BasicEphemeralKey | EphemeralKey
   error: string | null
 }
 

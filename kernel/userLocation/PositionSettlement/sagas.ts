@@ -1,6 +1,6 @@
 import { parseParcelPosition } from '@dcl/utils'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
-import { SceneLifeCycleState } from '~/kernel/scene-runner/types'
+import { SceneLifeCycleState } from '../../scene-runner/types'
 import { SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR } from '../../scene-runner/actions'
 import { getSightedScenesRunningReport, isSceneAtPositionRendereable } from '../../scene-runner/selectors'
 import { setPosition, SET_POSITION } from '../ParcelSight/actions'

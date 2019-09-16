@@ -3,7 +3,8 @@ import future from 'fp-future'
 import { Store } from 'redux'
 import { tokenRequest } from './actions'
 import { BasicEphemeralKey, EphemeralKey, MessageInput } from './ephemeral'
-import { getAccessToken, getCommsToken, getEphemeralKey, isLoggedIn, RootAuthState, isTokenExpired } from './selectors'
+import { getAccessToken, getCommsToken, getEphemeralKey, isLoggedIn, isTokenExpired } from './selectors'
+import { RootAuthState } from './types'
 
 export class Auth {
   store: Store<RootAuthState>
@@ -51,7 +52,7 @@ export class Auth {
 
   getEphemeralKey() {
     let ephemeralKey = getEphemeralKey(this.store.getState())
-    if (!ephemeralKey || isTokenExpired(ephemeralKey.expirationDate)) {
+    if (!ephemeralKey || ((ephemeralKey as BasicEphemeralKey).expirationDate && isTokenExpired((ephemeralKey as BasicEphemeralKey).expirationDate))) {
       ephemeralKey = BasicEphemeralKey.generateNewKey(getConfiguration('EPHEMERAL_KEY_TTL'))
     }
     return ephemeralKey

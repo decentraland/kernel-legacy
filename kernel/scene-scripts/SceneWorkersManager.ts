@@ -1,4 +1,4 @@
-import { ScriptingTransport, WebWorkerTransport } from '@dcl/rpc'
+import { ScriptingTransport } from '@dcl/rpc'
 import { IWorker } from '@dcl/rpc/common/transports/WebWorker'
 import { ISceneManifest } from '@dcl/utils'
 import { IRendererParcelSceneAPI } from '../renderer/IRendererParcelSceneAPI'

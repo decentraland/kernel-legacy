@@ -1,6 +1,4 @@
-import { connectRouter, RouterState } from 'connected-react-router'
-import { History } from 'history'
-import { AnyAction, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { authReducer } from './auth/reducer'
 import { commsReducer } from './comms/reducer'
 import { ParcelLoadingActionType } from './loader/ParcelLoading/actions'
@@ -12,7 +10,7 @@ import { RootPositionToSceneIdState } from './loader/PositionToSceneId/types'
 import { sceneIdToSceneManifestReducer as sceneIdToManifest } from './loader/SceneIdToSceneManifest/reducer'
 import { RootSceneIdToSceneManifestState, SceneByIdAction } from './loader/SceneIdToSceneManifest/types'
 import { passportsReducer } from './passports/reducer'
-import { RootSceneLifeCycleState, SceneLifeCycleAction } from './scene-runner/actions'
+import { RootSceneLifeCycleState, SceneLifeCycleAction } from './scene-runner/types'
 import { sceneLifeCycleReducer as sceneLifeCycle } from './scene-runner/reducer'
 import { ParcelSightAction } from './userLocation/ParcelSight/actions'
 import { parcelSightReducer as parcelSight } from './userLocation/ParcelSight/reducer'
@@ -36,9 +34,8 @@ export type RootAction =
   | SceneByIdAction
   | SceneLifeCycleAction
 
-export const createReducer: any = (history: History) => {
+export const createReducer: any = () => {
   return combineReducers({
-    router: connectRouter(history) as (state: any, action: AnyAction) => RouterState,
     auth: authReducer,
     comms: commsReducer,
     parcelLoading,

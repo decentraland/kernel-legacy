@@ -44,8 +44,12 @@ export class GamekitScene extends Script implements ISceneRunningScript {
 
     this.status = AWAKE
 
-    this.runFirstRound()
-    this.runStartFunctions()
+    try {
+      await this.runFirstRound()
+      this.runStartFunctions()
+    } catch (error) {
+      throw error
+    }
 
     this.status = RUNNING
   }

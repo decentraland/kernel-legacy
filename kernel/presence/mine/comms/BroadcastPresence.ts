@@ -1,7 +1,4 @@
-import { createLogger } from '@dcl/utils'
 import { ProtocolConnection } from '../../../comms/brokers/ProtocolConnection'
-
-const logger = createLogger('BroadcastPresence')
 
 export const POSITION_BEACON_INTERVAL = 100
 

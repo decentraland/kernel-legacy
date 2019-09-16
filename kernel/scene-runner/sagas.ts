@@ -31,8 +31,7 @@ export function* rootSceneLifecycleSaga(): any {
 function* triggerSceneSightDelta() {
   const { updatedSightCount, newlySeenScenes, lostSightScenes } = yield select(getSceneDeltaPositionReport)
   if (newlySeenScenes.length || lostSightScenes.length) {
-    const sceneReport = reportSceneSightDelta({ updatedSightCount, newlySeenScenes, lostSightScenes }))
-    debugger
+    const sceneReport = reportSceneSightDelta({ updatedSightCount, newlySeenScenes, lostSightScenes })
     yield put(sceneReport)
   }
 }

@@ -1,5 +1,3 @@
-import { booleanMap } from '@dcl/utils'
-
 export type coordinateString = string
 export type sceneIdString = string
 

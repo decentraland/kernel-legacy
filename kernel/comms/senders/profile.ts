@@ -2,8 +2,9 @@ import { Category, ProfileData } from '@dcl/protos'
 import { getTopicForPosition } from '../../presence/mine/getTopicForPosition'
 import { ProtocolConnection } from '../brokers/ProtocolConnection'
 import { sendTopicIdentityMessage } from './topicIdentity'
+import { Vector3 } from '@dcl/utils'
 
-export function sendProfileMessage(comms: ProtocolConnection, currentPosition: string, profileVersion: string) {
+export function sendProfileMessage(comms: ProtocolConnection, currentPosition: Vector3, profileVersion: string) {
   const d = new ProfileData()
   d.setCategory(Category.PROFILE)
   d.setTime(Date.now())

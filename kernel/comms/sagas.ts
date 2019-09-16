@@ -35,7 +35,7 @@ import { sendProfileMessage } from './senders/profile'
 export var connection
 export var commsBroker: IBrokerConnection
 
-export function* commsSaga() {
+export function* commsSaga(): any {
   yield takeLatest(COMMS_STARTED, handleCommsStart)
   yield takeLatest(PROTOCOL_OUT_POSITION, handleSendPositionRequest)
   yield takeLatest(PROTOCOL_OUT_PROFILE, handleSendProfileRequest)
@@ -46,41 +46,41 @@ export function* commsSaga() {
   yield takeLatest(PROTOCOL_OUT_SCENE, handleSendSceneRequest)
 }
 
-export function* handleSendPositionRequest(action: ProtocolOutPositionAction) {
+export function* handleSendPositionRequest(action: ProtocolOutPositionAction): any {
   const position = yield select(getCurrentPosition)
   const topic = getTopicForPosition(position)
-  sendPosition(connection, topic, marshalPositionReport(action.payload))
+  sendPosition(connection, topic, marshalPositionReport(action.payload) as any)
 }
 
-export function* handleSendProfileRequest() {
+export function* handleSendProfileRequest(): any {
   const position = yield select(getCurrentPosition)
   const myProfileVersion = yield select(getMyCurrentProfileVersion)
   sendProfileMessage(connection, position, myProfileVersion)
 }
 
-export function* handleSendPingRequest() {
+export function* handleSendPingRequest(): any {
   sendPing(connection)
 }
 
 var currentMessageId = 0
-export function* handlePrivateMessageRequest(action: ProtocolOutPrivateMessageAction) {
+export function* handlePrivateMessageRequest(action: ProtocolOutPrivateMessageAction): any {
   sendChatMessage(connection, action.payload.to, '' + ++currentMessageId, action.payload.message)
 }
-export function* handleYellRequest(action: ProtocolOutYellAction) {
+export function* handleYellRequest(action: ProtocolOutYellAction): any {
   const position = yield select(getCurrentPosition)
   sendChatMessage(connection, 'r-' + position, '' + ++currentMessageId, action.payload.message)
 }
 /**
  * @deprecated
  */
-export function* handleSendChatRequest() {
+export function* handleSendChatRequest(): any {
   console.log('sendChatMessage is deprecated -- please use Yell or PrivateMessage')
 }
-export function* handleSendSceneRequest(action: ProtocolOutSceneAction) {
+export function* handleSendSceneRequest(action: ProtocolOutSceneAction): any {
   sendChatMessage(connection, action.payload.sceneId, '' + ++currentMessageId, action.payload.message)
 }
 
-export function* handleCommsStart() {
+export function* handleCommsStart(): any {
   if (USE_LOCAL_COMMS) {
     const commsUrl = document.location.toString().replace(/^http/, 'ws')
     defaultLogger.log('Using WebSocket comms: ' + commsUrl)
@@ -112,7 +112,7 @@ export function* handleCommsStart() {
       url.search = qs.toString()
 
       commsBroker = new BrokerConnection(url.toString(), auth)
-      return new ProtocolConnection(commsBroker, action => {})
+      return new ProtocolConnection(commsBroker, action => { })
     })
   }
 }

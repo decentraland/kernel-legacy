@@ -2,8 +2,8 @@ import future from 'fp-future'
 import { getFromLocalStorage, saveToLocalStorage, Color4, defaultLogger } from '@dcl/utils'
 import { getServerConfigurations } from '@dcl/config'
 
-import { StoredProfile } from './types/StoredProfile'
-import { ResolvedProfile } from './types/ResolvedProfile'
+import { StoredProfile } from './passportTypes/StoredProfile'
+import { ResolvedProfile } from './passportTypes/ResolvedProfile'
 import { Catalog } from '../assets/wearables/base'
 
 export class ProfileStore {

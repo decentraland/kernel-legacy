@@ -1,6 +1,6 @@
 import { defaultLogger, IScene, memoize, ParcelInfoResponse } from '@dcl/utils'
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects'
-import { migrateFromILand } from '~/kernel/worldMap/sceneTransforms/migrateFromILand'
+import { migrateFromILand } from '../../worldMap/sceneTransforms/migrateFromILand'
 import { SetPositionsAsResolvedAction, SET_POSITION_AS_RESOLVED } from '../PositionToSceneId/actions'
 import { getDownloadServer, isMappingResolved } from './selectors'
 import { sceneByIdFailure, sceneByIdRequest, SceneByIdRequest, sceneByIdSuccess, SCENE_BY_ID_REQUEST } from './types'

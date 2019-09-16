@@ -27,7 +27,6 @@ import {
   commsWebrtcIceOffer,
   commsWebrtcIceAnswer,
   commsWebrtcSignalingState,
-  commsStarted,
   commsWebrtcIceState,
   commsWebrtcError,
   commsDatachannelReliableLost,
@@ -37,7 +36,7 @@ import {
 } from '../actions'
 
 export class BrokerConnection implements IBrokerConnection {
-  public alias: string | null = null
+  public alias: number | null = null
   public authenticated = false
 
   public commServerAlias: number | null = null
@@ -132,7 +131,7 @@ export class BrokerConnection implements IBrokerConnection {
 
     switch (msgType) {
       case MessageType.UNKNOWN_MESSAGE_TYPE: {
-        store.dispatch(protocolUnknown(msgType))
+        store.dispatch(protocolUnknown(msgType as any))
         this.logger.log('unsopported message')
         break
       }
@@ -145,7 +144,7 @@ export class BrokerConnection implements IBrokerConnection {
           break
         }
 
-        const alias = `${message.getAlias()}`
+        const alias = message.getAlias()
         const availableServers = message.getAvailableServersList()
 
         if (availableServers.length === 0) {
