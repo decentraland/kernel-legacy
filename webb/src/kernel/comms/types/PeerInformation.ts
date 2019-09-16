@@ -1,4 +1,4 @@
-import { StoredProfile } from '../../passports/types/StoredProfile'
+import { StoredProfile } from '../../passports/passportTypes/StoredProfile'
 
 type UUID = string
 

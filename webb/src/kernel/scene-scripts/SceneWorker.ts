@@ -9,7 +9,7 @@ import { EnvironmentAPI } from './kernelSpace/EnvironmentAPI'
 import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneToScript'
 
 {
-  ;[EnvironmentAPI, RendererParcelSceneToScript, DevTools].map(api =>
+  ;[EnvironmentAPI, RendererParcelSceneToScript, DevTools].forEach(api =>
     console.log('Loaded API accessible by scripts:', api.name, name)
   )
 }
@@ -17,7 +17,8 @@ import { RendererParcelSceneToScript } from './kernelSpace/RendererParcelSceneTo
 const logger = createLogger('SceneWorker')
 
 export class SceneWorker implements ISceneWorker {
-  public system: IFuture<ScriptingHost> = future<ScriptingHost>()
+  public system: ScriptingHost
+  public systemPromise: IFuture<ScriptingHost> = future<ScriptingHost>()
 
   public engineAPI: RendererParcelSceneToScript
   public enabled = true
@@ -33,8 +34,11 @@ export class SceneWorker implements ISceneWorker {
     parcelScene.registerWorker(this)
 
     this.loadSystem(transport, gamekit)
-      .then($ => this.system.resolve($))
-      .catch($ => this.system.reject($))
+      .then($ => {
+        this.systemPromise.resolve($)
+        this.system = $
+      })
+      .catch($ => this.systemPromise.reject($))
   }
 
   dispose() {
@@ -42,8 +46,8 @@ export class SceneWorker implements ISceneWorker {
       this.enabled = false
 
       // Unmount the system
-      if (this.system) {
-        this.system.then(() => this.unmountSystem()).catch(e => logger.error('Unable to unmount system', e))
+      if (this.systemPromise) {
+        this.systemPromise.then(() => this.unmountSystem()).catch(e => logger.error('Unable to unmount system', e))
       }
 
       this.parcelScene.dispose()
@@ -53,10 +57,10 @@ export class SceneWorker implements ISceneWorker {
   }
 
   private async startSystem(transport: ScriptingTransport) {
-    const system = await ScriptingHost.fromTransport(transport)
+    const system = this.system = await ScriptingHost.fromTransport(transport)
     this.transport = transport
 
-    this.engineAPI = system.getAPIInstance('EngineAPI')
+    this.engineAPI = system.getAPIInstance('EngineAPI') as any
     this.engineAPI.rendererParcelSceneAPI = this.parcelScene
 
     system.getAPIInstance(EnvironmentAPI).sceneManifest = this.parcelScene.sceneManifest
@@ -78,7 +82,12 @@ export class SceneWorker implements ISceneWorker {
     return this.startSystem(transport || WebWorkerTransport(worker))
   }
 
-  unmountSystem() {
-    this.system.then(system => system.unmount()).catch(e => logger.error('Error unmounting system', e))
+  async unmountSystem() {
+    if (this.systemPromise.isPending) {
+      await this.systemPromise
+    }
+    if (this.system) {
+      this.system.unmount()
+    }
   }
 }

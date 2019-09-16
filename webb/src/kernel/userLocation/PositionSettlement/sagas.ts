@@ -1,8 +1,8 @@
 import { parseParcelPosition } from '@dcl/utils'
-import { call, put, select, takeLatest } from 'redux-saga/effects'
-import { SceneLifeCycleState } from '~/kernel/scene-runner/types'
+import { put, select, takeLatest } from 'redux-saga/effects'
 import { SCENE_RUNNING, SCENE_SCRIPT_SOURCED_FATAL_ERROR } from '../../scene-runner/actions'
 import { getSightedScenesRunningReport, isSceneAtPositionRendereable } from '../../scene-runner/selectors'
+import { SceneLifeCycleState } from '../../scene-runner/types'
 import { setPosition, SET_POSITION } from '../ParcelSight/actions'
 import { settlePosition, TeleportAction, unsettlePosition } from './actions'
 import { isPositionSettled } from './selectors'
@@ -18,14 +18,14 @@ export function* positionSettlementSaga(): any {
 export function* tryToSettle(): any {
   const hasSettled = yield select(isPositionSettled)
   if (!hasSettled) {
-    if (yield call(canPositionSettle)) {
+    const currentSceneStatus = yield select(getSightedScenesRunningReport)
+    if (canPositionSettle(currentSceneStatus)) {
       yield put(settlePosition())
     }
   }
 }
 
-export function* canPositionSettle(): any {
-  const currentSceneStatus: SceneLifeCycleState = yield select(getSightedScenesRunningReport)
+export function canPositionSettle(currentSceneStatus: SceneLifeCycleState): boolean {
   const sighted = Object.keys(currentSceneStatus)
   if (!sighted.length) {
     return false
@@ -46,6 +46,10 @@ export function* handleTeleport(action: TeleportAction): any {
     //      This means waiting for other side-effects watchers to realize.
     //  - Should this trigger the selection of a spawnpoint?
     //      This sounds like something with more awareness of how scenes work should do it
+    const isSettled = yield select(isPositionSettled)
+    if (!isSettled) {
+      yield put(settlePosition())
+    }
   } else {
     // What should we do here? We are teleporting to a loading scene.
     if (yield select(isPositionSettled)) {

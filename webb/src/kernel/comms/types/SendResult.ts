@@ -1,3 +1,3 @@
 export class SendResult {
-  constructor(public bytesSize: number) {}
+  constructor(public bytesSize: number) { }
 }

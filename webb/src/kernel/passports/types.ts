@@ -1,17 +1,17 @@
-import { StoredProfile } from './types/StoredProfile'
+import { StoredProfile } from './passportTypes/StoredProfile'
 
 export type PassportState = {
   profileServer: string
   info: {
     [key: string]:
-      | {
-          status: 'loading' | 'error'
-          data: any
-        }
-      | {
-          status: 'ok'
-          data: StoredProfile
-        }
+    | {
+      status: 'loading' | 'error'
+      data: any
+    }
+    | {
+      status: 'ok'
+      data: StoredProfile
+    }
   }
 }
 export type RootPassportState = {

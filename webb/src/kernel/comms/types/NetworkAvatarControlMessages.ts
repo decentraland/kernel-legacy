@@ -1,6 +1,6 @@
 import { AvatarMessageType } from './AvatarMessageType'
 import { Pose } from './Pose'
-import { StoredProfile } from '../../passports/types/StoredProfile'
+import { StoredProfile } from '../../passports/passportTypes/StoredProfile'
 
 export type ReceiveUserDataMessage = {
   type: AvatarMessageType.USER_DATA

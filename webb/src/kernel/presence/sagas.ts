@@ -11,7 +11,7 @@ import { SET_POSITION } from '../userLocation/ParcelSight/actions'
 import { allInSight } from '../userLocation/ParcelSight/selectors'
 import { SETTLE_POSITION, UNSETTLE_POSITION } from '../userLocation/PositionSettlement/types'
 
-export function* presenceSaga() {
+export function* presenceSaga(): any {
   yield takeLatest(PROTOCOL_PING, handleIncomingPing)
   yield takeLatest(PROTOCOL_PROFILE, handleIncomingPing)
   yield takeLatest(PROTOCOL_CHAT, handleIncomingPing)
@@ -36,4 +36,4 @@ function* subscribeAround() {
   return [delta, currentlySighted]
 }
 
-function* handleNeedToUnsubscribe() {}
+function* handleNeedToUnsubscribe() { }

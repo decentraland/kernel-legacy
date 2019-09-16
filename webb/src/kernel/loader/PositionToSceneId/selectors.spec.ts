@@ -11,11 +11,8 @@ describe('position to sceneid selectors', () => {
         {
           positionToSceneId: {
             downloadServer: 'download',
-            loadingPositionCoordinates: {},
-            resolvedPositionToScene: {},
             sceneIdToPositions: {},
-            errorPositions: {},
-            emptyPositions: {}
+            positionToScene: {}
           }
         },
         ['1,1']

@@ -45,7 +45,7 @@ export function sceneLifeCycleReducer(state?: SceneLifeCycleState, action?: Scen
     return state
   }
   if (action.type === SCENE_SIGHT_DELTA) {
-    return { ...state, sightCount: { ...state.sightCount, ...action.payload.updatedSightCount } }
+    return { ...state, sightCount: action.payload.updatedSightCount }
   }
   if (action && action.payload && action.payload.sceneId) {
     const sceneId = action.payload.sceneId

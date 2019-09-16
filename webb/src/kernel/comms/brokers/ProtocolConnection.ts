@@ -60,7 +60,7 @@ export class ProtocolConnection {
       let dataMessage, body, dataHeader, category
       switch (msgType) {
         case MessageType.UNKNOWN_MESSAGE_TYPE:
-          store.dispatch(protocolUnknown(msgType))
+          store.dispatch(protocolUnknown(msgType as any))
           this.logger.warn(`Unsupported message type: ${msgType}`)
           return
         case MessageType.TOPIC_FW:

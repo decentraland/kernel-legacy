@@ -23,8 +23,8 @@ export class MemoryRendererParcelScene extends EventEmitter implements IRenderer
     }
   }
   registerWorker(worker: ISceneWorker): void {
-    this.worker = worker
-    worker.system
+    this.worker = worker;
+    (worker.system as any as Promise<ScriptingHost>)
       .then(system => (this.system = system))
       .catch(error => {
         console.log(error)

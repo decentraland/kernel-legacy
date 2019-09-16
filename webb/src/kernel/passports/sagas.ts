@@ -8,7 +8,7 @@ export function* profileResolverSaga(): any {
   yield takeLatest(PASSPORT_REQUEST, fetchProfile)
 }
 
-export function* fetchProfile(action: PassportRequestAction) {
+export function* fetchProfile(action: PassportRequestAction): any {
   const userId = action.payload.userId
   try {
     const serverUrl = yield select(getProfileDownloadServer)
