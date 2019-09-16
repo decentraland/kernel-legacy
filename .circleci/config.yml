@@ -45,8 +45,8 @@ jobs:
       - run:
           name: Install differences in node_modules
           command: |
-              npm i
-              git checkout -- package-lock.json
+            npm i
+            git checkout -- package-lock.json
       - save_cache:
           name: Store node_modules cache
           paths:
@@ -55,8 +55,8 @@ jobs:
       - run:
           name: Run linters and checks
           command: |
-              make lint
-              npm outdated --depth 0 || true
+            make lint
+            npm outdated --depth 0 || true
       - run:
           name: Build decentraland-ecs
           command: |
@@ -91,8 +91,8 @@ jobs:
       - run:
           name: Run tests
           command: |
-              make test-ci
-              npx codecov
+            make test-ci
+            npx codecov
       - store_artifacts:
           name: Save screenshots of visual tests
           path: test/diff
@@ -107,7 +107,7 @@ jobs:
       - run:
           name: Build deployment dist
           command: |
-              make build-deploy
+            make build-deploy
       - save_cache:
           name: Save the built files
           paths:
@@ -287,7 +287,16 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - hold-explorer:
+      - hold-explorer-prd:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/
+      - hold-explorer-stg:
           type: approval
           requires:
             - build
@@ -327,6 +336,7 @@ workflows:
           requires:
             - build
             - deploy-dev
+            - hold-explorer-stg
           filters:
             branches:
               ignore: /.*/
@@ -334,7 +344,7 @@ workflows:
               only: /^\d+\.\d+\.\d(.*)/
       - deploy-prd:
           requires:
-            - hold-explorer
+            - hold-explorer-prd
           filters:
             branches:
               ignore: /.*/
