@@ -52,6 +52,9 @@ let downloadManager: SceneDataDownloadManager
       positionController.on('Unsettled Position', () => {
         connector.notify('Position.unsettled')
       })
+      positionController.on('Tracking Event', (event: { name: string; data: any }) =>
+        connector.notify('Event.track', event)
+      )
 
       sceneController.on('Start scene', sceneId => {
         connector.notify('Scene.shouldStart', { sceneId })

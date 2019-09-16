@@ -6,7 +6,6 @@ import { SceneDataDownloadManager } from './download'
 import { worldToGrid, gridToWorld } from '../../../atomicHelpers/parcelScenePositions'
 import { pickWorldSpawnpoint } from 'shared/world/positionThings'
 import { InstancedSpawnPoint } from 'shared/types'
-import { queueTrackingEvent } from 'shared/analytics'
 
 export class PositionLifecycleController extends EventEmitter {
   private positionSettled: boolean = false
@@ -27,11 +26,11 @@ export class PositionLifecycleController extends EventEmitter {
     if (teleported) {
       const land = await this.downloadManager.getParcelData(`${position.x},${position.y}`)
       if (land) {
-        const spawnpoint = pickWorldSpawnpoint(land)
-        resolvedPosition = worldToGrid(spawnpoint.position)
-        queueTrackingEvent('Scene Spawn', { parcel: land.scene.scene.base, spawnpoint: spawnpoint.position })
+        const spawnPoint = pickWorldSpawnpoint(land)
+        resolvedPosition = worldToGrid(spawnPoint.position)
+        this.queueTrackingEvent('Scene Spawn', { parcel: land.scene.scene.base, spawnpoint: spawnPoint.position })
 
-        this.currentSpawnpoint = spawnpoint
+        this.currentSpawnpoint = spawnPoint
       } else {
         this.currentSpawnpoint = { position: gridToWorld(position.x, position.y) }
       }
@@ -70,5 +69,9 @@ export class PositionLifecycleController extends EventEmitter {
         this.emit('Settled Position', this.currentSpawnpoint)
       }
     }
+  }
+
+  private queueTrackingEvent(name: string, data: any) {
+    this.emit('Tracking Event', { name, data })
   }
 }
