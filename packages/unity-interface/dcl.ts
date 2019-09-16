@@ -15,7 +15,6 @@ import {
   MappingsResponse,
   ILand,
   Profile,
-  Notification,
   InstancedSpawnPoint,
   AvatarAsset,
   Notification
@@ -166,10 +165,10 @@ const unityInterface = {
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   },
-  AddWearablesToCatalog(wearables: AvatarAsset[]){
+  AddWearablesToCatalog(wearables: AvatarAsset[]) {
     gameInstance.SendMessage('SceneController', 'AddWearablesToCatalog', JSON.stringify(wearables))
   },
-  RemoveWearablesFromCatalog(wearableIds: string[]){
+  RemoveWearablesFromCatalog(wearableIds: string[]) {
     gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
   },
   ClearWearableCatalog() {
