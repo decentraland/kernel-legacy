@@ -7,7 +7,6 @@ global.isEditor = window.isEditor = true
 import { EventEmitter } from 'events'
 import future, { IFuture } from 'fp-future'
 
-import { sleep } from '../atomicHelpers/sleep'
 import { loadedSceneWorkers } from '../shared/world/parcelSceneManager'
 import { IScene, normalizeContentMappings, ILand } from '../shared/types'
 import { SceneWorker } from '../shared/world/SceneWorker'
@@ -56,26 +55,22 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
   unityScene = loadBuilderScene(sceneData)
   bindSceneEvents()
 
-  const system = await unityScene.worker.system
-  const engineAPI = unityScene.worker.engineAPI!
-
+  const engineReady = future()
   sceneLifeCycleObservable.addOnce(obj => {
     if (sceneData.sceneId === obj.sceneId && obj.status === 'ready') {
-      ActivateRendering()
+      engineReady.resolve(true)
     }
   })
-
-  while (!system.isEnabled || !engineAPI.didStart) {
-    await sleep(10)
-  }
+  await engineReady
 
   if (isFirstRun) {
     readyBuilderScene()
-    await builderSceneLoaded
   } else {
     resetBuilderScene()
   }
+  await builderSceneLoaded
 
+  ActivateRendering()
   evtEmitter.emit('ready', {})
 }
 
