@@ -8,7 +8,7 @@ import { authSaga } from './auth/sagas'
 import { commsSaga } from './comms/sagas'
 import { profileResolverSaga } from './passports/sagas'
 
-export function* rootSaga() {
+export function* rootSaga(): any {
   yield fork(authSaga)
   yield fork(commsSaga)
   yield fork(rootSceneLifecycleSaga)
