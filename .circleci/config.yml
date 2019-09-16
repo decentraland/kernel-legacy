@@ -45,8 +45,8 @@ jobs:
       - run:
           name: Install differences in node_modules
           command: |
-              npm i
-              git checkout -- package-lock.json
+            npm i
+            git checkout -- package-lock.json
       - save_cache:
           name: Store node_modules cache
           paths:
@@ -55,35 +55,44 @@ jobs:
       - run:
           name: Run linters and checks
           command: |
-              make lint
-              npm outdated --depth 0 || true
+            make lint
+            npm outdated --depth 0 || true
       - run:
           name: Build decentraland-ecs
           command: |
               make build-essentials
-              find public -name *.ts | xargs shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js | sort > .scene-system-checksum
-      # TODO - reenable cache - moliva - 04/09/19
-      # - restore_cache:
-      #     name: Restore cached test scenes
-      #     keys:
-      #       - cached-scenes-{{ checksum ".scene-system-checksum" }}
+              mkdir -p scene-cache
+              cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
+              find public -name *.ts | xargs shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js | sort > .compiled-scene-checksum
+      - restore_cache:
+          name: Restore cached test scenes, part I
+          keys:
+            - compiled-scenes-{{ checksum ".compiled-scene-checksum" }}
+      - run:
+          name: Restore cached test scenes, part II
+          command: |
+              touch static/systems/scene.system.js
+              cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
+              for compiled in `find public -name '*.js'`; do touch $compiled; done
       - run:
           name: Build scenes
           command: |
               make test-scenes
+      - run:
+          name: Build cache of test scenes
+          command: |
+              cd public && find . -name '*.js' | xargs -I{} cp -f -t ../scene-cache/ --parents {}; cd ..
       - save_cache:
           name: Store cached test scenes
           paths:
-            - packages
-            - scripts
-            - static
-            - public
-          key: cached-scenes-{{ checksum ".scene-system-checksum" }}
+            - static/systems/scene.system.js
+            - scene-cache
+          key: compiled-scenes-{{ checksum ".compiled-scene-checksum" }}
       - run:
           name: Run tests
           command: |
-              make test-ci
-              npx codecov
+            make test-ci
+            npx codecov
       - store_artifacts:
           name: Save screenshots of visual tests
           path: test/diff
@@ -98,7 +107,7 @@ jobs:
       - run:
           name: Build deployment dist
           command: |
-              make build-deploy
+            make build-deploy
       - save_cache:
           name: Save the built files
           paths:
@@ -278,7 +287,16 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - hold-explorer:
+      - hold-explorer-prd:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/
+      - hold-explorer-stg:
           type: approval
           requires:
             - build
@@ -318,6 +336,7 @@ workflows:
           requires:
             - build
             - deploy-dev
+            - hold-explorer-stg
           filters:
             branches:
               ignore: /.*/
@@ -325,7 +344,7 @@ workflows:
               only: /^\d+\.\d+\.\d(.*)/
       - deploy-prd:
           requires:
-            - hold-explorer
+            - hold-explorer-prd
           filters:
             branches:
               ignore: /.*/

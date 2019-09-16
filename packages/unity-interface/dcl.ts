@@ -16,7 +16,9 @@ import {
   ILand,
   Profile,
   Notification,
-  InstancedSpawnPoint
+  InstancedSpawnPoint,
+  AvatarAsset,
+  Notification
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -163,6 +165,15 @@ const unityInterface = {
   },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+  AddWearablesToCatalog(wearables: AvatarAsset[]){
+    gameInstance.SendMessage('SceneController', 'AddWearablesToCatalog', JSON.stringify(wearables))
+  },
+  RemoveWearablesFromCatalog(wearableIds: string[]){
+    gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
+  },
+  ClearWearableCatalog() {
+    gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
   },
   ShowNotification(notification: Notification) {
     gameInstance.SendMessage('HUDController', 'ShowNotification', JSON.stringify(notification))
