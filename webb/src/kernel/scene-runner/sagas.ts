@@ -108,7 +108,7 @@ function* evaluateUnloadScenes(action: SceneSightDeltaAction) {
 
 async function watchScriptForAwake(worker: ISceneWorker) {
   const awake = future<boolean>()
-  const system = await (worker as any).system
+  const system = await (worker as any).systemPromise
   system.on('awake', () => {
     console.log(worker.sceneManifest.id, 'awake')
     awake.resolve(true)

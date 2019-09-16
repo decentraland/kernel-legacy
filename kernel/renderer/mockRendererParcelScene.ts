@@ -22,14 +22,15 @@ export class MemoryRendererParcelScene extends EventEmitter implements IRenderer
       }
     }
   }
-  registerWorker(worker: ISceneWorker): void {
+  async registerWorker(worker: ISceneWorker): Promise<void> {
     this.worker = worker;
-    (worker.system as any as Promise<ScriptingHost>)
-      .then(system => (this.system = system))
-      .catch(error => {
-        console.log(error)
-        this.dispose()
-      })
+    try {
+      // TODO (eordano): fixme
+      await (worker as any).systemPromise
+    } catch (error) {
+      console.log(error)
+      this.dispose
+    }
     console.log('Registered worker', worker.sceneManifest.id)
   }
   dispose(): void {

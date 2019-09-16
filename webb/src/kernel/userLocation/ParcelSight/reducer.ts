@@ -35,7 +35,9 @@ export function parcelSightReducer(state?: ParcelSightState, action?: ParcelSigh
         state.isTargetPlaced &&
         state.currentPosition &&
         state.currentPosition.x === action.payload.x &&
-        state.currentPosition.y === action.payload.y
+        state.currentPosition.y === action.payload.y &&
+        state.delta.sighted.length === 0 &&
+        state.delta.lostSight.length === 0
       ) {
         return state
       }

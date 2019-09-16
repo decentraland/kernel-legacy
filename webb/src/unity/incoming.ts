@@ -45,7 +45,11 @@ export const browserInterface = {
     positionEvent.quaternion.set(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w)
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
     positionEvent.playerHeight = data.playerHeight || playerConfigurations.height
-    store.dispatch(rendererPositionReport(positionEvent))
+    const { x, y } = reusableVector2
+    const positionReport = rendererPositionReport(positionEvent)
+    if (positionReport.payload.x !== x || positionReport.payload.y !== y) {
+      store.dispatch(positionReport)
+    }
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
@@ -145,7 +149,7 @@ namespace DCL {
       throw new Error('There is no UnityGame')
     }
 
-    ;(window as any).unityInterface = unityInterface
+    ; (window as any).unityInterface = unityInterface
     _instancedJS = initializeEngine(_gameInstance!)
 
     _instancedJS
@@ -179,17 +183,17 @@ function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): Un
   container.innerHTML = `<h3>Connecting...</h3>`
   const ws = new WebSocket(webSocketUrl)
 
-  ws.onclose = function(e) {
+  ws.onclose = function (e) {
     defaultLogger.error('WS closed!', e)
     container.innerHTML = `<h3 style='color:red'>Disconnected</h3>`
   }
 
-  ws.onerror = function(e) {
+  ws.onerror = function (e) {
     defaultLogger.error('WS error!', e)
     container.innerHTML = `<h3 style='color:red'>EERRORR</h3>`
   }
 
-  ws.onmessage = function(ev) {
+  ws.onmessage = function (ev) {
     if (DEBUG_MESSAGES) {
       defaultLogger.info('>>>', ev.data)
     }
@@ -219,7 +223,7 @@ function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): Un
     }
   }
 
-  ws.onopen = function() {
+  ws.onopen = function () {
     container.classList.remove('dcl-loading')
     defaultLogger.info('WS open!')
     gameInstance.SendMessage('', 'Reset', '')

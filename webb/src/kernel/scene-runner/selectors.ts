@@ -41,7 +41,7 @@ export function getSceneDeltaPositionReport(
   const updatedSightCount = getSceneCountForPosition(state, currentlySeenParcels)
   const oldSceneSightCount = state.sceneLifeCycle.sightCount
   const oldScenes = Object.keys(oldSceneSightCount).filter(_ => !!_ && _ !== 'error' && !!oldSceneSightCount[_])
-  const newScenes = Object.keys(updatedSightCount).filter(_ => !!_ && _ !== 'error')
+  const newScenes = Object.keys(updatedSightCount).filter(_ => !!_ && _ !== 'error' && !!updatedSightCount[_])
 
   const seenBefore = {}
   const lostSightScenes = []
@@ -58,7 +58,6 @@ export function getSceneDeltaPositionReport(
       newlySeenScenes.push(sceneId)
     }
   }
-  debugger
 
   return { updatedSightCount, newlySeenScenes, lostSightScenes }
 }

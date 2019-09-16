@@ -19,6 +19,13 @@ describe('parcel sight behavior', () => {
     expect(state.delta.sighted.length).toBe(state.lineOfSightRadius * 2 + 1)
     expect(state.delta.lostSight.length).toBe(state.lineOfSightRadius * 2 + 1)
   })
+  it('moving to the same position does not trigger changes', () => {
+    let state = INITIAL_PARCEL_SIGHT_STATE
+    state = parcelSightReducer(state, setPosition({ x: 0, y: 0 }))
+    state = parcelSightReducer(state, setPosition({ x: 0, y: 0 }))
+    expect(state.delta.sighted.length).toBe(0)
+    expect(state.delta.lostSight.length).toBe(0)
+  })
   it('starting position is empty', () => {
     const state = INITIAL_PARCEL_SIGHT_STATE
     expect(state.currentlySightedList).toEqual([])
