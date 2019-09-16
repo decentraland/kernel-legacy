@@ -17,6 +17,7 @@ import { AuthState } from './types'
 export const INITIAL_STATE: AuthState = {
   loading: [],
   commsToken: null,
+  ephemeral: null,
   data: null,
   error: null
 }
@@ -91,6 +92,7 @@ export function authReducer(state: AuthState = INITIAL_STATE, action: AuthReduce
       return {
         ...state,
         commsToken: null,
+        ephemeral: action.payload.ephemeral,
         loading: loadingReducer(state.loading, action)
       }
     }

@@ -16,9 +16,10 @@ import { sha256 } from '@dcl/utils'
 
 export class SceneManifest implements ISceneManifest {
   raw: UnsanitizedSceneManifest
+  private _id: string
   private _cannonicalRepresentation?: string
-  private _legacyMappings?: { file: string; hash: string }[]
   private _requiredAssets?: AssetDefinition[]
+  private _legacyMappings?: { file: string; hash: string }[]
   private _referenceSystem?: ReferenceSystem
   private _requiredTags?: string[]
   private _spawnPoints?: [SpawnPointDefinition, ...SpawnPointDefinition[]]
@@ -36,7 +37,13 @@ export class SceneManifest implements ISceneManifest {
   }
 
   get id(): string {
-    return this.cannonicalSerialization
+    if (!this._id) {
+      this._id = this.cannonicalCID
+    }
+    return this._id
+  }
+  set id(value: string) {
+    this._id = value
   }
 
   get sceneCID(): string {
@@ -109,9 +116,10 @@ export class SceneManifest implements ISceneManifest {
     return this._requiredAssets
   }
 
-  get legacyMappings() {
+  /** @deprecated */
+  get legacyMappings(): { file: string; hash: string }[] {
     if (!this._legacyMappings) {
-      this._legacyMappings = this.assets.map((asset: any) => ({ file: asset.name, hash: asset.uri || asset.hash }))
+      this._legacyMappings = this.assets.map((asset: any) => ({ file: asset.name, hash: asset.hash || asset.uri }))
     }
     return this._legacyMappings
   }
@@ -154,10 +162,6 @@ export class SceneManifest implements ISceneManifest {
       }
     }
     return this._referenceSystem
-  }
-
-  get legacyBaseUrl(): string {
-    return this.raw['baseUrl']
   }
 
   get cannonicalSerialization(): string {

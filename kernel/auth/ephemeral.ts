@@ -65,9 +65,7 @@ export class BasicEphemeralKey implements EphemeralKey {
    */
   public static generateNewKey(ttl: number): BasicEphemeralKey {
     const keys = EcdsaKeyPair.generateRandomKey()
-
     const expDate = getExpirationDate(ttl)
-
     return new BasicEphemeralKey(keys, expDate)
   }
 

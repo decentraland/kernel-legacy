@@ -1,19 +1,13 @@
-import future from 'fp-future'
-import { createStore, Store, combineReducers } from 'redux'
-
 import { getConfiguration } from '@dcl/config'
-
-import { BasicEphemeralKey, EphemeralKey, MessageInput } from './ephemeral'
-import { authReducer } from './reducer'
-import { getAccessToken, isLoggedIn, RootAuthState, getCommsToken } from './selectors'
+import future from 'fp-future'
+import { Store } from 'redux'
 import { tokenRequest } from './actions'
+import { BasicEphemeralKey, EphemeralKey, MessageInput } from './ephemeral'
+import { getAccessToken, getCommsToken, getEphemeralKey, isLoggedIn, RootAuthState, isTokenExpired } from './selectors'
 
 export class Auth {
   store: Store<RootAuthState>
   ephemeralKey: EphemeralKey
-  setup() {
-    this.store = createStore(combineReducers({ auth: authReducer }))
-  }
 
   getAccessToken() {
     if (isLoggedIn(this.store.getState())) {
@@ -43,7 +37,11 @@ export class Auth {
         unsubscribe()
       }
     })
-    this.store.dispatch(tokenRequest(this.getEphemeralKey()))
+    try {
+      this.store.dispatch(tokenRequest(this.getEphemeralKey()))
+    } catch (e) {
+      console.log(e)
+    }
     return result
   }
 
@@ -52,10 +50,11 @@ export class Auth {
   }
 
   getEphemeralKey() {
-    if (!this.ephemeralKey || this.ephemeralKey.hasExpired()) {
-      this.ephemeralKey = BasicEphemeralKey.generateNewKey(getConfiguration('EPHEMERAL_KEY_TTL'))
+    let ephemeralKey = getEphemeralKey(this.store.getState())
+    if (!ephemeralKey || isTokenExpired(ephemeralKey.expirationDate)) {
+      ephemeralKey = BasicEphemeralKey.generateNewKey(getConfiguration('EPHEMERAL_KEY_TTL'))
     }
-    return this.ephemeralKey
+    return ephemeralKey
   }
 
   async getMessageCredentials(message: string | null) {

@@ -5,11 +5,8 @@ export type sceneIdString = string
 
 export type PositionToSceneIdState = {
   downloadServer: string
-  loadingPositionCoordinates: booleanMap
-  resolvedPositionToScene: Record<coordinateString, sceneIdString>
   sceneIdToPositions: Record<sceneIdString, coordinateString[]>
-  errorPositions: Record<string, boolean>
-  emptyPositions: Record<string, boolean>
+  positionToScene: Record<coordinateString, sceneIdString>
 }
 
 export type RootPositionToSceneIdState = {

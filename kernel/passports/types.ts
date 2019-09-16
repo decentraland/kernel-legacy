@@ -1,6 +1,7 @@
 import { StoredProfile } from './types/StoredProfile'
 
 export type PassportState = {
+  profileServer: string
   info: {
     [key: string]:
       | {
@@ -13,9 +14,10 @@ export type PassportState = {
         }
   }
 }
-export type PassportRootState = {
+export type RootPassportState = {
   passports: PassportState
 }
 export const INITIAL_PASSPORTS: PassportState = {
+  profileServer: '',
   info: {}
 }

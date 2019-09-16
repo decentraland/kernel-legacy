@@ -15,13 +15,12 @@ export function needsResolution(state: RootPositionToSceneIdState, position: str
   return internalNeedsResolution(state.positionToSceneId, position)
 }
 
+export function hasFinishedLoadingPositionMapping(state: RootPositionToSceneIdState, position: string) {
+  return state.positionToSceneId.positionToScene[position] !== 'loading'
+}
+
 export function internalNeedsResolution(state: PositionToSceneIdState, position: string) {
-  return (
-    !state.resolvedPositionToScene[position] &&
-    !state.errorPositions[position] &&
-    !state.emptyPositions[position] &&
-    !state.loadingPositionCoordinates[position]
-  )
+  return state.positionToScene[position] === undefined
 }
 
 export function getDownloadServer(state: RootPositionToSceneIdState) {
@@ -32,14 +31,39 @@ export function getSceneIdForPositionVector(state: RootPositionToSceneIdState, x
   return getSceneIdForPosition(state, encodeParcelPositionFromCoordinates(x, y))
 }
 
+export function getSceneCountForPosition(state: RootPositionToSceneIdState, positions: string[]) {
+  return positions.reduce((cumm, position) => {
+    const sceneId = state.positionToSceneId.positionToScene[position]
+    if (sceneId === 'error') {
+      return cumm
+    }
+    if (!sceneId) {
+      return cumm
+    }
+    if (cumm[sceneId] === undefined) {
+      cumm[sceneId] = 1
+    } else {
+      cumm[sceneId]++
+    }
+    return cumm
+  }, {})
+}
+
+export function getSceneIdForPositions(state: RootPositionToSceneIdState, positions: string[]) {
+  return Object.keys(getSceneCountForPosition(state, positions))
+}
+
 export function getSceneIdForPosition(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.resolvedPositionToScene[position]
+  const status = state.positionToSceneId.positionToScene[position]
+  if (status === 'loading' || status === 'empty' || status === 'error') {
+    return undefined
+  }
 }
 
 export function getPositionError(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.errorPositions[position]
+  return state.positionToSceneId.positionToScene[position] === 'error'
 }
 
 export function getEmptyStatus(state: RootPositionToSceneIdState, position: string) {
-  return state.positionToSceneId.emptyPositions[position]
+  return state.positionToSceneId.positionToScene[position] === 'empty'
 }

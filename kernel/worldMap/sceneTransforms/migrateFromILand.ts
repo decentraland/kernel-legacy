@@ -1,9 +1,11 @@
 import { ILand, ISceneManifest } from '@dcl/utils'
 import { SceneManifest } from '../scene'
+import { isValidSceneInput, getInvalidReason } from '../scene/validation'
 
 export function migrateFromILand(scene: any, mappings?: any): ISceneManifest {
   const raw = scene.mappingsResponse ? _upgradeILandToSceneManifest(scene) : _upgradeToV2(scene, mappings)
-  return new SceneManifest(raw)
+  const manifest = new SceneManifest(raw)
+  return manifest
 }
 function _upgradeILandToSceneManifest(scene: ILand<any>) {
   return _upgradeToV2(scene.scene, { data: [{ content: scene.mappingsResponse }] })
@@ -24,7 +26,14 @@ function _upgradeToV2(scene: any, mappings: any) {
   if (!allContainFileAndHash) {
     throw new Error('Invalid mappings: all files must have a `file` and `hash` value')
   }
-  return {
+  function lastPart(e: string) {
+    const split = e.split('.')
+    if (!split.length) {
+      return ''
+    }
+    return split[split.length - 1]
+  }
+  const data = {
     version: 2,
     assets: mappings.data[0].content.contents
       .filter((f: any) => f.file !== 'scene.json')
@@ -34,7 +43,7 @@ function _upgradeToV2(scene: any, mappings: any) {
         name: 'required',
         assets: mappings.data[0].content.contents
           .map((e: any) => e.file)
-          .filter((e: any) => ['js', 'glb', 'gltf'].includes(e.split('.')[e.split('.').length - 1]))
+          .filter((e: any) => ['js', 'glb', 'gltf'].includes(lastPart(e)))
       }
     ],
     requiredTags: ['required'],
@@ -66,4 +75,8 @@ function _upgradeToV2(scene: any, mappings: any) {
       title: scene.display.title
     }
   }
+  if (!isValidSceneInput(data)) {
+    throw new Error(getInvalidReason(data))
+  }
+  return data
 }
