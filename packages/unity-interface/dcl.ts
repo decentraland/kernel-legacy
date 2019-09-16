@@ -121,13 +121,8 @@ const unityInterface = {
      */
     gameInstance.SendMessage('SceneController', 'CreateUIScene', JSON.stringify(data))
   },
-  /** Sends the camera position to the engine */
-  Teleport(initialPosition: InstancedSpawnPoint) {
-    const {
-      position: { x, y, z },
-      cameraTarget
-    } = initialPosition
-
+  /** Sends the camera position & target to the engine */
+  Teleport({ position: { x, y, z }, cameraTarget }: InstancedSpawnPoint) {
     const theY = y <= 0 ? 2 : y
 
     gameInstance.SendMessage('CharacterController', 'Teleport', JSON.stringify({ x, y: theY, z, cameraTarget }))
