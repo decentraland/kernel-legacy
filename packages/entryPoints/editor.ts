@@ -31,7 +31,8 @@ import {
   setCameraPositionBuilder,
   setCameraRotationBuilder,
   resetCameraZoomBuilder,
-  setBuilderGridResolution
+  setBuilderGridResolution,
+  setBuilderArrowKeyDown
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -298,6 +299,10 @@ namespace editor {
   export const envHelper = null
   export function getCameraPosition() {
     console.log('getCameraPosition')
+  }
+
+  export function setArrowKeyDown(key: string) {
+    setBuilderArrowKeyDown(key)
   }
 }
 

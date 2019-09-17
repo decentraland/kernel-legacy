@@ -518,6 +518,10 @@ export function updateBuilderScene(sceneData: ILand) {
   }
 }
 
+export function setBuilderArrowKeyDown(key: string) {
+  unityInterface.sendBuilderMessage('SetArrowKeyDown', key)
+}
+
 teleportObservable.add((position: { x: number; y: number }) => {
   unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
 })
