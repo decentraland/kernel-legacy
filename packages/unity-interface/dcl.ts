@@ -427,7 +427,7 @@ export function setBuilderGridResolution(position: number, rotation: number, sca
   )
 }
 
-let currentLoadedScene: SceneWorker
+let currentLoadedScene: SceneWorker | null
 
 export async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
@@ -474,12 +474,7 @@ export async function loadPreviewScene() {
 }
 
 export function loadBuilderScene(sceneData: ILand) {
-  let lastId: string | null = null
-
-  if (currentLoadedScene) {
-    lastId = currentLoadedScene.parcelScene.data.sceneId
-    stopParcelSceneWorker(currentLoadedScene)
-  }
+  unloadCurrentBuilderScene()
 
   defaultLogger.info('Starting Builder Scene...')
 
@@ -491,12 +486,19 @@ export function loadBuilderScene(sceneData: ILand) {
   const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
   delete target.land
 
-  if (lastId) {
-    unityInterface.UnloadScene(lastId)
-  }
-
   unityInterface.LoadParcelScenes([target])
   return parcelScene
+}
+
+export function unloadCurrentBuilderScene() {
+  if (currentLoadedScene) {
+    const parcelScene = currentLoadedScene.parcelScene as UnityParcelScene
+    parcelScene.emit('builderSceneUnloaded', {})
+
+    stopParcelSceneWorker(currentLoadedScene)
+    unityInterface.sendBuilderMessage('UnloadScene', parcelScene.data.sceneId)
+    currentLoadedScene = null
+  }
 }
 
 export function readyBuilderScene() {

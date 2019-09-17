@@ -27,12 +27,12 @@ import {
   ActivateRendering,
   DeactivateRendering,
   resetBuilderScene,
-  UnloadScene,
   setCameraPositionBuilder,
   setCameraRotationBuilder,
   resetCameraZoomBuilder,
   setBuilderGridResolution,
-  setBuilderArrowKeyDown
+  setBuilderArrowKeyDown,
+  unloadCurrentBuilderScene
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -163,8 +163,11 @@ function bindSceneEvents() {
   })
 
   unityScene.on('builderSceneStart', e => {
-    console.log('builderSceneStart evento llega')
     builderSceneLoaded.resolve(true)
+  })
+
+  unityScene.on('builderSceneUnloaded', e => {
+    loadingEntities = []
   })
 }
 
@@ -205,7 +208,7 @@ namespace editor {
   }
   export async function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
     if (action.type === 'Close editor') {
-      UnloadScene(unityScene.data.sceneId)
+      unloadCurrentBuilderScene()
       DeactivateRendering()
     } else if (unityScene) {
       const { worker } = unityScene
