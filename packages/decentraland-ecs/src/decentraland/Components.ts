@@ -1,5 +1,5 @@
 import { Component, ObservableComponent, DisposableComponent } from '../ecs/Component'
-import { Vector3, Quaternion, Matrix, MathTmp, Color3 } from './math'
+import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from './math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
 import { IEvents } from './Types'
@@ -540,18 +540,18 @@ export class TextShape extends Shape {
 @DisposableComponent('engine.material', CLASS_ID.PRB_MATERIAL)
 export class Material extends ObservableComponent {
   /**
-   * Opacity level between 0 and 1.
-   * Defaults to 1.
+   * Cutoff level for ALPHATEST mode. Range is between 0 and 1.
+   * Defaults to 0.5
    */
   @ObservableComponent.field
-  alpha?: number
+  alphaTest?: number = 0.5
 
   /**
    * AKA Diffuse Color in other nomenclature.
    * Defaults to #CCCCCC.
    */
   @ObservableComponent.field
-  albedoColor?: Color3
+  albedoColor?: Color4 | Color3
 
   /**
    * The color emitted from the material.
