@@ -125,7 +125,7 @@ jobs:
             - .git
           key: build-sdk-{{ .Revision }}
 
-  publish-ecs-latest:
+  publish-ecs-prd:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
@@ -152,7 +152,7 @@ jobs:
           command: make publish
           when: on_success
 
-  publish-ecs-next:
+  publish-ecs-stg:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
@@ -235,7 +235,11 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_DEV_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_DEV_SECRET_ACCESS_KEY}
       - run:
+<<<<<<< HEAD
           name: Deploy tag to .today
+=======
+          name: Deploy to .today
+>>>>>>> simplify branches
           command: |
             aws s3 sync static s3://explorer.decentraland.today/ --exclude "tags/*" --acl public-read
       - run:
@@ -259,7 +263,11 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_PRD_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_PRD_SECRET_ACCESS_KEY}
       - run:
+<<<<<<< HEAD
           name: Deploy tag to .org
+=======
+          name: Deploy to .org
+>>>>>>> simplify branches
           command: |
             aws s3 sync static s3://explorer.decentraland.org/ --exclude "tags/*" --acl public-read
       - run:
@@ -280,30 +288,18 @@ workflows:
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              only: release
       - hold-explorer-stg:
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              only: staging
       - hold-ecs-prd:
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              only: release
       - hold-ecs-stg:
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              only: staging
       - deploy-on-pr:
           requires:
             - build
@@ -311,8 +307,6 @@ workflows:
             branches:
               ignore:
                 - master
-                - staging
-                - release
       - deploy-dev:
           requires:
             - build
@@ -322,26 +316,20 @@ workflows:
       - publish-ecs-prd:
           requires:
             - hold-ecs-prd
-          filters:
-            branches:
-              only: release
       - publish-ecs-stg:
           requires:
             - hold-ecs-stg
+<<<<<<< HEAD
           filters:
             branches:
               only: master
             tags:
               only: /^\d+\.\d+\.\d(.*)/
+=======
+>>>>>>> simplify branches
       - deploy-prd:
           requires:
             - hold-explorer-prd
-          filters:
-            branches:
-              only: release
       - deploy-stg:
           requires:
             - hold-explorer-stg
-          filters:
-            branches:
-              only: staging
