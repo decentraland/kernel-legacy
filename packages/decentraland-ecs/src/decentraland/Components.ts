@@ -46,7 +46,7 @@ export enum CLASS_ID {
   AVATAR_SHAPE = 56,
 
   BASIC_MATERIAL = 64,
-  PRB_MATERIAL = 65,
+  PBR_MATERIAL = 65,
 
   HIGHLIGHT_ENTITY = 66,
 
@@ -537,7 +537,7 @@ export class TextShape extends Shape {
 /**
  * @public
  */
-@DisposableComponent('engine.material', CLASS_ID.PRB_MATERIAL)
+@DisposableComponent('engine.material', CLASS_ID.PBR_MATERIAL)
 export class Material extends ObservableComponent {
   /**
    * Cutoff level for ALPHATEST mode. Range is between 0 and 1.
@@ -687,13 +687,6 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.field
   transparencyMode: number = 4
-
-  /**
-   * Does the albedo texture has alpha?
-   * Defaults to false.
-   */
-  @ObservableComponent.field
-  hasAlpha?: boolean
 }
 
 /**
