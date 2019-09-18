@@ -288,18 +288,36 @@ workflows:
           type: approval
           requires:
             - build
+          filters:
+            branches:
+              only:
+                - master
       - hold-explorer-stg:
           type: approval
           requires:
             - build
+          filters:
+            branches:
+              only:
+                - master
       - hold-ecs-prd:
           type: approval
           requires:
             - build
+          filters:	
+            branches:	
+              only: master	
+            tags:	
+              only: /^\d+\.\d+\.\d(.*)/
       - hold-ecs-stg:
           type: approval
           requires:
             - build
+          filters:	
+            branches:	
+              only: master	
+            tags:	
+              only: /^\d+\.\d+\.\d(.*)/
       - deploy-on-pr:
           requires:
             - build
@@ -315,10 +333,16 @@ workflows:
               only: master
       - publish-ecs-prd:
           requires:
+            - build
             - hold-ecs-prd
+          filters:
+            branches:
+              only: master
       - publish-ecs-stg:
           requires:
+            - build
             - hold-ecs-stg
+<<<<<<< HEAD
 <<<<<<< HEAD
           filters:
             branches:
@@ -327,9 +351,22 @@ workflows:
               only: /^\d+\.\d+\.\d(.*)/
 =======
 >>>>>>> simplify branches
+=======
+          filters:
+            branches:
+              only: master
+>>>>>>> Update config.yml
       - deploy-prd:
           requires:
+            - build
             - hold-explorer-prd
+          filters:
+            branches:
+              only: master
       - deploy-stg:
           requires:
+            - build
             - hold-explorer-stg
+          filters:
+            branches:
+              only: master
