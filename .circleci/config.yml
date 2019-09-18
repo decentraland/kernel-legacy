@@ -275,60 +275,59 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /.*/
+      - build
       - hold-explorer-prd:
           type: approval
           requires:
             - build
           filters:
             branches:
-              only: master
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
+              only: release
       - hold-explorer-stg:
           type: approval
           requires:
             - build
           filters:
             branches:
-              only: master
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
-      - hold-ecs:
+              only: staging
+      - hold-ecs-prd:
           type: approval
           requires:
             - build
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
+              only: release
+      - hold-ecs-stg:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: staging
       - deploy-on-pr:
           requires:
             - build
           filters:
             branches:
-              ignore: master
+              ignore:
+                - master
+                - staging
+                - release
       - deploy-dev:
           requires:
             - build
           filters:
             branches:
               only: master
-      - publish-ecs-next:
+      - publish-ecs-prd:
           requires:
-            - build
+            - hold-ecs-prd
           filters:
             branches:
-              only: master
-      - deploy-stg:
+              only: release
+      - publish-ecs-stg:
           requires:
-            - build
-            - deploy-dev
-            - hold-explorer-stg
+            - hold-ecs-stg
           filters:
             branches:
               only: master
@@ -339,14 +338,10 @@ workflows:
             - hold-explorer-prd
           filters:
             branches:
-              only: master
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
-      - publish-ecs-latest:
+              only: release
+      - deploy-stg:
           requires:
-            - hold-ecs
+            - hold-explorer-stg
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
+              only: staging
