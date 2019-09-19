@@ -107,6 +107,24 @@
       display: none !important;
     }
 
+    body.error {
+      background: black !important;
+      background-image: none !important;
+    }
+
+    body.error #gameContainer {
+      display: none !important;
+    }
+
+    body.error #progress-bar {
+      display: none !important;
+    }
+
+    body.error #gameContainer {
+      background: black !important;
+      background-image: none !important;
+    }
+
     @keyframes progress_30 {
       from {
         width: 0;
@@ -219,6 +237,26 @@
     </div>
   </div>
 
+  <div id="error-nomobile-mobile" class="error-container hidden-error">
+    <div class="errormessage">
+      <div class="errortext col">
+        <div class="error">Error</div>
+        <div class="communicationslink">The client is only available on<br />desktop right now.</div>
+        <div class="errorimage col">
+          <img src="images/error-robotmobile.png" />
+        </div>
+        <div class="notavailable-mobile">
+          <div class="givesomedetailof">Sign up to receive updates and check it out on your computer.</div>
+          <div class="enteremail">
+            <input class="enteremail"></input>
+          </div>
+          <div class="cta">
+            <button class="submitemail">Sign up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div id="error-nomobile" class="error-container hidden-error">
     <div class="errormessage">
       <div class="errortext col">
