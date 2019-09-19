@@ -40,8 +40,7 @@ import { chatObservable } from '../shared/comms/chat'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
-import { Vector3Component } from '../atomicHelpers/landHelpers'
-import { Auth } from '../shared/auth/Auth'
+import { Session } from 'shared/session'
 
 let gameInstance!: GameInstance
 
@@ -82,8 +81,8 @@ const browserInterface = {
     // stub. there is no code about this in unity side yet
   },
 
-  async LogOut() {
-    await Auth.instance.logout()
+  LogOut() {
+    Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
   },
 
   ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
@@ -105,7 +104,7 @@ const browserInterface = {
   }
 }
 
-function setLoadingScreenVisible(shouldShow: boolean) {
+export function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
   document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }

@@ -19,6 +19,7 @@ import { defaultLogger } from './logger'
 import { ProfileSpec } from './types'
 import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
+import { Session } from './session/index'
 import {
   createProfile,
   createStubProfileSpec,
@@ -45,12 +46,15 @@ async function initializeAnalytics(userId: string) {
 
 declare let window: any
 
-export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWORK> {
+export async function initShared(): Promise<Session> {
+  const session = new Session()
+
   const auth = new Auth({
     ...getLoginConfigurationForCurrentDomain(),
     redirectUri: window.location.href,
     ephemeralKeyTTL: 24 * 60 * 60 * 1000
   })
+  session.auth = auth
 
   let userId: string
 
@@ -107,11 +111,11 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   // DCL Servers connections/requests after this
   if (STATIC_WORLD) {
-    return net
+    return session
   }
 
   console['group']('connect#comms')
-  const maxTries = 5
+  const maxAttemps = 5
   for (let i = 1; ; ++i) {
     try {
       defaultLogger.info(`Try number ${i}...`)
@@ -122,9 +126,9 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
       )
       break
     } catch (e) {
-      if (!e.message.startsWith('Communications link') || i === maxTries) {
-        // max number of tries reached, rethrow error
-        defaultLogger.info(`Max number of tries reached (${maxTries}), unsuccessful connection`)
+      if (!e.message.startsWith('Communications link') || i === maxAttemps) {
+        // max number of attemps reached, rethrow error
+        defaultLogger.info(`Max number of attemps reached (${maxAttemps}), unsuccessful connection`)
         disconnect()
         throw e
       }
@@ -171,5 +175,5 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
   }
   console['groupEnd']()
 
-  return net
+  return session
 }
