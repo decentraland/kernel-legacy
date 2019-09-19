@@ -3,6 +3,7 @@
  */
 
 .error-container {
+  width: 800px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -586,6 +587,14 @@
  * Mobile (WIP)
  */
 
+#error-nomobile-mobile.error-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(2);
+  padding-left: 115px;
+}
+
 #error-nomobile-mobile.error-container .errormessage {
   background-color: rgba(255, 255, 255, 0.0);
   display: flex;
@@ -779,10 +788,6 @@
   -webkit-font-smoothing: antialiased;
   -webkit-rtl-ordering: logical;
   -webkit-border-image: none;
-}
-
-#error-nomobile-mobile {
-  display: block !important;
 }
 
 #error-nomobile.error-container .errormessage .cta .submitemail {
