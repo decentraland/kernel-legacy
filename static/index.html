@@ -239,6 +239,35 @@
       </div>
     </div>
   </div>
+  <script>
+    var stylesheetPath = 'styles/errors.css';
+    var cb = function () {
+      var l = document.createElement('link'); l.rel = 'stylesheet';
+      l.href = stylesheetPath;
+      var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
+    };
+    var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+      webkitRequestAnimationFrame || msRequestAnimationFrame;
+    if (raf) raf(cb);
+    else window.addEventListener('load', cb);
+  </script>
+  <noscript>
+    <div id="error-notsupported" class="error-container hidden-error">
+      <div class="errormessage">
+        <div class="errortext col">
+          <div class="error">Error</div>
+          <div class="communicationslink">Your browser or device is not supported</div>
+          <div class="givesomedetailof">The Explorer only works on Chrome or Firefox for Windows, Linux and macOS.</div>
+        </div>
+        <div class="errorimage col">
+          <img src="images/error-robotmobile.png" />
+        </div>
+      </div>
+    </div>
+    <link rel="stylesheet" href="styles/errors.css">
+  </noscript>
+
+
   <!-- End error messages -->
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63691338-5"></script>
