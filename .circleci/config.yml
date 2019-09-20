@@ -19,7 +19,6 @@ jobs:
             sudo apt-get update && sudo apt-get install -y git-lfs=2.7.2
             ssh git@github.com git-lfs-authenticate decentraland/kernel.git download
             git lfs install
-
       # checkout the actual code
       - checkout
 
@@ -209,11 +208,7 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_DEV_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_DEV_SECRET_ACCESS_KEY}
       - run:
-<<<<<<< HEAD
-          name: Deploy tag to .today
-=======
           name: Deploy to .today
->>>>>>> simplify branches
           command: |
             aws s3 sync static s3://explorer.decentraland.today/ --exclude "tags/*" --acl public-read
       - run:
@@ -237,11 +232,7 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_PRD_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_PRD_SECRET_ACCESS_KEY}
       - run:
-<<<<<<< HEAD
-          name: Deploy tag to .org
-=======
           name: Deploy to .org
->>>>>>> simplify branches
           command: |
             aws s3 sync static s3://explorer.decentraland.org/ --exclude "tags/*" --acl public-read
       - run:
@@ -306,25 +297,6 @@ workflows:
                 - release
       - deploy-stg:
           requires:
-<<<<<<< HEAD
-            - build
-            - hold-ecs-stg
-<<<<<<< HEAD
-<<<<<<< HEAD
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
-=======
->>>>>>> simplify branches
-=======
-          filters:
-            branches:
-              only: master
->>>>>>> Update config.yml
-      - deploy-prd:
-=======
             - hold-explorer-stg
           filters:
             branches:
@@ -332,7 +304,6 @@ workflows:
 
       - hold-explorer-prd:
           type: approval
->>>>>>> chore: using release branch, simplifying ecs flows
           requires:
             - build
           filters:
