@@ -936,11 +936,10 @@
 .iphone8916 .cta {
   -webkit-font-smoothing: antialiased;
   background-color: rgba(255, 255, 255, 0.0);
-  top: 596px;
-  height: 39px;
+  text-align: center;
   width: 320px;
   position: absolute;
-  margin: 0;
+  bottom: 70px;
   left: 30px;
   transform: rotate(0);
 }
@@ -958,58 +957,20 @@
 }
 
 .iphone8916 .signup {
-  -webkit-font-smoothing: antialiased;
-  background-color: rgba(255, 255, 255, 0.0);
-  top: 12px;
-  height: auto;
-  width: 108px;
-  position: absolute;
-  margin: 0;
-  left: 107px;
-  transform: rotate(0);
-  font-family: 'SFUIText-Heavy', '-apple-system', Helvetica, Arial, serif;
+  font-family: 'SFUIText-Bold', '-apple-system', Helvetica, Arial, serif;
+  font-weight: 500;
   font-size: 14.0px;
   color: rgba(255, 255, 255, 1.0);
-  text-align: center;
   line-height: 14.4px;
-}
-
-.iphone8916 .input .emailinput {
-  background-color: rgb(255, 255, 255);
-  border-color: rgb(115, 110, 125);
-  border-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-style: none;
-  border-width: 0px;
-  color: #111;
+  height: 50px;
+  border-radius: 5px;
+  z-index: 1000;
   cursor: pointer;
-  display: block;
-  font-size: 15px;
-  font-stretch: 100%;
-  font-style: normal;
-  text-align: center;
-  flex-grow: 1;
-  font-weight: 400;
-  height: 44px;
-  letter-spacing: normal;
-  line-height: 24px;
-  outline-color: rgb(115, 110, 125);
-  outline-style: none;
-  outline-width: 0px;
-  padding-bottom: 10px;
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-top: 10px;
-  word-spacing: 0px;
-  writing-mode: horizontal-tb;
-  background-color: white;
-  top: 537px;
-  height: 39px;
-  width: 320px;
-  position: absolute;
-  margin: 0;
-  left: 30px;
-  transform: rotate(0);
+  border: 1px solid white;
+  padding-top: 17px;
+  padding-left: 5px;
+  text-transform: uppercase;
+  width: 100%;
 }
 
 .iphone8916 .input button {
