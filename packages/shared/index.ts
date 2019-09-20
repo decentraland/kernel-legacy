@@ -1,13 +1,4 @@
-import {
-  DEBUG,
-  ENABLE_WEB3,
-  ETHEREUM_NETWORK,
-  getTLD,
-  PREVIEW,
-  setNetwork,
-  STATIC_WORLD,
-  getLoginConfigurationForCurrentDomain
-} from '../config'
+import { ENABLE_WEB3, ETHEREUM_NETWORK, getLoginConfigurationForCurrentDomain, getTLD, PREVIEW, setNetwork, STATIC_WORLD } from '../config'
 import { initialize, queueTrackingEvent } from './analytics'
 import './apis/index'
 import { Auth } from './auth'
@@ -15,18 +6,13 @@ import { connect, disconnect } from './comms'
 import { persistCurrentUser } from './comms/index'
 import { localProfileUUID } from './comms/peers'
 import './events'
+import { ReportFatalError } from './loading/ReportFatalError'
+import { AUTH_ERROR_LOGGED_OUT, COMMS_COULD_NOT_BE_ESTABLISHED } from './loading/types'
 import { defaultLogger } from './logger'
 import { ProfileSpec } from './types'
 import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
-import {
-  createProfile,
-  createStubProfileSpec,
-  fetchLegacy,
-  fetchProfile,
-  legacyToSpec,
-  resolveProfileSpec
-} from './world/profiles'
+import { createProfile, createStubProfileSpec, fetchLegacy, fetchProfile, legacyToSpec, resolveProfileSpec } from './world/profiles'
 
 // TODO fill with segment keys and integrate identity server
 export async function initializeAnalytics(userId: string) {
@@ -64,7 +50,8 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
     } catch (e) {
       defaultLogger.error(e)
       console['groupEnd']()
-      throw new Error('Authentication error. Please reload the page to try again. (' + e.toString() + ')')
+      ReportFatalError(AUTH_ERROR_LOGGED_OUT)
+      throw e
     }
     await initializeAnalytics(userId)
   }
@@ -92,17 +79,6 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
 
   initializeUrlPositionObserver()
 
-  // Warn in case wallet is set in mainnet
-  if (net === ETHEREUM_NETWORK.MAINNET && DEBUG && ENABLE_WEB3) {
-    const style = document.createElement('style')
-    style.appendChild(
-      document.createTextNode(
-        `body:before{content:'You are using Mainnet Ethereum Network, real transactions are going to be made.';background:#ff0044;color:#fff;text-align:center;text-transform:uppercase;height:24px;width:100%;position:fixed;padding-top:2px}#main-canvas{padding-top:24px};`
-      )
-    )
-    document.head.appendChild(style)
-  }
-
   // DCL Servers connections/requests after this
   if (STATIC_WORLD) {
     return net
@@ -124,7 +100,7 @@ export async function initShared(container: HTMLElement): Promise<ETHEREUM_NETWO
         // max number of tries reached, rethrow error
         defaultLogger.info(`Max number of tries reached (${maxTries}), unsuccessful connection`)
         disconnect()
-        throw e
+        ReportFatalError(COMMS_COULD_NOT_BE_ESTABLISHED)
       }
     }
   }
