@@ -1,4 +1,12 @@
-import { ENABLE_WEB3, ETHEREUM_NETWORK, getLoginConfigurationForCurrentDomain, getTLD, PREVIEW, setNetwork, STATIC_WORLD } from '../config'
+import {
+  ENABLE_WEB3,
+  ETHEREUM_NETWORK,
+  getLoginConfigurationForCurrentDomain,
+  getTLD,
+  PREVIEW,
+  setNetwork,
+  STATIC_WORLD
+} from '../config'
 import { initialize, queueTrackingEvent } from './analytics'
 import './apis/index'
 import { Auth } from './auth'
@@ -14,7 +22,14 @@ import { Session } from './session/index'
 import { ProfileSpec } from './types'
 import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
-import { createProfile, createStubProfileSpec, fetchLegacy, fetchProfile, legacyToSpec, resolveProfileSpec } from './world/profiles'
+import {
+  createProfile,
+  createStubProfileSpec,
+  fetchLegacy,
+  fetchProfile,
+  legacyToSpec,
+  resolveProfileSpec
+} from './world/profiles'
 
 // TODO fill with segment keys and integrate identity server
 async function initializeAnalytics(userId: string) {
@@ -34,7 +49,6 @@ async function initializeAnalytics(userId: string) {
 declare let window: any
 
 export async function initShared(): Promise<Session | undefined> {
-
   if (isMobile()) {
     ReportFatalError(MOBILE_NOT_SUPPORTED)
     return
@@ -108,11 +122,12 @@ export async function initShared(): Promise<Session | undefined> {
       )
       break
     } catch (e) {
-      if (!e.message.startsWith('Communications link') || i === maxAttemps) {
+      if (!e.message.startsWith('Communications link') || i >= maxAttemps) {
         // max number of attemps reached, rethrow error
         defaultLogger.info(`Max number of attemps reached (${maxAttemps}), unsuccessful connection`)
         disconnect()
         ReportFatalError(COMMS_COULD_NOT_BE_ESTABLISHED)
+        throw e
       }
     }
   }
