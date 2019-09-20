@@ -125,7 +125,7 @@ jobs:
             - .git
           key: build-sdk-{{ .Revision }}
 
-  publish-ecs-prd:
+  publish-ecs:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
@@ -149,32 +149,6 @@ jobs:
 
       - run:
           name: Publish a new version of decentraland-ecs
-          command: make publish
-          when: on_success
-
-  publish-ecs-stg:
-    docker:
-      - image: circleci/node:10-browsers
-    working_directory: /tmp/explorer
-    steps:
-      # restore build files
-      - restore_cache:
-          keys:
-            - build-{{ .Revision }}
-      - restore_cache:
-          keys:
-            - build-sdk-{{ .Revision }}
-      # restore node_modules
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
-      - run:
-          name: Set up NPM
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          when: on_success
-
-      - run:
-          name: publish decentraland-api
           command: make publish
           when: on_success
 
@@ -284,40 +258,14 @@ workflows:
   build-deploy:
     jobs:
       - build
-      - hold-explorer-prd:
-          type: approval
+
+      # explorer master + pr branch jobs (deploy to dev + pr dev)
+      - deploy-dev:
           requires:
             - build
           filters:
             branches:
-              only:
-                - master
-      - hold-explorer-stg:
-          type: approval
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-      - hold-ecs-prd:
-          type: approval
-          requires:
-            - build
-          filters:	
-            branches:	
-              only: master	
-            tags:	
-              only: /^\d+\.\d+\.\d(.*)/
-      - hold-ecs-stg:
-          type: approval
-          requires:
-            - build
-          filters:	
-            branches:	
-              only: master	
-            tags:	
-              only: /^\d+\.\d+\.\d(.*)/
+              only: master
       - deploy-on-pr:
           requires:
             - build
@@ -325,21 +273,40 @@ workflows:
             branches:
               ignore:
                 - master
-      - deploy-dev:
+                - release
+
+      # ecs publish jobs (publish as next + latest depending on context branch/tag)
+      # TODO - deploy from release branch + add an additional 'dev' tag to npm replacing 'next' + use 'next' for stg releases
+      - hold-ecs:
+          type: approval
           requires:
             - build
           filters:
             branches:
-              only: master
-      - publish-ecs-prd:
+              only: master # next
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/ # npm tag + latest
+      - publish-ecs:
           requires:
-            - build
-            - hold-ecs-prd
+            - hold-ecs
           filters:
             branches:
-              only: master
-      - publish-ecs-stg:
+              only: master # next
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/ # npm tag + latest
+
+      # explorer release branch jobs (stg + prd)
+      - hold-explorer-stg:
+          type: approval
           requires:
+            - build
+          filters:
+            branches:
+              only:
+                - release
+      - deploy-stg:
+          requires:
+<<<<<<< HEAD
             - build
             - hold-ecs-stg
 <<<<<<< HEAD
@@ -357,16 +324,24 @@ workflows:
               only: master
 >>>>>>> Update config.yml
       - deploy-prd:
-          requires:
-            - build
-            - hold-explorer-prd
-          filters:
-            branches:
-              only: master
-      - deploy-stg:
-          requires:
-            - build
+=======
             - hold-explorer-stg
           filters:
             branches:
-              only: master
+              only: release
+
+      - hold-explorer-prd:
+          type: approval
+>>>>>>> chore: using release branch, simplifying ecs flows
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - release
+      - deploy-prd:
+          requires:
+            - hold-explorer-prd
+          filters:
+            branches:
+              only: release
