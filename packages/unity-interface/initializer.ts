@@ -40,8 +40,11 @@ const engineInitialized = future()
 
 /** Initialize the engine in a container */
 export async function initializeUnity(container: HTMLElement): Promise<InitializeUnityResult> {
-  Session.current = await initShared()
-
+  const session = await initShared()
+  if (!session) {
+    throw new Error()
+  }
+  Session.current = session as Session
   const qs = queryString.parse(document.location.search)
 
   if (qs.ws) {

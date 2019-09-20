@@ -3,11 +3,12 @@ import { initialize, queueTrackingEvent } from './analytics'
 import './apis/index'
 import { Auth } from './auth'
 import { connect, disconnect } from './comms'
+import { isMobile } from './comms/mobile'
 import { persistCurrentUser } from './comms/index'
 import { localProfileUUID } from './comms/peers'
 import './events'
 import { ReportFatalError } from './loading/ReportFatalError'
-import { AUTH_ERROR_LOGGED_OUT, COMMS_COULD_NOT_BE_ESTABLISHED } from './loading/types'
+import { AUTH_ERROR_LOGGED_OUT, COMMS_COULD_NOT_BE_ESTABLISHED, MOBILE_NOT_SUPPORTED } from './loading/types'
 import { defaultLogger } from './logger'
 import { Session } from './session/index'
 import { ProfileSpec } from './types'
@@ -32,7 +33,12 @@ async function initializeAnalytics(userId: string) {
 
 declare let window: any
 
-export async function initShared(): Promise<Session> {
+export async function initShared(): Promise<Session | undefined> {
+
+  if (isMobile()) {
+    ReportFatalError(MOBILE_NOT_SUPPORTED)
+    return
+  }
   const session = new Session()
 
   const auth = new Auth({

@@ -44,6 +44,8 @@ export const COMMS_ERROR_RETRYING = 'Communications channel error (will retry)'
 export const commsErrorRetrying = () => action(COMMS_ERROR_RETRYING)
 export const COMMS_COULD_NOT_BE_ESTABLISHED = 'Communications channel error'
 export const commsCouldNotBeEstablished = () => action(COMMS_COULD_NOT_BE_ESTABLISHED)
+export const MOBILE_NOT_SUPPORTED = 'Mobile is not supported'
+export const mobileNotSupported = () => action(MOBILE_NOT_SUPPORTED)
 
 export const ExecutionLifecycleNotifications = {
   loadingStarted,
@@ -58,6 +60,7 @@ export const ExecutionLifecycleNotifications = {
   sceneEntered,
   unexpectedError,
   unexpectedErrorLoadingCatalog,
+  mobileNotSupported,
   authErrorLoggedOut,
   contentServerDown,
   failedFetchingUnity,
@@ -79,6 +82,7 @@ export type ExecutionLifecycleEvent =
   | typeof SCENE_ENTERED
   | typeof UNEXPECTED_ERROR
   | typeof AUTH_ERROR_LOGGED_OUT
+  | typeof MOBILE_NOT_SUPPORTED
   | typeof CONTENT_SERVER_DOWN
   | typeof FAILED_FETCHING_UNITY
   | typeof COMMS_ERROR_RETRYING
@@ -102,5 +106,6 @@ export const ExecutionLifecycleEventsList = [
   CONTENT_SERVER_DOWN,
   FAILED_FETCHING_UNITY,
   COMMS_ERROR_RETRYING,
+  MOBILE_NOT_SUPPORTED,
   COMMS_COULD_NOT_BE_ESTABLISHED
 ]

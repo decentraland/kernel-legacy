@@ -1,4 +1,4 @@
-import { ExecutionLifecycleEvent, COMMS_COULD_NOT_BE_ESTABLISHED, NOT_INVITED, NO_WEBGL_COULD_BE_CREATED } from "./types";
+import { ExecutionLifecycleEvent, COMMS_COULD_NOT_BE_ESTABLISHED, NOT_INVITED, NO_WEBGL_COULD_BE_CREATED, MOBILE_NOT_SUPPORTED } from "./types";
 
 let aborted = false
 
@@ -17,7 +17,8 @@ export function bringDownClientAndShowError(event: ExecutionLifecycleEvent) {
   const targetError = event === COMMS_COULD_NOT_BE_ESTABLISHED ? 'comms'
     : event === NOT_INVITED ? 'notinvited'
       : event === NO_WEBGL_COULD_BE_CREATED ? 'notsupported'
-        : 'fatal'
+        : event === MOBILE_NOT_SUPPORTED ? 'nomobile-mobile'
+          : 'fatal'
 
   document.getElementById('error-' + targetError)!.setAttribute('style', 'display: block !important')
   aborted = true
