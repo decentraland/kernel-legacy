@@ -1,9 +1,10 @@
 import future from 'fp-future'
 import { DEBUG_MESSAGES } from '../config'
 import { initShared } from '../shared'
+import { ReportFatalError } from '../shared/loading/ReportFatalError'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
-import { ReportFatalError } from '../shared/loading/ReportFatalError'
+import { Session } from '../shared/session'
 const queryString = require('query-string')
 
 declare var global: any
@@ -39,7 +40,7 @@ const engineInitialized = future()
 
 /** Initialize the engine in a container */
 export async function initializeUnity(container: HTMLElement): Promise<InitializeUnityResult> {
-  await initShared(container)
+  Session.current = await initShared()
 
   const qs = queryString.parse(document.location.search)
 
