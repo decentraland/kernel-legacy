@@ -17,7 +17,7 @@ export function bringDownClientAndShowError(event: ExecutionLifecycleEvent) {
   const targetError = event === COMMS_COULD_NOT_BE_ESTABLISHED ? 'comms'
     : event === NOT_INVITED ? 'notinvited'
       : event === NO_WEBGL_COULD_BE_CREATED ? 'notsupported'
-        : event === MOBILE_NOT_SUPPORTED ? 'nomobile-mobile'
+        : event === MOBILE_NOT_SUPPORTED ? 'nomobile'
           : 'fatal'
 
   document.getElementById('error-' + targetError)!.setAttribute('style', 'display: block !important')
