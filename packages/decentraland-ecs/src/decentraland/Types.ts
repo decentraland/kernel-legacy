@@ -344,3 +344,71 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 
 // @internal
 export const AVATAR_OBSERVABLE = 'AVATAR_OBSERVABLE'
+
+/**
+ * @public
+ */
+export type WearableId = string
+/**
+ * @public
+ */
+export type ColorString = string
+
+/**
+ * @public
+ */
+export type Avatar = {
+  bodyShape: WearableId
+  skinColor: ColorString
+  hairColor: ColorString
+  eyeColor: ColorString
+  wearables: WearableId[]
+}
+
+/**
+ * @public
+ */
+export type Wearable = {
+  id: WearableId
+  type: 'wearable'
+  category: string
+  baseUrl: string
+  tags: string[]
+  representations: BodyShapeRespresentation[]
+}
+
+/**
+ * @public
+ */
+export type BodyShapeRespresentation = {
+  bodyShapes: string[]
+  mainFile: string
+  contents: FileAndHash[]
+}
+
+/**
+ * @public
+ */
+export type FileAndHash = {
+  file: string
+  hash: string
+}
+
+/**
+ * @public
+ */
+export type Profile = {
+  userId: string
+  name: string
+  description: string
+  email: string
+  avatar: Avatar
+  inventory: WearableId[]
+  snapshots: {
+    face: string
+    body: string
+  }
+  version: number
+  updated_at: number
+  created_at: number
+}

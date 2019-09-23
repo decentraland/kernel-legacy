@@ -1,39 +1,35 @@
-import 'webrtc-adapter'
-
-import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
-
-import { defaultLogger } from 'shared/logger'
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
+import { commConfigurations, ETHEREUM_NETWORK, getServerConfigurations, parcelLimits, USE_LOCAL_COMMS } from 'config'
+import { CommunicationsController } from 'shared/apis/CommunicationsController'
+import { Auth } from 'shared/auth/Auth'
+import { defaultLogger } from 'shared/logger'
+import { MessageEntry } from 'shared/types'
 import { positionObservable, PositionReport } from 'shared/world/positionThings'
-import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
+import 'webrtc-adapter'
+import { PassportAsPromise } from '../passports/PassportAsPromise'
+import { Profile } from '../passports/types'
+import { BrokerConnection } from './BrokerConnection'
+import { ChatEvent, chatObservable } from './chat'
+import { CliBrokerConnection } from './CliBrokerConnection'
 import { Stats } from './debug'
-import { Auth } from 'shared/auth'
-
+import { IBrokerConnection } from './IBrokerConnection'
 import {
   getCurrentPeer,
-  localProfileUUID,
-  getUser,
-  removeById,
-  setLocalProfile,
   getCurrentUser,
-  receiveUserData,
-  receiveUserVisible,
-  receiveUserPose,
+  getPeer,
+  getUser,
   getUserProfile,
-  getPeer
+  localProfileUUID,
+  receiveUserData,
+  receiveUserPose,
+  receiveUserVisible,
+  removeById,
+  setLocalProfile
 } from './peers'
-
 import { ChatData, PositionData, ProfileData } from './proto/comms'
-import { chatObservable, ChatEvent } from './chat'
+import { Pose, UserInformation } from './types'
+import { CommunicationArea, Position, position2parcel, sameParcel, squareDistance } from './utils'
 import { WorldInstanceConnection } from './worldInstanceConnection'
-import { BrokerConnection } from './BrokerConnection'
-import { UserInformation, Pose } from './types'
-import { CommunicationsController } from 'shared/apis/CommunicationsController'
-import { CliBrokerConnection } from './CliBrokerConnection'
-import { MessageEntry } from 'shared/types'
-import { IBrokerConnection } from './IBrokerConnection'
-import { resolveProfile } from 'shared/world/profiles'
-import { Profile } from '../types'
 
 type Timestamp = number
 type PeerAlias = string
@@ -47,12 +43,12 @@ export class PeerTrackingInfo {
   public lastUpdate: Timestamp = 0
   public receivedPublicChatMessages = new Set<string>()
 
-  profilePromise: { promise: Promise<void>; version: string | null } = {
+  profilePromise: { promise: Promise<Profile | void>; version: number | null } = {
     promise: Promise.resolve(),
     version: null
   }
 
-  public loadProfileIfNecessary(auth: Auth, profileVersion: string) {
+  public loadProfileIfNecessary(profileVersion: number) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
       if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
@@ -61,15 +57,18 @@ export class PeerTrackingInfo {
         }
       }
       this.profilePromise = {
-        promise: auth.getAccessToken().then((token: string) =>
-          resolveProfile(token, this.identity!).then(($: Profile) => {
+        promise: PassportAsPromise(this.identity, profileVersion)
+          .then(profile => {
+            this.lastProfileUpdate = new Date().getTime()
             const userInfo = this.userInfo || {}
-            userInfo.profile = $
-            userInfo.version = $.version
+            userInfo.profile = profile
+            userInfo.version = profile.version
             this.userInfo = userInfo
-            return
+            return profile
           })
-        ),
+          .catch(error => {
+            defaultLogger.error('Error fetching profile!', error)
+          }),
         version: profileVersion
       }
     }
@@ -153,7 +152,7 @@ export function processParcelSceneCommsMessage(context: Context, fromAlias: stri
   }
 }
 
-export function persistCurrentUser(changes: Partial<UserInformation>): Readonly<UserInformation> {
+export function persistCurrentUser(changes: Partial<Profile>): Readonly<UserInformation> {
   const peer = getCurrentPeer()
 
   if (!peer || !localProfileUUID) throw new Error('cannotGetCurrentPeer')
@@ -223,7 +222,7 @@ export function processProfileMessage(
     const profileVersion = data.getProfileVersion()
 
     peerTrackingInfo.identity = identity
-    peerTrackingInfo.loadProfileIfNecessary(auth, profileVersion)
+    peerTrackingInfo.loadProfileIfNecessary(profileVersion ? parseInt(profileVersion, 10) : 0)
 
     peerTrackingInfo.lastProfileUpdate = msgTimestamp
     peerTrackingInfo.lastUpdate = Date.now()

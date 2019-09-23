@@ -13,7 +13,7 @@ export interface CallableLogin {
   restoreSession: () => void
 }
 
-export function createSaga(callbackProvider: CallableLogin) {
+export function authSaga(callbackProvider: CallableLogin) {
   return function* authSaga(): any {
     yield fork(handleRestoreSession)
     yield all([

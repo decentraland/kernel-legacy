@@ -1,25 +1,17 @@
 // tslint:disable:prefer-function-over-method
-import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host'
-
-import { sendPublicChatMessage } from 'shared/comms'
-import { chatObservable, ChatEvent } from 'shared/comms/chat'
-import { ExposableAPI } from 'shared/apis/ExposableAPI'
-import { IChatCommand, MessageEntry } from 'shared/types'
-import { EngineAPI } from 'shared/apis/EngineAPI'
-import { teleportObservable } from 'shared/world/positionThings'
-import {
-  getCurrentUser,
-  findPeerByName,
-  peerMap,
-  addToMutedUsers,
-  removeFromMutedUsers,
-  avatarMessageObservable
-} from 'shared/comms/peers'
-import { uuid } from 'atomicHelpers/math'
-import { parcelLimits } from 'config'
-import { parseParcelPosition, worldToGrid } from 'atomicHelpers/parcelScenePositions'
 import { Vector3Component } from 'atomicHelpers/landHelpers'
+import { uuid } from 'atomicHelpers/math'
+import { parseParcelPosition, worldToGrid } from 'atomicHelpers/parcelScenePositions'
+import { parcelLimits } from 'config'
+import { APIOptions, exposeMethod, registerAPI } from 'decentraland-rpc/lib/host'
+import { EngineAPI } from 'shared/apis/EngineAPI'
+import { ExposableAPI } from 'shared/apis/ExposableAPI'
+import { sendPublicChatMessage } from 'shared/comms'
+import { ChatEvent, chatObservable } from 'shared/comms/chat'
+import { addToMutedUsers, avatarMessageObservable, findPeerByName, getCurrentUser, peerMap, removeFromMutedUsers } from 'shared/comms/peers'
 import { AvatarMessage, AvatarMessageType } from 'shared/comms/types'
+import { IChatCommand, MessageEntry } from 'shared/types'
+import { teleportObservable } from 'shared/world/positionThings'
 
 const userPose: { [key: string]: Vector3Component } = {}
 avatarMessageObservable.add((pose: AvatarMessage) => {
@@ -159,9 +151,9 @@ export class ChatController extends ExposableAPI implements IChatController {
         } else {
           response = `Coordinates are outside of the boundaries. Limits are from ${
             parcelLimits.minLandCoordinateX
-          } to ${parcelLimits.maxLandCoordinateX} for X and ${parcelLimits.minLandCoordinateY} to ${
+            } to ${parcelLimits.maxLandCoordinateX} for X and ${parcelLimits.minLandCoordinateY} to ${
             parcelLimits.maxLandCoordinateY
-          } for Y`
+            } for Y`
         }
       }
 
@@ -179,7 +171,7 @@ export class ChatController extends ExposableAPI implements IChatController {
       const strings = users
         .filter(([_, value]) => !!(value && value.user && value.user.profile && value.user.profile.name))
         .filter(([uuid]) => userPose[uuid])
-        .map(function([uuid, value]) {
+        .map(function ([uuid, value]) {
           const pos = { x: 0, y: 0 }
           worldToGrid(userPose[uuid], pos)
           return `  ${value.user!.profile!.name}: ${pos.x}, ${pos.y}`

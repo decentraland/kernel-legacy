@@ -1,4 +1,4 @@
-import { Profile } from '../types'
+import { Profile } from '../passports/types'
 export enum AvatarMessageType {
   // Networking related messages
   USER_DATA = 'USER_DATA',
@@ -78,7 +78,7 @@ export type PeerInformation = {
 
 export type UserInformation = {
   userId?: string
-  version?: string
+  version?: number
   status?: string
   pose?: Pose
   profile?: Profile
