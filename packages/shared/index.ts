@@ -43,7 +43,6 @@ export async function initShared(): Promise<Session | undefined> {
 
   const { store, startSagas, auth } = buildStore({
     ...getLoginConfigurationForCurrentDomain(),
-    redirectUri: window.location.href,
     ephemeralKeyTTL: 24 * 60 * 60 * 1000
   });
   (window as any).globalStore = globalStore = store
