@@ -4,7 +4,34 @@ import { getAccessToken, getCurrentUserId } from '../auth/selectors'
 import defaultLogger from '../logger'
 import { isInitialized } from '../renderer/selectors'
 import { RENDERER_INITIALIZED } from '../renderer/types'
-import { addCatalog, AddCatalogAction, ADD_CATALOG, catalogLoaded, CATALOG_LOADED, inventoryFailure, InventoryRequest, inventorySuccess, INVENTORY_REQUEST, passportRandom, PassportRandomAction, PassportRequestAction, passportSuccess, PassportSuccessAction, PASSPORT_RANDOM, PASSPORT_REQUEST, PASSPORT_SUCCESS, saveAvatarFailure, SaveAvatarRequest, saveAvatarSuccess, SAVE_AVATAR_REQUEST, setProfileServer, inventoryRequest, INVENTORY_SUCCESS, INVENTORY_FAILURE, InventorySuccess } from './actions'
+import {
+  addCatalog,
+  AddCatalogAction,
+  ADD_CATALOG,
+  catalogLoaded,
+  CATALOG_LOADED,
+  inventoryFailure,
+  InventoryRequest,
+  inventorySuccess,
+  INVENTORY_REQUEST,
+  passportRandom,
+  PassportRandomAction,
+  PassportRequestAction,
+  passportSuccess,
+  PassportSuccessAction,
+  PASSPORT_RANDOM,
+  PASSPORT_REQUEST,
+  PASSPORT_SUCCESS,
+  saveAvatarFailure,
+  SaveAvatarRequest,
+  saveAvatarSuccess,
+  SAVE_AVATAR_REQUEST,
+  setProfileServer,
+  inventoryRequest,
+  INVENTORY_SUCCESS,
+  INVENTORY_FAILURE,
+  InventorySuccess
+} from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { legacyProfilesToAvatar } from './legacyProfilesToAvatar'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
@@ -119,7 +146,7 @@ export async function fetchCatalog(url: string) {
 }
 
 export function sendWearablesCatalog(catalog: Catalog) {
-  (window as any)['unityInterface'].AddWearablesToCatalog(catalog)
+  global['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
@@ -138,7 +165,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  (window as any)['unityInterface'].LoadProfile(profile)
+  global['unityInterface'].LoadProfile(profile)
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
@@ -165,7 +192,10 @@ export function* handleFetchInventory(action: InventoryRequest) {
 }
 
 function dropIndexFromExclusives(exclusive: string) {
-  return exclusive.split('/').slice(0, 4).join('/')
+  return exclusive
+    .split('/')
+    .slice(0, 4)
+    .join('/')
 }
 
 export async function fetchInventoryItemsByAddress(address: string) {
@@ -220,7 +250,7 @@ export async function modifyAvatar(params: {
   currentVersion: number
   userId: string
   accessToken: string
-  profile: { avatar: Avatar, faceSnapshot: string, bodySnapshot: string }
+  profile: { avatar: Avatar; faceSnapshot: string; bodySnapshot: string }
 }) {
   const { url, method, currentVersion, profile, accessToken } = params
   const { faceSnapshot, avatar, bodySnapshot } = profile

@@ -13,15 +13,14 @@ if (!container) throw new Error('cannot find element #gameContainer')
 
 initializeUnity(container)
   .then(async _ => {
-    ; (global as any)['globalStore'].dispatch(signalRendererInitialized())
+    ;(global as any)['globalStore'].dispatch(signalRendererInitialized())
     await startUnityParcelLoading()
 
     _.instancedJS
       .then($ => teleportObservable.notifyObservers(worldToGrid(lastPlayerPosition)))
       .catch(defaultLogger.error)
-    document.body.classList.remove('dcl-loading');
-
-    (window as any).UnityLoader.Error.handler = (error: any) => {
+    document.body.classList.remove('dcl-loading')
+    ;(window as any).UnityLoader.Error.handler = (error: any) => {
       console.error(error)
       ReportFatalError(error.message)
     }

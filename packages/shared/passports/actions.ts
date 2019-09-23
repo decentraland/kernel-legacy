@@ -49,7 +49,10 @@ export const SAVE_AVATAR_REQUEST = '[Request] Save Avatar'
 export const SAVE_AVATAR_SUCCESS = '[Success] Save Avatar'
 export const SAVE_AVATAR_FAILURE = '[Failure] Save Avatar'
 
-export const saveAvatarRequest = (profile: { avatar: Avatar, bodySnapshot: string, faceSnapshot: string }, userId?: string) => action(SAVE_AVATAR_REQUEST, { userId, profile })
+export const saveAvatarRequest = (
+  profile: { avatar: Avatar; bodySnapshot: string; faceSnapshot: string },
+  userId?: string
+) => action(SAVE_AVATAR_REQUEST, { userId, profile })
 export const saveAvatarSuccess = (userId: string) => action(SAVE_AVATAR_SUCCESS, { userId })
 export const saveAvatarFailure = (userId: string, error: any) => action(SAVE_AVATAR_FAILURE, { userId, error })
 

@@ -8,7 +8,14 @@ import { EngineAPI } from 'shared/apis/EngineAPI'
 import { ExposableAPI } from 'shared/apis/ExposableAPI'
 import { sendPublicChatMessage } from 'shared/comms'
 import { ChatEvent, chatObservable } from 'shared/comms/chat'
-import { addToMutedUsers, avatarMessageObservable, findPeerByName, getCurrentUser, peerMap, removeFromMutedUsers } from 'shared/comms/peers'
+import {
+  addToMutedUsers,
+  avatarMessageObservable,
+  findPeerByName,
+  getCurrentUser,
+  peerMap,
+  removeFromMutedUsers
+} from 'shared/comms/peers'
 import { AvatarMessage, AvatarMessageType } from 'shared/comms/types'
 import { IChatCommand, MessageEntry } from 'shared/types'
 import { teleportObservable } from 'shared/world/positionThings'
@@ -151,9 +158,9 @@ export class ChatController extends ExposableAPI implements IChatController {
         } else {
           response = `Coordinates are outside of the boundaries. Limits are from ${
             parcelLimits.minLandCoordinateX
-            } to ${parcelLimits.maxLandCoordinateX} for X and ${parcelLimits.minLandCoordinateY} to ${
+          } to ${parcelLimits.maxLandCoordinateX} for X and ${parcelLimits.minLandCoordinateY} to ${
             parcelLimits.maxLandCoordinateY
-            } for Y`
+          } for Y`
         }
       }
 
@@ -171,7 +178,7 @@ export class ChatController extends ExposableAPI implements IChatController {
       const strings = users
         .filter(([_, value]) => !!(value && value.user && value.user.profile && value.user.profile.name))
         .filter(([uuid]) => userPose[uuid])
-        .map(function ([uuid, value]) {
+        .map(function([uuid, value]) {
           const pos = { x: 0, y: 0 }
           worldToGrid(userPose[uuid], pos)
           return `  ${value.user!.profile!.name}: ${pos.x}, ${pos.y}`

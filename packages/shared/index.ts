@@ -1,5 +1,13 @@
 import { Store } from 'redux'
-import { ENABLE_WEB3, ETHEREUM_NETWORK, getLoginConfigurationForCurrentDomain, getTLD, PREVIEW, setNetwork, STATIC_WORLD } from '../config'
+import {
+  ENABLE_WEB3,
+  ETHEREUM_NETWORK,
+  getLoginConfigurationForCurrentDomain,
+  getTLD,
+  PREVIEW,
+  setNetwork,
+  STATIC_WORLD
+} from '../config'
 import { initialize, queueTrackingEvent } from './analytics'
 import './apis/index'
 import { connect, disconnect } from './comms'
@@ -44,8 +52,8 @@ export async function initShared(): Promise<Session | undefined> {
   const { store, startSagas, auth } = buildStore({
     ...getLoginConfigurationForCurrentDomain(),
     ephemeralKeyTTL: 24 * 60 * 60 * 1000
-  });
-  (window as any).globalStore = globalStore = store
+  })
+  ;(window as any).globalStore = globalStore = store
 
   let userId: string
 
