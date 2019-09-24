@@ -50,7 +50,7 @@ export const SAVE_AVATAR_SUCCESS = '[Success] Save Avatar'
 export const SAVE_AVATAR_FAILURE = '[Failure] Save Avatar'
 
 export const saveAvatarRequest = (
-  profile: { avatar: Avatar; bodySnapshot: string; faceSnapshot: string },
+  profile: { avatar: Avatar; body: string; face: string },
   userId?: string
 ) => action(SAVE_AVATAR_REQUEST, { userId, profile })
 export const saveAvatarSuccess = (userId: string) => action(SAVE_AVATAR_SUCCESS, { userId })

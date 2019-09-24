@@ -165,7 +165,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  (global as any)['unityInterface'].LoadProfile(profile)
+  (global as any)['unityInterface'].LoadProfile(transformProfileColors(profile))
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
@@ -250,10 +250,10 @@ export async function modifyAvatar(params: {
   currentVersion: number
   userId: string
   accessToken: string
-  profile: { avatar: Avatar; faceSnapshot: string; bodySnapshot: string }
+  profile: { avatar: Avatar; face: string; body: string }
 }) {
   const { url, method, currentVersion, profile, accessToken } = params
-  const { faceSnapshot, avatar, bodySnapshot } = profile
+  const { face, avatar, body } = profile
   const payload = JSON.stringify({
     avatar: ensureServerFormat(avatar, currentVersion)
   })
@@ -264,7 +264,7 @@ export async function modifyAvatar(params: {
       Authorization: 'Bearer ' + accessToken
     }
   }
-  await saveSnapshots(url, accessToken, faceSnapshot, bodySnapshot)
+  await saveSnapshots(url, accessToken, face, body)
 
   const response = await fetch(url, options)
   return response
@@ -272,8 +272,8 @@ export async function modifyAvatar(params: {
 
 async function saveSnapshots(userURL: string, accessToken: string, face: string, body: string) {
   const data = new FormData()
-  data.append('face', face, 'face.png')
-  data.append('body', body, 'body.png')
+  data.append('face', stringToBlob(face), 'face.png')
+  data.append('body', stringToBlob(body), 'body.png')
   return fetch(`${userURL}/snapshot`, {
     method: 'POST',
     body: data,
@@ -281,6 +281,9 @@ async function saveSnapshots(userURL: string, accessToken: string, face: string,
       Authorization: 'Bearer ' + accessToken
     }
   })
+}
+function stringToBlob(str: string) {
+  return new Blob([str], { type: "application/base64" });
 }
 
 function ensureServerFormat(avatar: any, currentVersion: number) {
@@ -320,7 +323,16 @@ function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
     }
     if (typeof avatar[name] === 'string') {
       if (avatar[name].length === 7) {
-        return { color: convertToRGBObject(avatar[name].color) }
+        return { color: convertToRGBObject(avatar[name]) }
+      }
+    }
+    if (avatar[name]) {
+      if (
+        typeof avatar[name].r === 'number' &&
+        typeof avatar[name].g === 'number' &&
+        typeof avatar[name].b === 'number'
+      ) {
+        return avatar[name]
       }
     }
     if (avatar[name].color) {
@@ -329,7 +341,7 @@ function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
         typeof avatar[name].color.g === 'number' &&
         typeof avatar[name].color.b === 'number'
       ) {
-        return avatar[name]
+        return avatar[name].color
       }
     }
   }
@@ -342,6 +354,16 @@ function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
 }
 
 function convertToRGBObject(colorString: string) {
+  if (!(typeof colorString === 'string')) {
+    if (colorString === undefined) {
+      throw new Error('Unexpected undefined value for color object: ' + JSON.stringify(colorString))
+    }
+    const colorAsObject = colorString as { r: number, g: number, b: number, a?: number }
+    if (colorAsObject.r === undefined || colorAsObject.g === undefined || colorAsObject.b === undefined) {
+      throw new Error('Unexpected undefined value for color object: ' + JSON.stringify(colorAsObject))
+    }
+    return colorAsObject
+  }
   const r = convertSection(1, colorString)
   const g = convertSection(3, colorString)
   const b = convertSection(5, colorString)
@@ -349,4 +371,16 @@ function convertToRGBObject(colorString: string) {
 }
 function convertSection(index: number, colorString: string) {
   return parseInt(colorString.slice(index, index + 2), 10) / 256
+}
+
+function transformProfileColors(profile: Profile) {
+  return {
+    ...profile,
+    avatar: {
+      ...profile.avatar,
+      eyeColor: convertToRGBObject(profile.avatar.eyeColor),
+      hairColor: convertToRGBObject(profile.avatar.hairColor),
+      skinColor: convertToRGBObject(profile.avatar.skinColor),
+    }
+  }
 }
