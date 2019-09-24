@@ -146,7 +146,7 @@ export async function fetchCatalog(url: string) {
 }
 
 export function sendWearablesCatalog(catalog: Catalog) {
-  global['unityInterface'].AddWearablesToCatalog(catalog)
+  (global as any)['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
@@ -165,7 +165,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  global['unityInterface'].LoadProfile(profile)
+  (global as any)['unityInterface'].LoadProfile(profile)
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
