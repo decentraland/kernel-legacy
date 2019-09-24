@@ -537,6 +537,17 @@ export class TextShape extends Shape {
 /**
  * @public
  */
+export enum TransparencyMode {
+  OPAQUE = 0,
+  ALPHA_TEST = 1,
+  ALPHA_BLEND = 2,
+  ALPHA_TEST_AND_BLEND = 3,
+  AUTO = 4
+}
+
+/**
+ * @public
+ */
 @DisposableComponent('engine.material', CLASS_ID.PBR_MATERIAL)
 export class Material extends ObservableComponent {
   /**
@@ -686,7 +697,7 @@ export class Material extends ObservableComponent {
    * | 4     | AUTO (ALPHABLEND if alpha OPAQUE otherwise     |
    */
   @ObservableComponent.field
-  transparencyMode: number = 4
+  transparencyMode: TransparencyMode = 4
 }
 
 /**
