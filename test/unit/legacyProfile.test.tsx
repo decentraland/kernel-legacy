@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { legacyProfilesToAvatar } from 'shared/passports/legacyProfilesToAvatar'
+import { legacyProfilesToAvatar } from 'shared/passports/transformations/legacyProfilesToAvatar'
 
 describe('legacy spec conversion', () => {
   it('works with a sample case', () => {

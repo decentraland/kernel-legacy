@@ -1,6 +1,7 @@
-import { ColorString, WearableId } from '../decentraland/Types'
+import { WearableId } from '../decentraland/Types'
 import { Component, ObservableComponent } from '../ecs/Component'
 import { CLASS_ID } from './Components'
+import { ReadOnlyColor4 } from './math'
 
 /**
  * @public
@@ -20,13 +21,13 @@ export class AvatarShape extends ObservableComponent {
   wearables!: WearableId[]
 
   @ObservableComponent.field
-  skinColor!: ColorString
+  skinColor!: ReadOnlyColor4
 
   @ObservableComponent.field
-  hairColor!: ColorString
+  hairColor!: ReadOnlyColor4
 
   @ObservableComponent.field
-  eyeColor!: ColorString
+  eyeColor!: ReadOnlyColor4
 
   @ObservableComponent.field
   useDummyModel: boolean = false

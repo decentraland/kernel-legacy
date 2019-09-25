@@ -30,6 +30,7 @@ import { ChatData, PositionData, ProfileData } from './proto/comms'
 import { Pose, UserInformation } from './types'
 import { CommunicationArea, Position, position2parcel, sameParcel, squareDistance } from './utils'
 import { WorldInstanceConnection } from './worldInstanceConnection'
+import { profileToRendererFormat } from 'shared/passports/transformations/profileToRendererFormat'
 
 type Timestamp = number
 type PeerAlias = string
@@ -61,7 +62,7 @@ export class PeerTrackingInfo {
           .then(profile => {
             this.lastProfileUpdate = new Date().getTime()
             const userInfo = this.userInfo || {}
-            userInfo.profile = profile
+            userInfo.profile = profileToRendererFormat(profile)
             userInfo.version = profile.version
             this.userInfo = userInfo
             return profile

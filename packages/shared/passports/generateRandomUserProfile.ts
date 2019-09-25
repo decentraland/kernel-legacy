@@ -1,7 +1,7 @@
 import { getServerConfigurations } from '../../config/index'
 import { Profile } from './types'
 import { colorString } from './colorString'
-import { fixWearableIds } from './legacyProfilesToAvatar'
+import { fixWearableIds } from './transformations/legacyProfilesToAvatar'
 
 export const sexes = ['female', 'male']
 export const skins = ['7d5d47', '522c1c', 'cc9b77', 'f2c2a5', 'ffe4c6']

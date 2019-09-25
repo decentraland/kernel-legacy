@@ -33,9 +33,11 @@ import {
   InventorySuccess
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
-import { legacyProfilesToAvatar } from './legacyProfilesToAvatar'
+import { legacyProfilesToAvatar } from './transformations/legacyProfilesToAvatar'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
-import { Avatar, Catalog, Profile } from './types'
+import { Catalog, Profile, Avatar } from './types'
+import { profileToRendererFormat } from './transformations/profileToRendererFormat'
+import { ensureServerFormat } from './transformations/profileToServerFormat'
 
 /**
  * This saga handles both passports and assets required for the renderer to show the
@@ -165,7 +167,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  (global as any)['unityInterface'].LoadProfile(transformProfileColors(profile))
+  (global as any)['unityInterface'].LoadProfile(profileToRendererFormat(profile))
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
@@ -283,104 +285,5 @@ async function saveSnapshots(userURL: string, accessToken: string, face: string,
   })
 }
 function stringToBlob(str: string) {
-  return new Blob([str], { type: "application/base64" });
-}
-
-function ensureServerFormat(avatar: any, currentVersion: number) {
-  const eyes = analizeColorPart(avatar, 'eyeColor', 'eyes')
-  const hair = analizeColorPart(avatar, 'hairColor', 'hair')
-  const skin = analizeColorPart(avatar, 'skin', 'skinColor')
-  if (
-    !avatar.wearables ||
-    !Array.isArray(avatar.wearables) ||
-    !avatar.wearables.reduce(
-      (prev: boolean, next: any) => prev && typeof next === 'string' && next.startsWith('dcl://'),
-      true
-    )
-  ) {
-    throw new Error('Invalid Wearables array! Received: ' + JSON.stringify(avatar))
-  }
-  if (!avatar.bodyShape || !isValidBodyShape(avatar.bodyShape)) {
-    throw new Error('Invalid BodyShape! Received: ' + JSON.stringify(avatar))
-  }
-  return {
-    bodyShape: avatar.bodyShape,
-    eyes,
-    hair,
-    skin,
-    wearables: avatar.wearables,
-    version: currentVersion + 1
-  }
-}
-
-function isValidBodyShape(shape: string) {
-  return shape === 'dcl://base-avatars/BaseMale' || shape === 'dcl://base-avatars/BaseFemale'
-}
-function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
-  for (let name of alternativeNames) {
-    if (!avatar[name]) {
-      continue
-    }
-    if (typeof avatar[name] === 'string') {
-      if (avatar[name].length === 7) {
-        return { color: convertToRGBObject(avatar[name]) }
-      }
-    }
-    if (avatar[name]) {
-      if (
-        typeof avatar[name].r === 'number' &&
-        typeof avatar[name].g === 'number' &&
-        typeof avatar[name].b === 'number'
-      ) {
-        return avatar[name]
-      }
-    }
-    if (avatar[name].color) {
-      if (
-        typeof avatar[name].color.r === 'number' &&
-        typeof avatar[name].color.g === 'number' &&
-        typeof avatar[name].color.b === 'number'
-      ) {
-        return avatar[name].color
-      }
-    }
-  }
-  throw new Error(
-    'Unable to find a color between ' +
-    JSON.stringify(alternativeNames) +
-    ' in the submitted avatar model ' +
-    JSON.stringify(avatar)
-  )
-}
-
-function convertToRGBObject(colorString: string) {
-  if (!(typeof colorString === 'string')) {
-    if (colorString === undefined) {
-      throw new Error('Unexpected undefined value for color object: ' + JSON.stringify(colorString))
-    }
-    const colorAsObject = colorString as { r: number, g: number, b: number, a?: number }
-    if (colorAsObject.r === undefined || colorAsObject.g === undefined || colorAsObject.b === undefined) {
-      throw new Error('Unexpected undefined value for color object: ' + JSON.stringify(colorAsObject))
-    }
-    return colorAsObject
-  }
-  const r = convertSection(1, colorString)
-  const g = convertSection(3, colorString)
-  const b = convertSection(5, colorString)
-  return { r, g, b }
-}
-function convertSection(index: number, colorString: string) {
-  return parseInt(colorString.slice(index, index + 2), 10) / 256
-}
-
-function transformProfileColors(profile: Profile) {
-  return {
-    ...profile,
-    avatar: {
-      ...profile.avatar,
-      eyeColor: convertToRGBObject(profile.avatar.eyeColor),
-      hairColor: convertToRGBObject(profile.avatar.hairColor),
-      skinColor: convertToRGBObject(profile.avatar.skinColor),
-    }
-  }
+  return new Blob([str], { type: 'application/base64' })
 }

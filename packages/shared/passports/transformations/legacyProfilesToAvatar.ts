@@ -1,5 +1,5 @@
-import { Profile } from './types'
-import { colorString } from './colorString'
+import { Profile } from '../types'
+import { colorString } from '../colorString'
 
 export function fixWearableIds(wearableId: string) {
   return wearableId.replace('/male_body', '/BaseMale').replace('/female_body', '/BaseFemale')

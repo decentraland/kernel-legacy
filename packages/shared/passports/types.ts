@@ -1,6 +1,8 @@
+import { ReadOnlyColor4 } from 'decentraland-ecs/src'
+
 export type Catalog = Wearable[]
 
-export type Profile = {
+export interface Profile {
   userId: string
   name: string
   description: string
@@ -16,11 +18,34 @@ export type Profile = {
   created_at: number
 }
 
-export type Avatar = {
+export interface Avatar {
   bodyShape: WearableId
   skinColor: ColorString
   hairColor: ColorString
   eyeColor: ColorString
+  wearables: WearableId[]
+}
+export interface ProfileForRenderer {
+  userId: string
+  name: string
+  description: string
+  email: string
+  avatar: AvatarForRenderer
+  inventory: WearableId[]
+  snapshots: {
+    face: string
+    body: string
+  }
+  version: number
+  updated_at: number
+  created_at: number
+}
+
+export interface AvatarForRenderer {
+  bodyShape: WearableId
+  skinColor: ReadOnlyColor4
+  hairColor: ReadOnlyColor4
+  eyeColor: ReadOnlyColor4
   wearables: WearableId[]
 }
 

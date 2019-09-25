@@ -1,4 +1,4 @@
-import { ReadOnlyVector3, ReadOnlyQuaternion } from './math'
+import { ReadOnlyVector3, ReadOnlyQuaternion, ReadOnlyColor4 } from './math'
 import { RaycastResponse } from './Events'
 
 /** @public */
@@ -349,19 +349,15 @@ export const AVATAR_OBSERVABLE = 'AVATAR_OBSERVABLE'
  * @public
  */
 export type WearableId = string
-/**
- * @public
- */
-export type ColorString = string
 
 /**
  * @public
  */
-export type Avatar = {
+export type AvatarForRenderer = {
   bodyShape: WearableId
-  skinColor: ColorString
-  hairColor: ColorString
-  eyeColor: ColorString
+  skinColor: ReadOnlyColor4
+  hairColor: ReadOnlyColor4
+  eyeColor: ReadOnlyColor4
   wearables: WearableId[]
 }
 
@@ -397,12 +393,12 @@ export type FileAndHash = {
 /**
  * @public
  */
-export type Profile = {
+export type ProfileForRenderer = {
   userId: string
   name: string
   description: string
   email: string
-  avatar: Avatar
+  avatar: AvatarForRenderer
   inventory: WearableId[]
   snapshots: {
     face: string

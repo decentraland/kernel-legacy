@@ -9,7 +9,7 @@ import { Session } from 'shared/session'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
 import { DEBUG, ENGINE_DEBUG_PANEL, playerConfigurations, SCENE_DEBUG_PANEL } from '../config'
 import { Quaternion, ReadOnlyQuaternion, ReadOnlyVector3, Vector3 } from '../decentraland-ecs/src/decentraland/math'
-import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
+import { IEventNames, IEvents, ProfileForRenderer } from '../decentraland-ecs/src/decentraland/Types'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { DevTools } from '../shared/apis/DevTools'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
@@ -17,7 +17,7 @@ import { chatObservable } from '../shared/comms/chat'
 import { getUserProfile } from '../shared/comms/peers'
 import { createLogger, defaultLogger, ILogger } from '../shared/logger'
 import { saveAvatarRequest } from '../shared/passports/actions'
-import { Profile, Wearable, Avatar } from '../shared/passports/types'
+import { Wearable, Avatar } from '../shared/passports/types'
 import {
   EntityAction,
   EnvironmentData,
@@ -84,7 +84,7 @@ const browserInterface = {
     Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
   },
 
-  SaveUserAvatar(data: { faceSnapshot: string; bodySnapshot: string; avatar: Avatar }) {
+  SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
     ;(global as any).globalStore.dispatch(saveAvatarRequest(data))
   },
 
@@ -129,7 +129,7 @@ const unityInterface = {
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
-  LoadProfile(profile: Profile) {
+  LoadProfile(profile: ProfileForRenderer) {
     gameInstance.SendMessage('SceneController', 'LoadProfile', JSON.stringify(profile))
   },
   CreateUIScene(data: { id: string; baseUrl: string }) {

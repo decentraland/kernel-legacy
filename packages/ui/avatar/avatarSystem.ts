@@ -13,7 +13,7 @@ import {
   UUID
 } from 'shared/comms/types'
 import { execute } from './rpc'
-import { Profile } from 'decentraland-ecs/src/decentraland/Types'
+import { ProfileForRenderer } from 'decentraland-ecs/src/decentraland/Types'
 
 export const avatarMessageObservable = new Observable<AvatarMessage>()
 
@@ -37,7 +37,7 @@ export class AvatarEntity extends Entity {
     this.transform = this.getComponentOrCreate(Transform)
   }
 
-  loadProfile(profile: Profile) {
+  loadProfile(profile: ProfileForRenderer) {
     if (profile) {
       const { avatar } = profile
 
