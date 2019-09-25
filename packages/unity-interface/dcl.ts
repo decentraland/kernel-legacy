@@ -17,7 +17,8 @@ import {
   Profile,
   InstancedSpawnPoint,
   AvatarAsset,
-  Notification
+  Notification,
+  HUDConfiguration
 } from '../shared/types'
 import { DevTools } from '../shared/apis/DevTools'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
@@ -181,6 +182,15 @@ const unityInterface = {
   },
   ShowNotification(notification: Notification) {
     gameInstance.SendMessage('HUDController', 'ShowNotification', JSON.stringify(notification))
+  },
+  ConfigureMinimapHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
+  },
+  ConfigureAvatarHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureAvatarHUD', JSON.stringify(configuration))
+  },
+  ConfigureNotificationHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
   }
 }
 

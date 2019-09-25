@@ -425,6 +425,10 @@ export type Notification = {
   externalCallbackID: string
 }
 
+export type HUDConfiguration = {
+  active: boolean
+}
+
 export function normalizeContentMappings(
   mappings: Record<string, string> | Array<ContentMapping>
 ): Array<ContentMapping> {
