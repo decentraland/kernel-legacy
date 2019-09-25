@@ -2,7 +2,6 @@ import { all, call, fork, put, takeLatest } from 'redux-saga/effects'
 import { authFailure, authRequest, authSuccess, AUTH_REQUEST, LOGIN, LOGOUT } from './actions'
 import { AuthData } from './types'
 
-
 export type CallbackResult = { data: AuthData; redirectUri: string | undefined }
 
 export interface CallableLogin {
