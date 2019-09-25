@@ -697,7 +697,7 @@ export class Material extends ObservableComponent {
    * | 4     | AUTO (ALPHABLEND if alpha OPAQUE otherwise     |
    */
   @ObservableComponent.field
-  transparencyMode: TransparencyMode = 4
+  transparencyMode: TransparencyMode = TransparencyMode.AUTO
 }
 
 /**
