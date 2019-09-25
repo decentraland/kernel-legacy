@@ -1,4 +1,4 @@
-import { call, put, select, race, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { call, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { getServerConfigurations } from '../../config'
 import { getAccessToken, getCurrentUserId } from '../auth/selectors'
 import defaultLogger from '../logger'
@@ -12,8 +12,12 @@ import {
   CATALOG_LOADED,
   inventoryFailure,
   InventoryRequest,
+  inventoryRequest,
   inventorySuccess,
+  InventorySuccess,
+  INVENTORY_FAILURE,
   INVENTORY_REQUEST,
+  INVENTORY_SUCCESS,
   passportRandom,
   PassportRandomAction,
   PassportRequestAction,
@@ -26,18 +30,14 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer,
-  inventoryRequest,
-  INVENTORY_SUCCESS,
-  INVENTORY_FAILURE,
-  InventorySuccess
+  setProfileServer
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
-import { legacyProfilesToAvatar } from './transformations/legacyProfilesToAvatar'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
-import { Catalog, Profile, Avatar } from './types'
+import { legacyProfilesToAvatar } from './transformations/legacyProfilesToAvatar'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
+import { Avatar, Catalog, Profile } from './types'
 
 /**
  * This saga handles both passports and assets required for the renderer to show the
@@ -234,6 +234,8 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
       })
       if (response2.ok) {
         yield put(saveAvatarSuccess(userId))
+        const updatedProfile: Profile = yield select(getProfile, userId)
+        yield sendLoadProfile(updatedProfile)
       }
     } else {
       yield put(saveAvatarFailure(userId, 'unknown reason'))

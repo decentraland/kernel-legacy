@@ -2,7 +2,7 @@ import { Profile, RootPassportState, Wearable } from './types'
 
 export const getProfileDownloadServer = (store: RootPassportState) => store.passports.profileServer
 
-export const getProfile = (store: RootPassportState, userId: string) =>
+export const getProfile = (store: RootPassportState, userId: string): Profile | null =>
   store.passports &&
   store.passports.userInfo &&
   store.passports.userInfo[userId] &&
@@ -10,7 +10,7 @@ export const getProfile = (store: RootPassportState, userId: string) =>
     ? (store.passports.userInfo[userId].data as Profile)
     : null
 
-export const getInventory = (store: RootPassportState, userId: string) =>
+export const getInventory = (store: RootPassportState, userId: string): Wearable[] | null =>
   store.passports &&
   store.passports.userInventory &&
   store.passports.userInventory[userId] &&
@@ -18,7 +18,7 @@ export const getInventory = (store: RootPassportState, userId: string) =>
     ? ((store.passports.userInventory[userId] as any).data as Wearable[])
     : null
 
-export const getPlatformCatalog = (store: RootPassportState) =>
+export const getPlatformCatalog = (store: RootPassportState): Wearable[] | null =>
   store.passports &&
   store.passports.catalogs &&
   store.passports.catalogs['base-avatars'] &&
@@ -26,7 +26,7 @@ export const getPlatformCatalog = (store: RootPassportState) =>
     ? (store.passports.catalogs['base-avatars'].data as Wearable[])
     : null
 
-export const getExclusiveCatalog = (store: RootPassportState) =>
+export const getExclusiveCatalog = (store: RootPassportState): Wearable[] | null =>
   store.passports.catalogs &&
   store.passports.catalogs['base-exclusive'] &&
   store.passports.catalogs['base-exclusive'].status === 'ok'

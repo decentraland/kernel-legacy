@@ -22,7 +22,7 @@ export function convertToRGBObject(colorString: any): ReadOnlyColor4 {
   const r = convertSection(1, colorString)
   const g = convertSection(3, colorString)
   const b = convertSection(5, colorString)
-  const a = (colorString.length > 7) ? convertSection(7, colorString) : 1
+  const a = colorString.length > 7 ? convertSection(7, colorString) : 1
   return { r, g, b, a }
 }
 

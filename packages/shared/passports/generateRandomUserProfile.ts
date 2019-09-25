@@ -41,7 +41,8 @@ export async function generateRandomUserProfile(userId: string): Promise<Profile
     eyeColor: colorString(avatarJson.eyes.color),
     wearables: avatarJson.wearables.map(fixWearableIds)
   }
-  const name = 'Guest-' +
+  const name =
+    'Guest-' +
     Math.random()
       .toFixed(6)
       .substr(2)
