@@ -7,6 +7,8 @@ export function fixWearableIds(wearableId: string) {
 export const deprecatedWearables = [
   'dcl://base-avatars/male_body',
   'dcl://base-avatars/female_body',
+  'dcl://base-avatars/BaseMale',
+  'dcl://base-avatars/BaseFemale',
   'dcl://base-avatars/00_EmptyEarring',
   'dcl://base-avatars/00_EmptyFacialHair',
   'dcl://base-avatars/00_bald'

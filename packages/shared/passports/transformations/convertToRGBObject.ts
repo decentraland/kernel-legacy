@@ -27,7 +27,7 @@ export function convertToRGBObject(colorString: any): ReadOnlyColor4 {
 }
 
 export function convertSection(index: number, colorString: string) {
-  const value = parseInt(colorString.slice(index, index + 2), 10) / 256
+  const value = parseInt(colorString.slice(index, index + 2), 16) / 256
   if (value < 0) {
     return 0
   }

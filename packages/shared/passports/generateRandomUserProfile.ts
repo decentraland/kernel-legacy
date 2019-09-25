@@ -41,16 +41,16 @@ export async function generateRandomUserProfile(userId: string): Promise<Profile
     eyeColor: colorString(avatarJson.eyes.color),
     wearables: avatarJson.wearables.map(fixWearableIds)
   }
+  const name = 'Guest-' +
+    Math.random()
+      .toFixed(6)
+      .substr(2)
   return {
     userId,
-    email: userId + '@nowhere.com',
+    email: name.toLowerCase() + '@nowhere.com',
     inventory: [],
     version: 0,
-    name:
-      'Guest-' +
-      Math.random()
-        .toFixed(6)
-        .substr(2),
+    name,
     description: '',
     updated_at: new Date().getDate(),
     created_at: new Date().getDate(),
