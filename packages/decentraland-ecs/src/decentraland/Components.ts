@@ -385,7 +385,7 @@ export class Texture extends ObservableComponent {
 
     if (opts) {
       for (let i in opts) {
-        (this as any)[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
+        ;(this as any)[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
       }
     }
   }
@@ -739,7 +739,7 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
   static uuidEvent(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       const componentSymbol = propertyKey + '_' + Math.random()
-      ; (target as any)[componentSymbol] = undefined
+      ;(target as any)[componentSymbol] = undefined
 
       Object.defineProperty(target, componentSymbol, {
         ...Object.getOwnPropertyDescriptor(target, componentSymbol),

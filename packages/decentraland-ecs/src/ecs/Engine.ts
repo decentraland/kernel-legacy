@@ -66,7 +66,7 @@ export class Engine implements IEngine {
     }
 
     entity.eventManager = this.eventManager
-    ; (entity as Entity).engine = this
+    ;(entity as Entity).engine = this
 
     this._entities[entity.uuid] = entity
 
