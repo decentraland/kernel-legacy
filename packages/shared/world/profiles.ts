@@ -3,7 +3,7 @@ import { Color4 } from '../../decentraland-ecs/src/decentraland/math/Color4'
 import { getServerConfigurations, PREVIEW } from '../../config/index'
 import defaultLogger from '../logger'
 
-export async function resolveProfile(accessToken: string, uuid: string = ''): Promise<Profile> {
+export async function resolveProfile(accessToken: string, uuid: string): Promise<Profile> {
   let response
   if (!PREVIEW) {
     try {
@@ -30,7 +30,7 @@ export async function resolveProfile(accessToken: string, uuid: string = ''): Pr
   return resolveProfileSpec(uuid, spec)
 }
 
-export async function resolveProfileSpec(uuid: string, spec: ProfileSpec): Promise<Profile> {
+export async function resolveProfileSpec(uuid: string, spec: ProfileSpec, email?: string): Promise<Profile> {
   const avatar = await mapSpecToAvatar(spec.avatar)
 
   // TODO - fetch name from claim server - moliva - 22/07/2019
@@ -39,7 +39,7 @@ export async function resolveProfileSpec(uuid: string, spec: ProfileSpec): Promi
   return {
     userId: uuid,
     name: name,
-    email: `${name}@decentraland.org`, // TODO - populate with actual email when ready - moliva - 29/07/2019
+    email: email || `${name}@decentraland.org`,
     description: spec.description,
     created_at: spec.created_at,
     updated_at: spec.updated_at,
@@ -179,9 +179,9 @@ export async function fetchProfile(accessToken: string, uuid: string) {
       Authorization: 'Bearer ' + accessToken
     }
   }
-  const request = `${getServerConfigurations().profile}/profile${uuid ? '/' + uuid : ''}`
-  let response = await fetch(request, authHeader)
-  return response
+  const request = `${getServerConfigurations().profile}/profile/${uuid}`
+
+  return fetch(request, authHeader)
 }
 
 export async function createProfile(accessToken: string, avatar: AvatarSpec) {
