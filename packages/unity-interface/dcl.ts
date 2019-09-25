@@ -110,8 +110,16 @@ export function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }
 function ensureTeleportAnimation() {
-  document.getElementById('gameContainer')!.setAttribute('style', 'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;')
-  document.body.setAttribute('style', 'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;')
+  document
+    .getElementById('gameContainer')!
+    .setAttribute(
+      'style',
+      'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+    )
+  document.body.setAttribute(
+    'style',
+    'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+  )
 }
 
 const unityInterface = {
@@ -194,6 +202,18 @@ const unityInterface = {
   }
 }
 
+export const HUD: Record<string, { configure: (config: HUDConfiguration) => void }> = {
+  Minimap: {
+    configure: unityInterface.ConfigureMinimapHUD
+  },
+  Avatar: {
+    configure: unityInterface.ConfigureAvatarHUD
+  },
+  Notification: {
+    configure: unityInterface.ConfigureNotificationHUD
+  }
+}
+
 window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -257,6 +277,12 @@ class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *
+ * Common initialization logic for the unity engine
+ *
+ * @param _gameInstance Unity game instance
+ */
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
@@ -283,7 +309,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
-        ; (browserInterface as any)[type](message)
+        ;(browserInterface as any)[type](message)
       } else {
         defaultLogger.info(`Unknown message (did you forget to add ${type} to unity-interface/dcl.ts?)`, message)
       }
