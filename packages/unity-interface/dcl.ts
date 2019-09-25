@@ -17,7 +17,7 @@ import { chatObservable } from '../shared/comms/chat'
 import { getUserProfile } from '../shared/comms/peers'
 import { createLogger, defaultLogger, ILogger } from '../shared/logger'
 import { saveAvatarRequest } from '../shared/passports/actions'
-import { Wearable, Avatar } from '../shared/passports/types'
+import { Avatar, Wearable } from '../shared/passports/types'
 import {
   EntityAction,
   EnvironmentData,
@@ -29,6 +29,7 @@ import {
   MappingsResponse,
   Notification
 } from '../shared/types'
+import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
   enableParcelSceneLoading,
   getParcelSceneID,
@@ -36,10 +37,10 @@ import {
   loadParcelScene,
   stopParcelSceneWorker
 } from '../shared/world/parcelSceneManager'
-import { positionObservable, teleportObservable } from '../shared/world/positionThings'
-import { hudWorkerUrl, ParcelSceneAPI, SceneWorker } from '../shared/world/SceneWorker'
+import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { positionObservable, teleportObservable } from '../shared/world/positionThings'
 
 let gameInstance!: GameInstance
 

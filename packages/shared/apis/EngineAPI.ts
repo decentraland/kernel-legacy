@@ -1,8 +1,7 @@
-import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host'
-
-import { ExposableAPI } from './ExposableAPI'
-import { EntityAction } from '../types'
 import { IEventNames, IEvents } from 'decentraland-ecs/src/decentraland/Types'
+import { APIOptions, exposeMethod, registerAPI } from 'decentraland-rpc/lib/host'
+import { EntityAction } from '../types'
+import { ExposableAPI } from './ExposableAPI'
 
 export interface IEngineAPI {
   /**
