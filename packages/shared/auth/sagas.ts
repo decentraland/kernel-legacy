@@ -1,15 +1,15 @@
-import { fork, call, all, takeLatest, put } from 'redux-saga/effects'
-
-import { AUTH_REQUEST, LOGIN, LOGOUT, authRequest, authSuccess, authFailure, LoginAction } from './actions'
+import { all, call, fork, put, takeLatest } from 'redux-saga/effects'
+import { authFailure, authRequest, authSuccess, AUTH_REQUEST, LOGIN, LOGOUT } from './actions'
 import { AuthData } from './types'
 
-export type CallbackResult = { data: AuthData; redirectUrl: string | null }
+
+export type CallbackResult = { data: AuthData; redirectUri: string | undefined }
 
 export interface CallableLogin {
   login: any
   logout: () => void
   isExpired: (store: any) => boolean
-  handleCallback: any
+  handleCallback: () => Promise<{ data: any, redirectUri: string | undefined }>
   restoreSession: () => void
 }
 
@@ -23,8 +23,8 @@ export function createSaga(callbackProvider: CallableLogin) {
     ])
   }
 
-  function* handleLogin(action: LoginAction): any {
-    yield call(() => callbackProvider.login(action.payload.redirectUrl))
+  function* handleLogin(): any {
+    yield call(() => callbackProvider.login())
   }
 
   function* handleLogout(): any {
@@ -37,11 +37,9 @@ export function createSaga(callbackProvider: CallableLogin) {
 
   function* handleAuthRequest(): any {
     let data: AuthData
-    let redirectUrl: string | null = null
     try {
       const result: CallbackResult = yield call(() => callbackProvider.handleCallback())
       data = result.data
-      redirectUrl = result.redirectUrl
     } catch (error) {
       if (error.error && error.error.includes('unauthorized')) {
         yield call(() => callbackProvider.logout())
@@ -55,6 +53,6 @@ export function createSaga(callbackProvider: CallableLogin) {
         }
       }
     }
-    yield put(authSuccess(data, redirectUrl))
+    yield put(authSuccess(data))
   }
 }
