@@ -37,7 +37,7 @@ export async function resolveProfileSpec(uuid: string, spec: ProfileSpec, email?
   return {
     userId: uuid,
     name,
-    email: email || `${name}@decentraland.org`,
+    email: email || '',
     description: spec.description,
     created_at: spec.createdAt,
     updated_at: spec.updatedAt,
