@@ -3,7 +3,7 @@ import { FAILED_FETCHING_UNITY } from 'shared/loading/types'
 import { worldToGrid } from '../atomicHelpers/parcelScenePositions'
 import defaultLogger from '../shared/logger'
 import { lastPlayerPosition, teleportObservable } from '../shared/world/positionThings'
-import { startUnityParcelLoading } from '../unity-interface/dcl'
+import { startUnityParcelLoading, HUD } from '../unity-interface/dcl'
 import { initializeUnity } from '../unity-interface/initializer'
 
 const container = document.getElementById('gameContainer')
@@ -12,14 +12,15 @@ if (!container) throw new Error('cannot find element #gameContainer')
 
 initializeUnity(container)
   .then(async _ => {
+    Object.keys(HUD).forEach($ => HUD[$].configure({ active: true }))
+
     await startUnityParcelLoading()
 
     _.instancedJS
       .then($ => teleportObservable.notifyObservers(worldToGrid(lastPlayerPosition)))
       .catch(defaultLogger.error)
-    document.body.classList.remove('dcl-loading');
-
-    (window as any).UnityLoader.Error.handler = (error: any) => {
+    document.body.classList.remove('dcl-loading')
+    ;(window as any).UnityLoader.Error.handler = (error: any) => {
       console.error(error)
       ReportFatalError(error.message)
     }
