@@ -1,4 +1,4 @@
-export function hexaNumber(value: number) {
+export function hexaNumber(value: number | any) {
   const result = parseInt(((!value ? 0 : value) * 256).toFixed(0), 10).toString(16)
   if (result.length === 1) {
     return '0' + result
