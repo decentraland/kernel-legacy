@@ -52,6 +52,7 @@ export class PeerTrackingInfo {
 
   public loadProfileIfNecessary(profileVersion: number) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
+      debugger
       if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
           ...(this.userInfo || {}),
@@ -67,6 +68,7 @@ export class PeerTrackingInfo {
             userInfo.profile = forRenderer
             userInfo.version = profile.version
             this.userInfo = userInfo
+            debugger
             return forRenderer
           })
           .catch(error => {
