@@ -8,7 +8,7 @@ export function hexaNumber(value: number) {
   return result
 }
 
-export function colorString(color: { r: number; g: number; b: number; a: number }) {
+export function colorString(color: { r: number; g: number; b: number; a: number | undefined }) {
   return `#${hexaNumber(color.r)}${hexaNumber(color.g)}${hexaNumber(color.b)}${hexaNumber(
     color.a === 0 || color.a === undefined ? 1 : color.a
   )}`

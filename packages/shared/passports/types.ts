@@ -8,6 +8,7 @@ export interface Profile {
   description: string
   email: string
   avatar: Avatar
+  ethAddress: string | undefined
   inventory: WearableId[]
   snapshots: {
     face: string
@@ -31,6 +32,7 @@ export interface ProfileForRenderer {
   description: string
   email: string
   avatar: AvatarForRenderer
+  ethAddress: string | undefined
   inventory: WearableId[]
   snapshots: {
     face: string

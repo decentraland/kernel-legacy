@@ -2,7 +2,6 @@ import { registerAPI, exposeMethod, APIOptions } from 'decentraland-rpc/lib/host
 
 import { ExposableAPI } from './ExposableAPI'
 import { EntityAction } from '../types'
-import { ParcelSceneAPI } from 'shared/world/SceneWorker'
 import { IEventNames, IEvents } from 'decentraland-ecs/src/decentraland/Types'
 
 export interface IEngineAPI {
@@ -37,7 +36,7 @@ export interface IEngineAPI {
 @registerAPI('EngineAPI')
 export class EngineAPI extends ExposableAPI implements IEngineAPI {
   didStart: boolean = false
-  parcelSceneAPI!: ParcelSceneAPI
+  parcelSceneAPI!: any
 
   // this dictionary contains the list of subscriptions.
   // the boolean value indicates if the client is actively

@@ -510,7 +510,7 @@ export function disconnect() {
 
 declare var global: any
 
-global['printCommsInformation'] = function () {
+global['printCommsInformation'] = function() {
   if (context) {
     defaultLogger.log('Communication topics: ' + previousTopics)
     context.stats.printDebugInformation()

@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 import { login } from './actions'
 import { CommsAuth } from './CommsAuth'
 import { CallbackResult } from './sagas'
-import { getAccessToken, getData, getSub, isLoggedIn } from './selectors'
+import { getAccessToken, getData, getSub, isLoggedIn, getEmail } from './selectors'
 import { AuthData, AuthState } from './types'
 
 type RootState = any
@@ -18,17 +18,16 @@ export function isTokenExpired(expiresAt: number) {
 }
 
 export class Auth {
-  ephemeralKey?: BasicEphemeralKey
-
-  webAuth: auth0.WebAuth
-  sagaMiddleware: any
-
-  comms: CommsAuth
-
-  isExpired = createSelector<RootState, AuthState['data'], boolean>(
+  public isExpired = createSelector<RootState, AuthState['data'], boolean>(
     getData,
     data => !!data && isTokenExpired(data.expiresAt)
   ) as (store: any) => boolean
+
+  private ephemeralKey?: BasicEphemeralKey
+
+  private webAuth: auth0.WebAuth
+
+  private comms: CommsAuth
 
   constructor(
     private config: {
@@ -55,6 +54,11 @@ export class Auth {
   async getUserId() {
     await this.getAccessToken()
     return getSub(this.store.getState())
+  }
+
+  async getEmail() {
+    await this.getAccessToken()
+    return getEmail(this.store.getState())
   }
 
   async getCommsAccessToken() {

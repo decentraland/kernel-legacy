@@ -45,7 +45,7 @@ export let globalStore: Store<RootState>
 export async function initShared(): Promise<Session | undefined> {
   if (isMobile()) {
     ReportFatalError(MOBILE_NOT_SUPPORTED)
-    return
+    return undefined
   }
   const session = new Session()
 
