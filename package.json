@@ -3,7 +3,7 @@
   "version": "6.4.2",
   "license": "Apache-2.0",
   "scripts": {
-    "postinstall": "git lfs install --force && cp node_modules/decentraland-renderer/*.unitywasm static/unity/Build/",
+    "postinstall": "git lfs install --force && cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/",
     "start": "make watch",
     "build": "make build-essentials",
     "test": "make test-ci"
