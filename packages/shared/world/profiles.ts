@@ -16,7 +16,6 @@ export async function resolveProfile(accessToken: string, uuid: string): Promise
 
   let spec: ProfileSpec
   if (response && response.ok) {
-    // @ts-ignore
     spec = (await response.json()) as ProfileSpec
   } else {
     const legacy = await fetchLegacy(accessToken, uuid)
@@ -33,17 +32,16 @@ export async function resolveProfile(accessToken: string, uuid: string): Promise
 export async function resolveProfileSpec(uuid: string, spec: ProfileSpec, email?: string): Promise<Profile> {
   const avatar = await mapSpecToAvatar(spec.avatar)
 
-  // TODO - fetch name from claim server - moliva - 22/07/2019
   const name = spec.name || `Guest_${uuid.replace('email|', '').slice(0, 7)}` // strip email| from auth0 uuid
 
   return {
     userId: uuid,
-    name: name,
+    name,
     email: email || `${name}@decentraland.org`,
     description: spec.description,
-    created_at: spec.created_at,
-    updated_at: spec.updated_at,
-    version: spec.version,
+    created_at: spec.createdAt,
+    updated_at: spec.updatedAt,
+    version: '' + spec.version,
     avatar
   }
 }
@@ -53,9 +51,9 @@ export async function createStubProfileSpec(uuid = ('' + Math.random()).slice(2,
   return {
     name,
     description: '',
-    updated_at: 1,
-    created_at: 1,
-    version: '0',
+    updatedAt: 1,
+    createdAt: 1,
+    version: 0,
     avatar: await generateRandomAvatarSpec()
   }
 }
@@ -161,12 +159,12 @@ export async function fetchLegacy(accessToken: string, uuid: string) {
 }
 
 export function legacyToSpec(legacy: any) {
-  const { profile, /* email, */ snapshots, updatedAt, userId } = legacy
+  const { profile, snapshots, updatedAt, userId } = legacy
   const { created_at, description, name, avatar } = profile
   return {
     description,
-    created_at,
-    updated_at: updatedAt,
+    createdAt: created_at,
+    updatedAt,
     version: updatedAt,
     name,
     avatar: { ...avatar, snapshots, name, userId }
