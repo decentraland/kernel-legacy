@@ -72,7 +72,7 @@ export class Auth {
         result.resolve(getAccessToken(state))
         unsubscribe()
       } else if (state.auth.error) {
-        this.login(this.config.redirectUri)
+        this.login()
       }
     })
     return result
@@ -115,15 +115,15 @@ export class Auth {
         if (auth && auth.accessToken && auth.idToken) {
           this.webAuth.client.userInfo(auth.accessToken, (err: any, user: any) => {
             if (err) {
-              this.store.dispatch(login(this.config.redirectUri))
+              this.store.dispatch(login())
               reject(err)
               return
             }
 
-            let redirectUrl = null
+            let redirectUri: string | undefined = undefined
             if (auth.state) {
-              redirectUrl = localStorage.getItem(auth.state)
-              if (redirectUrl) {
+              redirectUri = localStorage.getItem(auth.state) || undefined
+              if (redirectUri) {
                 localStorage.removeItem(auth.state)
               }
             }
@@ -135,7 +135,7 @@ export class Auth {
               accessToken: auth.accessToken,
               idToken: auth.idToken
             }
-            resolve({ data, redirectUrl })
+            resolve({ data, redirectUri })
           })
         } else {
           reject(new Error('No access token found in the url hash'))
@@ -144,13 +144,11 @@ export class Auth {
     })
   }
 
-  login(redirectUrl?: string) {
+  login() {
     let options: auth0.AuthorizeOptions = {}
-    if (redirectUrl) {
-      const nonce = uuid()
-      localStorage.setItem(nonce, redirectUrl)
-      options.state = nonce
-    }
+    const nonce = uuid()
+    localStorage.setItem(nonce, this.config.redirectUri)
+    options.state = nonce
     try {
       this.webAuth.authorize(options)
     } catch (e) {
@@ -159,11 +157,11 @@ export class Auth {
   }
 
   restoreSession(): Promise<AuthData> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       this.webAuth.checkSession({}, (err: any, auth: any) => {
         if (err) {
-          this.store.dispatch(login(this.config.redirectUri))
-          return
+          this.store.dispatch(login())
+          return reject(err)
         }
         const result: AuthData = {
           email: auth.idTokenPayload.email,
