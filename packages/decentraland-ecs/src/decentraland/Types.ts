@@ -193,6 +193,7 @@ export interface IEvents {
    */
   onChange: {
     value?: any
+    text?: string
     /** ID of the pointer that triggered the event */
     pointerId?: number
   }
