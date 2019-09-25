@@ -31,6 +31,7 @@ import { Pose, UserInformation } from './types'
 import { CommunicationArea, Position, position2parcel, sameParcel, squareDistance } from './utils'
 import { WorldInstanceConnection } from './worldInstanceConnection'
 import { profileToRendererFormat } from 'shared/passports/transformations/profileToRendererFormat'
+import { ProfileForRenderer } from 'decentraland-ecs/src'
 
 type Timestamp = number
 type PeerAlias = string
@@ -44,7 +45,7 @@ export class PeerTrackingInfo {
   public lastUpdate: Timestamp = 0
   public receivedPublicChatMessages = new Set<string>()
 
-  profilePromise: { promise: Promise<Profile | void>; version: number | null } = {
+  profilePromise: { promise: Promise<ProfileForRenderer | void>; version: number | null } = {
     promise: Promise.resolve(),
     version: null
   }
@@ -60,12 +61,13 @@ export class PeerTrackingInfo {
       this.profilePromise = {
         promise: PassportAsPromise(this.identity, profileVersion)
           .then(profile => {
+            const forRenderer = profileToRendererFormat(profile)
             this.lastProfileUpdate = new Date().getTime()
             const userInfo = this.userInfo || {}
-            userInfo.profile = profileToRendererFormat(profile)
+            userInfo.profile = forRenderer
             userInfo.version = profile.version
             this.userInfo = userInfo
-            return profile
+            return forRenderer
           })
           .catch(error => {
             defaultLogger.error('Error fetching profile!', error)
@@ -506,7 +508,7 @@ export function disconnect() {
 
 declare var global: any
 
-global['printCommsInformation'] = function() {
+global['printCommsInformation'] = function () {
   if (context) {
     defaultLogger.log('Communication topics: ' + previousTopics)
     context.stats.printDebugInformation()
