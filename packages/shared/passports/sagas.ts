@@ -102,6 +102,16 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     yield put(passportSuccess(userId, avatar))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
+    yield put(inventoryRequest(userId))
+    const inventoryResult = yield race({
+      success: take(INVENTORY_SUCCESS),
+      failure: take(INVENTORY_FAILURE)
+    })
+    if (inventoryResult.failure) {
+      defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
+    } else {
+      randomizedUserProfile.avatar.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+    }
     yield put(passportRandom(userId, randomizedUserProfile))
   }
 }
