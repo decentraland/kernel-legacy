@@ -10,6 +10,14 @@ export const getProfile = (store: RootPassportState, userId: string): Profile | 
     ? (store.passports.userInfo[userId].data as Profile)
     : null
 
+export const getEthereumAddress = (store: RootPassportState, userId: string): string | undefined =>
+  store.passports &&
+  store.passports.userInfo &&
+  store.passports.userInfo[userId] &&
+  store.passports.userInfo[userId].status === 'ok'
+    ? (store.passports.userInfo[userId].data as Profile).ethAddress
+    : undefined
+
 export const getInventory = (store: RootPassportState, userId: string): Wearable[] | null =>
   store.passports &&
   store.passports.userInventory &&

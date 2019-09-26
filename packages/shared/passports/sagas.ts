@@ -34,7 +34,7 @@ import {
   passportRequest
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
-import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
+import { baseCatalogsLoaded, getProfile, getProfileDownloadServer, getEthereumAddress } from './selectors'
 import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
@@ -89,7 +89,6 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
-    const avatar = processServerProfile(userId, profile)
     yield put(inventoryRequest(userId))
     const inventoryResult = yield race({
       success: take(INVENTORY_SUCCESS),
@@ -98,9 +97,10 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     if (inventoryResult.failure) {
       defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
     } else {
-      avatar.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      profile.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
     }
-    yield put(passportSuccess(userId, avatar))
+    const passport = processServerProfile(userId, profile)
+    yield put(passportSuccess(userId, passport))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
     yield put(inventoryRequest(userId))
@@ -111,9 +111,10 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     if (inventoryResult2.failure) {
       defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult2.failure)
     } else {
-      randomizedUserProfile.avatar.inventory = (inventoryResult2.success as InventorySuccess).payload.inventory.map(
-        dropIndexFromExclusives
-      )
+      randomizedUserProfile.inventory = [
+        'dcl://base-exclusive/tropical_mask',
+        'dcl://base-exclusive/Serial_killer_mask'
+      ]
     }
     yield put(passportRandom(userId, randomizedUserProfile))
   }
@@ -197,9 +198,7 @@ export function fetchCurrentProfile(accessToken: string, uuid: string) {
 
 export function* handleFetchInventory(action: InventoryRequest) {
   const { userId } = action.payload
-  // @TODO (eordano, 20/Sep/2019): Query the Profile Server the user's ethereum address and hit the wearables-api
-  const MOCK_ETHEREUM_ADDRESS = '0x0a6Fd8C23e0ECfa9aD8cBda9EDCBEDEC2e1E38fD'
-  const ethereumAddress = MOCK_ETHEREUM_ADDRESS
+  const ethereumAddress = yield select(getEthereumAddress, userId)
   try {
     const inventoryItems = yield call(fetchInventoryItemsByAddress, ethereumAddress)
     yield put(inventorySuccess(userId, inventoryItems))
