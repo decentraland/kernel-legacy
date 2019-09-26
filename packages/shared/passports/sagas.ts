@@ -148,8 +148,10 @@ export async function fetchCatalog(url: string) {
   return request.json()
 }
 
+declare var window: any
+
 export function sendWearablesCatalog(catalog: Catalog) {
-  ;(window as any)['unityInterface'].AddWearablesToCatalog(catalog)
+  window['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
@@ -168,7 +170,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  ;(window as any)['unityInterface'].LoadProfile(profileToRendererFormat(profile))
+  window['unityInterface'].LoadProfile(profileToRendererFormat(profile))
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
