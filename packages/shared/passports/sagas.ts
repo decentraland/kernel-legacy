@@ -1,6 +1,6 @@
 import { call, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { getServerConfigurations } from '../../config'
-import { getAccessToken, getCurrentUserId } from '../auth/selectors'
+import { getAccessToken, getCurrentUserId, getEmail } from '../auth/selectors'
 import defaultLogger from '../logger'
 import { isInitialized } from '../renderer/selectors'
 import { RENDERER_INITIALIZED } from '../renderer/types'
@@ -89,6 +89,10 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
+    const currentId = yield select(getCurrentUserId)
+    if (currentId === userId) {
+      profile.email = yield select(getEmail)
+    }
     if (profile.ethAddress) {
       yield put(inventoryRequest(userId, profile.ethAddress))
       const inventoryResult = yield race({
@@ -107,6 +111,10 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     yield put(passportSuccess(userId, passport))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
+    const currentId = yield select(getCurrentUserId)
+    if (currentId === userId) {
+      randomizedUserProfile.email = yield select(getEmail)
+    }
     yield put(inventorySuccess(userId, randomizedUserProfile.inventory))
     yield put(passportRandom(userId, randomizedUserProfile))
   }
