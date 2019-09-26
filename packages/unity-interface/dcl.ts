@@ -28,7 +28,6 @@ import {
   MappingsResponse,
   Notification
 } from '../shared/types'
-import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
   enableParcelSceneLoading,
   getParcelSceneID,
@@ -36,10 +35,11 @@ import {
   loadParcelScene,
   stopParcelSceneWorker
 } from '../shared/world/parcelSceneManager'
-import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
+import { SceneWorker, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
 import { positionObservable, teleportObservable } from '../shared/world/positionThings'
+import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 
 let gameInstance!: GameInstance
 
@@ -81,7 +81,9 @@ const browserInterface = {
   },
 
   LogOut() {
-    Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
+    
+
+ion.current.logout().catch(e => defaultLogger.error('error while logging out', e))
   },
 
   SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
