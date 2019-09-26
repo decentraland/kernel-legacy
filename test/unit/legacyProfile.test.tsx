@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { legacyProfilesToAvatar } from 'shared/passports/transformations/legacyProfilesToAvatar'
+import { processServerProfile } from 'shared/passports/transformations/processServerProfile'
 
 describe('legacy spec conversion', () => {
   it('works with a sample case', () => {
@@ -88,6 +88,6 @@ describe('legacy spec conversion', () => {
       }
     }
 
-    expect(legacyProfilesToAvatar(original)).to.deep.equal(expected)
+    expect(processServerProfile('email|5d056a5302751940134de62c', original)).to.deep.equal(expected)
   })
 })

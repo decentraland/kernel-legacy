@@ -30,11 +30,12 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer
+  setProfileServer,
+  passportRequest
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
-import { legacyProfilesToAvatar } from './transformations/legacyProfilesToAvatar'
+import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
 import { Avatar, Catalog, Profile } from './types'
@@ -54,7 +55,7 @@ import { Avatar, Catalog, Profile } from './types'
  * It's *very* important for the renderer to never receive a passport with items that have not been loaded into the catalog.
  */
 export function* passportSaga(): any {
-  yield put(setProfileServer(getServerConfigurations().avatar.server))
+  yield put(setProfileServer(getServerConfigurations().profile))
   yield takeEvery(RENDERER_INITIALIZED, initialLoad)
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
@@ -87,8 +88,8 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
   try {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
-    const profile = yield call(legacyProfileRequest, serverUrl, accessToken)
-    const avatar = legacyProfilesToAvatar(profile.data)
+    const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
+    const avatar = processServerProfile(userId, profile)
     yield put(inventoryRequest(userId))
     const inventoryResult = yield race({
       success: take(INVENTORY_SUCCESS),
@@ -116,9 +117,9 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
   }
 }
 
-export async function legacyProfileRequest(serverUrl: string, accessToken: string) {
+export async function profileServerRequest(serverUrl: string, userId: string, accessToken: string) {
   try {
-    const request = await fetch(`${serverUrl}api/profile/`, {
+    const request = await fetch(`${serverUrl}/profile/${userId}`, {
       headers: {
         Authorization: 'Bearer ' + accessToken
       }
@@ -157,8 +158,10 @@ export async function fetchCatalog(url: string) {
   return request.json()
 }
 
+declare var window: any
+
 export function sendWearablesCatalog(catalog: Catalog) {
-  (global as any)['unityInterface'].AddWearablesToCatalog(catalog)
+  window['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
@@ -177,7 +180,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  (global as any)['unityInterface'].LoadProfile(profileToRendererFormat(profile))
+  window['unityInterface'].LoadProfile(profileToRendererFormat(profile))
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
@@ -223,33 +226,18 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
   try {
     const currentVersion = (yield select(getProfile, userId)).version || 0
     const accessToken = yield select(getAccessToken)
-    const url = `${getServerConfigurations().profile}/profile/avatar/${userId}`
-    const response = yield call(modifyAvatar, {
+    const url = getServerConfigurations().profile + '/profile/' + userId + '/avatar'
+    const result = yield call(modifyAvatar, {
       url,
-      method: currentVersion === 0 ? 'PUT' : 'POST',
+      method: 'PUT',
       userId,
       currentVersion,
       accessToken,
       profile: saveAvatar.payload.profile
     })
-    if (response.ok) {
-      const url2 = `${getServerConfigurations().avatar}/profile/avatar`
-      const response2 = yield call(modifyAvatar, {
-        url: url2,
-        method: 'POST',
-        userId,
-        currentVersion,
-        accessToken,
-        profile: saveAvatar.payload.profile
-      })
-      if (response2.ok) {
-        yield put(saveAvatarSuccess(userId))
-        const updatedProfile: Profile = yield select(getProfile, userId)
-        yield sendLoadProfile(updatedProfile)
-      }
-    } else {
-      yield put(saveAvatarFailure(userId, 'unknown reason'))
-    }
+    const { version } = result
+    yield put(saveAvatarSuccess(userId, version))
+    yield put(passportRequest(userId))
   } catch (error) {
     yield put(saveAvatarFailure(userId, 'unknown reason'))
   }
@@ -260,7 +248,7 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
  */
 export async function modifyAvatar(params: {
   url: string
-  method: 'PUT' | 'POST'
+  method: string
   currentVersion: number
   userId: string
   accessToken: string
@@ -268,9 +256,15 @@ export async function modifyAvatar(params: {
 }) {
   const { url, method, currentVersion, profile, accessToken } = params
   const { face, avatar, body } = profile
-  const payload = JSON.stringify({
-    avatar: ensureServerFormat(avatar, currentVersion)
-  })
+  const snapshots = await saveSnapshots(
+    getServerConfigurations().profile + '/profile/' + params.userId,
+    accessToken,
+    face,
+    body
+  )
+  const avatarData: any = avatar
+  avatarData.snapshots = snapshots
+  const payload = JSON.stringify(ensureServerFormat(avatarData, currentVersion))
   const options = {
     method,
     body: payload,
@@ -278,24 +272,23 @@ export async function modifyAvatar(params: {
       Authorization: 'Bearer ' + accessToken
     }
   }
-  await saveSnapshots(url, accessToken, face, body)
 
   const response = await fetch(url, options)
-  return response
+  return response.json()
 }
 
 async function saveSnapshots(userURL: string, accessToken: string, face: string, body: string) {
   const data = new FormData()
   data.append('face', stringToBlob(face), 'face.png')
   data.append('body', stringToBlob(body), 'body.png')
-  return fetch(`${userURL}/snapshot`, {
+  return (await fetch(`${userURL}/snapshot`, {
     method: 'POST',
     body: data,
     headers: {
       Authorization: 'Bearer ' + accessToken
     }
-  })
+  })).json()
 }
 function stringToBlob(str: string) {
-  return new Blob([str], { type: 'application/base64' })
+  return new Blob([btoa(str)], { type: 'image/png' })
 }

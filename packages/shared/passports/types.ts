@@ -15,8 +15,8 @@ export interface Profile {
     body: string
   }
   version: number
-  updated_at: number
-  created_at: number
+  updatedAt: number
+  createdAt: number
 }
 
 export interface Avatar {
@@ -39,8 +39,8 @@ export interface ProfileForRenderer {
     body: string
   }
   version: number
-  updated_at: number
-  created_at: number
+  updatedAt: number
+  createdAt: number
 }
 
 export interface AvatarForRenderer {

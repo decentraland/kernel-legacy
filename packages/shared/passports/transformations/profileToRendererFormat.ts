@@ -1,7 +1,7 @@
 import { Profile } from '../types'
 import { ProfileForRenderer } from 'decentraland-ecs/src'
 import { convertToRGBObject } from './convertToRGBObject'
-import { dropDeprecatedWearables } from './legacyProfilesToAvatar'
+import { dropDeprecatedWearables } from './processServerProfile'
 export function profileToRendererFormat(profile: Profile): ProfileForRenderer {
   return {
     ...profile,

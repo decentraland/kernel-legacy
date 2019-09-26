@@ -52,7 +52,6 @@ export class PeerTrackingInfo {
 
   public loadProfileIfNecessary(profileVersion: number) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
-      debugger
       if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
           ...(this.userInfo || {}),
@@ -68,7 +67,6 @@ export class PeerTrackingInfo {
             userInfo.profile = forRenderer
             userInfo.version = profile.version
             this.userInfo = userInfo
-            debugger
             return forRenderer
           })
           .catch(error => {
@@ -397,7 +395,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
 
   const user = getCurrentUser()
   if (!user) {
-    return
+    return undefined
   }
 
   const userInfo = {
@@ -489,6 +487,8 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
       collectInfo(context)
     }
   }, 100)
+
+  return context
 }
 
 export function disconnect() {

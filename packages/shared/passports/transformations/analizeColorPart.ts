@@ -8,6 +8,9 @@ export function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
       if (avatar[name].length === 7) {
         return { color: convertToRGBObject(avatar[name]) }
       }
+      if (avatar[name].length === 9) {
+        return { color: convertToRGBObject(avatar[name]) }
+      }
     }
     if (avatar[name]) {
       if (
@@ -34,4 +37,9 @@ export function analizeColorPart(avatar: any, ...alternativeNames: string[]) {
       ' in the submitted avatar model ' +
       JSON.stringify(avatar)
   )
+}
+
+export function stripAlpha(colorInput: any & { a: number }) {
+  const { a, ...color } = colorInput
+  return color
 }

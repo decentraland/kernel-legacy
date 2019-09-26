@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
-import { legacyProfileRequest, handleFetchProfile } from 'shared/passports/sagas'
+import { profileServerRequest, handleFetchProfile } from 'shared/passports/sagas'
 import { getProfileDownloadServer } from 'shared/passports/selectors'
 import { getAccessToken } from 'shared/auth/selectors'
 import { passportRequest, passportSuccess } from 'shared/passports/actions'
@@ -11,7 +11,7 @@ describe('fetchProfile behavior', () => {
       .provide([
         [select(getProfileDownloadServer), 'server'],
         [select(getAccessToken), 'access-token'],
-        [call(legacyProfileRequest, 'server', 'access-token'), { data: 'profile' }]
+        [call(profileServerRequest, 'server', 'userId', 'access-token'), { data: 'profile' }]
       ])
       .put(passportSuccess('userId', 'profile' as any))
       .run()
