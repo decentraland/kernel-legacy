@@ -210,6 +210,7 @@ export function getServerConfigurations() {
     wearablesApi: `https://dcl-wearable-api.now.sh`,
     avatar: {
       // avatars-api.decentraland.zone is down
+      snapshotStorage: `https://avatars-storage.decentraland.org/`,
       server: `https://avatars-api.decentraland.${TLDDefault === 'zone' ? 'today' : TLDDefault}/`,
       catalog: 'https://avatar-assets.now.sh',
       contents: `https://s3.amazonaws.com/content-service.decentraland.org/`,

@@ -88,6 +88,6 @@ describe('legacy spec conversion', () => {
       }
     }
 
-    expect(processServerProfile(original)).to.deep.equal(expected)
+    expect(processServerProfile('email|5d056a5302751940134de62c', original)).to.deep.equal(expected)
   })
 })

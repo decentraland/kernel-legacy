@@ -1,5 +1,6 @@
 import { Profile } from '../types'
 import { colorString } from './colorString'
+import { getServerConfigurations } from 'config'
 
 export function fixWearableIds(wearableId: string) {
   return wearableId.replace('/male_body', '/BaseMale').replace('/female_body', '/BaseFemale')
@@ -16,17 +17,29 @@ export const deprecatedWearables = [
 export function dropDeprecatedWearables(wearableId: string): boolean {
   return deprecatedWearables.indexOf(wearableId) === -1
 }
-export function processServerProfile(receivedProfile: any): Profile {
+export function processServerProfile(userId: string, receivedProfile: any): Profile {
+  const name =
+    receivedProfile.name ||
+    'Guest-' +
+      Math.random()
+        .toFixed(6)
+        .substr(2)
   return {
-    userId: receivedProfile.userId,
-    email: receivedProfile.email,
-    name: receivedProfile.name,
-    description: receivedProfile.description,
+    userId: userId,
+    email: receivedProfile.email || name.toLowerCase() + '@nowhere.com',
+    name: receivedProfile.name || name,
+    description: receivedProfile.description || '',
     createdAt: new Date(receivedProfile.createdAt).getTime(),
     ethAddress: receivedProfile.ethAddress || 'noeth',
-    updatedAt: typeof receivedProfile.updatedAt === 'string' ? new Date(receivedProfile.updatedAt).getTime() : receivedProfile.updatedAt,
-    snapshots: receivedProfile.avatar && receivedProfile.snapshots,
-    version: receivedProfile.avatar.version,
+    updatedAt:
+      typeof receivedProfile.updatedAt === 'string'
+        ? new Date(receivedProfile.updatedAt).getTime()
+        : receivedProfile.updatedAt,
+    snapshots: (receivedProfile.avatar && receivedProfile.avatar.snapshots) || {
+      face: getServerConfigurations().avatar.snapshotStorage + userId + `/face.png`,
+      body: getServerConfigurations().avatar.snapshotStorage + userId + `/body.png`
+    },
+    version: receivedProfile.avatar.version || 1,
     avatar: {
       eyeColor: colorString(receivedProfile.avatar.eyes.color),
       hairColor: colorString(receivedProfile.avatar.hair.color),
@@ -34,6 +47,6 @@ export function processServerProfile(receivedProfile: any): Profile {
       bodyShape: fixWearableIds(receivedProfile.avatar.bodyShape),
       wearables: receivedProfile.avatar.wearables.map(fixWearableIds).filter(dropDeprecatedWearables)
     },
-    inventory: []
+    inventory: receivedProfile.inventory || []
   }
 }

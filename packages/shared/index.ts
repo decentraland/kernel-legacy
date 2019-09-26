@@ -24,6 +24,7 @@ import { RootState } from './store/rootTypes'
 import { buildStore } from './store/store'
 import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
+import { setWorldContext } from './protocol/actions'
 
 // TODO fill with segment keys and integrate identity server
 async function initializeAnalytics(userId: string) {
@@ -108,11 +109,14 @@ export async function initShared(): Promise<Session | undefined> {
   for (let i = 1; ; ++i) {
     try {
       defaultLogger.info(`Try number ${i}...`)
-      await connect(
+      const context = await connect(
         userId,
         net,
         auth
       )
+      if (context !== undefined) {
+        store.dispatch(setWorldContext(context))
+      }
       break
     } catch (e) {
       if (!e.message.startsWith('Communications link') || i >= maxAttemps) {

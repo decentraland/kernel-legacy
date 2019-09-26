@@ -30,7 +30,8 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer
+  setProfileServer,
+  passportRequest
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
@@ -88,7 +89,7 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
-    const avatar = processServerProfile(profile)
+    const avatar = processServerProfile(userId, profile)
     yield put(inventoryRequest(userId))
     const inventoryResult = yield race({
       success: take(INVENTORY_SUCCESS),
@@ -148,7 +149,7 @@ export async function fetchCatalog(url: string) {
 }
 
 export function sendWearablesCatalog(catalog: Catalog) {
-  (global as any)['unityInterface'].AddWearablesToCatalog(catalog)
+  ;(window as any)['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
@@ -167,7 +168,7 @@ export function* sendLoadProfile(profile: Profile) {
   while (!(yield select(baseCatalogsLoaded))) {
     yield take(CATALOG_LOADED)
   }
-  (global as any)['unityInterface'].LoadProfile(profileToRendererFormat(profile))
+  ;(window as any)['unityInterface'].LoadProfile(profileToRendererFormat(profile))
 }
 
 export function fetchCurrentProfile(accessToken: string, uuid: string) {
@@ -213,33 +214,18 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
   try {
     const currentVersion = (yield select(getProfile, userId)).version || 0
     const accessToken = yield select(getAccessToken)
-    const url = `${getServerConfigurations().profile}/profile/avatar/${userId}`
-    const response = yield call(modifyAvatar, {
+    const url = getServerConfigurations().profile + '/profile/' + userId + '/avatar'
+    const result = yield call(modifyAvatar, {
       url,
-      method: currentVersion === 0 ? 'PUT' : 'POST',
+      method: 'PUT',
       userId,
       currentVersion,
       accessToken,
       profile: saveAvatar.payload.profile
     })
-    if (response.ok) {
-      const url2 = `${getServerConfigurations().avatar}/profile/avatar`
-      const response2 = yield call(modifyAvatar, {
-        url: url2,
-        method: 'POST',
-        userId,
-        currentVersion,
-        accessToken,
-        profile: saveAvatar.payload.profile
-      })
-      if (response2.ok) {
-        yield put(saveAvatarSuccess(userId))
-        const updatedProfile: Profile = yield select(getProfile, userId)
-        yield sendLoadProfile(updatedProfile)
-      }
-    } else {
-      yield put(saveAvatarFailure(userId, 'unknown reason'))
-    }
+    const { version } = result
+    yield put(saveAvatarSuccess(userId, version))
+    yield put(passportRequest(userId))
   } catch (error) {
     yield put(saveAvatarFailure(userId, 'unknown reason'))
   }
@@ -250,7 +236,7 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
  */
 export async function modifyAvatar(params: {
   url: string
-  method: 'PUT' | 'POST'
+  method: string
   currentVersion: number
   userId: string
   accessToken: string
@@ -258,9 +244,15 @@ export async function modifyAvatar(params: {
 }) {
   const { url, method, currentVersion, profile, accessToken } = params
   const { face, avatar, body } = profile
-  const payload = JSON.stringify({
-    avatar: ensureServerFormat(avatar, currentVersion)
-  })
+  const snapshots = await saveSnapshots(
+    getServerConfigurations().profile + '/profile/' + params.userId,
+    accessToken,
+    face,
+    body
+  )
+  const avatarData: any = avatar
+  avatarData.snapshots = snapshots
+  const payload = JSON.stringify(ensureServerFormat(avatarData, currentVersion))
   const options = {
     method,
     body: payload,
@@ -268,24 +260,23 @@ export async function modifyAvatar(params: {
       Authorization: 'Bearer ' + accessToken
     }
   }
-  await saveSnapshots(url, accessToken, face, body)
 
   const response = await fetch(url, options)
-  return response
+  return response.json()
 }
 
 async function saveSnapshots(userURL: string, accessToken: string, face: string, body: string) {
   const data = new FormData()
   data.append('face', stringToBlob(face), 'face.png')
   data.append('body', stringToBlob(body), 'body.png')
-  return fetch(`${userURL}/snapshot`, {
+  return (await fetch(`${userURL}/snapshot`, {
     method: 'POST',
     body: data,
     headers: {
       Authorization: 'Bearer ' + accessToken
     }
-  })
+  })).json()
 }
 function stringToBlob(str: string) {
-  return new Blob([str], { type: 'application/base64' })
+  return new Blob([btoa(str)], { type: 'image/png' })
 }
