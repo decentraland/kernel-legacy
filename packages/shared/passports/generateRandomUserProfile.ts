@@ -49,7 +49,7 @@ export async function generateRandomUserProfile(userId: string): Promise<Profile
   return {
     userId,
     email: name.toLowerCase() + '@nowhere.com',
-    inventory: [],
+    inventory: ['dcl://base-exclusive/tropical_mask', 'dcl://base-exclusive/Serial_killer_mask'],
     version: 0,
     name,
     ethAddress: 'noeth',

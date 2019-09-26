@@ -103,7 +103,7 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     yield put(passportSuccess(userId, passport))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
-    randomizedUserProfile.inventory = ['dcl://base-exclusive/tropical_mask', 'dcl://base-exclusive/Serial_killer_mask']
+    yield put(inventorySuccess(userId, randomizedUserProfile.inventory))
     yield put(passportRandom(userId, randomizedUserProfile))
   }
 }
