@@ -7,7 +7,6 @@ export function profileToRendererFormat(profile: Profile): ProfileForRenderer {
     ...profile,
     avatar: {
       ...profile.avatar,
-      snapshots: profile.snapshots,
       wearables: profile.avatar.wearables.filter(dropDeprecatedWearables),
       eyeColor: convertToRGBObject(profile.avatar.eyeColor),
       hairColor: convertToRGBObject(profile.avatar.hairColor),

@@ -355,10 +355,6 @@ export type WearableId = string
  */
 export type AvatarForRenderer = {
   bodyShape: WearableId
-  snapshots: {
-    face: string
-    body: string
-  }
   skinColor: ReadOnlyColor4
   hairColor: ReadOnlyColor4
   eyeColor: ReadOnlyColor4
@@ -403,6 +399,10 @@ export type ProfileForRenderer = {
   description: string
   email: string
   avatar: AvatarForRenderer
+  snapshots: {
+    face: string
+    body: string
+  }
   inventory: WearableId[]
   version: number
   updatedAt: number

@@ -1,6 +1,5 @@
 import { Profile } from '../types'
 import { colorString } from './colorString'
-import { getServerConfigurations } from 'config'
 
 export function fixWearableIds(wearableId: string) {
   return wearableId.replace('/male_body', '/BaseMale').replace('/female_body', '/BaseFemale')
@@ -35,10 +34,7 @@ export function processServerProfile(userId: string, receivedProfile: any): Prof
       typeof receivedProfile.updatedAt === 'string'
         ? new Date(receivedProfile.updatedAt).getTime()
         : receivedProfile.updatedAt,
-    snapshots: (receivedProfile.avatar && receivedProfile.avatar.snapshots) || {
-      face: getServerConfigurations().avatar.snapshotStorage + userId + `/face.png`,
-      body: getServerConfigurations().avatar.snapshotStorage + userId + `/body.png`
-    },
+    snapshots: receivedProfile.avatar.snapshots,
     version: receivedProfile.avatar.version || 1,
     avatar: {
       eyeColor: colorString(receivedProfile.avatar.eyes.color),
