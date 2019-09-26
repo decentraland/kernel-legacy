@@ -34,7 +34,7 @@ import {
   passportRequest
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
-import { baseCatalogsLoaded, getProfile, getProfileDownloadServer, getEthereumAddress } from './selectors'
+import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
 import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
@@ -89,15 +89,19 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
-    yield put(inventoryRequest(userId))
-    const inventoryResult = yield race({
-      success: take(INVENTORY_SUCCESS),
-      failure: take(INVENTORY_FAILURE)
-    })
-    if (inventoryResult.failure) {
-      defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
+    if (profile.ethAddress) {
+      yield put(inventoryRequest(userId, profile.ethAddress))
+      const inventoryResult = yield race({
+        success: take(INVENTORY_SUCCESS),
+        failure: take(INVENTORY_FAILURE)
+      })
+      if (inventoryResult.failure) {
+        defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
+      } else {
+        profile.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      }
     } else {
-      profile.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      profile.inventory = []
     }
     const passport = processServerProfile(userId, profile)
     yield put(passportSuccess(userId, passport))
@@ -185,10 +189,9 @@ export function fetchCurrentProfile(accessToken: string, uuid: string) {
 }
 
 export function* handleFetchInventory(action: InventoryRequest) {
-  const { userId } = action.payload
-  const ethereumAddress = yield select(getEthereumAddress, userId)
+  const { userId, ethAddress } = action.payload
   try {
-    const inventoryItems = yield call(fetchInventoryItemsByAddress, ethereumAddress)
+    const inventoryItems = yield call(fetchInventoryItemsByAddress, ethAddress)
     yield put(inventorySuccess(userId, inventoryItems))
   } catch (error) {
     yield put(inventoryFailure(userId, error))
