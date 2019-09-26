@@ -1,6 +1,4 @@
-import { UICanvas, UIContainerRect, Color4, UIInputText, log } from 'decentraland-ecs/src'
-
-import { OnTextSubmit, OnChanged } from 'decentraland-ecs/src/decentraland/UIEvents'
+import { UICanvas, UIContainerRect, Color4, UIInputText, log, OnTextSubmit, OnChanged } from 'decentraland-ecs/src'
 
 const ui = new UICanvas()
 
