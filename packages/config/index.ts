@@ -207,8 +207,11 @@ export function getServerConfigurations() {
     content: `https://content.decentraland.${TLDDefault === 'today' ? 'org' : TLDDefault}`,
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
     profile: `https://profile.decentraland.${TLDDefault}/api/v1`,
+    wearablesApi: `https://dcl-wearable-api.now.sh`,
     avatar: {
-      server: `https://avatars-api.decentraland.${TLDDefault}/`,
+      // avatars-api.decentraland.zone is down
+      snapshotStorage: `https://avatars-storage.decentraland.${TLDDefault}/`,
+      server: `https://avatars-api.decentraland.${TLDDefault === 'zone' ? 'today' : TLDDefault}/`,
       catalog: 'https://avatar-assets.now.sh',
       contents: `https://s3.amazonaws.com/content-service.decentraland.org/`,
       presets: `https://avatars-storage.decentraland.org/mobile-avatars`

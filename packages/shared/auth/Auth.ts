@@ -1,18 +1,15 @@
-import future from 'fp-future'
-import { createStore, Store, applyMiddleware, combineReducers, compose } from 'redux'
-import auth0 from 'auth0-js'
-import { v4 as uuid } from 'uuid'
-import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
-
-import { CommsAuth } from './CommsAuth'
-import { authReducer } from './reducer'
-import { getAccessToken, isLoggedIn, getData, getSub } from './selectors'
-import { AuthState, AuthData } from './types'
-import { CallbackResult, createSaga } from './sagas'
-import { createSelector } from 'reselect'
-import createSagaMiddleware from '@redux-saga/core'
+const auth0 = require('auth0-js')
 import { getServerConfigurations } from 'config'
+import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
+import future from 'fp-future'
+import { Store } from 'redux'
+import { createSelector } from 'reselect'
+import { v4 as uuid } from 'uuid'
 import { login } from './actions'
+import { CommsAuth } from './CommsAuth'
+import { CallbackResult } from './sagas'
+import { getAccessToken, getData, getSub, isLoggedIn, getEmail } from './selectors'
+import { AuthData, AuthState } from './types'
 
 type RootState = any
 
@@ -21,16 +18,14 @@ export function isTokenExpired(expiresAt: number) {
 }
 
 export class Auth {
-  isExpired = createSelector<RootState, AuthState['data'], boolean>(
+  public isExpired = createSelector<RootState, AuthState['data'], boolean>(
     getData,
     data => !!data && isTokenExpired(data.expiresAt)
   ) as (store: any) => boolean
 
-  private store: Store<{ auth: AuthState }>
   private ephemeralKey?: BasicEphemeralKey
 
   private webAuth: auth0.WebAuth
-  private sagaMiddleware: any
 
   private comms: CommsAuth
 
@@ -41,15 +36,10 @@ export class Auth {
       domain: string
       redirectUri: string
       audience: string
-    }
+    },
+    public store: Store<{ auth: AuthState }>
   ) {
-    this.sagaMiddleware = createSagaMiddleware()
-    const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
     this.comms = new CommsAuth({ baseURL: getServerConfigurations().auth })
-    this.store = createStore(
-      combineReducers({ auth: authReducer }),
-      composeEnhancers(applyMiddleware(this.sagaMiddleware))
-    )
 
     this.webAuth = new auth0.WebAuth({
       clientID: this.config.clientId,
@@ -61,13 +51,14 @@ export class Auth {
     })
   }
 
-  setup() {
-    this.sagaMiddleware.run(createSaga(this))
-  }
-
   async getUserId() {
     await this.getAccessToken()
     return getSub(this.store.getState())
+  }
+
+  async getEmail() {
+    await this.getAccessToken()
+    return getEmail(this.store.getState())
   }
 
   async getCommsAccessToken() {
@@ -85,7 +76,7 @@ export class Auth {
         result.resolve(getAccessToken(state))
         unsubscribe()
       } else if (state.auth.error) {
-        this.login(this.config.redirectUri)
+        this.login()
       }
     })
     return result
@@ -120,36 +111,35 @@ export class Auth {
 
   handleCallback(): Promise<CallbackResult> {
     return new Promise((resolve, reject) => {
-      this.webAuth.parseHash((err, auth) => {
+      this.webAuth.parseHash((err: any, auth: any) => {
         if (err) {
-          debugger
           reject(err)
           return
         }
         if (auth && auth.accessToken && auth.idToken) {
-          this.webAuth.client.userInfo(auth.accessToken, (err, user) => {
+          this.webAuth.client.userInfo(auth.accessToken, (err: any, user: any) => {
             if (err) {
-              this.store.dispatch(login(this.config.redirectUri))
+              this.store.dispatch(login())
               reject(err)
               return
             }
 
-            let redirectUrl = null
+            let redirectUri: string | undefined = undefined
             if (auth.state) {
-              redirectUrl = localStorage.getItem(auth.state)
-              if (redirectUrl) {
+              redirectUri = localStorage.getItem(auth.state) || undefined
+              if (redirectUri) {
                 localStorage.removeItem(auth.state)
               }
             }
 
             const data: AuthData = {
-              email: user.email!,
+              email: user.email,
               sub: user.sub,
-              expiresAt: auth.expiresIn! * 1000 + new Date().getTime(),
-              accessToken: auth.accessToken!,
-              idToken: auth.idToken!
+              expiresAt: auth.expiresIn * 1000 + new Date().getTime(),
+              accessToken: auth.accessToken,
+              idToken: auth.idToken
             }
-            resolve({ data, redirectUrl })
+            resolve({ data, redirectUri })
           })
         } else {
           reject(new Error('No access token found in the url hash'))
@@ -158,13 +148,11 @@ export class Auth {
     })
   }
 
-  login(redirectUrl?: string) {
+  login() {
     let options: auth0.AuthorizeOptions = {}
-    if (redirectUrl) {
-      const nonce = uuid()
-      localStorage.setItem(nonce, redirectUrl)
-      options.state = nonce
-    }
+    const nonce = uuid()
+    localStorage.setItem(nonce, this.config.redirectUri)
+    options.state = nonce
     try {
       this.webAuth.authorize(options)
     } catch (e) {
@@ -174,10 +162,10 @@ export class Auth {
 
   restoreSession(): Promise<AuthData> {
     return new Promise((resolve, reject) => {
-      this.webAuth.checkSession({}, (err, auth) => {
+      this.webAuth.checkSession({}, (err: any, auth: any) => {
         if (err) {
-          this.store.dispatch(login(this.config.redirectUri))
-          return
+          this.store.dispatch(login())
+          return reject(err)
         }
         const result: AuthData = {
           email: auth.idTokenPayload.email,
