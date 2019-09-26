@@ -1,7 +1,7 @@
 import { getServerConfigurations } from '../../config/index'
 import { Profile } from './types'
 import { colorString } from './transformations/colorString'
-import { fixWearableIds } from './transformations/legacyProfilesToAvatar'
+import { fixWearableIds } from './transformations/processServerProfile'
 
 export const sexes = ['female', 'male']
 export const skins = ['7d5d47', '522c1c', 'cc9b77', 'f2c2a5', 'ffe4c6']
@@ -52,9 +52,10 @@ export async function generateRandomUserProfile(userId: string): Promise<Profile
     inventory: [],
     version: 0,
     name,
+    ethAddress: 'noeth',
     description: '',
-    updated_at: new Date().getDate(),
-    created_at: new Date().getDate(),
+    updatedAt: new Date().getDate(),
+    createdAt: new Date().getDate(),
     avatar: avatarV2,
     snapshots: {
       face: `${baseUrl}/face.png`,

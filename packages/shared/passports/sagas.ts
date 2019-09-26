@@ -34,7 +34,7 @@ import {
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getProfile, getProfileDownloadServer } from './selectors'
-import { legacyProfilesToAvatar } from './transformations/legacyProfilesToAvatar'
+import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
 import { Avatar, Catalog, Profile } from './types'
@@ -54,7 +54,7 @@ import { Avatar, Catalog, Profile } from './types'
  * It's *very* important for the renderer to never receive a passport with items that have not been loaded into the catalog.
  */
 export function* passportSaga(): any {
-  yield put(setProfileServer(getServerConfigurations().avatar.server))
+  yield put(setProfileServer(getServerConfigurations().profile))
   yield takeEvery(RENDERER_INITIALIZED, initialLoad)
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
@@ -87,8 +87,8 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
   try {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
-    const profile = yield call(legacyProfileRequest, serverUrl, accessToken)
-    const avatar = legacyProfilesToAvatar(profile.data)
+    const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
+    const avatar = processServerProfile(profile)
     yield put(inventoryRequest(userId))
     const inventoryResult = yield race({
       success: take(INVENTORY_SUCCESS),
@@ -106,9 +106,9 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
   }
 }
 
-export async function legacyProfileRequest(serverUrl: string, accessToken: string) {
+export async function profileServerRequest(serverUrl: string, userId: string, accessToken: string) {
   try {
-    const request = await fetch(`${serverUrl}api/profile/`, {
+    const request = await fetch(`${serverUrl}/profile/${userId}`, {
       headers: {
         Authorization: 'Bearer ' + accessToken
       }
