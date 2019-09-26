@@ -111,7 +111,9 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     if (inventoryResult2.failure) {
       defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult2.failure)
     } else {
-      randomizedUserProfile.avatar.inventory = (inventoryResult2.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      randomizedUserProfile.avatar.inventory = (inventoryResult2.success as InventorySuccess).payload.inventory.map(
+        dropIndexFromExclusives
+      )
     }
     yield put(passportRandom(userId, randomizedUserProfile))
   }
