@@ -26,5 +26,5 @@ textInput.onTextSubmit = new OnTextSubmit(x => {
   log('submitted text! ' + x.text)
 })
 textInput.onChanged = new OnChanged(x => {
-  log('text changed: ' + x.text)
+  log('text changed: ' + x.value)
 })
