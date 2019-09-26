@@ -14,7 +14,6 @@ import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/contr
 import { DevTools } from '../shared/apis/DevTools'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { chatObservable } from '../shared/comms/chat'
-import { getUserProfile } from '../shared/comms/peers'
 import { createLogger, defaultLogger, ILogger } from '../shared/logger'
 import { saveAvatarRequest } from '../shared/passports/actions'
 import { Avatar, Wearable } from '../shared/passports/types'
@@ -345,7 +344,6 @@ async function initializeDecentralandUI() {
   await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
-  unityInterface.LoadProfile(getUserProfile().profile)
 }
 
 let currentLoadedScene: SceneWorker
