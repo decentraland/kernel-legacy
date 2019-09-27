@@ -3,15 +3,10 @@ import { ProfileForRenderer } from 'decentraland-ecs/src'
 import { convertToRGBObject } from './convertToRGBObject'
 import { dropDeprecatedWearables } from './processServerProfile'
 export function profileToRendererFormat(profile: Profile): ProfileForRenderer {
-  const snapshots = profile.snapshots
-    ? {
-        face: profile.snapshots.face.replace('|', '%7C'),
-        body: profile.snapshots.body.replace('|', '%7C')
-      }
-    : {
-        face: '',
-        body: ''
-      }
+  const snapshots = profile.snapshots || { face: '', body: '' }
+  snapshots.face = snapshots.face.replace('|', '%7C')
+  snapshots.body = snapshots.body.replace('|', '%7C')
+
   return {
     ...profile,
     snapshots,
