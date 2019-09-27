@@ -30,7 +30,7 @@ import {
   stopParcelSceneWorker,
   loadParcelScene
 } from '../shared/world/parcelSceneManager'
-import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
+import { SceneWorker, hudWorkerUrl } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
@@ -40,7 +40,8 @@ import { chatObservable } from '../shared/comms/chat'
 import { getUserProfile } from '../shared/comms/peers'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
-import { Session } from 'shared/session'
+import { Session } from '../shared/session'
+import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 
 let gameInstance!: GameInstance
 
@@ -109,8 +110,16 @@ export function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }
 function ensureTeleportAnimation() {
-  document.getElementById('gameContainer')!.setAttribute('style', 'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;')
-  document.body.setAttribute('style', 'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;')
+  document
+    .getElementById('gameContainer')!
+    .setAttribute(
+      'style',
+      'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+    )
+  document.body.setAttribute(
+    'style',
+    'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+  )
 }
 
 const unityInterface = {
@@ -273,7 +282,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
-        ; (browserInterface as any)[type](message)
+        ;(browserInterface as any)[type](message)
       } else {
         defaultLogger.info(`Unknown message (did you forget to add ${type} to unity-interface/dcl.ts?)`, message)
       }
