@@ -8,11 +8,11 @@ export interface CallableLogin {
   login: any
   logout: () => void
   isExpired: (store: any) => boolean
-  handleCallback: () => Promise<{ data: any, redirectUri: string | undefined }>
+  handleCallback: () => Promise<{ data: any; redirectUri: string | undefined }>
   restoreSession: () => void
 }
 
-export function createSaga(callbackProvider: CallableLogin) {
+export function authSaga(callbackProvider: CallableLogin) {
   return function* authSaga(): any {
     yield fork(handleRestoreSession)
     yield all([
