@@ -65,7 +65,7 @@ describe('My example test', function() {
 
 1. Visit https://www.npmjs.com/package/decentraland-renderer -> “versions” tab and choose the wanted deployment tag
 2. In the repo's root directory run the following command: `npm install decentraland-renderer@[CHOSEN TAG]`
-3. Run `make watch` and the local kernel should already use the selected renderer
+3. Run `make watch` and the local kernel should already use the selected renderer (make sure to restart it if you are already running it).
 
 ## Copyright info
 
