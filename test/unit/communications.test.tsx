@@ -49,7 +49,7 @@ class MockWebSocket {
   }
 }
 
-describe('Communications', function() {
+describe('Communications', function () {
   describe('CommunicationArea', () => {
     function makePosition(x: number, z: number): Position {
       return [x, 0, z, 0, 0, 0, 0]
@@ -84,7 +84,7 @@ describe('Communications', function() {
 
     before(() => {
       // NOTE: little hack to be able to mock websocket requests
-      ;(window as any)['WebSocket'] = MockWebSocket
+      ; (window as any)['WebSocket'] = MockWebSocket
     })
 
     let connection: BrokerConnection
@@ -111,17 +111,18 @@ describe('Communications', function() {
         setRemoteDescription: sinon.stub(),
         setLocalDescription: sinon.stub(),
         createAnswer: sinon.stub(),
+        remoteDescription: true,
         onicecandidate: connection.webRtcConn!.onicecandidate,
         ondatachannel: connection.webRtcConn!.ondatachannel
       }
       connection.webRtcConn = mockWebRtc
-      ;(webSocket as any).readyState = SocketReadyState.OPEN
+        ; (webSocket as any).readyState = SocketReadyState.OPEN
 
       webSocket.send = sinon.stub()
     })
 
     after(() => {
-      ;(window as any)['WebSocket'] = ORIGINAL_WEB_SOCKET
+      ; (window as any)['WebSocket'] = ORIGINAL_WEB_SOCKET
     })
 
     describe('coordinator messages', () => {
@@ -180,7 +181,7 @@ describe('Communications', function() {
         connection.commServerAlias = 1
 
         const answer = { sdp: 'answer-sdp', type: 'answer' }
-        ;(connection.webRtcConn!.createAnswer as any).resolves(answer)
+          ; (connection.webRtcConn!.createAnswer as any).resolves(answer)
 
         const offer = { sdp: 'offer-sdp', type: 'offer' }
 
@@ -189,7 +190,7 @@ describe('Communications', function() {
         msg.setFromAlias(1)
         const encoder = new TextEncoder()
         msg.setData(encoder.encode(JSON.stringify(offer)))
-        ;(connection.webRtcConn! as any)['localDescription'] = answer
+          ; (connection.webRtcConn! as any)['localDescription'] = answer
         connection.gotCandidatesFuture.resolve(answer as any)
 
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
@@ -427,7 +428,7 @@ describe('Communications', function() {
         it('profile', () => {
           const p = [20, 20, 20, 20, 20, 20, 20] as Position
           const profile = {
-            version: 'version'
+            version: 0
           }
           worldConn.sendProfileMessage(p, profile)
 
@@ -437,7 +438,7 @@ describe('Communications', function() {
             expect(msg.getTopic()).to.equal('37:37')
 
             const data = ProfileData.deserializeBinary(msg.getBody() as Uint8Array)
-            expect(data.getProfileVersion()).to.equal('version')
+            expect(data.getProfileVersion()).to.equal('')
             return true
           })
         })
@@ -521,18 +522,37 @@ describe('Communications', function() {
     })
 
     describe('profile handler', () => {
+      beforeEach(() => {
+        (global as any).globalStore = {
+          getState: () => ({
+            passports: {
+              userInfo: {
+                userId1: {
+                  status: 'ok',
+                  data: {
+                    version: 'version'
+                  }
+                }
+              }
+            }
+          })
+        }
+      })
+      const fakeAuth: any = {
+        getAccessToken: () => Promise.resolve('access_token')
+      }
       it('new profile message', () => {
         const context = new Context({})
 
         const profileData = new ProfileData()
         profileData.setTime(Date.now())
-        profileData.setProfileVersion('version')
+        profileData.setProfileVersion('2')
 
         const info = new PeerTrackingInfo()
         sinon.spy(info, 'loadProfileIfNecessary')
         context.peerData.set('client2', info)
 
-        processProfileMessage(context, 'client2', 'userId1', profileData)
+        processProfileMessage(fakeAuth, context, 'client2', 'userId1', profileData)
 
         expect(context.peerData).to.have.key('client2')
         const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
@@ -540,7 +560,7 @@ describe('Communications', function() {
         expect(trackingInfo.userInfo).to.deep.equal({
           userId: 'userId1'
         })
-        expect(trackingInfo.loadProfileIfNecessary).to.have.been.calledWith('version')
+        expect(trackingInfo.loadProfileIfNecessary).to.have.been.calledWith(2)
       })
 
       it('old profile message', () => {
@@ -553,13 +573,13 @@ describe('Communications', function() {
 
         const profileData = new ProfileData()
         profileData.setTime(new Date(2008).getTime())
-        profileData.setProfileVersion('version1')
+        profileData.setProfileVersion('2')
 
-        processProfileMessage(context, 'client2', 'identity2', profileData)
+        processProfileMessage(fakeAuth, context, 'client2', 'identity2', profileData)
 
         expect(context.peerData).to.have.key('client2')
         const trackingInfo = context.peerData.get('client2') as PeerTrackingInfo
-        expect(trackingInfo.loadProfileIfNecessary).to.not.have.been.calledWith('version1')
+        expect(trackingInfo.loadProfileIfNecessary).to.not.have.been.calledWith('2')
       })
     })
   })

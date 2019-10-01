@@ -24,7 +24,7 @@ import { ILogger, defaultLogger } from 'shared/logger'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { IParcelSceneLimits } from 'atomicHelpers/landHelpers'
 import { measureObject3D, areBoundariesIgnored } from './utils/checkParcelSceneLimits'
-import { IEventNames, IEvents, PointerEvent } from 'decentraland-ecs/src/decentraland/Types'
+import { IEventNames, IEvents, InputEventResult } from 'decentraland-ecs/src/decentraland/Types'
 import { Observable, ReadOnlyVector3 } from 'decentraland-ecs/src'
 import { colliderMaterial } from './utils/colliders'
 import future from 'fp-future'
@@ -151,10 +151,10 @@ export class SharedSceneContext implements BABYLON.IDisposable {
     let audioClips = new Set<any>()
 
     this.disposableComponents.forEach($ => {
-      $.contributions.textures.forEach($ => textures.add($))
-      $.contributions.materials.forEach($ => materials.add($))
-      $.contributions.geometries.forEach($ => geometries.add($))
-      $.contributions.audioClips.forEach($ => audioClips.add($))
+      $.contributions.textures.forEach(($: any) => textures.add($))
+      $.contributions.materials.forEach(($: any) => materials.add($))
+      $.contributions.geometries.forEach(($: any) => geometries.add($))
+      $.contributions.audioClips.forEach(($: any) => audioClips.add($))
     })
 
     materials.delete(scene.defaultMaterial)
@@ -171,11 +171,11 @@ export class SharedSceneContext implements BABYLON.IDisposable {
   }
 
   on<T extends IEventNames>(event: T, cb: (data: IEvents[T]) => void) {
-    return this.eventSubscriber.on(event, cb)
+    return this.eventSubscriber.on(event as any, cb)
   }
 
   emit<T extends IEventNames>(event: T, data: IEvents[T]) {
-    this.eventSubscriber.emit(event, data)
+    this.eventSubscriber.emit(event as any, data)
   }
 
   /// #ECS.InitMessagesFinished: This message is sent after the scene ends executing the initialization code. Before the render loop.
@@ -336,6 +336,10 @@ export class SharedSceneContext implements BABYLON.IDisposable {
     }
   }
 
+  Query(system: string, config: any) {
+    // nothing to do here
+  }
+
   dispatchUUIDEvent(uuid: string, payload: any): void {
     this.eventSubscriber.emit('uuidEvent', {
       uuid,
@@ -345,14 +349,14 @@ export class SharedSceneContext implements BABYLON.IDisposable {
 
   sendPointerEvent(
     pointerEventType: 'pointerDown' | 'pointerUp',
-    pointerId: number,
+    buttonId: number,
     entityId: string,
     pickingResult: BABYLON.PickingInfo
   ) {
     if (!pickingResult.ray) return
 
-    const event: PointerEvent = {
-      pointerId,
+    const event: InputEventResult = {
+      buttonId,
       origin: {
         x: pickingResult.ray.origin.x - this.rootEntity.position.x,
         y: pickingResult.ray.origin.y - this.rootEntity.position.y,

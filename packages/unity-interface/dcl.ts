@@ -1,4 +1,5 @@
 declare var window: any
+declare var global: any
 
 type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
@@ -6,46 +7,44 @@ type GameInstance = {
 
 import { IFuture } from 'fp-future'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
-
+import { Session } from 'shared/session'
+import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
+import { DEBUG, ENGINE_DEBUG_PANEL, playerConfigurations, SCENE_DEBUG_PANEL, EDITOR } from '../config'
+import { Quaternion, ReadOnlyQuaternion, ReadOnlyVector3, Vector3 } from '../decentraland-ecs/src/decentraland/math'
+import { IEventNames, IEvents, ProfileForRenderer } from '../decentraland-ecs/src/decentraland/Types'
+import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
+import { DevTools } from '../shared/apis/DevTools'
+import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
+import { chatObservable } from '../shared/comms/chat'
+import { createLogger, defaultLogger, ILogger } from '../shared/logger'
+import { saveAvatarRequest } from '../shared/passports/actions'
+import { Avatar, Wearable } from '../shared/passports/types'
 import {
-  LoadableParcelScene,
   EntityAction,
   EnvironmentData,
-  ILandToLoadableParcelScene,
-  ILandToLoadableParcelSceneUpdate,
-  IScene,
-  MappingsResponse,
+  HUDConfiguration,
   ILand,
-  Profile
+  ILandToLoadableParcelScene,
+  InstancedSpawnPoint,
+  IScene,
+  LoadableParcelScene,
+  MappingsResponse,
+  Notification,
+  ILandToLoadableParcelSceneUpdate
 } from '../shared/types'
-import { DevTools } from '../shared/apis/DevTools'
-import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
-import { ILogger, createLogger, defaultLogger } from '../shared/logger'
-import {
-  positionObservable,
-  lastPlayerPosition,
-  getWorldSpawnpoint,
-  teleportObservable
-} from '../shared/world/positionThings'
+import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
   enableParcelSceneLoading,
-  getSceneWorkerBySceneID,
   getParcelSceneID,
-  stopParcelSceneWorker,
-  loadParcelScene
+  getSceneWorkerBySceneID,
+  loadParcelScene,
+  stopParcelSceneWorker
 } from '../shared/world/parcelSceneManager'
-import { SceneWorker, ParcelSceneAPI, hudWorkerUrl } from '../shared/world/SceneWorker'
+import { positionObservable, teleportObservable } from '../shared/world/positionThings'
+import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
-import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
-import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
-import { IEventNames, IEvents } from '../decentraland-ecs/src/decentraland/Types'
-import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from '../decentraland-ecs/src/decentraland/math'
-import { DEBUG, ENGINE_DEBUG_PANEL, SCENE_DEBUG_PANEL, EDITOR, parcelLimits, playerConfigurations } from '../config'
-import { chatObservable } from '../shared/comms/chat'
-import { queueTrackingEvent } from '../shared/analytics'
-import { getUserProfile } from '../shared/comms/peers'
-import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
 
 let gameInstance!: GameInstance
 
@@ -72,7 +71,6 @@ const browserInterface = {
   },
 
   ReportMousePosition(data: { id: string; mousePosition: ReadOnlyVector3 }) {
-    console.log('ReportMousePosition:' + data.mousePosition)
     positionEvent.mousePosition.set(data.mousePosition.x, data.mousePosition.y, data.mousePosition.z)
     positionObservable.notifyObservers(positionEvent)
     futures[data.id].resolve(data.mousePosition)
@@ -80,7 +78,6 @@ const browserInterface = {
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
     const scene = getSceneWorkerBySceneID(data.sceneId)
-
     if (scene) {
       const parcelScene = scene.parcelScene as UnityParcelScene
       parcelScene.emit(data.eventType as IEventNames, data.payload)
@@ -89,8 +86,20 @@ const browserInterface = {
     }
   },
 
+  OpenWebURL(data: { url: string }) {
+    window.open(data.url, '_blank')
+  },
+
   PreloadFinished(data: { sceneId: string }) {
     // stub. there is no code about this in unity side yet
+  },
+
+  LogOut() {
+    Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
+  },
+
+  SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
+    global.globalStore.dispatch(saveAvatarRequest(data))
   },
 
   ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
@@ -116,9 +125,21 @@ const browserInterface = {
   }
 }
 
-function setLoadingScreenVisible(shouldShow: boolean) {
+export function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
   document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
+}
+function ensureTeleportAnimation() {
+  document
+    .getElementById('gameContainer')!
+    .setAttribute(
+      'style',
+      'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+    )
+  document.body.setAttribute(
+    'style',
+    'background: #151419 url(images/teleport.gif) no-repeat center !important; background-size: 194px 257px !important;'
+  )
 }
 
 export const unityInterface = {
@@ -126,7 +147,7 @@ export const unityInterface = {
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
   },
-  LoadProfile(profile: Profile) {
+  LoadProfile(profile: ProfileForRenderer) {
     gameInstance.SendMessage('SceneController', 'LoadProfile', JSON.stringify(profile))
   },
   CreateUIScene(data: { id: string; baseUrl: string }) {
@@ -138,11 +159,12 @@ export const unityInterface = {
      */
     gameInstance.SendMessage('SceneController', 'CreateUIScene', JSON.stringify(data))
   },
-  /** Sends the camera position to the engine */
-  SetPosition(x: number, y: number, z: number) {
-    let theY = y <= 0 ? 2 : y
+  /** Sends the camera position & target to the engine */
+  Teleport({ position: { x, y, z }, cameraTarget }: InstancedSpawnPoint) {
+    const theY = y <= 0 ? 2 : y
 
-    gameInstance.SendMessage('CharacterController', 'SetPosition', JSON.stringify({ x, y: theY, z }))
+    ensureTeleportAnimation()
+    gameInstance.SendMessage('CharacterController', 'Teleport', JSON.stringify({ x, y: theY, z, cameraTarget }))
   },
   /** Tells the engine which scenes to load */
   LoadParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
@@ -193,6 +215,48 @@ export const unityInterface = {
 
   SetBuilderReady() {
     gameInstance.SendMessage('SceneController', 'BuilderReady')
+  },
+
+  AddWearablesToCatalog(wearables: Wearable[]) {
+    for (let wearable of wearables) {
+      gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
+    }
+  },
+
+  RemoveWearablesFromCatalog(wearableIds: string[]) {
+    gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
+  },
+
+  ClearWearableCatalog() {
+    gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
+  },
+
+  ShowNotification(notification: Notification) {
+    gameInstance.SendMessage('HUDController', 'ShowNotification', JSON.stringify(notification))
+  },
+
+  ConfigureMinimapHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
+  },
+
+  ConfigureAvatarHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureAvatarHUD', JSON.stringify(configuration))
+  },
+
+  ConfigureNotificationHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
+  }
+}
+
+export const HUD: Record<string, { configure: (config: HUDConfiguration) => void }> = {
+  Minimap: {
+    configure: unityInterface.ConfigureMinimapHUD
+  },
+  Avatar: {
+    configure: unityInterface.ConfigureAvatarHUD
+  },
+  Notification: {
+    configure: unityInterface.ConfigureNotificationHUD
   }
 }
 
@@ -259,12 +323,17 @@ export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *
+ * Common initialization logic for the unity engine
+ *
+ * @param _gameInstance Unity game instance
+ */
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
   setLoadingScreenVisible(true)
 
-  unityInterface.SetPosition(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerPosition.z)
   unityInterface.DeactivateRendering()
 
   if (DEBUG) {
@@ -288,7 +357,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
         // tslint:disable-next-line:semicolon
         ;(browserInterface as any)[type](message)
       } else {
-        defaultLogger.info('MessageFromEngine', type, message)
+        defaultLogger.info(`Unknown message (did you forget to add ${type} to unity-interface/dcl.ts?)`, message)
       }
     }
   }
@@ -309,11 +378,6 @@ export async function startUnityParcelLoading(downloadManager?: SceneDataDownloa
       // 2) await for preload message or timeout
       // 3) return
     },
-    onSpawnpoint: initialLand => {
-      const newPosition = getWorldSpawnpoint(initialLand)
-      unityInterface.SetPosition(newPosition.x, newPosition.y, newPosition.z)
-      queueTrackingEvent('Scene Spawn', { parcel: initialLand.scene.scene.base, spawnpoint: newPosition })
-    },
     onLoadParcelScenes: lands => {
       unityInterface.LoadParcelScenes(
         lands.map($ => {
@@ -328,11 +392,11 @@ export async function startUnityParcelLoading(downloadManager?: SceneDataDownloa
         unityInterface.UnloadScene($.sceneId)
       })
     },
-    onPositionSettled: () => {
+    onPositionSettled: spawnPoint => {
+      unityInterface.Teleport(spawnPoint)
       unityInterface.ActivateRendering()
     },
     onPositionUnsettled: () => {
-      setLoadingScreenVisible(true)
       unityInterface.DeactivateRendering()
     }
   })
@@ -355,7 +419,6 @@ async function initializeDecentralandUI() {
   await ensureUiApis(worker)
 
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
-  unityInterface.LoadProfile(getUserProfile().profile)
 }
 
 // Builder functions
@@ -467,10 +530,13 @@ export async function loadPreviewScene() {
     }
 
     unityInterface.LoadParcelScenes([target])
+
+    defaultLogger.info('finish...')
+
+    return defaultScene
   } else {
     throw new Error('Could not load scene.json')
   }
-  defaultLogger.info('finish...')
 }
 
 export function loadBuilderScene(sceneData: ILand) {
@@ -525,7 +591,8 @@ export function setBuilderArrowKeyDown(key: string) {
 }
 
 teleportObservable.add((position: { x: number; y: number }) => {
-  unityInterface.SetPosition(position.x * parcelLimits.parcelSize, 0, position.y * parcelLimits.parcelSize)
+  // before setting the new position, show loading screen to avoid showing an empty world
+  setLoadingScreenVisible(true)
 })
 
 worldRunningObservable.add(isRunning => {

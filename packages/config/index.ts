@@ -40,6 +40,7 @@ export namespace parcelLimits {
   export const centimeter = 0.01
 
   export const visibleRadius = 4
+  export const secureRadius = 4
 
   export const maxX = 3000
   export const maxZ = 3000
@@ -86,12 +87,14 @@ export const STATIC_WORLD = location.search.indexOf('STATIC_WORLD') !== -1 || !!
 
 // Development
 export const ENABLE_WEB3 = location.search.indexOf('ENABLE_WEB3') !== -1 || !!(global as any).enableWeb3 || EDITOR
+export const ENV_OVERRIDE = location.search.indexOf('ENV') !== -1
 export const USE_LOCAL_COMMS = location.search.indexOf('LOCAL_COMMS') !== -1 || PREVIEW
 export const DEBUG = location.search.indexOf('DEBUG_MODE') !== -1 || !!(global as any).mocha || PREVIEW || EDITOR
 export const DEBUG_ANALYTICS = location.search.indexOf('DEBUG_ANALYTICS') !== -1
 export const DEBUG_MOBILE = location.search.indexOf('DEBUG_MOBILE') !== -1
 export const DEBUG_MESSAGES = location.search.indexOf('DEBUG_MESSAGES') !== -1
 export const DEBUG_WS_MESSAGES = location.search.indexOf('DEBUG_WS_MESSAGES') !== -1
+export const DEBUG_REDUX = location.search.indexOf('DEBUG_REDUX') !== -1
 
 export const DISABLE_AUTH = location.search.indexOf('DISABLE_AUTH') !== -1 || DEBUG
 export const ENGINE_DEBUG_PANEL = location.search.indexOf('ENGINE_DEBUG_PANEL') !== -1
@@ -119,11 +122,26 @@ export namespace commConfigurations {
       urls: 'stun:stun4.l.google.com:19302'
     },
     {
-      urls: 'turn:184.73.100.50:3478',
+      urls: 'turn:stun.decentraland.org:3478',
       credential: 'passworddcl',
       username: 'usernamedcl'
     }
   ]
+}
+export const loginConfig = {
+  org: {
+    domain: 'decentraland.auth0.com',
+    client_id: 'yqFiSmQsxk3LK46JOIB4NJ3wK4HzZVxG'
+  },
+  today: {
+    domain: 'dcl-stg.auth0.com',
+    client_id: '0UB0I7w6QA3AgSvbXh9rGvDuhKrJV1C0'
+  },
+  zone: {
+    domain: 'dcl-test.auth0.com',
+    client_id: 'lTUEMnFpYb0aiUKeIRPbh7pBxKM6sccx'
+  },
+  audience: 'decentraland.org'
 }
 
 // take address from http://contracts.decentraland.org/addresses.json
@@ -138,6 +156,9 @@ let contracts: any = null
 let network: ETHEREUM_NETWORK | null = null
 
 export function getTLD() {
+  if (ENV_OVERRIDE) {
+    return window.location.search.match(/ENV=(\w+)/)[1]
+  }
   if (window) {
     return window.location.hostname.match(/(\w+)$/)[0]
   }
@@ -147,6 +168,9 @@ export const knownTLDs = ['zone', 'org', 'today']
 
 function getDefaultTLD() {
   const TLD = getTLD()
+  if (ENV_OVERRIDE) {
+    return TLD
+  }
 
   // web3 is now disabled by default
   if (!ENABLE_WEB3 && TLD === 'localhost') {
@@ -160,18 +184,38 @@ function getDefaultTLD() {
   return TLD
 }
 
+export function getLoginConfigurationForCurrentDomain() {
+  let tld: 'org' | 'zone' | 'today' = getDefaultTLD()
+  // Use `.zone` auth for any localhost or other edge case
+  if ((tld as any) !== 'org' && (tld as any) !== 'zone' && (tld as any) !== 'today') {
+    tld = 'zone'
+  }
+  return {
+    clientId: loginConfig[tld].client_id,
+    domain: loginConfig[tld].domain,
+    redirectUri: window.location.origin + '/' + (ENV_OVERRIDE ? '?ENV=' + getTLD() : ''),
+    audience: loginConfig.audience
+  }
+}
+
+export const ENABLE_EMPTY_SCENES = !DEBUG || knownTLDs.includes(getTLD())
+
 export function getServerConfigurations() {
   const TLDDefault = getDefaultTLD()
   return {
     auth: `https://auth.decentraland.${TLDDefault}/api/v1`,
     landApi: `https://api.decentraland.${TLDDefault}/v1`,
-    content: `https://content.decentraland.${TLDDefault}`,
+    content: `https://content.decentraland.${TLDDefault === 'today' ? 'org' : TLDDefault}`,
     worldInstanceUrl: `wss://world-comm.decentraland.${TLDDefault}/connect`,
     profile: `https://profile.decentraland.${TLDDefault}/api/v1`,
+    wearablesApi: `https://dcl-wearable-api.now.sh`,
     avatar: {
+      // avatars-api.decentraland.zone is down
+      snapshotStorage: `https://avatars-storage.decentraland.${TLDDefault}/`,
+      server: `https://avatars-api.decentraland.${TLDDefault === 'zone' ? 'today' : TLDDefault}/`,
       catalog: 'https://avatar-assets.now.sh',
       contents: `https://s3.amazonaws.com/content-service.decentraland.org/`,
-      presets: `https://s3.amazonaws.com/avatars-storage.decentraland.org/mobile-avatars`
+      presets: `https://avatars-storage.decentraland.org/mobile-avatars`
     },
     darApi:
       TLDDefault === 'zone' || TLDDefault === 'today'
@@ -181,21 +225,37 @@ export function getServerConfigurations() {
 }
 
 export async function setNetwork(net: ETHEREUM_NETWORK) {
-  const response = await fetch('https://contracts.decentraland.org/addresses.json')
-  const json = await response.json()
+  try {
+    const response = await fetch('https://contracts.decentraland.org/addresses.json')
+    const json = await response.json()
 
-  network = net
-  contracts = json[net]
+    network = net
+    contracts = json[net]
 
-  decentralandConfigurations = {
-    contractAddress: contracts.LANDProxy,
-    contracts: {
-      serviceLocator: contracts.ServiceLocator
-    },
-    paymentTokens: {
-      MANA: contracts.MANAToken
-    },
-    invite: contracts.DecentralandInvite
+    decentralandConfigurations = {
+      contractAddress: contracts.LANDProxy,
+      contracts: {
+        serviceLocator: contracts.ServiceLocator
+      },
+      paymentTokens: {
+        MANA: contracts.MANAToken
+      }
+    }
+  } catch (e) {
+    // Could not fetch addresses. You might be offline. Setting sensitive defaults for contract addresses...
+
+    network = net
+    contracts = {}
+
+    decentralandConfigurations = {
+      contractAddress: '',
+      contracts: {
+        serviceLocator: ''
+      },
+      paymentTokens: {
+        MANA: ''
+      }
+    }
   }
 }
 

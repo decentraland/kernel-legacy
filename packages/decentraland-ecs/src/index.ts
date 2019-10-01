@@ -35,10 +35,15 @@ if (typeof dcl !== 'undefined') {
   engine.addSystem(new DecentralandSynchronizationSystem(dcl), Infinity)
 }
 
-import { uuidEventSystem } from './decentraland/Systems'
+import { uuidEventSystem, pointerEventSystem, raycastEventSystem } from './decentraland/Systems'
 
 // Initialize UUID Events system
 engine.addSystem(uuidEventSystem)
+// Initialize Pointer Events System
+engine.addSystem(pointerEventSystem)
+
+// Initialize Raycast Events System
+engine.addSystem(raycastEventSystem)
 
 // DECENTRALAND DEPENDENCIES
 export * from './decentraland/Types'
@@ -55,5 +60,6 @@ export * from './decentraland/UIShapes'
 export * from './decentraland/AvatarShape'
 export * from './decentraland/UIEvents'
 export * from './decentraland/MessageBus'
+export * from './decentraland/PhysicsCast'
 
 export { engine }

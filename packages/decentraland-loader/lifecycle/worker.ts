@@ -7,7 +7,7 @@ import { ParcelLifeCycleController } from './controllers/parcel'
 import { SceneLifeCycleController, SceneLifeCycleStatusReport } from './controllers/scene'
 import { PositionLifecycleController } from './controllers/position'
 import { SceneDataDownloadManager } from './controllers/download'
-import { ILand } from 'shared/types'
+import { ILand, InstancedSpawnPoint } from 'shared/types'
 import defaultLogger from 'shared/logger'
 
 export type LifecycleWorkerOptions = {
@@ -38,76 +38,59 @@ let downloadManager: SceneDataDownloadManager
  * - 'Scene.prefetchDone' { sceneId: string }
  */
 {
-  connector.on('Lifecycle.initialize', (options: LifecycleWorkerOptions) => {
-    if (options.mockedDownloadManager) {
-      downloadManager = getMockedDownloaderManager(connector)
-    } else {
+  connector.on(
+    'Lifecycle.initialize',
+    (options: { contentServer: string; lineOfSightRadius: number; secureRadius: number; emptyScenes: boolean }) => {
       downloadManager = new SceneDataDownloadManager({ contentServer: options.contentServer })
-    }
-    parcelController = new ParcelLifeCycleController({ lineOfSightRadius: options.lineOfSightRadius })
-    sceneController = new SceneLifeCycleController({ downloadManager })
-    positionController = new PositionLifecycleController(parcelController, sceneController)
-
-    parcelController.on('Sighted', (parcels: string[]) => connector.notify('Parcel.sighted', { parcels }))
-    parcelController.on('Lost sight', (parcels: string[]) => connector.notify('Parcel.lostSight', { parcels }))
-
-    positionController.on('Settled Position', (sceneId: string) => {
-      connector.notify('Position.settled', { sceneId })
-    })
-    positionController.on('Unsettled Position', () => {
-      connector.notify('Position.unsettled')
-    })
-
-    sceneController.on('Start scene', sceneId => {
-      connector.notify('Scene.shouldStart', { sceneId })
-    })
-    sceneController.on('Preload scene', sceneId => {
-      connector.notify('Scene.shouldPrefetch', { sceneId })
-    })
-    sceneController.on('Unload scene', sceneId => {
-      connector.notify('Scene.shouldUnload', { sceneId })
-    })
-
-    connector.on('User.setPosition', (opt: { position: { x: number; y: number }; teleported: boolean }) => {
-      positionController.reportCurrentPosition(opt.position, opt.teleported).catch(e => {
-        defaultLogger.error(`error while resolving new scenes around`)
-        defaultLogger.error(e)
+      parcelController = new ParcelLifeCycleController({
+        lineOfSightRadius: options.lineOfSightRadius,
+        secureRadius: options.secureRadius
       })
-    })
+      sceneController = new SceneLifeCycleController({ downloadManager, enabledEmpty: options.emptyScenes })
+      positionController = new PositionLifecycleController(downloadManager, parcelController, sceneController)
 
-    connector.on('Scene.dataRequest', async (data: { sceneId: string }) =>
-      connector.notify('Scene.dataResponse', {
-        data: (await downloadManager.getParcelDataBySceneId(data.sceneId)) as ILand
+      parcelController.on('Sighted', (parcels: string[]) => connector.notify('Parcel.sighted', { parcels }))
+      parcelController.on('Lost sight', (parcels: string[]) => connector.notify('Parcel.lostSight', { parcels }))
+
+      positionController.on('Settled Position', (spawnPoint: InstancedSpawnPoint) => {
+        connector.notify('Position.settled', { spawnPoint })
       })
-    )
+      positionController.on('Unsettled Position', () => {
+        connector.notify('Position.unsettled')
+      })
+      positionController.on('Tracking Event', (event: { name: string; data: any }) =>
+        connector.notify('Event.track', event)
+      )
 
-    connector.on('Scene.prefetchDone', (opt: { sceneId: string }) => {
-      sceneController.reportDataLoaded(opt.sceneId)
-    })
+      sceneController.on('Start scene', sceneId => {
+        connector.notify('Scene.shouldStart', { sceneId })
+      })
+      sceneController.on('Preload scene', sceneId => {
+        connector.notify('Scene.shouldPrefetch', { sceneId })
+      })
+      sceneController.on('Unload scene', sceneId => {
+        connector.notify('Scene.shouldUnload', { sceneId })
+      })
 
-    connector.on('Scene.status', (data: SceneLifeCycleStatusReport) => {
-      sceneController.reportStatus(data.sceneId, data.status)
-    })
-  })
-}
-
-function getMockedDownloaderManager(connector: Adapter): SceneDataDownloadManager {
-  return {
-    getParcelData: position => {
-      connector.notify('getParcelData', { position })
-      return new Promise(resolve => {
-        connector.on('DownloaderManager.getParcelData', ({ scene }: { scene: ILand | null }) => {
-          resolve(scene)
+      connector.on('User.setPosition', (opt: { position: { x: number; y: number }; teleported: boolean }) => {
+        positionController.reportCurrentPosition(opt.position, opt.teleported).catch(e => {
+          defaultLogger.error(`error while resolving new scenes around`, e)
         })
       })
-    },
-    getParcelDataBySceneId: id => {
-      connector.notify('getParcelDataBySceneId', { id })
-      return new Promise(resolve => {
-        connector.on('DownloaderManager.getParcelDataBySceneId', ({ scene }: { scene: ILand | null }) => {
-          resolve(scene)
+
+      connector.on('Scene.dataRequest', async (data: { sceneId: string }) =>
+        connector.notify('Scene.dataResponse', {
+          data: (await downloadManager.getParcelDataBySceneId(data.sceneId)) as ILand
         })
+      )
+
+      connector.on('Scene.prefetchDone', (opt: { sceneId: string }) => {
+        sceneController.reportDataLoaded(opt.sceneId)
+      })
+
+      connector.on('Scene.status', (data: SceneLifeCycleStatusReport) => {
+        sceneController.reportStatus(data.sceneId, data.status)
       })
     }
-  } as SceneDataDownloadManager
+  )
 }

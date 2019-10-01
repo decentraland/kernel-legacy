@@ -8,7 +8,7 @@ import { resolveUrl } from 'atomicHelpers/parseUrl'
 import { ILand } from 'shared/types'
 import defaultLogger from 'shared/logger'
 import { SceneDataDownloadManager } from './controllers/download'
-import { DEBUG, parcelLimits, getServerConfigurations } from '../../config'
+import { DEBUG, parcelLimits, getServerConfigurations, ENABLE_EMPTY_SCENES } from '../../config'
 
 /*
  * The worker is set up on the first require of this file
@@ -56,7 +56,9 @@ export async function initParcelSceneWorker(downloadManager?: SceneDataDownloadM
   server.notify('Lifecycle.initialize', {
     contentServer: DEBUG ? resolveUrl(document.location.origin, '/local-ipfs') : getServerConfigurations().content,
     lineOfSightRadius: parcelLimits.visibleRadius,
-    mockedDownloadManager: !!downloadManager
+    mockedDownloadManager: !!downloadManager,
+    secureRadius: parcelLimits.secureRadius,
+    emptyScenes: ENABLE_EMPTY_SCENES && !(globalThis as any)['isRunningTests']
   })
 
   if (downloadManager) {

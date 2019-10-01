@@ -10,20 +10,21 @@ jobs:
     working_directory: /tmp/explorer
     steps:
       # Install lfs
-      - run: mkdir -p ~/.ssh
-      - run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-      - run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-      # The `ledger-wallet-provider` lib has `node-hid` as a dependency, which won't build on certain
-      # Linux systems without installing libusb first
-      - run: sudo apt-get update && sudo apt-get install -y git-lfs=2.7.2 libusb-1.0-0 libusb-1.0-0-dev
-      - run: ssh git@github.com git-lfs-authenticate decentraland/explorer.git download
-      - run: git lfs install
-
+      - run:
+          name: 'Install git-lfs'
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+            sudo apt-get update && sudo apt-get install -y git-lfs=2.7.2
+            ssh git@github.com git-lfs-authenticate decentraland/kernel.git download
+            git lfs install
       # checkout the actual code
       - checkout
 
       # restore cached lfs
       - restore_cache:
+          name: Restore large files from github's lfs repo
           keys:
             - gitlfs-{{ .Branch }}
             - gitlfs
@@ -32,39 +33,69 @@ jobs:
           command: |
             while true; do git reset --hard HEAD && git clean -fd && git lfs pull && break; done
       - save_cache:
+          name: Store large files in cache
           key: gitlfs-{{ .Branch }}
           paths:
             - .git/lfs
-
-      # restore node_modules
       - restore_cache:
+          name: Restoring node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
-
-      # install differences in node_modules
-      - run: npm ci
+      - run:
+          name: Install differences in node_modules
+          command: |
+            npm i
+            git checkout -- package-lock.json
       - save_cache:
+          name: Store node_modules cache
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
-
-      - run: make lint
-      - run: npm outdated --depth 0 || true
-
-      - run: make test-ci
-
+      - run:
+          name: Run linters and checks
+          command: |
+            make lint
+            npm outdated --depth 0 || true
+      - run:
+          name: Build decentraland-ecs
+          command: |
+            make build-essentials
+            mkdir -p scene-cache
+            cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
+            find public -name *.ts | xargs shasum packages/decentraland-ecs/dist/index.d.ts static/systems/scene.system.js | sort > .compiled-scene-checksum
+      - restore_cache:
+          name: Restore cached test scenes, part I
+          keys:
+            - compiled-scenes-{{ checksum ".compiled-scene-checksum" }}
+      - run:
+          name: Restore cached test scenes, part II
+          command: |
+            touch static/systems/scene.system.js
+            cd scene-cache && find . -name '*.js' | xargs -I{} cp -f -t ../public/ --parents {}; cd ..
+            for compiled in `find public -name '*.js'`; do touch $compiled; done
+      - run:
+          name: Build scenes
+          command: |
+            make test-scenes
+      - run:
+          name: Build cache of test scenes
+          command: |
+            cd public && find . -name '*.js' | xargs -I{} cp -f -t ../scene-cache/ --parents {}; cd ..
+      - save_cache:
+          name: Store cached test scenes
+          paths:
+            - static/systems/scene.system.js
+            - scene-cache
+          key: compiled-scenes-{{ checksum ".compiled-scene-checksum" }}
+      - run:
+          name: Run tests
+          command: |
+            make test-ci
+            npx codecov
       - store_artifacts:
+          name: Save screenshots of visual tests
           path: test/diff
           when: on_fail
-
-      - store_artifacts:
-          path: coverage
-
-      - run:
-          name: send coverage to codecov
-          command: npx codecov
-
       - store_artifacts:
           path: packages/decentraland-ecs/api-docs-review/decentraland-ecs.api.ts
           when: on_fail
@@ -72,71 +103,54 @@ jobs:
           path: packages/decentraland-ecs/temp/decentraland-ecs.api.ts
           when: on_fail
 
+      - run:
+          name: Build deployment dist
+          command: |
+            make build-deploy
       - save_cache:
+          name: Save the built files
           paths:
             - static
           key: build-{{ .Revision }}
       - save_cache:
+          name: Save the files required to release an SDK version
           paths:
             - Makefile
             - packages
             - scripts
+            - tsconfig.json
             - package-lock.json
             - package.json
             - .git
-          key: build-npm-{{ .Revision }}
+          key: build-sdk-{{ .Revision }}
 
-  publish-ecs-latest:
+  publish-ecs:
     docker:
       - image: circleci/node:10-browsers
     working_directory: /tmp/explorer
     steps:
-      # restore build files
       - restore_cache:
+          name: Restore built files
           keys:
             - build-{{ .Revision }}
       - restore_cache:
+          name: Restore sdk-release files
           keys:
-            - build-npm-{{ .Revision }}
-      # restore node_modules
+            - build-sdk-{{ .Revision }}
       - restore_cache:
+          name: Restore node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
       - run:
-          name: Set up NPM
+          name: Copy Unity build to target directory
+          command: cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/
+      - run:
+          name: Set up NPM access tokens
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           when: on_success
 
       - run:
-          name: publish decentraland-api
-          command: make publish
-          when: on_success
-
-  publish-ecs-next:
-    docker:
-      - image: circleci/node:10-browsers
-    working_directory: /tmp/explorer
-    steps:
-      # restore build files
-      - restore_cache:
-          keys:
-            - build-{{ .Revision }}
-      - restore_cache:
-          keys:
-            - build-npm-{{ .Revision }}
-      # restore node_modules
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
-      - run:
-          name: Set up NPM
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          when: on_success
-
-      - run:
-          name: publish decentraland-api
+          name: Publish a new version of decentraland-ecs
           command: make publish
           when: on_success
 
@@ -197,11 +211,7 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_DEV_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_DEV_SECRET_ACCESS_KEY}
       - run:
-          name: Deploy tag to .today/tags/${CIRCLE_TAG}
-          command: |
-            aws s3 sync static s3://explorer.decentraland.today/tags/${CIRCLE_TAG} --exclude "tags/*" --acl public-read
-      - run:
-          name: Deploy tag to .today
+          name: Deploy to .today
           command: |
             aws s3 sync static s3://explorer.decentraland.today/ --exclude "tags/*" --acl public-read
       - run:
@@ -225,11 +235,7 @@ jobs:
           command: |
             aws configure set aws_access_key_id ${AWS_PRD_ACCESS_KEY_ID} && aws configure set aws_secret_access_key ${AWS_PRD_SECRET_ACCESS_KEY}
       - run:
-          name: Deploy tag to .org/tags/${CIRCLE_TAG}
-          command: |
-            aws s3 sync static s3://explorer.decentraland.org/tags/${CIRCLE_TAG} --exclude "tags/*" --acl public-read
-      - run:
-          name: Deploy tag to .org
+          name: Deploy to .org
           command: |
             aws s3 sync static s3://explorer.decentraland.org/ --exclude "tags/*" --acl public-read
       - run:
@@ -247,66 +253,59 @@ workflows:
     jobs:
       - build:
           filters:
-            tags:
-              only: /.*/
-      - hold-explorer:
-          type: approval
-          requires:
-            - build
-          filters:
             branches:
-              ignore: /.*/
+              only: /(.*)/
             tags:
-              only: /^\d+\.\d+\.\d(.*)/
-      - hold-ecs:
-          type: approval
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
-      - deploy-on-pr:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: master
+              only: /^\d+\.\d+\.\d(.*)/ # npm tag + latest
+
+      # explorer master + pr branch jobs (deploy to dev + pr dev)
       - deploy-dev:
           requires:
             - build
           filters:
             branches:
               only: master
-      - publish-ecs-next:
+      - deploy-on-pr:
           requires:
             - build
           filters:
             branches:
-              only: master
+              ignore:
+                - master
+                - staging
+                - release
+
+      # ecs publish jobs (publish as next + latest depending on context branch/tag)
+      # TODO - deploy from release branch + add an additional 'dev' tag to npm replacing 'next' + use 'next' for stg releases
+      - hold-ecs:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /(.*)/ # on branch: master we don't want to hold, but publish after the build is done
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/ # npm tag + latest
+      - publish-ecs:
+          requires:
+            - build # on master we don't hold, but publish to next right after the build is done
+            - hold-ecs # on tags we wait until there's an approval
+          filters:
+            branches:
+              only: master # next
+            tags:
+              only: /^\d+\.\d+\.\d(.*)/ # npm tag + latest
+
       - deploy-stg:
           requires:
             - build
-            - deploy-dev
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
+              only: staging
+
       - deploy-prd:
           requires:
-            - hold-explorer
+            - build
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
-      - publish-ecs-latest:
-          requires:
-            - hold-ecs
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d(.*)/
+              only: release

@@ -4,6 +4,10 @@ import { ILand, IScene, ParcelInfoResponse } from 'shared/types'
 import { jsonFetch } from 'atomicHelpers/jsonFetch'
 import { createLogger } from 'shared/logger'
 
+const origin = globalThis.origin
+
+const emptyScenes = require('./emptyScenes.json')
+
 const logger = createLogger('loader')
 const { error } = logger
 
@@ -42,53 +46,60 @@ export class SceneDataDownloadManager {
     return this.resolveLandData(sceneId)
   }
 
-  private async resolveSceneSceneId(pos: string): Promise<string | null> {
-    if (this.positionToSceneId.has(pos)) {
-      return this.positionToSceneId.get(pos)!
-    }
-    const promised = future<string | null>()
-    this.positionToSceneId.set(pos, promised)
-    const nw = pos.split(',').map($ => parseInt($, 10))
-    const responseContent = await fetch(
-      this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
-    )
-
-    if (!responseContent.ok) {
-      error(`Error in ${this.options.contentServer}/scenes response!`, responseContent)
-      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
-      promised.reject(ret)
-      throw ret
-    } else {
-      const contents = (await responseContent.json()) as SceneMappingResponse
-      if (!contents.data.length) {
-        promised.resolve(null)
-        return null
+  createFakeILand(sceneId: string) {
+    const coordinates = sceneId.replace('empty-', '')
+    const pick = ((coordinates.split(',').reduce((prev, next) => prev + Math.abs(parseInt(next, 10)), 0) % 12) + 1)
+      .toString()
+      .padStart(2, '0')
+    return {
+      sceneId: sceneId,
+      baseUrl: origin + '/loader/empty-scenes/Tile1M_' + pick + '/',
+      scene: {
+        display: { title: 'Empty parcel' },
+        owner: '',
+        contact: {},
+        main: 'bin/game.js',
+        tags: [],
+        scene: { parcels: [coordinates], base: coordinates },
+        policy: {},
+        communications: { commServerUrl: '' }
+      },
+      mappingsResponse: {
+        parcel_id: coordinates,
+        contents: [
+          {
+            file: 'scene.json',
+            hash: 'scene.json'
+          },
+          {
+            file: 'bin/game.js',
+            hash: 'bin/game.js'
+          }
+        ].concat(emptyScenes[pick]),
+        root_cid: sceneId,
+        publisher: '0x13371b17ddb77893cd19e10ffa58461396ebcc19'
       }
-      this.setSceneRoots(contents)
-    }
-    return promised
-  }
-
-  private setSceneRoots(contents: SceneMappingResponse) {
-    for (let result of contents.data) {
-      const sceneId = getSceneIdFromSceneMappingResponse(result)
-      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
-
-      if (promised.isPending) {
-        promised.resolve(sceneId)
-      }
-
-      this.positionToSceneId.set(result.parcel_id, promised)
     }
   }
 
-  private async resolveLandData(sceneId: string): Promise<ILand | null> {
+  async resolveLandData(sceneId: string): Promise<ILand | null> {
     if (this.sceneIdToLandData.has(sceneId)) {
       return this.sceneIdToLandData.get(sceneId)!
     }
 
     const promised = future<ILand | null>()
     this.sceneIdToLandData.set(sceneId, promised)
+
+    if (sceneId.startsWith('empty-')) {
+      const promisedPos = future<string | null>()
+      const pos = sceneId.replace('empty-', '')
+      promisedPos.resolve(pos)
+      this.positionToSceneId.set(pos, promisedPos)
+      const scene = this.createFakeILand(sceneId)
+      promised.resolve(scene)
+      return promised
+    }
+
     const actualResponse = await fetch(this.options.contentServer + `/parcel_info?cids=${sceneId}`)
     if (!actualResponse.ok) {
       error(`Error in ${this.options.contentServer}/parcel_info response!`, actualResponse)
@@ -153,5 +164,45 @@ export class SceneDataDownloadManager {
     promised.resolve(data)
 
     return data
+  }
+
+  private async resolveSceneSceneId(pos: string): Promise<string | null> {
+    if (this.positionToSceneId.has(pos)) {
+      return this.positionToSceneId.get(pos)!
+    }
+    const promised = future<string | null>()
+    this.positionToSceneId.set(pos, promised)
+    const nw = pos.split(',').map($ => parseInt($, 10))
+    const responseContent = await fetch(
+      this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
+    )
+
+    if (!responseContent.ok) {
+      error(`Error in ${this.options.contentServer}/scenes response!`, responseContent)
+      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
+      promised.reject(ret)
+      throw ret
+    } else {
+      const contents = (await responseContent.json()) as SceneMappingResponse
+      if (!contents.data.length) {
+        promised.resolve(null)
+        return null
+      }
+      this.setSceneRoots(contents)
+    }
+    return promised
+  }
+
+  private setSceneRoots(contents: SceneMappingResponse) {
+    for (let result of contents.data) {
+      const sceneId = getSceneIdFromSceneMappingResponse(result)
+      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
+
+      if (promised.isPending) {
+        promised.resolve(sceneId)
+      }
+
+      this.positionToSceneId.set(result.parcel_id, promised)
+    }
   }
 }

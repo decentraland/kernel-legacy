@@ -27,6 +27,8 @@ export enum SocketReadyState {
   CLOSED
 }
 
+import { Reporter } from './PresenceReporter'
+
 class SendResult {
   constructor(public bytesSize: number) {}
 }
@@ -39,12 +41,15 @@ export function positionHash(p: Position) {
 }
 
 export class WorldInstanceConnection {
+  public aliases: Record<number, string> = {}
   public positionHandler: ((fromAlias: string, positionData: PositionData) => void) | null = null
   public profileHandler: ((fromAlias: string, identity: string, profileData: ProfileData) => void) | null = null
   public chatHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   // TODO: Once we have the correct class, change ChatData
   public sceneMessageHandler: ((fromAlias: string, chatData: ChatData) => void) | null = null
   public ping: number = -1
+
+  public fatalErrorSent = false
 
   public stats: Stats | null = null
   private pingInterval: any = null
@@ -93,7 +98,7 @@ export class WorldInstanceConnection {
     const d = new ProfileData()
     d.setCategory(Category.PROFILE)
     d.setTime(Date.now())
-    userProfile.version && d.setProfileVersion(userProfile.version)
+    userProfile.version && d.setProfileVersion('' + userProfile.version)
 
     const r = this.sendTopicIdentityMessage(true, topic, d)
     if (this.stats) {
@@ -158,8 +163,14 @@ export class WorldInstanceConnection {
 
   updateSubscriptions(rawTopics: string) {
     if (!this.connection.hasReliableChannel) {
-      throw new Error('trying to send topic subscription message but reliable channel is not ready')
+      if (!this.fatalErrorSent) {
+        this.fatalErrorSent = true
+        throw new Error('trying to send topic subscription message but reliable channel is not ready')
+      } else {
+        return
+      }
     }
+    rawTopics.split(' ').map(_ => Reporter.subscribe(_))
     const subscriptionMessage = new SubscriptionMessage()
     subscriptionMessage.setType(MessageType.SUBSCRIPTION)
     subscriptionMessage.setFormat(Format.PLAIN)
@@ -217,7 +228,9 @@ export class WorldInstanceConnection {
           break
         }
 
-        const alias = dataMessage.getFromAlias().toString()
+        const aliasNum = dataMessage.getFromAlias()
+        const alias = aliasNum.toString()
+        if (this.aliases[aliasNum]) Reporter.reportSeen(this.aliases[aliasNum])
         const category = dataHeader.getCategory()
         switch (category) {
           case Category.POSITION: {
@@ -285,6 +298,8 @@ export class WorldInstanceConnection {
 
         const alias = dataMessage.getFromAlias().toString()
         const userId = atob(dataMessage.getIdentity_asB64())
+        Reporter.reportSeen(userId)
+        this.aliases[dataMessage.getFromAlias()] = userId
         const category = dataHeader.getCategory()
         switch (category) {
           case Category.PROFILE: {
@@ -337,12 +352,22 @@ export class WorldInstanceConnection {
     }
     if (reliable) {
       if (!this.connection.hasReliableChannel) {
-        throw new Error('trying to send a topic message using null reliable channel')
+        if (!this.fatalErrorSent) {
+          this.fatalErrorSent = true
+          throw new Error('trying to send a topic message using null reliable channel')
+        } else {
+          return new SendResult(0)
+        }
       }
       this.connection.sendReliable(bytes)
     } else {
       if (!this.connection.hasUnreliableChannel) {
-        throw new Error('trying to send a topic message using null unreliable channel')
+        if (!this.fatalErrorSent) {
+          this.fatalErrorSent = true
+          throw new Error('trying to send a topic message using null unreliable channel')
+        } else {
+          return new SendResult(0)
+        }
       }
       this.connection.sendUnreliable(bytes)
     }

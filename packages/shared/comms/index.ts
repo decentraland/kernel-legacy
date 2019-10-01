@@ -1,39 +1,37 @@
-import 'webrtc-adapter'
-
-import { parcelLimits, ETHEREUM_NETWORK, commConfigurations, getServerConfigurations, USE_LOCAL_COMMS } from 'config'
-
-import { defaultLogger } from 'shared/logger'
 import { saveToLocalStorage } from 'atomicHelpers/localStorage'
+import { commConfigurations, ETHEREUM_NETWORK, getServerConfigurations, parcelLimits, USE_LOCAL_COMMS } from 'config'
+import { CommunicationsController } from 'shared/apis/CommunicationsController'
+import { Auth } from 'shared/auth/Auth'
+import { defaultLogger } from 'shared/logger'
+import { MessageEntry } from 'shared/types'
 import { positionObservable, PositionReport } from 'shared/world/positionThings'
-import { CommunicationArea, squareDistance, Position, position2parcel, sameParcel } from './utils'
+import 'webrtc-adapter'
+import { PassportAsPromise } from '../passports/PassportAsPromise'
+import { Profile } from '../passports/types'
+import { BrokerConnection } from './BrokerConnection'
+import { ChatEvent, chatObservable } from './chat'
+import { CliBrokerConnection } from './CliBrokerConnection'
 import { Stats } from './debug'
-import { Auth } from 'shared/auth'
-
+import { IBrokerConnection } from './IBrokerConnection'
 import {
   getCurrentPeer,
-  localProfileUUID,
-  getUser,
-  removeById,
-  setLocalProfile,
   getCurrentUser,
-  receiveUserData,
-  receiveUserVisible,
-  receiveUserPose,
+  getPeer,
+  getUser,
   getUserProfile,
-  getPeer
+  localProfileUUID,
+  receiveUserData,
+  receiveUserPose,
+  receiveUserVisible,
+  removeById,
+  setLocalProfile
 } from './peers'
-
 import { ChatData, PositionData, ProfileData } from './proto/comms'
-import { chatObservable, ChatEvent } from './chat'
+import { Pose, UserInformation } from './types'
+import { CommunicationArea, Position, position2parcel, sameParcel, squareDistance } from './utils'
 import { WorldInstanceConnection } from './worldInstanceConnection'
-import { BrokerConnection } from './BrokerConnection'
-import { UserInformation, Pose } from './types'
-import { CommunicationsController } from 'shared/apis/CommunicationsController'
-import { CliBrokerConnection } from './CliBrokerConnection'
-import { MessageEntry } from 'shared/types'
-import { IBrokerConnection } from './IBrokerConnection'
-import { resolveProfile } from 'shared/world/profiles'
-import { Profile } from '../types'
+import { profileToRendererFormat } from 'shared/passports/transformations/profileToRendererFormat'
+import { ProfileForRenderer } from 'decentraland-ecs/src'
 
 type Timestamp = number
 type PeerAlias = string
@@ -47,12 +45,12 @@ export class PeerTrackingInfo {
   public lastUpdate: Timestamp = 0
   public receivedPublicChatMessages = new Set<string>()
 
-  profilePromise: { promise: Promise<void>; version: string | null } = {
+  profilePromise: { promise: Promise<ProfileForRenderer | void>; version: number | null } = {
     promise: Promise.resolve(),
     version: null
   }
 
-  public loadProfileIfNecessary(profileVersion: string) {
+  public loadProfileIfNecessary(profileVersion: number) {
     if (this.identity && profileVersion !== this.profilePromise.version) {
       if (!this.userInfo || !this.userInfo.userId) {
         this.userInfo = {
@@ -61,13 +59,19 @@ export class PeerTrackingInfo {
         }
       }
       this.profilePromise = {
-        promise: resolveProfile(this.identity).then(($: Profile) => {
-          const userInfo = this.userInfo || {}
-          userInfo.profile = $
-          userInfo.version = $.version
-          this.userInfo = userInfo
-          return
-        }),
+        promise: PassportAsPromise(this.identity, profileVersion)
+          .then(profile => {
+            const forRenderer = profileToRendererFormat(profile)
+            this.lastProfileUpdate = new Date().getTime()
+            const userInfo = this.userInfo || {}
+            userInfo.profile = forRenderer
+            userInfo.version = profile.version
+            this.userInfo = userInfo
+            return forRenderer
+          })
+          .catch(error => {
+            defaultLogger.error('Error fetching profile!', error)
+          }),
         version: profileVersion
       }
     }
@@ -86,6 +90,10 @@ export class Context {
   public network: ETHEREUM_NETWORK | null
 
   public worldInstanceConnection: WorldInstanceConnection | null = null
+
+  profileInterval?: NodeJS.Timer
+  positionObserver: any
+  infoCollecterInterval?: NodeJS.Timer
 
   constructor(userInfo: UserInformation, network?: ETHEREUM_NETWORK) {
     this.userInfo = userInfo
@@ -147,7 +155,7 @@ export function processParcelSceneCommsMessage(context: Context, fromAlias: stri
   }
 }
 
-export function persistCurrentUser(changes: Partial<UserInformation>): Readonly<UserInformation> {
+export function persistCurrentUser(changes: Partial<Profile>): Readonly<UserInformation> {
   const peer = getCurrentPeer()
 
   if (!peer || !localProfileUUID) throw new Error('cannotGetCurrentPeer')
@@ -202,7 +210,13 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
   }
 }
 
-export function processProfileMessage(context: Context, fromAlias: string, identity: string, data: ProfileData) {
+export function processProfileMessage(
+  auth: Auth,
+  context: Context,
+  fromAlias: string,
+  identity: string,
+  data: ProfileData
+) {
   const msgTimestamp = data.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -211,7 +225,7 @@ export function processProfileMessage(context: Context, fromAlias: string, ident
     const profileVersion = data.getProfileVersion()
 
     peerTrackingInfo.identity = identity
-    peerTrackingInfo.loadProfileIfNecessary(profileVersion)
+    peerTrackingInfo.loadProfileIfNecessary(profileVersion ? parseInt(profileVersion, 10) : 0)
 
     peerTrackingInfo.lastProfileUpdate = msgTimestamp
     peerTrackingInfo.lastUpdate = Date.now()
@@ -249,6 +263,7 @@ type ProcessingPeerInfo = {
 let currentParcelTopics = ''
 let previousTopics = ''
 
+let lastNetworkUpdatePosition = new Date().getTime()
 export function onPositionUpdate(context: Context, p: Position) {
   const worldConnection = context.worldInstanceConnection
 
@@ -292,7 +307,11 @@ export function onPositionUpdate(context: Context, p: Position) {
   }
 
   context.currentPosition = p
-  worldConnection.sendPositionMessage(p)
+  const now = new Date().getTime()
+  if (now - lastNetworkUpdatePosition > 100) {
+    lastNetworkUpdatePosition = now
+    worldConnection.sendPositionMessage(p)
+  }
 }
 
 function collectInfo(context: Context) {
@@ -376,7 +395,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
 
   const user = getCurrentUser()
   if (!user) {
-    return
+    return undefined
   }
 
   const userInfo = {
@@ -386,7 +405,11 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
   let commsBroker: IBrokerConnection
 
   if (USE_LOCAL_COMMS) {
-    const commsUrl = document.location.toString().replace(/^http/, 'ws')
+    let location = document.location.toString()
+    if (location.indexOf('#') > -1) {
+      location = location.substring(0, location.indexOf('#')) // drop fragment identifier
+    }
+    const commsUrl = location.replace(/^http/, 'ws') // change protocol to ws
 
     const url = new URL(commsUrl)
     const qs = new URLSearchParams({
@@ -424,7 +447,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     processPositionMessage(context!, alias, data)
   }
   connection.profileHandler = (alias: string, identity: string, data: ProfileData) => {
-    processProfileMessage(context!, alias, identity, data)
+    processProfileMessage(auth, context!, alias, identity, data)
   }
   connection.chatHandler = (alias: string, data: ChatData) => {
     processChatMessage(context!, alias, data)
@@ -441,13 +464,13 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     commsBroker.stats = context.stats
   }
 
-  setInterval(() => {
+  context.profileInterval = setInterval(() => {
     if (context && context.currentPosition && context.worldInstanceConnection) {
       context.worldInstanceConnection.sendProfileMessage(context.currentPosition, context.userInfo)
     }
   }, 1000)
 
-  positionObservable.add((obj: Readonly<PositionReport>) => {
+  context.positionObserver = positionObservable.add((obj: Readonly<PositionReport>) => {
     const p = [
       obj.position.x,
       obj.position.y - obj.playerHeight,
@@ -463,11 +486,30 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     }
   })
 
-  setInterval(() => {
+  context.infoCollecterInterval = setInterval(() => {
     if (context) {
       collectInfo(context)
     }
   }, 100)
+
+  return context
+}
+
+export function disconnect() {
+  if (context) {
+    if (context.profileInterval) {
+      clearInterval(context.profileInterval)
+    }
+    if (context.infoCollecterInterval) {
+      clearInterval(context.infoCollecterInterval)
+    }
+    if (context.positionObserver) {
+      positionObservable.remove(context.positionObserver)
+    }
+    if (context.worldInstanceConnection) {
+      context.worldInstanceConnection.close()
+    }
+  }
 }
 
 declare var global: any

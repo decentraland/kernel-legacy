@@ -14,6 +14,7 @@ import { EventManager } from './EventManager'
 import { ComponentGroup } from './ComponentGroup'
 
 import { log, error } from './helpers'
+import { Entity } from './Entity'
 
 /**
  * @internal
@@ -61,12 +62,11 @@ export class Engine implements IEngine {
     const parent = entity.getParent()
 
     if (entity.isAddedToEngine()) {
-      log('The entity is already in the engine. Please fix this')
       return entity
     }
 
     entity.eventManager = this.eventManager
-    entity.engine = this
+    ;(entity as Entity).engine = this
 
     this._entities[entity.uuid] = entity
 

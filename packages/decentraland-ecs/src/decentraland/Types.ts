@@ -1,4 +1,5 @@
-import { ReadOnlyVector3, ReadOnlyQuaternion } from './math'
+import { ReadOnlyVector3, ReadOnlyQuaternion, ReadOnlyColor4 } from './math'
+import { RaycastResponse } from './Events'
 
 /** @public */
 export type ModuleDescriptor = {
@@ -51,6 +52,10 @@ export type DecentralandInterface = {
   /** set a new parent for the entity */
   setParent(entityId: string, parentId: string): void
 
+  // QUERY
+
+  query(queryId: string, payload: any): void
+
   // COMPONENTS
 
   /** called after creating a component in the kernel  */
@@ -83,13 +88,13 @@ export type DecentralandInterface = {
 }
 
 /** @public */
-export type PointerEvent = {
+export type InputEventResult = {
   /** Origin of the ray, relative to the scene */
   origin: ReadOnlyVector3
   /** Direction vector of the ray (normalized) */
   direction: ReadOnlyVector3
   /** ID of the pointer that triggered the event */
-  pointerId: number
+  buttonId: number
   /** Does this pointer event hit any object? */
   hit?: {
     /** Length of the ray */
@@ -105,6 +110,17 @@ export type PointerEvent = {
     /** Hit entity ID if any */
     entityId: string
   }
+}
+
+/** @public */
+export enum InputEventType {
+  DOWN,
+  UP
+}
+
+/** @public */
+export type GlobalInputEventResult = InputEventResult & {
+  type: InputEventType
 }
 
 /**
@@ -141,13 +157,24 @@ export interface IEvents {
    * `pointerUp` is triggered when the user releases an input pointer.
    * It could be a VR controller, a touch screen or the mouse.
    */
-  pointerUp: PointerEvent
+  pointerUp: InputEventResult
 
   /**
    * `pointerDown` is triggered when the user press an input pointer.
    * It could be a VR controller, a touch screen or the mouse.
    */
-  pointerDown: PointerEvent
+  pointerDown: InputEventResult
+
+  /**
+   * `pointerEvent` is triggered when the user press or releases an input pointer.
+   * It could be a VR controller, a touch screen or the mouse.
+   */
+  pointerEvent: GlobalInputEventResult
+
+  /**
+   * `raycastResponse` is triggered in response to a raycast query
+   */
+  raycastResponse: RaycastResponse<any>
 
   /**
    * `chatMessage` is triggered when the user sends a message through chat entity.
@@ -327,3 +354,67 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 
 // @internal
 export const AVATAR_OBSERVABLE = 'AVATAR_OBSERVABLE'
+
+/**
+ * @public
+ */
+export type WearableId = string
+
+/**
+ * @public
+ */
+export type AvatarForRenderer = {
+  bodyShape: WearableId
+  skinColor: ReadOnlyColor4
+  hairColor: ReadOnlyColor4
+  eyeColor: ReadOnlyColor4
+  wearables: WearableId[]
+}
+
+/**
+ * @public
+ */
+export type Wearable = {
+  id: WearableId
+  type: 'wearable'
+  category: string
+  baseUrl: string
+  tags: string[]
+  representations: BodyShapeRespresentation[]
+}
+
+/**
+ * @public
+ */
+export type BodyShapeRespresentation = {
+  bodyShapes: string[]
+  mainFile: string
+  contents: FileAndHash[]
+}
+
+/**
+ * @public
+ */
+export type FileAndHash = {
+  file: string
+  hash: string
+}
+
+/**
+ * @public
+ */
+export type ProfileForRenderer = {
+  userId: string
+  name: string
+  description: string
+  email: string
+  avatar: AvatarForRenderer
+  inventory: WearableId[]
+  snapshots: {
+    face: string
+    body: string
+  }
+  version: number
+  updatedAt: number
+  createdAt: number
+}

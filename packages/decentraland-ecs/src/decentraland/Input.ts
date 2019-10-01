@@ -1,11 +1,9 @@
 // tslint:disable:ter-indent
 // tslint:disable:ter-indent
 
-import { DecentralandInterface, PointerEvent } from './Types'
+import { GlobalInputEventResult, InputEventType } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
-
-declare let dcl: DecentralandInterface | void
 
 /** @public */
 export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
@@ -13,25 +11,26 @@ export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP'
 /**
  * @public
  */
-export enum Pointer {
+export enum ActionButton {
+  POINTER = 'POINTER',
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY'
 }
 
 /** @public */
 export type InputState = Record<
-  Pointer,
+  ActionButton,
   {
     BUTTON_DOWN: boolean
   }
 >
 
 /** @public */
-export type LocalPointerEvent = PointerEvent & {
+export type LocalActionButtonEvent = GlobalInputEventResult & {
   origin: Vector3
   direction: Vector3
-  pointer: Pointer
-  hit?: PointerEvent['hit'] & {
+  button: ActionButton
+  hit?: GlobalInputEventResult['hit'] & {
     hitPoint: Vector3
     normal: Vector3
     worldNormal: Vector3
@@ -42,7 +41,7 @@ export type LocalPointerEvent = PointerEvent & {
  * @public
  */
 export class PointerEventComponent {
-  constructor(public readonly callback: (event: LocalPointerEvent) => void) {
+  constructor(public readonly callback: (event: LocalActionButtonEvent) => void) {
     if (!callback || !('apply' in callback) || !('call' in callback)) {
       throw new Error('Callback is not a function')
     }
@@ -63,6 +62,16 @@ export class GlobalPointerDown extends PointerEventComponent {}
 @Component('pointerUp')
 export class GlobalPointerUp extends PointerEventComponent {}
 
+export class Subscription {
+  public fn: (e: LocalActionButtonEvent) => void
+  public useRaycast: boolean
+
+  constructor(fn: (e: LocalActionButtonEvent) => void, useRaycast: boolean) {
+    this.fn = fn
+    this.useRaycast = useRaycast
+  }
+}
+
 /**
  * @public
  */
@@ -74,38 +83,34 @@ export class Input {
     return Input._instance
   }
 
-  public get state(): Readonly<InputState> {
-    return this.internalState
-  }
-
-  private subscriptions: Record<InputEventKind, Array<(e: LocalPointerEvent) => void>> = {
-    BUTTON_DOWN: [],
-    BUTTON_UP: []
+  private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> = {
+    [ActionButton.POINTER]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.PRIMARY]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.SECONDARY]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    }
   }
 
   private internalState: InputState = {
-    [Pointer.PRIMARY]: {
+    [ActionButton.POINTER]: {
       BUTTON_DOWN: false
     },
-    [Pointer.SECONDARY]: {
+    [ActionButton.PRIMARY]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.SECONDARY]: {
       BUTTON_DOWN: false
     }
   }
 
-  private constructor() {
-    if (typeof dcl !== 'undefined') {
-      dcl.subscribe('pointerUp')
-      dcl.subscribe('pointerDown')
-
-      dcl.onEvent(event => {
-        if (event.type === 'pointerUp') {
-          this.handlePointerUp(event.data as PointerEvent)
-        } else if (event.type === 'pointerDown') {
-          this.handlePointerDown(event.data as PointerEvent)
-        }
-      })
-    }
-  }
+  private constructor() {}
 
   static ensureInstance(): any {
     if (!Input._instance) {
@@ -114,96 +119,136 @@ export class Input {
   }
 
   /**
+   * Allows to know if a button is pressed
+   *
+   * Returns true if the button is pressed
+   * @param buttonId - The id of the button.
+   */
+  public isButtonPressed(buttonId: ActionButton) {
+    return this.internalState[buttonId]
+  }
+
+  /**
    * Subscribes to an input event and triggers the provided callback.
    *
    * Returns a function that can be called to remove the subscription.
    * @param eventName - The name of the event (see InputEventKind).
+   * @param buttonId - The id of the button.
+   * @param useRaycast - Enables getting raycast information.
    * @param fn - A callback function to be called when the event is triggered.
    */
-  public subscribe(eventName: InputEventKind, fn: (e: LocalPointerEvent) => void) {
-    this.subscriptions[eventName].push(fn)
-    return () => this.unsubscribe(eventName, fn)
+  public subscribe(
+    eventName: InputEventKind,
+    buttonId: ActionButton,
+    useRaycast: boolean,
+    fn: (e: LocalActionButtonEvent) => void
+  ) {
+    this.subscriptions[buttonId][eventName].push(new Subscription(fn, useRaycast))
+    return () => this.unsubscribe(eventName, buttonId, fn)
   }
 
   /**
    * Removes an existing input event subscription.
    * @param eventName - The name of the event (see InputEventKind).
+   * @param buttonId - The id of the button.
    * @param fn - The callback function used when subscribing to the event.
    */
-  public unsubscribe(eventName: InputEventKind, fn: (e: LocalPointerEvent) => void) {
-    const index = this.subscriptions[eventName].indexOf(fn)
+  public unsubscribe(eventName: InputEventKind, buttonId: ActionButton, fn: (e: LocalActionButtonEvent) => void) {
+    const index = this.getSubscriptionId(eventName, buttonId, fn)
     if (index > -1) {
-      return this.subscriptions[eventName].splice(index, 1)
+      return this.subscriptions[buttonId][eventName].splice(index, 1)
     }
     return false
   }
 
-  private getPointerById(id: number): Pointer {
-    if (id === 1) return Pointer.PRIMARY
-    return Pointer.SECONDARY
-  }
+  public handlePointerEvent(data: GlobalInputEventResult) {
+    const button = this.getPointerById(data.buttonId)
 
-  private handlePointerUp(data: PointerEvent) {
-    const pointer = this.getPointerById(data.pointerId)
-    const newData: LocalPointerEvent = {
+    let eventResult: LocalActionButtonEvent = {
       ...data,
-      pointer,
+      button: button,
       direction: new Vector3().copyFrom(data.direction),
       origin: new Vector3().copyFrom(data.origin),
-      hit: data.hit
-        ? {
-            ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
-          }
-        : undefined
+      hit: undefined
     }
 
-    this.internalState[Pointer.PRIMARY].BUTTON_DOWN = false
+    const hit = data.hit
+      ? {
+          ...data.hit,
+          hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
+          normal: new Vector3().copyFrom(data.hit.normal),
+          worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
+        }
+      : undefined
 
-    for (let i = 0; i < this.subscriptions['BUTTON_UP'].length; i++) {
-      this.subscriptions['BUTTON_UP'][i](newData)
-    }
+    if (data.type === InputEventType.DOWN) {
+      this.internalState[button].BUTTON_DOWN = true
 
-    if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-      const entity = DisposableComponent.engine.entities[newData.hit.entityId]
-      const handler = entity && entity.getComponentOrNull(GlobalPointerUp)
-      if (handler) {
-        handler.callback(newData)
+      for (let i = 0; i < this.subscriptions[button]['BUTTON_DOWN'].length; i++) {
+        let subscription = this.subscriptions[button]['BUTTON_DOWN'][i]
+
+        // remove hit information when raycast is disabled
+        if (subscription.useRaycast) {
+          eventResult.hit = hit
+        } else {
+          eventResult.hit = undefined
+        }
+
+        subscription.fn(eventResult)
+      }
+
+      if (hit && hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[hit.entityId]
+        const handler = entity && entity.getComponentOrNull(GlobalPointerDown)
+        if (handler) {
+          eventResult.hit = hit
+          handler.callback(eventResult)
+        }
+      }
+    } else {
+      this.internalState[button].BUTTON_DOWN = false
+
+      for (let i = 0; i < this.subscriptions[button]['BUTTON_UP'].length; i++) {
+        let subscription = this.subscriptions[button]['BUTTON_UP'][i]
+
+        // remove hit information when raycast is disabled
+        if (subscription.useRaycast) {
+          eventResult.hit = hit
+        } else {
+          eventResult.hit = undefined
+        }
+
+        subscription.fn(eventResult)
+      }
+
+      if (hit && hit.entityId && DisposableComponent.engine) {
+        const entity = DisposableComponent.engine.entities[hit.entityId]
+        const handler = entity && entity.getComponentOrNull(GlobalPointerUp)
+        if (handler) {
+          eventResult.hit = hit
+          handler.callback(eventResult)
+        }
       }
     }
   }
 
-  private handlePointerDown(data: PointerEvent) {
-    const pointer = this.getPointerById(data.pointerId)
-    const newData: LocalPointerEvent = {
-      ...data,
-      pointer,
-      direction: new Vector3().copyFrom(data.direction),
-      origin: new Vector3().copyFrom(data.origin),
-      hit: data.hit
-        ? {
-            ...data.hit,
-            hitPoint: new Vector3().copyFrom(data.hit.hitPoint),
-            normal: new Vector3().copyFrom(data.hit.normal),
-            worldNormal: new Vector3().copyFrom(data.hit.worldNormal)
-          }
-        : undefined
-    }
-
-    this.internalState[Pointer.PRIMARY].BUTTON_DOWN = true
-
-    for (let i = 0; i < this.subscriptions['BUTTON_DOWN'].length; i++) {
-      this.subscriptions['BUTTON_DOWN'][i](newData)
-    }
-
-    if (newData.hit && newData.hit.entityId && DisposableComponent.engine) {
-      const entity = DisposableComponent.engine.entities[newData.hit.entityId]
-      const handler = entity && entity.getComponentOrNull(GlobalPointerDown)
-      if (handler) {
-        handler.callback(newData)
+  private getSubscriptionId(
+    eventName: InputEventKind,
+    buttonId: ActionButton,
+    fn: (e: LocalActionButtonEvent) => void
+  ): number {
+    for (let i = 0; i < this.subscriptions[buttonId][eventName].length; i++) {
+      if (this.subscriptions[buttonId][eventName][i].fn === fn) {
+        return i
       }
     }
+
+    return -1
+  }
+
+  private getPointerById(id: number): ActionButton {
+    if (id === 0) return ActionButton.POINTER
+    else if (id === 1) return ActionButton.PRIMARY
+    return ActionButton.SECONDARY
   }
 }

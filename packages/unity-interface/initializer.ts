@@ -1,8 +1,10 @@
+import future from 'fp-future'
 import { DEBUG_MESSAGES } from '../config'
 import { initShared } from '../shared'
+import { ReportFatalError } from '../shared/loading/ReportFatalError'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
-import future from 'fp-future'
+import { Session } from '../shared/session'
 const queryString = require('query-string')
 
 declare var global: any
@@ -24,11 +26,6 @@ type UnityGame = {
 let _instancedJS: ReturnType<typeof initializeEngine> | null = null
 
 /**
- * HTML Container where everything happens
- */
-let _container: HTMLElement | null = null
-
-/**
  * UnityGame instance (Either Unity WebGL or Or Unity editor via WebSocket)
  */
 let _gameInstance: UnityGame | null = null
@@ -43,10 +40,11 @@ const engineInitialized = future()
 
 /** Initialize the engine in a container */
 export async function initializeUnity(container: HTMLElement): Promise<InitializeUnityResult> {
-  _container = container
-
-  await initShared(container)
-
+  const session = await initShared()
+  if (!session) {
+    throw new Error()
+  }
+  Session.current = session as Session
   const qs = queryString.parse(document.location.search)
 
   if (qs.ws) {
@@ -77,8 +75,7 @@ namespace DCL {
       })
       .catch(error => {
         engineInitialized.reject(error)
-        _container!.classList.remove('dcl-loading')
-        _container!.innerHTML = `<h3>${error.message}</h3>`
+        ReportFatalError('Unexpected fatal error')
       })
   }
 
@@ -122,7 +119,7 @@ function initializeUnityEditor(webSocketUrl: string, container: HTMLElement): Un
         const payload = JSON.parse(m.payload)
         _instancedJS!.then($ => $.onMessage(m.type, payload))
       } else {
-        defaultLogger.error('Dont know what to do with ', m)
+        defaultLogger.error('Unexpected message: ', m)
       }
     } catch (e) {
       defaultLogger.error(e)

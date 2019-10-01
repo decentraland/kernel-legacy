@@ -1,6 +1,7 @@
 import { Engine } from '../ecs/Engine'
 import { IEntity, ISystem, ComponentAdded, ComponentRemoved, ParentChanged } from '../ecs/IEntity'
-import { UUIDEvent } from './Events'
+import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
+
 import {
   DisposableComponentCreated,
   DisposableComponentRemoved,
@@ -12,6 +13,7 @@ import {
 } from '../ecs/Component'
 
 import { DecentralandInterface } from './Types'
+import { RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
 
 // This number is defined in the protocol ECS.SetEntityParent.3
 const ROOT_ENTITY_ID = '0'
@@ -43,10 +45,20 @@ export class DecentralandSynchronizationSystem implements ISystem {
     })
 
     this.dcl.onEvent(event => {
+      const data = event.data as any
       switch (event.type) {
         case 'uuidEvent':
-          const data = event.data as any
           engine.eventManager.fireEvent(new UUIDEvent(data.uuid, data.payload))
+          break
+        case 'raycastResponse':
+          if (data.queryType === 'HitFirst') {
+            engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntity>(data))
+          } else if (data.queryType === 'HitAll') {
+            engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntities>(data))
+          }
+          break
+        case 'pointerEvent':
+          engine.eventManager.fireEvent(new PointerEvent(data.payload))
           break
       }
     })

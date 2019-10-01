@@ -1,180 +1,104 @@
+const auth0 = require('auth0-js')
+import { getServerConfigurations } from 'config'
 import { BasicEphemeralKey, MessageInput } from 'decentraland-auth-protocol'
+import future from 'fp-future'
+import { Store } from 'redux'
+import { createSelector } from 'reselect'
+import { v4 as uuid } from 'uuid'
+import { login } from './actions'
+import { CommsAuth } from './CommsAuth'
+import { CallbackResult } from './sagas'
+import { getAccessToken, getData, getSub, isLoggedIn, getEmail } from './selectors'
+import { AuthData, AuthState } from './types'
 
-import { defaultLogger } from 'shared/logger'
-import { Login } from './Login'
-import { API, APIOptions } from './API'
+type RootState = any
 
-const jwt = require('jsonwebtoken')
-
-type AuthOptions = {
-  ephemeralKeyTTL: number
-  api?: APIOptions
+export function isTokenExpired(expiresAt: number) {
+  return expiresAt > 0 && expiresAt < Date.now()
 }
-
-type AccessToken = {
-  ephemeral_key: string
-  exp: number
-  user_id: string
-  version: string
-}
-
-const LOCAL_STORAGE_KEY = 'decentraland-auth-user-token'
 
 export class Auth {
-  static defaultOptions: AuthOptions = {
-    ephemeralKeyTTL: 60 * 60 * 2 // TTL for the ephemeral key
+  public isExpired = createSelector<RootState, AuthState['data'], boolean>(
+    getData,
+    data => !!data && isTokenExpired(data.expiresAt)
+  ) as (store: any) => boolean
+
+  private ephemeralKey?: BasicEphemeralKey
+
+  private webAuth: auth0.WebAuth
+
+  private comms: CommsAuth
+
+  constructor(
+    private config: {
+      ephemeralKeyTTL: number
+      clientId: string
+      domain: string
+      redirectUri: string
+      audience: string
+    },
+    public store: Store<{ auth: AuthState }>
+  ) {
+    this.comms = new CommsAuth({ baseURL: getServerConfigurations().auth })
+
+    this.webAuth = new auth0.WebAuth({
+      clientID: this.config.clientId,
+      domain: this.config.domain,
+      redirectUri: this.config.redirectUri,
+      responseType: 'token id_token',
+      audience: this.config.audience,
+      scope: 'openid email'
+    })
   }
 
-  private options: AuthOptions
-  private api: API
-  private userToken: string | null = null
-  private accessToken: string | null = null
-  private serverPublicKey: string | null = null
-  private ephemeralKey: BasicEphemeralKey | null = null
-  private loginManager: Login
+  async getUserId() {
+    await this.getAccessToken()
+    return getSub(this.store.getState())
+  }
 
-  constructor(options: Partial<AuthOptions> = {}) {
-    this.options = {
-      ...Auth.defaultOptions,
-      ...options
+  async getEmail() {
+    await this.getAccessToken()
+    return getEmail(this.store.getState())
+  }
+
+  async getCommsAccessToken() {
+    return this.comms.getCommsAccessToken(this.getEphemeralKey(), await this.getAccessToken())
+  }
+
+  getAccessToken() {
+    if (isLoggedIn(this.store.getState())) {
+      return Promise.resolve(getAccessToken(this.store.getState()))
     }
-    this.api = new API(this.options.api)
-    this.loginManager = new Login(this.api)
-    this.userToken = localStorage.getItem(LOCAL_STORAGE_KEY) || null
-    this.ephemeralKey = BasicEphemeralKey.generateNewKey(this.options.ephemeralKeyTTL)
-  }
-
-  // returns a user token
-  async login(target?: HTMLElement) {
-    if (this.userToken === null) {
-      const [userToken] = await Promise.all([
-        target ? this.loginManager.fromIFrame(target) : this.loginManager.fromPopup(),
-        this.getServerPublicKey()
-      ])
-      this.userToken = userToken
-      localStorage.setItem(LOCAL_STORAGE_KEY, this.userToken)
-      return this.userToken
-    }
-    return this.userToken
-  }
-
-  async logout() {
-    await this.loginManager.logout()
-
-    // remove from local storage
-    localStorage.removeItem(LOCAL_STORAGE_KEY)
-
-    // remove from instance
-    this.userToken = null
-    this.accessToken = null
+    const result = future<string>()
+    const unsubscribe = this.store.subscribe(() => {
+      const state = this.store.getState()
+      if (isLoggedIn(state)) {
+        result.resolve(getAccessToken(state))
+        unsubscribe()
+      } else if (state.auth.error) {
+        this.login(this.config.redirectUri)
+      }
+    })
+    return result
   }
 
   isLoggedIn() {
-    return this.userToken !== null
+    return isLoggedIn(this.store.getState())
   }
 
   getEphemeralKey() {
     if (!this.ephemeralKey || this.ephemeralKey.hasExpired()) {
-      this.ephemeralKey = BasicEphemeralKey.generateNewKey(this.options.ephemeralKeyTTL)
+      this.ephemeralKey = BasicEphemeralKey.generateNewKey(this.config.ephemeralKeyTTL)
     }
     return this.ephemeralKey
-  }
-
-  /**
-   * Returns the user data of the JWT decoded payload
-   */
-  async getAccessTokenData() {
-    return jwt.decode(await this.getAccessToken()) as AccessToken
-  }
-
-  async getAccessToken() {
-    const ephKey = this.getEphemeralKey()
-    const pubKey = ephKey.key.publicKeyAsHexString()
-
-    if (this.accessToken) {
-      try {
-        const tokenData = jwt.decode(this.accessToken) as AccessToken
-        if (tokenData.ephemeral_key === pubKey) {
-          const publicKey = await this.getServerPublicKey()
-          jwt.verify(this.accessToken, publicKey)
-          return this.accessToken
-        }
-      } catch (e) {
-        // invalid token, generate a new one
-      }
-    }
-    const userToken = await this.login()
-
-    try {
-      const { token } = await this.api.token({
-        userToken,
-        pubKey
-      })
-      this.accessToken = token
-      return token
-    } catch (e) {
-      defaultLogger.error(e.message)
-      await this.logout()
-      throw e
-    }
-  }
-
-  async createHeaders(url: string, options: RequestInit = {}) {
-    await this.login()
-
-    let method = 'GET'
-    let body: any = null
-    let headers: Record<string, string> = {}
-
-    if (options.method) {
-      method = options.method.toUpperCase()
-    }
-
-    if (options.body) {
-      body = Buffer.from(options.body as string)
-    }
-
-    const input = MessageInput.fromHttpRequest(method, url, body)
-    const accessToken = await this.getAccessToken()
-
-    // add required headers
-    const requiredHeaders = this.getEphemeralKey().makeMessageCredentials(input, accessToken)
-    for (const [key, value] of requiredHeaders.entries()) {
-      headers[key] = value
-    }
-
-    // add optional headers
-    if (options && options.headers) {
-      const optionalHeaders = options.headers as Record<string, string>
-      headers = {
-        ...headers,
-        ...optionalHeaders
-      }
-    }
-
-    return headers
-  }
-
-  async createRequest(url: string, options: RequestInit = {}): Promise<Request> {
-    let headers = await this.createHeaders(url, options)
-    if (options.headers) {
-      headers = { ...(options.headers as Record<string, string>), ...headers }
-    }
-
-    const request = new Request(url, {
-      ...options,
-      headers
-    })
-
-    return request
   }
 
   async getMessageCredentials(message: string | null) {
     const msg = message === null ? null : Buffer.from(message)
     const input = MessageInput.fromMessage(msg)
-    const accessToken = await this.getAccessToken()
+    const accessToken = await this.getCommsAccessToken()
 
-    const credentials = this.getEphemeralKey().makeMessageCredentials(input, accessToken)
+    const credentials = await this.getEphemeralKey().makeMessageCredentials(input, accessToken)
 
     let result: Record<string, string> = {}
 
@@ -185,16 +109,94 @@ export class Auth {
     return result
   }
 
-  dispose() {
-    this.loginManager.dispose()
+  handleCallback(): Promise<CallbackResult> {
+    return new Promise((resolve, reject) => {
+      this.webAuth.parseHash((err, auth) => {
+        if (err) {
+          debugger
+          reject(err)
+          return
+        }
+        if (auth && auth.accessToken && auth.idToken) {
+          this.webAuth.client.userInfo(auth.accessToken, (err, user) => {
+            if (err) {
+              this.store.dispatch(login(this.config.redirectUri))
+              reject(err)
+              return
+            }
+
+            let redirectUri = undefined
+            if (auth.state) {
+              redirectUri = localStorage.getItem(auth.state) || undefined
+              if (redirectUri) {
+                localStorage.removeItem(auth.state)
+              }
+            }
+
+            const data: AuthData = {
+              email: user.email!,
+              sub: user.sub,
+              expiresAt: auth.expiresIn! * 1000 + new Date().getTime(),
+              accessToken: auth.accessToken!,
+              idToken: auth.idToken!
+            }
+            resolve({ data, redirectUri })
+          })
+        } else {
+          reject(new Error('No access token found in the url hash'))
+        }
+      })
+    })
   }
 
-  private async getServerPublicKey() {
-    if (this.serverPublicKey) {
-      return this.serverPublicKey
+  login(redirectUrl?: string) {
+    let options: auth0.AuthorizeOptions = {}
+    if (redirectUrl) {
+      const nonce = uuid()
+      localStorage.setItem(nonce, redirectUrl)
+      options.state = nonce
     }
-    const serverPublicKey = await this.api.pubKey()
-    this.serverPublicKey = serverPublicKey
-    return serverPublicKey
+    try {
+      this.webAuth.authorize(options)
+    } catch (e) {
+      throw e
+    }
+  }
+
+  restoreSession(): Promise<AuthData> {
+    return new Promise((resolve, reject) => {
+      this.webAuth.checkSession({}, (err, auth) => {
+        if (err) {
+          this.store.dispatch(login(this.config.redirectUri))
+          return
+        }
+        const result: AuthData = {
+          email: auth.idTokenPayload.email,
+          sub: auth.idTokenPayload.sub,
+          expiresAt: auth.expiresIn * 1000 + new Date().getTime(),
+          accessToken: auth.accessToken,
+          idToken: auth.idToken
+        }
+        resolve(result)
+      })
+    })
+  }
+
+  logout(): Promise<void> {
+    return new Promise(resolve => {
+      this.webAuth.logout({
+        returnTo: window.location.origin,
+        federated: true
+      })
+      resolve()
+    })
+  }
+
+  createHeaders(idToken: string) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`
+    }
+    return headers
   }
 }

@@ -4,19 +4,20 @@ import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
 import { SceneDataDownloadManager } from 'decentraland-loader/lifecycle/controllers/download'
 import { positionObservable, teleportObservable } from './positionThings'
-import { SceneWorker, ParcelSceneAPI } from './SceneWorker'
-import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene } from '../types'
+import { SceneWorker } from './SceneWorker'
+import { LoadableParcelScene, EnvironmentData, ILand, ILandToLoadableParcelScene, InstancedSpawnPoint } from '../types'
 import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
 import { worldRunningObservable } from './worldState'
+import { queueTrackingEvent } from '../analytics'
+import { ParcelSceneAPI } from './ParcelSceneAPI'
 
 export type EnableParcelSceneLoadingOptions = {
   parcelSceneClass: { new (x: EnvironmentData<LoadableParcelScene>): ParcelSceneAPI }
   downloadManager?: SceneDataDownloadManager
   preloadScene: (parcelToLoad: ILand) => Promise<any>
-  onSpawnpoint?: (initialLand: ILand) => void
+  onPositionSettled?: (spawnPoint: InstancedSpawnPoint) => void
   onLoadParcelScenes?(x: ILand[]): void
   onUnloadParcelScenes?(x: ILand[]): void
-  onPositionSettled?(): void
   onPositionUnsettled?(): void
 }
 
@@ -91,9 +92,9 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
 
     const observer = sceneLifeCycleObservable.add(sceneStatus => {
       if (sceneStatus.sceneId === sceneId) {
+        sceneLifeCycleObservable.remove(observer)
         ret.notify('Scene.status', sceneStatus)
       }
-      sceneLifeCycleObservable.remove(observer)
     })
 
     // tell the engine to load the parcel scene
@@ -107,7 +108,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
         sceneLifeCycleObservable.remove(observer)
         ret.notify('Scene.status', { sceneId, status: 'failed' })
       }
-    }, 30000)
+    }, 60000)
   })
 
   ret.on('Scene.shouldUnload', async (opts: { sceneId: string }) => {
@@ -121,10 +122,9 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     }
   })
 
-  ret.on('Position.settled', async (opt: { sceneId: string }) => {
-    // TODO - readd spawnpoint - moliva - 15/08/2019
+  ret.on('Position.settled', async (opts: { spawnPoint: InstancedSpawnPoint }) => {
     if (options.onPositionSettled) {
-      options.onPositionSettled()
+      options.onPositionSettled(opts.spawnPoint)
     }
   })
 
@@ -133,6 +133,10 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
       options.onPositionUnsettled()
     }
     worldRunningObservable.notifyObservers(false)
+  })
+
+  ret.on('Event.track', (event: { name: string; data: any }) => {
+    queueTrackingEvent(event.name, event.data)
   })
 
   teleportObservable.add((position: { x: number; y: number }) => {
