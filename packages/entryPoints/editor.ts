@@ -42,13 +42,13 @@ import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/contr
 const evtEmitter = new EventEmitter()
 const initializedEngine = future<void>()
 
-let unityScene: UnityParcelScene
+let unityScene: UnityParcelScene | undefined
 let loadingEntities: string[] = []
 let builderSceneLoaded: IFuture<boolean> = future()
 
 /**
- * Function executed by builder secondly
- * It creates the builder scene, bind the scene events and stub the content mappings
+ * Function executed by builder
+ * It creates the builder scene, binds the scene events and stubs the content mappings
  */
 async function createBuilderScene(scene: IScene & { baseUrl: string }) {
   const isFirstRun = unityScene === undefined
@@ -76,9 +76,11 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
 }
 
 async function renewBuilderScene(scene: IScene & { baseUrl: string }) {
-  scene.baseUrl = unityScene.data.baseUrl
-  const sceneData = await getSceneData(scene)
-  updateBuilderScene(sceneData)
+  if (unityScene) {
+    scene.baseUrl = unityScene.data.baseUrl
+    const sceneData = await getSceneData(scene)
+    updateBuilderScene(sceneData)
+  }
 }
 
 /**
@@ -120,6 +122,8 @@ function getBaseCoords(scene: IScene): string {
 }
 
 function bindSceneEvents() {
+  if (!unityScene) return
+
   unityScene.on('uuidEvent' as any, event => {
     const { type } = event.payload
 
@@ -213,7 +217,7 @@ namespace editor {
     } else if (unityScene) {
       const { worker } = unityScene
       if (action.payload.mappings) {
-        var scene = action.payload.scene
+        const scene = action.payload.scene
         scene._mappings = action.payload.mappings
         await renewBuilderScene(scene)
       }
@@ -245,15 +249,10 @@ namespace editor {
   }
   export function resetCameraZoom() {
     console.log('resetCameraZoom')
-    //resetCameraBuilder()
     resetCameraZoomBuilder()
   }
 
   export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
-    //getMousePositionBuilder({ x: 50, y: 50, z: 0 })
-
-    // return getMouseWorldPositionBuilder()
-
     // donde T depende de que estes devolviendo
     const id = uuid()
     futures[id] = future()
@@ -264,7 +263,6 @@ namespace editor {
 
   export function handleUnitySomeVale(id: string, value: Vector3) {
     futures[id].resolve(value)
-    // delete futures[id]
   }
 
   // TODO: is this needed?
