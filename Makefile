@@ -229,14 +229,6 @@ watch: $(SOME_MAPPINGS) build-essentials static/dist/unity.js ## Watch the files
 			"$(COMPILER) targets/test.json --watch" \
 			"node ./scripts/runTestServer.js --keep-open"
 
-update: ## Update the version of the renderer (Unity build)
-	# TODO - make this install the latest published artifact of the current branch
-	# Something like; @export BRANCH=$(`git branch -l | grep '^\* .*$' | grep -o '[a-zA-Z0-9/.]*$'`)
-	# @echo current branch: $(BRANCH)
-	# @export TARGET_RELEASE=$([ $(BRANCH) == 'staging' ] && echo staging || ([ $(BRANCH) == 'release' ] && echo release || echo 'master'))
-	@ npm install decentraland-renderer@master
-	@ cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/
-
 clean: ## Clean all generated files
 	@$(COMPILER) targets/clean.json
 
