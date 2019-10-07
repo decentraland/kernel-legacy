@@ -163,7 +163,7 @@ const unityInterface = {
     if (unityInterface.debug) {
       defaultLogger.info(message)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${message}`)
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, message)
   },
   SetSceneDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
@@ -233,7 +233,7 @@ class UnityScene<T> implements ParcelSceneAPI {
 
   sendBatch(actions: EntityAction[]): void {
     const sceneId = getParcelSceneID(this)
-    var message = ''
+    let message = ''
 
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
