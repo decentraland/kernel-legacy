@@ -179,8 +179,7 @@ export function handleNewInventoryItem() {
     type: NotificationType.GENERIC,
     message: 'You received an exclusive wearable NFT mask! Check it out in the avatar editor.',
     buttonMessage: 'OK',
-    timer: 7,
-    scene: 'dcl-ui-scene'
+    timer: 7
   })
 }
 
