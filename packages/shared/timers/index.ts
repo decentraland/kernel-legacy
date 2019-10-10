@@ -19,9 +19,9 @@ const timers = new Set<Timer>()
 
 function handleVisibilityChange() {
   if (isForeground()) {
-    ;[...timers].forEach($ => $.resume())
+    [...timers].forEach($ => $.resume())
   } else {
-    ;[...timers].forEach($ => $.pause())
+    [...timers].forEach($ => $.pause())
   }
 }
 

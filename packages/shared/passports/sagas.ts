@@ -346,6 +346,9 @@ export function* queryInventoryEveryMinute() {
     }
     const ethAddress = yield select(getEthereumAddress, userId)
     const inventory = yield select(getInventory, userId)
+    if (!inventory) {
+      continue
+    }
     yield put(inventoryRequest(userId, ethAddress))
     const fetchNewInventory = yield race({
       success: take(INVENTORY_SUCCESS),
@@ -366,6 +369,6 @@ function areInventoriesDifferent(inventory1: WearableId[], inventory2: WearableI
   const sort2 = inventory2.sort()
   return (
     inventory1.length !== inventory2.length ||
-    sort1.reduce((result: boolean, next, index) => result && next === sort2[index], true)
+    sort1.reduce((result: boolean, next, index) => result && next !== sort2[index], true)
   )
 }
