@@ -180,10 +180,10 @@ namespace editor {
   /**
    * Function executed by builder which is the first function of the entry point
    */
-  export async function initEngine(container: HTMLElement, x?: number, y?: number, local?: boolean) {
+  export async function initEngine(container: HTMLElement, x?: number, y?: number) {
     defaultLogger.log('builder: init Engine.')
     try {
-      await initializeUnity(container, local)
+      await initializeUnity(container)
       defaultLogger.log('builder: Engine initialized.')
       initializedEngine.resolve()
     } catch (err) {
