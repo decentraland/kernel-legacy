@@ -490,6 +490,10 @@ export function setBuilderGridResolution(position: number, rotation: number, sca
   )
 }
 
+export function selectBuilderEntity(entityId: string) {
+  unityInterface.sendBuilderMessage('SelectEntity', entityId)
+}
+
 let currentLoadedScene: SceneWorker | null
 
 export async function loadPreviewScene() {
@@ -562,7 +566,7 @@ export function unloadCurrentBuilderScene() {
     parcelScene.emit('builderSceneUnloaded', {})
 
     stopParcelSceneWorker(currentLoadedScene)
-    unityInterface.sendBuilderMessage('UnloadScene', parcelScene.data.sceneId)
+    unityInterface.sendBuilderMessage('UnloadBuilderScene', parcelScene.data.sceneId)
     currentLoadedScene = null
   }
 }

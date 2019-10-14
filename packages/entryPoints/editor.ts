@@ -32,7 +32,8 @@ import {
   resetCameraZoomBuilder,
   setBuilderGridResolution,
   setBuilderArrowKeyDown,
-  unloadCurrentBuilderScene
+  unloadCurrentBuilderScene,
+  selectBuilderEntity
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -179,13 +180,14 @@ namespace editor {
   /**
    * Function executed by builder which is the first function of the entry point
    */
-  export async function initEngine(container: HTMLElement) {
+  export async function initEngine(container: HTMLElement, x?: number, y?: number, local?: boolean) {
+    defaultLogger.log('builder: init Engine.')
     try {
-      await initializeUnity(container)
-      defaultLogger.log('Engine initialized.')
+      await initializeUnity(container, local)
+      defaultLogger.log('builder: Engine initialized.')
       initializedEngine.resolve()
     } catch (err) {
-      defaultLogger.error('Error loading Unity', err)
+      defaultLogger.error('builder: Error loading Unity', err)
       initializedEngine.reject(err)
       throw err
     }
@@ -200,8 +202,8 @@ namespace editor {
   export function setGridResolution(position: number, rotation: number, scale: number) {
     setBuilderGridResolution(position, rotation, scale)
   }
-  export function selectEntity() {
-    console.log('selectEntity')
+  export function selectEntity(entityId: string) {
+    selectBuilderEntity(entityId)
   }
   export function getDCLCanvas() {
     return document.getElementById('#canvas')
