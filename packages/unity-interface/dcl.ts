@@ -122,6 +122,10 @@ const browserInterface = {
 
   SendScreenshot(data: { id: string; encodedTexture: string }) {
     futures[data.id].resolve(data.encodedTexture)
+  },
+
+  ReportBuilderCameraTarget(data: { id: string; cameraTarget: ReadOnlyVector3 }) {
+    futures[data.id].resolve(data.cameraTarget)
   }
 }
 
@@ -435,8 +439,8 @@ export function setCameraZoomDeltaBuilder(delta: number) {
   unityInterface.sendBuilderMessage('ZoomDelta', delta.toString())
 }
 
-export function getCameraTargetBuilder() {
-  return positionEvent.position
+export function getCameraTargetBuilder(futureId: string) {
+  unityInterface.sendBuilderMessage('GetCameraTargetBuilder', futureId)
 }
 
 export function setPlayModeBuilder(on: string) {

@@ -247,7 +247,10 @@ namespace editor {
     setCameraZoomDeltaBuilder(delta)
   }
   export function getCameraTarget() {
-    return getCameraTargetBuilder()
+    const id = uuid()
+    futures[id] = future()
+    getCameraTargetBuilder(id)
+    return futures[id]
   }
   export function resetCameraZoom() {
     console.log('resetCameraZoom')
