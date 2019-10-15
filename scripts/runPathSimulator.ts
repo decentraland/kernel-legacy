@@ -3,9 +3,24 @@ import express = require('express')
 import WebSocket = require('ws')
 import http = require('http')
 
-type Event = 'Reset'| 'DeactivateRendering'| 'SetDebug'| 'CreateUIScene'|  ConfigureMinimapHUD, ConfigureAvatarHUD, ConfigureNotificationHUD, SendSceneMessage, LoadParcelScenes, AddWearableToCatalog, Teleport, ActivateRendering, LoadProfile
+type Event =
+  | 'Reset'
+  | 'DeactivateRendering'
+  | 'SetDebug'
+  | 'CreateUIScene'
+  | 'ConfigureMinimapHUD'
+  | 'ConfigureAvatarHUD'
+  | 'ConfigureNotificationHUD'
+  | 'SendSceneMessage'
+  | 'LoadParcelScenes'
+  | 'AddWearableToCatalog'
+  | 'Teleport'
+  | 'ActivateRendering'
+  | 'LoadProfile'
+  | string
+
 type Message = {
-  type: Event 
+  type: Event
   payload?: string
 }
 
@@ -70,8 +85,8 @@ wss.on('connection', function connection(ws, req) {
         break
       }
       default: {
-        console.log(`Unknown message type ${data.type}`);
-       break 
+        console.log(`Unknown message type ${data.type}`)
+        break
       }
     }
   })
