@@ -199,7 +199,7 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'CreateEntity',
             tag: entityId,
-            payload: JSON.stringify({ id: entityId } as CreateEntityPayload)
+            payload: { id: entityId } as CreateEntityPayload
           })
         },
 
@@ -207,7 +207,7 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'RemoveEntity',
             tag: entityId,
-            payload: JSON.stringify({ id: entityId } as RemoveEntityPayload)
+            payload: { id: entityId } as RemoveEntityPayload
           })
         },
 

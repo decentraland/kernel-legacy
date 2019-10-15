@@ -27,7 +27,9 @@ import {
   IScene,
   LoadableParcelScene,
   MappingsResponse,
-  Notification
+  Notification,
+  CreateEntityPayload,
+  RemoveEntityPayload
 } from '../shared/types'
 import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
@@ -41,6 +43,7 @@ import { positionObservable, teleportObservable } from '../shared/world/position
 import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { SendSceneMessage, CreateEntity, RemoveEntity } from './engineinterface_pb'
 
 let gameInstance!: GameInstance
 
@@ -159,11 +162,33 @@ const unityInterface = {
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
   },
-  SendSceneMessage(parcelSceneId: string, method: string, payload: string, tag: string = '') {
+  SendSceneMessage(parcelSceneId: string, method: string, payload: any, tag: string = '') {
     if (unityInterface.debug) {
       defaultLogger.info(parcelSceneId, method, payload, tag)
     }
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
+
+    let message: SendSceneMessage = new SendSceneMessage()
+    message.setSceneid(parcelSceneId)
+    message.setTag(tag)
+
+    if (method === 'CreateEntity') {
+      let createEntityPayload: CreateEntityPayload = payload
+      let createEntity: CreateEntity = new CreateEntity()
+      createEntity.setId(createEntityPayload.id)
+      message.setCreateentity(createEntity)
+      let arrayBuffer: Uint8Array = message.serializeBinary()
+      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
+      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
+    } else if (method === 'RemoveEntity') {
+      let removeEntityPayload: RemoveEntityPayload = payload
+      let removeEntity: RemoveEntity = new RemoveEntity()
+      removeEntity.setId(removeEntityPayload.id)
+      message.setCreateentity(removeEntity)
+      let arrayBuffer: Uint8Array = message.serializeBinary()
+      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
+      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
+    } else
+      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
 
   SetSceneDebugPanel() {
