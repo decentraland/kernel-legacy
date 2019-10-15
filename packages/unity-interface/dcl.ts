@@ -25,6 +25,7 @@ import {
   HUDConfiguration,
   ILand,
   ILandToLoadableParcelScene,
+  ILandToLoadableParcelSceneUpdate,
   InstancedSpawnPoint,
   IScene,
   LoadableParcelScene,
@@ -568,7 +569,7 @@ export function updateBuilderScene(sceneData: ILand) {
   defaultLogger.info('mappings: ', sceneData.mappingsResponse)
 
   if (currentLoadedScene) {
-    const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
     delete target.land
     unityInterface.UpdateParcelScenes([target])
   }
