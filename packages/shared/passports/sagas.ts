@@ -1,6 +1,7 @@
-import { call, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { call, fork, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { NotificationType } from 'shared/types'
 import { getServerConfigurations } from '../../config'
-import { getAccessToken, getCurrentUserId } from '../auth/selectors'
+import { getAccessToken, getCurrentUserId, getEmail } from '../auth/selectors'
 import defaultLogger from '../logger'
 import { isInitialized } from '../renderer/selectors'
 import { RENDERER_INITIALIZED } from '../renderer/types'
@@ -18,8 +19,11 @@ import {
   INVENTORY_FAILURE,
   INVENTORY_REQUEST,
   INVENTORY_SUCCESS,
+  notifyNewInventoryItem,
+  NOTIFY_NEW_INVENTORY_ITEM,
   passportRandom,
   PassportRandomAction,
+  passportRequest,
   PassportRequestAction,
   passportSuccess,
   PassportSuccessAction,
@@ -30,15 +34,14 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer,
-  passportRequest
+  setProfileServer
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
-import { baseCatalogsLoaded, getProfile, getProfileDownloadServer, getEthereumAddress } from './selectors'
+import { baseCatalogsLoaded, getEthereumAddress, getInventory, getProfile, getProfileDownloadServer } from './selectors'
 import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
-import { Avatar, Catalog, Profile } from './types'
+import { Avatar, Catalog, Profile, WearableId } from './types'
 
 /**
  * This saga handles both passports and assets required for the renderer to show the
@@ -67,6 +70,10 @@ export function* passportSaga(): any {
   yield takeLatest(SAVE_AVATAR_REQUEST, handleSaveAvatar)
 
   yield takeLatest(INVENTORY_REQUEST, handleFetchInventory)
+
+  yield takeLatest(NOTIFY_NEW_INVENTORY_ITEM, handleNewInventoryItem)
+
+  yield fork(queryInventoryEveryMinute)
 }
 
 export function* initialLoad() {
@@ -89,20 +96,32 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     const serverUrl = yield select(getProfileDownloadServer)
     const accessToken = yield select(getAccessToken)
     const profile = yield call(profileServerRequest, serverUrl, userId, accessToken)
-    yield put(inventoryRequest(userId))
-    const inventoryResult = yield race({
-      success: take(INVENTORY_SUCCESS),
-      failure: take(INVENTORY_FAILURE)
-    })
-    if (inventoryResult.failure) {
-      defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
+    const currentId = yield select(getCurrentUserId)
+    if (currentId === userId) {
+      profile.email = yield select(getEmail)
+    }
+    if (profile.ethAddress) {
+      yield put(inventoryRequest(userId, profile.ethAddress))
+      const inventoryResult = yield race({
+        success: take(INVENTORY_SUCCESS),
+        failure: take(INVENTORY_FAILURE)
+      })
+      if (inventoryResult.failure) {
+        defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)
+      } else {
+        profile.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      }
     } else {
-      profile.inventory = (inventoryResult.success as InventorySuccess).payload.inventory.map(dropIndexFromExclusives)
+      profile.inventory = []
     }
     const passport = processServerProfile(userId, profile)
     yield put(passportSuccess(userId, passport))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
+    const currentId = yield select(getCurrentUserId)
+    if (currentId === userId) {
+      randomizedUserProfile.email = yield select(getEmail)
+    }
     yield put(inventorySuccess(userId, randomizedUserProfile.inventory))
     yield put(passportRandom(userId, randomizedUserProfile))
   }
@@ -155,6 +174,15 @@ export function sendWearablesCatalog(catalog: Catalog) {
   window['unityInterface'].AddWearablesToCatalog(catalog)
 }
 
+export function handleNewInventoryItem() {
+  window['unityInterface'].ShowNotification({
+    type: NotificationType.GENERIC,
+    message: 'You received an exclusive wearable NFT mask! Check it out in the avatar editor.',
+    buttonMessage: 'OK',
+    timer: 7
+  })
+}
+
 export function* submitPassportToRenderer(action: PassportSuccessAction): any {
   if ((yield select(getCurrentUserId)) === action.payload.userId) {
     if (!(yield select(isInitialized))) {
@@ -185,10 +213,9 @@ export function fetchCurrentProfile(accessToken: string, uuid: string) {
 }
 
 export function* handleFetchInventory(action: InventoryRequest) {
-  const { userId } = action.payload
-  const ethereumAddress = yield select(getEthereumAddress, userId)
+  const { userId, ethAddress } = action.payload
   try {
-    const inventoryItems = yield call(fetchInventoryItemsByAddress, ethereumAddress)
+    const inventoryItems = yield call(fetchInventoryItemsByAddress, ethAddress)
     yield put(inventorySuccess(userId, inventoryItems))
   } catch (error) {
     yield put(inventoryFailure(userId, error))
@@ -268,8 +295,8 @@ export async function modifyAvatar(params: {
 
 async function saveSnapshots(userURL: string, accessToken: string, face: string, body: string) {
   const data = new FormData()
-  data.append('face', stringToBlob(face), 'face.png')
-  data.append('body', stringToBlob(body), 'body.png')
+  data.append('face', base64ToBlob(face), 'face.png')
+  data.append('body', base64ToBlob(body), 'body.png')
   return (await fetch(`${userURL}/snapshot`, {
     method: 'POST',
     body: data,
@@ -278,6 +305,69 @@ async function saveSnapshots(userURL: string, accessToken: string, face: string,
     }
   })).json()
 }
-function stringToBlob(str: string) {
-  return new Blob([btoa(str)], { type: 'image/png' })
+
+export function base64ToBlob(base64: string): Blob {
+  const sliceSize = 1024
+  const byteChars = window.atob(base64)
+  const byteArrays = []
+  let len = byteChars.length
+
+  for (let offset = 0; offset < len; offset += sliceSize) {
+    const slice = byteChars.slice(offset, offset + sliceSize)
+
+    const byteNumbers = new Array(slice.length)
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i)
+    }
+
+    const byteArray = new Uint8Array(byteNumbers)
+
+    byteArrays.push(byteArray)
+    len = byteChars.length
+  }
+
+  return new Blob(byteArrays, { type: 'image/jpeg' })
+}
+
+const MILLIS_PER_SECOND = 1000
+const ONE_MINUTE = 60 * MILLIS_PER_SECOND
+
+export function delay(time: number) {
+  return new Promise(resolve => setTimeout(resolve, time))
+}
+
+export function* queryInventoryEveryMinute() {
+  while (true) {
+    yield delay(ONE_MINUTE)
+    const userId = yield select(getCurrentUserId)
+    if (!userId) {
+      continue
+    }
+    const ethAddress = yield select(getEthereumAddress, userId)
+    const inventory = yield select(getInventory, userId)
+    if (!inventory) {
+      continue
+    }
+    yield put(inventoryRequest(userId, ethAddress))
+    const fetchNewInventory = yield race({
+      success: take(INVENTORY_SUCCESS),
+      fail: take(INVENTORY_FAILURE)
+    })
+    if (fetchNewInventory.success) {
+      const newInventory = yield select(getInventory, userId)
+      if (areInventoriesDifferent(inventory, newInventory)) {
+        yield put(notifyNewInventoryItem())
+        yield call(sendLoadProfile, yield select(getProfile, userId))
+      }
+    }
+  }
+}
+
+function areInventoriesDifferent(inventory1: WearableId[], inventory2: WearableId[]) {
+  const sort1 = inventory1.sort()
+  const sort2 = inventory2.sort()
+  return (
+    inventory1.length !== inventory2.length ||
+    sort1.reduce((result: boolean, next, index) => result && next !== sort2[index], true)
+  )
 }

@@ -130,10 +130,6 @@ jobs:
     working_directory: /tmp/explorer
     steps:
       - restore_cache:
-          name: Restore built files
-          keys:
-            - build-{{ .Revision }}
-      - restore_cache:
           name: Restore sdk-release files
           keys:
             - build-sdk-{{ .Revision }}
@@ -141,9 +137,10 @@ jobs:
           name: Restore node_modules
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
-      - run:
-          name: Copy Unity build to target directory
-          command: cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/
+      - restore_cache:
+          name: Restore built files
+          keys:
+            - build-{{ .Revision }}
       - run:
           name: Set up NPM access tokens
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
@@ -173,6 +170,9 @@ jobs:
       - run:
           name: Invalidate cloudfront cache .zone
           command: aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true && aws cloudfront create-invalidation --distribution-id E297VXIBZFXIXE --paths "/*"
+      - run:
+          name: Invalidate cloudflare cache .zone
+          command: curl "$PURGE_CACHE_ZONE"
 
   deploy-dev:
     docker:

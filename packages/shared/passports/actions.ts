@@ -33,7 +33,8 @@ export const catalogLoaded = (name: string) => action(CATALOG_LOADED, { name })
 export type CatalogLoadedAction = ReturnType<typeof catalogLoaded>
 
 export const INVENTORY_REQUEST = '[Request] Inventory fetch'
-export const inventoryRequest = (userId: string) => action(INVENTORY_REQUEST, { userId })
+export const inventoryRequest = (userId: string, ethAddress: string) =>
+  action(INVENTORY_REQUEST, { userId, ethAddress })
 export type InventoryRequest = ReturnType<typeof inventoryRequest>
 
 export const INVENTORY_SUCCESS = '[Success] Inventory fetch'
@@ -48,6 +49,10 @@ export type InventoryFailure = ReturnType<typeof inventoryFailure>
 export const SAVE_AVATAR_REQUEST = '[Request] Save Avatar'
 export const SAVE_AVATAR_SUCCESS = '[Success] Save Avatar'
 export const SAVE_AVATAR_FAILURE = '[Failure] Save Avatar'
+
+export const NOTIFY_NEW_INVENTORY_ITEM = '[Inventory] New inventory item'
+export const notifyNewInventoryItem = () => action(NOTIFY_NEW_INVENTORY_ITEM)
+export type NotifyNewInventoryItem = ReturnType<typeof notifyNewInventoryItem>
 
 export const saveAvatarRequest = (profile: { avatar: Avatar; body: string; face: string }, userId?: string) =>
   action(SAVE_AVATAR_REQUEST, { userId, profile })
