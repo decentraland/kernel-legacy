@@ -594,8 +594,8 @@ export function updateBuilderScene(sceneData: ILand) {
   }
 }
 
-export function setBuilderArrowKeyDown(key: string) {
-  unityInterface.sendBuilderMessage('SetArrowKeyDown', key)
+export function onBuilderKeyDown(key: string) {
+  unityInterface.sendBuilderMessage('OnBuilderKeyDown', key)
 }
 
 teleportObservable.add((position: { x: number; y: number }) => {

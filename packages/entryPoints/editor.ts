@@ -31,7 +31,7 @@ import {
   setCameraRotationBuilder,
   resetCameraZoomBuilder,
   setBuilderGridResolution,
-  setBuilderArrowKeyDown,
+  onBuilderKeyDown,
   unloadCurrentBuilderScene,
   selectBuilderEntity
 } from '../unity-interface/dcl'
@@ -307,8 +307,8 @@ namespace editor {
     console.log('getCameraPosition')
   }
 
-  export function setArrowKeyDown(key: string) {
-    setBuilderArrowKeyDown(key)
+  export function onKeyDown(key: string) {
+    onBuilderKeyDown(key)
   }
 }
 
