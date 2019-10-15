@@ -41,6 +41,8 @@ import { positionObservable, teleportObservable } from '../shared/world/position
 import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { queueTrackingEvent } from '../shared/analytics'
+import { getPerformanceInfo } from '../shared/session/getPerformanceInfo'
 
 let gameInstance!: GameInstance
 
@@ -75,6 +77,11 @@ const browserInterface = {
 
   OpenWebURL(data: { url: string }) {
     window.open(data.url, '_blank')
+  },
+
+  PerformanceReport(samples: string) {
+    const perfReport = getPerformanceInfo(samples)
+    queueTrackingEvent('performance report', perfReport)
   },
 
   PreloadFinished(data: { sceneId: string }) {
