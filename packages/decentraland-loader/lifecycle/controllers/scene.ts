@@ -76,7 +76,7 @@ export class SceneLifeCycleController extends EventEmitter {
           }
         }
 
-        if (this.sceneStatus.has(sceneId) && this.sceneStatus.get(sceneId)!.isDead()) {
+        if (this.sceneStatus.get(sceneId)!.isDead()) {
           this.emit('Preload scene', sceneId)
           this.sceneStatus.get(sceneId)!.status = 'awake'
         }

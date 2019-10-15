@@ -10,12 +10,6 @@ import { SceneDataDownloadManager } from './controllers/download'
 import { ILand, InstancedSpawnPoint } from 'shared/types'
 import defaultLogger from 'shared/logger'
 
-export type LifecycleWorkerOptions = {
-  contentServer: string
-  lineOfSightRadius: number
-  mockedDownloadManager?: boolean // For stubbing (builder)
-}
-
 const connector = new Adapter(WebWorkerTransport(self as any))
 
 let parcelController: ParcelLifeCycleController

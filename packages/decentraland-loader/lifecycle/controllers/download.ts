@@ -27,23 +27,52 @@ function getSceneIdFromSceneMappingResponse(scene: DeployedScene) {
 }
 
 export class SceneDataDownloadManager {
-  private positionToSceneId: Map<string, IFuture<string | null>> = new Map()
-  private sceneIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
+  positionToSceneId: Map<string, IFuture<string | null>> = new Map()
+  sceneIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
+  rootIdToLandData: Map<string, IFuture<ILand | null>> = new Map()
 
-  constructor(private options: { contentServer: string }) {
+  constructor(public options: { contentServer: string }) {
     // stub
   }
 
-  async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {
-    return this.sceneIdToLandData.get(sceneId)!
+  async resolveSceneSceneId(pos: string): Promise<string | null> {
+    if (this.positionToSceneId.has(pos)) {
+      return this.positionToSceneId.get(pos)!
+    }
+    const promised = future<string | null>()
+    this.positionToSceneId.set(pos, promised)
+    const nw = pos.split(',').map($ => parseInt($, 10))
+    const responseContent = await fetch(
+      this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
+    )
+
+    if (!responseContent.ok) {
+      error(`Error in ${this.options.contentServer}/scenes response!`, responseContent)
+      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
+      promised.reject(ret)
+      throw ret
+    } else {
+      const contents = (await responseContent.json()) as SceneMappingResponse
+      if (!contents.data.length) {
+        promised.resolve(null)
+        return null
+      }
+      this.setSceneRoots(contents)
+    }
+    return promised
   }
 
-  async getParcelData(position: string): Promise<ILand | null> {
-    const sceneId = await this.resolveSceneSceneId(position)
-    if (sceneId === null) {
-      return null
+  setSceneRoots(contents: SceneMappingResponse) {
+    for (let result of contents.data) {
+      const sceneId = getSceneIdFromSceneMappingResponse(result)
+      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
+
+      if (promised.isPending) {
+        promised.resolve(sceneId)
+      }
+
+      this.positionToSceneId.set(result.parcel_id, promised)
     }
-    return this.resolveLandData(sceneId)
   }
 
   createFakeILand(sceneId: string) {
@@ -169,43 +198,15 @@ export class SceneDataDownloadManager {
     return data
   }
 
-  private async resolveSceneSceneId(pos: string): Promise<string | null> {
-    if (this.positionToSceneId.has(pos)) {
-      return this.positionToSceneId.get(pos)!
-    }
-    const promised = future<string | null>()
-    this.positionToSceneId.set(pos, promised)
-    const nw = pos.split(',').map($ => parseInt($, 10))
-    const responseContent = await fetch(
-      this.options.contentServer + `/scenes?x1=${nw[0]}&x2=${nw[0]}&y1=${nw[1]}&y2=${nw[1]}`
-    )
-
-    if (!responseContent.ok) {
-      error(`Error in ${this.options.contentServer}/scenes response!`, responseContent)
-      const ret = new Error(`Error in ${this.options.contentServer}/scenes response!`)
-      promised.reject(ret)
-      throw ret
-    } else {
-      const contents = (await responseContent.json()) as SceneMappingResponse
-      if (!contents.data.length) {
-        promised.resolve(null)
-        return null
-      }
-      this.setSceneRoots(contents)
-    }
-    return promised
+  async getParcelDataBySceneId(sceneId: string): Promise<ILand | null> {
+    return this.sceneIdToLandData.get(sceneId)!
   }
 
-  private setSceneRoots(contents: SceneMappingResponse) {
-    for (let result of contents.data) {
-      const sceneId = getSceneIdFromSceneMappingResponse(result)
-      const promised = this.positionToSceneId.get(result.parcel_id) || future<string | null>()
-
-      if (promised.isPending) {
-        promised.resolve(sceneId)
-      }
-
-      this.positionToSceneId.set(result.parcel_id, promised)
+  async getParcelData(position: string): Promise<ILand | null> {
+    const sceneId = await this.resolveSceneSceneId(position)
+    if (sceneId === null) {
+      return null
     }
+    return this.resolveLandData(sceneId)
   }
 }
