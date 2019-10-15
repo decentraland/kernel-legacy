@@ -392,29 +392,3 @@ export function ILandToLoadableParcelScene(land: ILand): EnvironmentData<Loadabl
 
   return ret
 }
-
-export function ILandToLoadableParcelSceneUpdate(land: ILand): EnvironmentData<LoadableParcelScene> {
-  const mappings: ContentMapping[] = normalizeContentMappings(land.mappingsResponse.contents)
-
-  const ret: EnvironmentData<LoadableParcelScene> = {
-    sceneId: land.sceneId,
-    baseUrl: land.baseUrl,
-    main: land.scene.main,
-    mappings,
-    data: {
-      id: land.sceneId,
-      basePosition: parseParcelPosition('0,0'),
-      parcels:
-        (land.scene &&
-          land.scene.scene &&
-          land.scene.scene.parcels &&
-          land.scene.scene.parcels.map(parseParcelPosition)) ||
-        [],
-      baseUrl: land.baseUrl,
-      contents: mappings,
-      land
-    }
-  }
-
-  return ret
-}
