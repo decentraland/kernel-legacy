@@ -35,6 +35,8 @@ import { ProfileForRenderer } from 'decentraland-ecs/src'
 type Timestamp = number
 type PeerAlias = string
 
+const UNREACHABLE_POSITION = [1000, 1000, 1000, 0, 0, 0, 0] as Position
+
 export class PeerTrackingInfo {
   public position: Position | null = null
   public identity: string | null = null
@@ -286,6 +288,9 @@ export function onPositionUpdate(context: Context, p: Position) {
     }
 
     currentParcelTopics = rawTopics.join(' ')
+    if (context.currentPosition) {
+      worldConnection.sendParcelUpdateMessage(context.currentPosition, p)
+    }
   }
 
   const parcelSceneSubscriptions = getParcelSceneSubscriptions()
@@ -476,6 +481,12 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
 
     if (context) {
       onPositionUpdate(context, p)
+    }
+  })
+
+  window.addEventListener('beforeunload', event => {
+    if (context && context.worldInstanceConnection && context.currentPosition) {
+      context.worldInstanceConnection.sendParcelUpdateMessage(context.currentPosition, UNREACHABLE_POSITION)
     }
   })
 
