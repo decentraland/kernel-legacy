@@ -29,8 +29,7 @@ import {
   IScene,
   LoadableParcelScene,
   MappingsResponse,
-  Notification,
-  ILandToLoadableParcelSceneUpdate
+  Notification
 } from '../shared/types'
 import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
@@ -44,7 +43,6 @@ import { positionObservable, teleportObservable } from '../shared/world/position
 import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
-import { SceneDataDownloadManager } from '../decentraland-loader/lifecycle/controllers/download'
 
 let gameInstance!: GameInstance
 
@@ -192,61 +190,47 @@ export const unityInterface = {
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
-
   SetSceneDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   },
-
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   },
-
   sendBuilderMessage(method: string, payload: string = '') {
     gameInstance.SendMessage(`BuilderController`, method, payload)
   },
-
   ActivateRendering() {
     gameInstance.SendMessage('SceneController', 'ActivateRendering')
   },
-
   DeactivateRendering() {
     gameInstance.SendMessage('SceneController', 'DeactivateRendering')
   },
-
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
   },
-
   SetBuilderReady() {
     gameInstance.SendMessage('SceneController', 'BuilderReady')
   },
-
   AddWearablesToCatalog(wearables: Wearable[]) {
     for (let wearable of wearables) {
       gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
     }
   },
-
   RemoveWearablesFromCatalog(wearableIds: string[]) {
     gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
   },
-
   ClearWearableCatalog() {
     gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
   },
-
   ShowNotification(notification: Notification) {
     gameInstance.SendMessage('HUDController', 'ShowNotificationFromJson', JSON.stringify(notification))
   },
-
   ConfigureMinimapHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
   },
-
   ConfigureAvatarHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureAvatarHUD', JSON.stringify(configuration))
   },
-
   ConfigureNotificationHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
   }
@@ -367,15 +351,9 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   }
 }
 
-/**
- * Initialize scenes loading worker
- * OPTIONAL: mock the download manager at @param downloaderManager for example
- * for not using content server. `editor.ts` entrypoint is using it
- */
-export async function startUnityParcelLoading(downloadManager?: SceneDataDownloadManager) {
+export async function startUnityParcelLoading() {
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
-    downloadManager,
     preloadScene: async _land => {
       // TODO:
       // 1) implement preload call
@@ -590,7 +568,7 @@ export function updateBuilderScene(sceneData: ILand) {
   defaultLogger.info('mappings: ', sceneData.mappingsResponse)
 
   if (currentLoadedScene) {
-    const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
     delete target.land
     unityInterface.UpdateParcelScenes([target])
   }
