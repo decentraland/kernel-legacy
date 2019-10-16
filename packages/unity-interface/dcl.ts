@@ -508,10 +508,6 @@ export async function loadPreviewScene() {
 export function loadBuilderScene(sceneData: ILand) {
   unloadCurrentBuilderScene()
 
-  defaultLogger.info('Starting Builder Scene...')
-
-  defaultLogger.info('mappings: ', sceneData.mappingsResponse)
-
   const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(sceneData))
   currentLoadedScene = loadParcelScene(parcelScene)
 
@@ -534,8 +530,6 @@ export function unloadCurrentBuilderScene() {
 }
 
 export function updateBuilderScene(sceneData: ILand) {
-  defaultLogger.info('Updating Builder Scene...')
-
   if (currentLoadedScene) {
     const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
     delete target.land
