@@ -197,7 +197,7 @@ export const unityInterface = {
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
   },
-  sendBuilderMessage(method: string, payload: string = '') {
+  SendBuilderMessage(method: string, payload: string = '') {
     gameInstance.SendMessage(`BuilderController`, method, payload)
   },
   ActivateRendering() {
@@ -234,6 +234,54 @@ export const unityInterface = {
   },
   ConfigureNotificationHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
+  },
+  SelectGizmoBuilder(type: string) {
+    this.SendBuilderMessage('SelectGizmo', type)
+  },
+  ResetBuilderObject() {
+    this.SendBuilderMessage('ResetObject')
+  },
+  SetCameraZoomDeltaBuilder(delta: number) {
+    this.SendBuilderMessage('ZoomDelta', delta.toString())
+  },
+  GetCameraTargetBuilder(futureId: string) {
+    this.SendBuilderMessage('GetCameraTargetBuilder', futureId)
+  },
+  SetPlayModeBuilder(on: string) {
+    this.SendBuilderMessage('SetPlayMode', on)
+  },
+  PreloadFileBuilder(url: string) {
+    this.SendBuilderMessage('PreloadFile', url)
+  },
+  GetMousePositionBuilder(x: string, y: string, id: string) {
+    this.SendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
+  },
+  TakeScreenshotBuilder(id: string) {
+    this.SendBuilderMessage('TakeScreenshot', id)
+  },
+  SetCameraPositionBuilder(position: Vector3) {
+    this.SendBuilderMessage('SetBuilderCameraPosition', position.x + ',' + position.y + ',' + position.z)
+  },
+  SetCameraRotationBuilder(aplha: number, beta: number) {
+    this.SendBuilderMessage('SetBuilderCameraRotation', aplha + ',' + beta)
+  },
+  ResetCameraZoomBuilder() {
+    this.SendBuilderMessage('ResetBuilderCameraZoom')
+  },
+  SetBuilderGridResolution(position: number, rotation: number, scale: number) {
+    this.SendBuilderMessage(
+      'SetGridResolution',
+      JSON.stringify({ position: position, rotation: rotation, scale: scale })
+    )
+  },
+  SelectBuilderEntity(entityId: string) {
+    this.SendBuilderMessage('SelectEntity', entityId)
+  },
+  ResetBuilderScene() {
+    this.SendBuilderMessage('ResetBuilderScene')
+  },
+  OnBuilderKeyDown(key: string) {
+    this.SendBuilderMessage('OnBuilderKeyDown', key)
   }
 }
 
@@ -407,77 +455,6 @@ async function initializeDecentralandUI() {
 
 // Builder functions
 
-export function selectGizmoBuilder(type: string) {
-  unityInterface.sendBuilderMessage('SelectGizmo', type)
-}
-
-export function resetObject() {
-  unityInterface.sendBuilderMessage('ResetObject')
-}
-
-export function setCameraZoomDeltaBuilder(delta: number) {
-  unityInterface.sendBuilderMessage('ZoomDelta', delta.toString())
-}
-
-export function getCameraTargetBuilder(futureId: string) {
-  unityInterface.sendBuilderMessage('GetCameraTargetBuilder', futureId)
-}
-
-export function setPlayModeBuilder(on: string) {
-  unityInterface.sendBuilderMessage('SetPlayMode', on)
-}
-
-export function getMouseWorldPositionBuilder() {
-  return positionEvent.mousePosition
-}
-
-export function preloadFileBuilder(url: string) {
-  unityInterface.sendBuilderMessage('PreloadFile', url)
-}
-
-export function getMousePositionBuilder(x: string, y: string, id: string) {
-  unityInterface.sendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
-}
-
-export function takeScreenshotBuilder(id: string) {
-  unityInterface.sendBuilderMessage('TakeScreenshot', id)
-}
-
-export function setCameraPositionBuilder(position: Vector3) {
-  unityInterface.sendBuilderMessage('SetBuilderCameraPosition', position.x + ',' + position.y + ',' + position.z)
-}
-
-export function setCameraRotationBuilder(aplha: number, beta: number) {
-  unityInterface.sendBuilderMessage('SetBuilderCameraRotation', aplha + ',' + beta)
-}
-
-export function resetCameraZoomBuilder() {
-  unityInterface.sendBuilderMessage('ResetBuilderCameraZoom')
-}
-
-export function ActivateRendering() {
-  unityInterface.ActivateRendering()
-}
-
-export function DeactivateRendering() {
-  unityInterface.DeactivateRendering()
-}
-
-export function UnloadScene(sceneId: string) {
-  unityInterface.UnloadScene(sceneId)
-}
-
-export function setBuilderGridResolution(position: number, rotation: number, scale: number) {
-  unityInterface.sendBuilderMessage(
-    'SetGridResolution',
-    JSON.stringify({ position: position, rotation: rotation, scale: scale })
-  )
-}
-
-export function selectBuilderEntity(entityId: string) {
-  unityInterface.sendBuilderMessage('SelectEntity', entityId)
-}
-
 let currentLoadedScene: SceneWorker | null
 
 export async function loadPreviewScene() {
@@ -551,17 +528,9 @@ export function unloadCurrentBuilderScene() {
     parcelScene.emit('builderSceneUnloaded', {})
 
     stopParcelSceneWorker(currentLoadedScene)
-    unityInterface.sendBuilderMessage('UnloadBuilderScene', parcelScene.data.sceneId)
+    unityInterface.SendBuilderMessage('UnloadBuilderScene', parcelScene.data.sceneId)
     currentLoadedScene = null
   }
-}
-
-export function readyBuilderScene() {
-  unityInterface.SetBuilderReady()
-}
-
-export function resetBuilderScene() {
-  unityInterface.sendBuilderMessage('ResetBuilderScene')
 }
 
 export function updateBuilderScene(sceneData: ILand) {
@@ -573,10 +542,6 @@ export function updateBuilderScene(sceneData: ILand) {
     delete target.land
     unityInterface.UpdateParcelScenes([target])
   }
-}
-
-export function onBuilderKeyDown(key: string) {
-  unityInterface.sendBuilderMessage('OnBuilderKeyDown', key)
 }
 
 teleportObservable.add((position: { x: number; y: number }) => {

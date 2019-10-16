@@ -13,26 +13,11 @@ import { SceneWorker } from '../shared/world/SceneWorker'
 import { initializeUnity } from '../unity-interface/initializer'
 import {
   UnityParcelScene,
-  selectGizmoBuilder,
-  setCameraZoomDeltaBuilder,
-  getCameraTargetBuilder,
-  setPlayModeBuilder,
   loadBuilderScene,
   updateBuilderScene,
-  readyBuilderScene,
-  preloadFileBuilder,
-  getMousePositionBuilder,
-  takeScreenshotBuilder,
   futures,
-  ActivateRendering,
-  DeactivateRendering,
-  resetBuilderScene,
-  setCameraPositionBuilder,
-  setCameraRotationBuilder,
-  resetCameraZoomBuilder,
-  setBuilderGridResolution,
-  onBuilderKeyDown,
-  unloadCurrentBuilderScene
+  unloadCurrentBuilderScene,
+  unityInterface
 } from '../unity-interface/dcl'
 import defaultLogger from '../shared/logger'
 import { uuid } from '../decentraland-ecs/src/ecs/helpers'
@@ -65,13 +50,13 @@ async function createBuilderScene(scene: IScene & { baseUrl: string }) {
   await engineReady
 
   if (isFirstRun) {
-    readyBuilderScene()
+    unityInterface.SetBuilderReady()
   } else {
-    resetBuilderScene()
+    unityInterface.ResetBuilderObject()
   }
   await builderSceneLoaded
 
-  ActivateRendering()
+  unityInterface.ActivateRendering()
   evtEmitter.emit('ready', {})
 }
 
@@ -200,12 +185,15 @@ namespace editor {
       await createBuilderScene(message.payload.scene)
     }
   }
+
   export function setGridResolution(position: number, rotation: number, scale: number) {
-    setBuilderGridResolution(position, rotation, scale)
+    unityInterface.SetBuilderGridResolution(position, rotation, scale)
   }
-  export function selectEntity() {
-    console.log('selectEntity')
+
+  export function selectEntity(entityId: string) {
+    unityInterface.SelectBuilderEntity(entityId)
   }
+
   export function getDCLCanvas() {
     return document.getElementById('#canvas')
   }
@@ -213,10 +201,11 @@ namespace editor {
   export function getScenes(): Set<SceneWorker> {
     return new Set(loadedSceneWorkers.values())
   }
+
   export async function sendExternalAction(action: { type: string; payload: { [key: string]: any } }) {
     if (action.type === 'Close editor') {
       unloadCurrentBuilderScene()
-      DeactivateRendering()
+      unityInterface.DeactivateRendering()
     } else if (unityScene) {
       const { worker } = unityScene
       if (action.payload.mappings) {
@@ -229,38 +218,41 @@ namespace editor {
   }
 
   export function selectGizmo(type: string) {
-    selectGizmoBuilder(type)
+    unityInterface.SelectGizmoBuilder(type)
   }
+
   export async function setPlayMode(on: boolean) {
     const onString: string = on ? 'true' : 'false'
-    setPlayModeBuilder(onString)
+    unityInterface.SetPlayModeBuilder(onString)
   }
+
   export function on(evt: string, listener: (...args: any[]) => void) {
     evtEmitter.addListener(evt, listener)
   }
+
   export function off(evt: string, listener: (...args: any[]) => void) {
     evtEmitter.removeListener(evt, listener)
   }
+
   export function setCameraZoomDelta(delta: number) {
-    setCameraZoomDeltaBuilder(delta)
+    unityInterface.SetCameraZoomDeltaBuilder(delta)
   }
+
   export function getCameraTarget() {
     const id = uuid()
     futures[id] = future()
-    getCameraTargetBuilder(id)
+    unityInterface.GetCameraTargetBuilder(id)
     return futures[id]
   }
+
   export function resetCameraZoom() {
-    resetCameraZoomBuilder()
-  }
-  export function resize() {
-    // TODO(pbosio): Implement builder window resize
+    unityInterface.ResetCameraZoomBuilder()
   }
 
   export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
     const id = uuid()
     futures[id] = future()
-    getMousePositionBuilder(x.toString(), y.toString(), id)
+    unityInterface.GetMousePositionBuilder(x.toString(), y.toString(), id)
     return futures[id]
   }
 
@@ -269,11 +261,13 @@ namespace editor {
   }
 
   export function preloadFile(url: string) {
-    preloadFileBuilder(url)
+    unityInterface.PreloadFileBuilder(url)
   }
+
   export function setCameraRotation(alpha: number, beta: number) {
-    setCameraRotationBuilder(alpha, beta)
+    unityInterface.SetCameraRotationBuilder(alpha, beta)
   }
+
   export function getLoadingEntity() {
     if (loadingEntities.length === 0) {
       return null
@@ -281,19 +275,20 @@ namespace editor {
       return loadingEntities[0]
     }
   }
+
   export function takeScreenshot(mime?: string): IFuture<string> {
     const id = uuid()
     futures[id] = future()
-    takeScreenshotBuilder(id)
+    unityInterface.TakeScreenshotBuilder(id)
     return futures[id]
   }
 
   export function setCameraPosition(position: Vector3) {
-    setCameraPositionBuilder(position)
+    unityInterface.SetCameraPositionBuilder(position)
   }
 
   export function onKeyDown(key: string) {
-    onBuilderKeyDown(key)
+    unityInterface.OnBuilderKeyDown(key)
   }
 }
 
