@@ -535,7 +535,6 @@ export function unloadCurrentBuilderScene() {
 
 export function updateBuilderScene(sceneData: ILand) {
   defaultLogger.info('Updating Builder Scene...')
-  defaultLogger.info('mappings: ', sceneData.mappingsResponse)
 
   if (currentLoadedScene) {
     const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
