@@ -253,6 +253,9 @@ namespace editor {
   export function resetCameraZoom() {
     resetCameraZoomBuilder()
   }
+  export function resize() {
+    // TODO(pbosio): Implement builder window resize
+  }
 
   export function getMouseWorldPosition(x: number, y: number): IFuture<Vector3> {
     const id = uuid()
