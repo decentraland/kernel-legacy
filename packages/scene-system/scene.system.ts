@@ -235,12 +235,12 @@ export default class GamekitScene extends Script {
             that.events.push({
               type: 'UpdateEntityComponent',
               tag: entityId + '_' + classId,
-              payload: JSON.stringify({
+              payload: {
                 entityId,
                 classId,
                 name: componentName.replace(componentNameRE, ''),
                 json
-              } as UpdateEntityComponentPayload)
+              } as UpdateEntityComponentPayload
             })
           }
         },
@@ -251,11 +251,11 @@ export default class GamekitScene extends Script {
             that.events.push({
               type: 'AttachEntityComponent',
               tag: entityId,
-              payload: JSON.stringify({
+              payload: {
                 entityId,
                 name: componentName.replace(componentNameRE, ''),
                 id
-              } as AttachEntityComponentPayload)
+              } as AttachEntityComponentPayload
             })
           }
         },
@@ -266,10 +266,10 @@ export default class GamekitScene extends Script {
             that.events.push({
               type: 'ComponentRemoved',
               tag: entityId,
-              payload: JSON.stringify({
+              payload: {
                 entityId,
                 name: componentName.replace(componentNameRE, '')
-              } as ComponentRemovedPayload)
+              } as ComponentRemovedPayload
             })
           }
         },
@@ -279,10 +279,10 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'SetEntityParent',
             tag: entityId,
-            payload: JSON.stringify({
+            payload: {
               entityId,
               parentId
-            } as SetEntityParentPayload)
+            } as SetEntityParentPayload
           })
         },
 
@@ -290,10 +290,10 @@ export default class GamekitScene extends Script {
         query(queryId: QueryType, payload: any) {
           that.events.push({
             type: 'Query',
-            payload: JSON.stringify({
+            payload: {
               queryId,
               payload
-            } as QueryPayload)
+            } as QueryPayload
           })
         },
 
@@ -314,11 +314,11 @@ export default class GamekitScene extends Script {
             that.events.push({
               type: 'ComponentCreated',
               tag: id,
-              payload: JSON.stringify({
+              payload: {
                 id,
                 classId,
                 name: componentName.replace(componentNameRE, '')
-              } as ComponentCreatedPayload)
+              } as ComponentCreatedPayload
             })
           }
         },
@@ -327,7 +327,7 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'ComponentDisposed',
             tag: id,
-            payload: JSON.stringify({ id } as ComponentDisposedPayload)
+            payload: { id } as ComponentDisposedPayload
           })
         },
 
@@ -335,10 +335,10 @@ export default class GamekitScene extends Script {
           that.events.push({
             type: 'ComponentUpdated',
             tag: id,
-            payload: JSON.stringify({
+            payload: {
               id,
               json
-            } as ComponentUpdatedPayload)
+            } as ComponentUpdatedPayload
           })
         },
 

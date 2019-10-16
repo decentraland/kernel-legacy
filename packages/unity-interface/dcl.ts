@@ -29,7 +29,15 @@ import {
   MappingsResponse,
   Notification,
   CreateEntityPayload,
-  RemoveEntityPayload
+  RemoveEntityPayload,
+  UpdateEntityComponentPayload,
+  AttachEntityComponentPayload,
+  ComponentRemovedPayload,
+  SetEntityParentPayload,
+  QueryPayload,
+  ComponentCreatedPayload,
+  ComponentDisposedPayload,
+  ComponentUpdatedPayload
 } from '../shared/types'
 import { ParcelSceneAPI } from '../shared/world/ParcelSceneAPI'
 import {
@@ -43,7 +51,24 @@ import { positionObservable, teleportObservable } from '../shared/world/position
 import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
-import { SendSceneMessage, CreateEntity, RemoveEntity } from './engineinterface_pb'
+import {
+  PB_SendSceneMessage,
+  PB_CreateEntity,
+  PB_RemoveEntity,
+  PB_UpdateEntityComponent,
+  PB_Vector3,
+  PB_AttachEntityComponent,
+  PB_SetEntityParent,
+  PB_Query,
+  PB_RayQuery,
+  PB_Ray
+} from './engineinterface_pb'
+import {
+  PB_ComponentRemoved,
+  PB_ComponentCreated,
+  PB_ComponentDisposed,
+  PB_ComponentUpdated
+} from './engineinterface_pb'
 
 let gameInstance!: GameInstance
 
@@ -167,28 +192,95 @@ const unityInterface = {
       defaultLogger.info(parcelSceneId, method, payload, tag)
     }
 
-    let message: SendSceneMessage = new SendSceneMessage()
+    let message: PB_SendSceneMessage = new PB_SendSceneMessage()
     message.setSceneid(parcelSceneId)
     message.setTag(tag)
 
     if (method === 'CreateEntity') {
       let createEntityPayload: CreateEntityPayload = payload
-      let createEntity: CreateEntity = new CreateEntity()
+      let createEntity: PB_CreateEntity = new PB_CreateEntity()
       createEntity.setId(createEntityPayload.id)
       message.setCreateentity(createEntity)
-      let arrayBuffer: Uint8Array = message.serializeBinary()
-      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
-      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
     } else if (method === 'RemoveEntity') {
       let removeEntityPayload: RemoveEntityPayload = payload
-      let removeEntity: RemoveEntity = new RemoveEntity()
+      let removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
       removeEntity.setId(removeEntityPayload.id)
       message.setCreateentity(removeEntity)
-      let arrayBuffer: Uint8Array = message.serializeBinary()
-      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
-      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
-    } else
-      gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
+    } else if (method === 'UpdateEntityComponent') {
+      let updateEntityComponentPayload: UpdateEntityComponentPayload = payload
+      let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
+      updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
+      updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
+      updateEntityComponent.setJson(updateEntityComponentPayload.json)
+      message.setUpdateentitycomponent(updateEntityComponent)
+    } else if (method === 'AttachEntityComponent') {
+      let attachEntityPayload: AttachEntityComponentPayload = payload
+      let attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
+      attachEntity.setEntityid(attachEntityPayload.entityId)
+      attachEntity.setName(attachEntityPayload.name)
+      attachEntity.setId(attachEntityPayload.id)
+      message.setAttachentitycomponent(attachEntity)
+    } else if (method === 'ComponentRemoved') {
+      let removeEntityComponentPayload: ComponentRemovedPayload = payload
+      let removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
+      removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
+      removeEntityComponent.setName(removeEntityComponentPayload.name)
+      message.setComponentremoved(removeEntityComponent)
+    } else if (method === 'SetEntityParent') {
+      let setEntityParentPayload: SetEntityParentPayload = payload
+      let setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
+      setEntityParent.setEntityid(setEntityParentPayload.entityId)
+      setEntityParent.setParentid(setEntityParentPayload.parentId)
+      message.setSetentityparent(setEntityParent)
+    } else if (method === 'Query') {
+      let queryPayload: QueryPayload = payload
+      let query: PB_Query = new PB_Query()
+      let rayQuery: PB_RayQuery = new PB_RayQuery()
+      let ray: PB_Ray = new PB_Ray()
+      let origin: PB_Vector3 = new PB_Vector3()
+      let direction: PB_Vector3 = new PB_Vector3()
+      origin.setX(queryPayload.payload.ray.origin.x)
+      origin.setY(queryPayload.payload.ray.origin.y)
+      origin.setZ(queryPayload.payload.ray.origin.z)
+      direction.setX(queryPayload.payload.ray.direction.x)
+      direction.setY(queryPayload.payload.ray.direction.y)
+      direction.setZ(queryPayload.payload.ray.direction.z)
+      ray.setOrigin(origin)
+      ray.setDirection(direction)
+      ray.setDistance(queryPayload.payload.ray.distance)
+      rayQuery.setRay(ray)
+      rayQuery.setQueryid(queryPayload.payload.queryId)
+      rayQuery.setQuerytype(queryPayload.payload.queryType)
+      query.setPayload(rayQuery)
+      query.setQueryid(queryPayload.queryId)
+      message.setQuery(query)
+    } else if (method === 'ComponentCreated') {
+      let componentCreatedPayload: ComponentCreatedPayload = payload
+      let componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
+      componentCreated.setId(componentCreatedPayload.id)
+      componentCreated.setClassid(componentCreatedPayload.classId)
+      componentCreated.setName(componentCreatedPayload.name)
+      message.setComponentcreated(componentCreated)
+    } else if (method === 'ComponentDisposed') {
+      let componentDisposedPayload: ComponentDisposedPayload = payload
+      let componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
+      componentDisposed.setId(componentDisposedPayload.id)
+      message.setComponentdisposed(componentDisposed)
+    } else if (method === 'ComponentUpdated') {
+      let componentUpdatedPayload: ComponentUpdatedPayload = payload
+      let componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
+      componentUpdated.setId(componentUpdatedPayload.id)
+      componentUpdated.setJson(componentUpdatedPayload.json)
+      message.setComponentupdated(componentUpdated)
+    } else if (method === 'InitMessagesFinished') {
+      message.setScenestarted()
+    }
+
+    let arrayBuffer: Uint8Array = message.serializeBinary()
+    let base64: string = btoa(String.fromCharCode(...arrayBuffer))
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
+    //  else
+    //   gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
 
   SetSceneDebugPanel() {
