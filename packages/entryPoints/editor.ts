@@ -77,8 +77,6 @@ async function getSceneData(scene: IScene & { baseUrl: string }): Promise<ILand>
   const publisher = '0x0'
   const contents = normalizeContentMappings(scene._mappings || [])
 
-  console.log('K', scene._mappings)
-
   if (!scene.baseUrl) {
     throw new Error('baseUrl missing in scene')
   }
