@@ -69,6 +69,7 @@ import {
   PB_ComponentDisposed,
   PB_ComponentUpdated
 } from './engineinterface_pb'
+import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 
 let gameInstance!: GameInstance
 
@@ -187,7 +188,103 @@ const unityInterface = {
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
   },
-  SendSceneMessage(parcelSceneId: string, method: string, payload: any, tag: string = '') {
+  SendSceneMessage(messages: string) {
+    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, messages)
+  },
+
+  SetSceneDebugPanel() {
+    gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
+  },
+
+  SetEngineDebugPanel() {
+    gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+  },
+  ActivateRendering() {
+    gameInstance.SendMessage('SceneController', 'ActivateRendering')
+  },
+  DeactivateRendering() {
+    gameInstance.SendMessage('SceneController', 'DeactivateRendering')
+  },
+  UnlockCursor() {
+    gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+  AddWearablesToCatalog(wearables: Wearable[]) {
+    for (let wearable of wearables) {
+      gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
+    }
+  },
+  RemoveWearablesFromCatalog(wearableIds: string[]) {
+    gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
+  },
+  ClearWearableCatalog() {
+    gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
+  },
+  ShowNotification(notification: Notification) {
+    gameInstance.SendMessage('HUDController', 'ShowNotificationFromJson', JSON.stringify(notification))
+  },
+  ConfigureMinimapHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
+  },
+  ConfigureAvatarHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureAvatarHUD', JSON.stringify(configuration))
+  },
+  ConfigureNotificationHUD(configuration: HUDConfiguration) {
+    gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
+  }
+}
+
+export const HUD: Record<string, { configure: (config: HUDConfiguration) => void }> = {
+  Minimap: {
+    configure: unityInterface.ConfigureMinimapHUD
+  },
+  Avatar: {
+    configure: unityInterface.ConfigureAvatarHUD
+  },
+  Notification: {
+    configure: unityInterface.ConfigureNotificationHUD
+  }
+}
+
+window['unityInterface'] = unityInterface
+
+////////////////////////////////////////////////////////////////////////////////
+
+class UnityScene<T> implements ParcelSceneAPI {
+  eventDispatcher = new EventDispatcher()
+  worker!: SceneWorker
+  logger: ILogger
+
+  constructor(public data: EnvironmentData<T>) {
+    this.logger = createLogger(getParcelSceneID(this) + ': ')
+  }
+
+  sendBatch(actions: EntityAction[]): void {
+    const sceneId = getParcelSceneID(this)
+    let messages = ''
+    for (let i = 0; i < actions.length; i++) {
+      const action = actions[i]
+      messages += this.generateSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
+    }
+    unityInterface.SendSceneMessage(messages)
+  }
+
+  registerWorker(worker: SceneWorker): void {
+    this.worker = worker
+  }
+
+  dispose(): void {
+    // TODO: do we need to release some resource after releasing a scene worker?
+  }
+
+  on<T extends IEventNames>(event: T, cb: (event: IEvents[T]) => void): void {
+    this.eventDispatcher.on(event, cb)
+  }
+
+  emit<T extends IEventNames>(event: T, data: IEvents[T]): void {
+    this.eventDispatcher.emit(event, data)
+  }
+
+  generateSceneMessage(parcelSceneId: string, method: string, payload: any, tag: string = ''): string {
     if (unityInterface.debug) {
       defaultLogger.info(parcelSceneId, method, payload, tag)
     }
@@ -273,104 +370,11 @@ const unityInterface = {
       componentUpdated.setJson(componentUpdatedPayload.json)
       message.setComponentupdated(componentUpdated)
     } else if (method === 'InitMessagesFinished') {
-      message.setScenestarted()
+      message.setScenestarted(new Empty()) // don't know if this is necessary
     }
 
     let arrayBuffer: Uint8Array = message.serializeBinary()
-    let base64: string = btoa(String.fromCharCode(...arrayBuffer))
-    gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, base64)
-    //  else
-    //   gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
-  },
-
-  SetSceneDebugPanel() {
-    gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
-  },
-
-  SetEngineDebugPanel() {
-    gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
-  },
-  ActivateRendering() {
-    gameInstance.SendMessage('SceneController', 'ActivateRendering')
-  },
-  DeactivateRendering() {
-    gameInstance.SendMessage('SceneController', 'DeactivateRendering')
-  },
-  UnlockCursor() {
-    gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
-  },
-  AddWearablesToCatalog(wearables: Wearable[]) {
-    for (let wearable of wearables) {
-      gameInstance.SendMessage('SceneController', 'AddWearableToCatalog', JSON.stringify(wearable))
-    }
-  },
-  RemoveWearablesFromCatalog(wearableIds: string[]) {
-    gameInstance.SendMessage('SceneController', 'RemoveWearablesFromCatalog', JSON.stringify(wearableIds))
-  },
-  ClearWearableCatalog() {
-    gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
-  },
-  ShowNotification(notification: Notification) {
-    gameInstance.SendMessage('HUDController', 'ShowNotificationFromJson', JSON.stringify(notification))
-  },
-  ConfigureMinimapHUD(configuration: HUDConfiguration) {
-    gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
-  },
-  ConfigureAvatarHUD(configuration: HUDConfiguration) {
-    gameInstance.SendMessage('HUDController', 'ConfigureAvatarHUD', JSON.stringify(configuration))
-  },
-  ConfigureNotificationHUD(configuration: HUDConfiguration) {
-    gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
-  }
-}
-
-export const HUD: Record<string, { configure: (config: HUDConfiguration) => void }> = {
-  Minimap: {
-    configure: unityInterface.ConfigureMinimapHUD
-  },
-  Avatar: {
-    configure: unityInterface.ConfigureAvatarHUD
-  },
-  Notification: {
-    configure: unityInterface.ConfigureNotificationHUD
-  }
-}
-
-window['unityInterface'] = unityInterface
-
-////////////////////////////////////////////////////////////////////////////////
-
-class UnityScene<T> implements ParcelSceneAPI {
-  eventDispatcher = new EventDispatcher()
-  worker!: SceneWorker
-  logger: ILogger
-
-  constructor(public data: EnvironmentData<T>) {
-    this.logger = createLogger(getParcelSceneID(this) + ': ')
-  }
-
-  sendBatch(actions: EntityAction[]): void {
-    const sceneId = getParcelSceneID(this)
-    for (let i = 0; i < actions.length; i++) {
-      const action = actions[i]
-      unityInterface.SendSceneMessage(sceneId, action.type, action.payload, action.tag)
-    }
-  }
-
-  registerWorker(worker: SceneWorker): void {
-    this.worker = worker
-  }
-
-  dispose(): void {
-    // TODO: do we need to release some resource after releasing a scene worker?
-  }
-
-  on<T extends IEventNames>(event: T, cb: (event: IEvents[T]) => void): void {
-    this.eventDispatcher.on(event, cb)
-  }
-
-  emit<T extends IEventNames>(event: T, data: IEvents[T]): void {
-    this.eventDispatcher.emit(event, data)
+    return btoa(String.fromCharCode(...arrayBuffer))
   }
 }
 
