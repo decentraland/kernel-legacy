@@ -35,7 +35,15 @@ import { ProfileForRenderer } from 'decentraland-ecs/src'
 type Timestamp = number
 type PeerAlias = string
 
-const UNREACHABLE_POSITION = [1000, 1000, 1000, 0, 0, 0, 0] as Position
+const UNREACHABLE_POSITION: Position = [
+  parcelLimits.parcelSize * 1000,
+  1000,
+  parcelLimits.parcelSize * 1000,
+  0,
+  0,
+  0,
+  0
+]
 
 export class PeerTrackingInfo {
   public position: Position | null = null
