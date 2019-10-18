@@ -26,9 +26,7 @@ type Message = {
   payload?: string
 }
 
-type Movement = Generator
-
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5001
 
 const app = express()
 
@@ -36,14 +34,11 @@ const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
 const path = (name: string) => {
-  console.log(`path name: ${name}`)
   switch (name) {
     case '/loop':
-      return [
-        // setHeight(2)
-        loop(walkTo(320, 320), walkTo(384, 320), walkTo(384, 384), walkTo(320, 384)),
-        logOut()
-      ]
+      return [loop(() => walkTo(320, 320), () => walkTo(384, 320), () => walkTo(384, 384), () => walkTo(320, 384))]
+    case '/rloop':
+      return [loop(() => walkTo(320, 320), () => walkTo(320, 384), () => walkTo(384, 384), () => walkTo(384, 320))]
     case '/walk':
       return [
         walkTo(384, 320),
@@ -93,16 +88,16 @@ const Sense = {
   }
 }
 
-function* loop(...moves: Movement[]) {
+function* loop(...moves) {
   while (true) {
     for (const move of moves) {
-      // yield* move
+      yield* move()
     }
   }
 }
 
 function* logOut() {
-  return { x: 1000, y: 1000, z: 1000 }
+  return { x: 16 * 1000, y: 1000, z: 16 * 1000 }
 }
 
 function* walkTo(x: number, z: number) {
@@ -175,6 +170,8 @@ wss.on('connection', function connection(ws, req) {
           payload: JSON.stringify({ eventType: 'ActivateRenderingACK' })
         }
         ws.send(JSON.stringify(response))
+
+        console.log(`${alias}: path to be used ${patho}`)
         resume(currentPosition, path(patho), ws, alias).catch(console.log)
         break
       }
@@ -209,7 +206,7 @@ async function resume(position: any, path: any[], ws: WebSocket, alias: number) 
           type: 'ReportPosition',
           payload: JSON.stringify({ position: current, rotation: { x: 0, y: 0, z: 0, w: 0 }, playerHeight: 2 })
         }
-        console.log(`${alias}: report position: ${JSON.stringify(response)}`)
+        // console.log(`${alias}: report position: ${JSON.stringify(response)}`)
         ws.send(JSON.stringify(response))
       }
 
