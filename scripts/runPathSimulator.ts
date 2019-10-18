@@ -5,6 +5,110 @@ import http = require('http')
 
 const url = require('url')
 
+// ******************************************************************************************************* //
+// ***** Movements ***** //
+// ******************************************************************************************************* //
+
+const Sense = {
+  POSITIVE: step => (current, target) => {
+    if (current === target) {
+      return current
+    }
+    const next = current + step
+    return next > target ? target : next
+  },
+  NEGATIVE: step => (current, target) => {
+    if (current === target) {
+      return current
+    }
+    const next = current - step
+    return next < target ? target : next
+  }
+}
+
+function single(...moves) {
+  return function*() {
+    for (const move of moves) {
+      yield* move()
+    }
+  }
+}
+
+function loop(...moves) {
+  return function*() {
+    while (true) {
+      for (const move of moves) {
+        yield* move()
+      }
+    }
+  }
+}
+
+function logOut() {
+  return function*() {
+    return { x: 16 * 1000, y: 1000, z: 16 * 1000 }
+  }
+}
+
+function walkTo(x: number, z: number) {
+  return function*() {
+    let position = yield
+
+    const xSense = (x > position.x ? Sense.POSITIVE : Sense.NEGATIVE)(2)
+    const zSense = (z > position.z ? Sense.POSITIVE : Sense.NEGATIVE)(2)
+
+    while (position.x !== x || position.z !== z) {
+      position = yield { x: xSense(position.x, x), y: position.y, z: zSense(position.z, z) }
+    }
+  }
+}
+
+// ******************************************************************************************************* //
+// ***** Paths ***** //
+// ******************************************************************************************************* //
+
+const path = (name: string) => {
+  switch (name) {
+    case '/loop':
+      return loop(walkTo(320, 320), walkTo(384, 320), walkTo(384, 384), walkTo(320, 384))
+    case '/rloop':
+      return loop(walkTo(320, 320), walkTo(320, 384), walkTo(384, 384), walkTo(384, 320))
+    case '/walk':
+      return single(
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        walkTo(320, 384),
+        walkTo(384, 320),
+        logOut()
+      )
+  }
+}
+
+// ******************************************************************************************************* //
+// ***** Engine simulator server ***** //
+// ******************************************************************************************************* //
+
 type Event =
   | 'Reset'
   | 'DeactivateRendering'
@@ -32,84 +136,6 @@ const app = express()
 
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
-
-const path = (name: string) => {
-  switch (name) {
-    case '/loop':
-      return [loop(() => walkTo(320, 320), () => walkTo(384, 320), () => walkTo(384, 384), () => walkTo(320, 384))]
-    case '/rloop':
-      return [loop(() => walkTo(320, 320), () => walkTo(320, 384), () => walkTo(384, 384), () => walkTo(384, 320))]
-    case '/walk':
-      return [
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        walkTo(320, 384),
-        walkTo(384, 320),
-        logOut()
-      ]
-  }
-}
-
-const Sense = {
-  POSITIVE: step => (current, target) => {
-    if (current === target) {
-      return current
-    }
-    const next = current + step
-    return next > target ? target : next
-  },
-  NEGATIVE: step => (current, target) => {
-    if (current === target) {
-      return current
-    }
-    const next = current - step
-    return next < target ? target : next
-  }
-}
-
-function* loop(...moves) {
-  while (true) {
-    for (const move of moves) {
-      yield* move()
-    }
-  }
-}
-
-function* logOut() {
-  return { x: 16 * 1000, y: 1000, z: 16 * 1000 }
-}
-
-function* walkTo(x: number, z: number) {
-  let position = yield
-
-  const xSense = (x > position.x ? Sense.POSITIVE : Sense.NEGATIVE)(2)
-  const zSense = (z > position.z ? Sense.POSITIVE : Sense.NEGATIVE)(2)
-
-  while (position.x !== x || position.z !== z) {
-    position = yield { x: xSense(position.x, x), y: position.y, z: zSense(position.z, z) }
-  }
-}
 
 let connectionCounter = 0
 
@@ -191,27 +217,25 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function resume(position: any, path: any[], ws: WebSocket, alias: number) {
+async function resume(position: any, path: () => Generator, ws: WebSocket, alias: number) {
+  const iterator = path()
+
   let current = position
+  let done = false
+  while (!done) {
+    let next = iterator.next(current)
+    current = next.value || current
+    done = next.done
 
-  for (const move of path) {
-    let done = false
-    while (!done) {
-      let next = move.next(current)
-      current = next.value || current
-      done = next.done
-
-      if (current) {
-        const response = {
-          type: 'ReportPosition',
-          payload: JSON.stringify({ position: current, rotation: { x: 0, y: 0, z: 0, w: 0 }, playerHeight: 2 })
-        }
-        // console.log(`${alias}: report position: ${JSON.stringify(response)}`)
-        ws.send(JSON.stringify(response))
+    if (current) {
+      const response = {
+        type: 'ReportPosition',
+        payload: JSON.stringify({ position: current, rotation: { x: 0, y: 0, z: 0, w: 0 }, playerHeight: 2 })
       }
-
-      await sleep(200)
+      ws.send(JSON.stringify(response))
     }
+
+    await sleep(200)
   }
 }
 
