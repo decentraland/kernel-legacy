@@ -36,9 +36,9 @@ type Timestamp = number
 type PeerAlias = string
 
 const UNREACHABLE_POSITION: Position = [
-  parcelLimits.parcelSize * 1000,
+  1000 * parcelLimits.parcelSize,
   1000,
-  parcelLimits.parcelSize * 1000,
+  1000 * parcelLimits.parcelSize,
   0,
   0,
   0,
