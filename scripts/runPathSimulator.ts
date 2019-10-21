@@ -11,18 +11,12 @@ const url = require('url')
 
 const Sense = {
   POSITIVE: step => (current, target) => {
-    if (current === target) {
-      return current
-    }
     const next = current + step
-    return next > target ? target : next
+    return next >= target ? target : next
   },
   NEGATIVE: step => (current, target) => {
-    if (current === target) {
-      return current
-    }
     const next = current - step
-    return next < target ? target : next
+    return next <= target ? target : next
   }
 }
 
@@ -63,16 +57,30 @@ function walkTo(x: number, z: number) {
   }
 }
 
+function walk(x: number, z: number) {
+  return function*() {
+    let position = yield
+
+    const target = { x: x + position.x, z: z + position.z }
+
+    yield* walkTo(target.x, target.z)()
+  }
+}
+
 // ******************************************************************************************************* //
 // ***** Paths ***** //
 // ******************************************************************************************************* //
 
 const path = (name: string) => {
   switch (name) {
-    case '/loop':
+    case '/loop-p21':
       return loop(walkTo(320, 320), walkTo(384, 320), walkTo(384, 384), walkTo(320, 384))
-    case '/rloop':
+    case '/rloop-p21':
       return loop(walkTo(320, 320), walkTo(320, 384), walkTo(384, 384), walkTo(384, 320))
+    case '/loop':
+      return loop(walk(20, 0), walk(0, 20), walk(-20, 0), walk(0, -20))
+    case '/rloop':
+      return loop(walk(0, 20), walk(20, 0), walk(0, -20), walk(-20, 0))
     case '/walk':
       return single(
         walkTo(384, 320),
@@ -122,6 +130,7 @@ type Event =
   | 'AddWearableToCatalog'
   | 'Teleport'
   | 'ActivateRendering'
+  | 'UnloadScene'
   | 'LoadProfile'
   | string
 
@@ -158,6 +167,7 @@ wss.on('connection', function connection(ws, req) {
       case 'SendSceneMessage':
       case 'AddWearableToCatalog':
       case 'RemoveWearablesFromCatalog':
+      case 'UnloadScene':
       case 'LoadProfile': {
         // ignore
         break
