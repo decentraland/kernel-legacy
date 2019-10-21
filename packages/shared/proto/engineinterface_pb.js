@@ -2425,14 +2425,15 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_ = [[4]];
+proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_ = [[4,5]];
 
 /**
  * @enum {number}
  */
 proto.engineinterface.PB_UpdateEntityComponent.ModelCase = {
   MODEL_NOT_SET: 0,
-  JSON: 4
+  TRANSFORM: 4,
+  JSON: 5
 };
 
 /**
@@ -2474,7 +2475,8 @@ proto.engineinterface.PB_UpdateEntityComponent.toObject = function(includeInstan
     entityid: jspb.Message.getFieldWithDefault(msg, 1, ""),
     classid: jspb.Message.getFieldWithDefault(msg, 2, 0),
     name: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    json: jspb.Message.getFieldWithDefault(msg, 4, "")
+    transform: (f = msg.getTransform()) && proto.engineinterface.PB_Transform.toObject(includeInstance, f),
+    json: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -2524,6 +2526,11 @@ proto.engineinterface.PB_UpdateEntityComponent.deserializeBinaryFromReader = fun
       msg.setName(value);
       break;
     case 4:
+      var value = new proto.engineinterface.PB_Transform;
+      reader.readMessage(value,proto.engineinterface.PB_Transform.deserializeBinaryFromReader);
+      msg.setTransform(value);
+      break;
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setJson(value);
       break;
@@ -2577,10 +2584,18 @@ proto.engineinterface.PB_UpdateEntityComponent.serializeBinaryToWriter = functio
       f
     );
   }
-  f = /** @type {string} */ (jspb.Message.getField(message, 4));
+  f = message.getTransform();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      proto.engineinterface.PB_Transform.serializeBinaryToWriter
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 5));
   if (f != null) {
     writer.writeString(
-      4,
+      5,
       f
     );
   }
@@ -2633,22 +2648,52 @@ proto.engineinterface.PB_UpdateEntityComponent.prototype.setName = function(valu
 
 
 /**
- * optional string json = 4;
+ * optional PB_Transform transform = 4;
+ * @return {?proto.engineinterface.PB_Transform}
+ */
+proto.engineinterface.PB_UpdateEntityComponent.prototype.getTransform = function() {
+  return /** @type{?proto.engineinterface.PB_Transform} */ (
+    jspb.Message.getWrapperField(this, proto.engineinterface.PB_Transform, 4));
+};
+
+
+/** @param {?proto.engineinterface.PB_Transform|undefined} value */
+proto.engineinterface.PB_UpdateEntityComponent.prototype.setTransform = function(value) {
+  jspb.Message.setOneofWrapperField(this, 4, proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_[0], value);
+};
+
+
+proto.engineinterface.PB_UpdateEntityComponent.prototype.clearTransform = function() {
+  this.setTransform(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.engineinterface.PB_UpdateEntityComponent.prototype.hasTransform = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string json = 5;
  * @return {string}
  */
 proto.engineinterface.PB_UpdateEntityComponent.prototype.getJson = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
 proto.engineinterface.PB_UpdateEntityComponent.prototype.setJson = function(value) {
-  jspb.Message.setOneofField(this, 4, proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_[0], value);
+  jspb.Message.setOneofField(this, 5, proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_[0], value);
 };
 
 
 proto.engineinterface.PB_UpdateEntityComponent.prototype.clearJson = function() {
-  jspb.Message.setOneofField(this, 4, proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_[0], undefined);
+  jspb.Message.setOneofField(this, 5, proto.engineinterface.PB_UpdateEntityComponent.oneofGroups_[0], undefined);
 };
 
 
@@ -2657,7 +2702,7 @@ proto.engineinterface.PB_UpdateEntityComponent.prototype.clearJson = function() 
  * @return {!boolean}
  */
 proto.engineinterface.PB_UpdateEntityComponent.prototype.hasJson = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 

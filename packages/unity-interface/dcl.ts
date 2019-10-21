@@ -5,7 +5,7 @@ type GameInstance = {
 }
 
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
-import { Session } from 'shared/session'
+import { Session } from '../shared/session'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
 import { DEBUG, ENGINE_DEBUG_PANEL, playerConfigurations, SCENE_DEBUG_PANEL } from '../config'
 import { Quaternion, ReadOnlyQuaternion, ReadOnlyVector3, Vector3 } from '../decentraland-ecs/src/decentraland/math'
@@ -61,14 +61,14 @@ import {
   PB_SetEntityParent,
   PB_Query,
   PB_RayQuery,
-  PB_Ray
-} from './engineinterface_pb'
-import {
+  PB_Ray,
+  PB_Transform,
   PB_ComponentRemoved,
   PB_ComponentCreated,
   PB_ComponentDisposed,
-  PB_ComponentUpdated
-} from './engineinterface_pb'
+  PB_ComponentUpdated,
+  PB_Quaternion
+} from '../shared/proto/engineinterface_pb'
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 
 let gameInstance!: GameInstance
@@ -265,6 +265,7 @@ class UnityScene<T> implements ParcelSceneAPI {
       const action = actions[i]
       messages += this.generateSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
     }
+
     unityInterface.SendSceneMessage(messages)
   }
 
@@ -308,7 +309,39 @@ class UnityScene<T> implements ParcelSceneAPI {
       let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
       updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
       updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
-      updateEntityComponent.setJson(updateEntityComponentPayload.json)
+      if (updateEntityComponentPayload.classId === 1) {
+        let transform: {
+          position: Vector3
+          rotation: Quaternion
+          scale: Vector3
+        } = JSON.parse(updateEntityComponentPayload.json)
+
+        let pbTransform: PB_Transform = new PB_Transform()
+        let pbPosition: PB_Vector3 = new PB_Vector3()
+        let pbRotation: PB_Quaternion = new PB_Quaternion()
+        let pbScale: PB_Vector3 = new PB_Vector3()
+
+        pbPosition.setX(transform.position.x)
+        pbPosition.setY(transform.position.y)
+        pbPosition.setZ(transform.position.z)
+
+        pbRotation.setX(transform.rotation.x)
+        pbRotation.setY(transform.rotation.y)
+        pbRotation.setZ(transform.rotation.z)
+        pbRotation.setW(transform.rotation.w)
+
+        pbScale.setX(transform.scale.x)
+        pbScale.setY(transform.scale.x)
+        pbScale.setZ(transform.scale.x)
+
+        pbTransform.setPosition(pbPosition)
+        pbTransform.setRotation(pbRotation)
+        pbTransform.setScale(pbScale)
+
+        updateEntityComponent.setTransform(pbTransform)
+      } else {
+        updateEntityComponent.setJson(updateEntityComponentPayload.json)
+      }
       message.setUpdateentitycomponent(updateEntityComponent)
     } else if (method === 'AttachEntityComponent') {
       let attachEntityPayload: AttachEntityComponentPayload = payload

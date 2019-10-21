@@ -239,7 +239,7 @@ export default class GamekitScene extends Script {
                 entityId,
                 classId,
                 name: componentName.replace(componentNameRE, ''),
-                json
+                json: json
               } as UpdateEntityComponentPayload
             })
           }

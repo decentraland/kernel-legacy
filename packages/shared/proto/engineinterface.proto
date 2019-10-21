@@ -1,0 +1,219 @@
+syntax = "proto3";
+
+package engineinterface;
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "DCL.Interface";
+
+message PB_CreateEntity {
+    string id = 1;
+}
+
+message PB_RemoveEntity {
+    string id = 1;
+}
+
+message PB_SetEntityParent {
+    string entityId = 1;
+    string parentId = 2;
+}
+
+message PB_ComponentRemoved {
+    string entityId = 1;
+    string name = 2;
+}
+
+message PB_Color {
+    float r = 1;
+    float g = 2;
+    float b = 3;
+}
+
+message PB_TextShapeModel {
+    bool billboard = 1;
+    string value = 2;
+    PB_Color color = 3;
+    float opacity = 4;
+    float fontSize = 5;
+    bool fontAutoSize = 6;
+    string fontWeight = 7;
+    string hTextAlign = 8;
+    string vTextAlign = 9;
+    float width = 10;
+    float height = 11;
+    bool adaptWidth = 12;
+    bool adaptHeight = 13;
+    float paddingTop = 14;
+    float paddingRight = 15;
+    float paddingBottom = 16;
+    float paddingLeft = 17;
+    float lineSpacing = 18;
+    int32 lineCount = 19;
+    bool textWrapping = 20;
+    float shadowBlur = 21;
+    float shadowOffsetX = 22;
+    float shadowOffsetY = 23;
+    PB_Color shadowColor = 24;
+    float outlineWidth = 25;
+    PB_Color outlineColor = 26;
+}
+
+message PB_Vector3
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message PB_Quaternion
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float w = 4;
+}
+
+message PB_Transform {
+    PB_Vector3 position = 1;
+    PB_Quaternion  rotation = 2;
+    PB_Vector3 scale = 3;
+}
+
+message PB_UpdateEntityComponent {
+    string entityId = 1;
+    int32 classId = 2;
+    string name = 3;
+    oneof model {
+        // PB_TextShapeModel textShape = 4;
+        PB_Transform transform = 4;
+        string json = 5;
+    }
+}
+
+message PB_ComponentCreated {
+    string id = 1;
+    int32 classid = 2;
+    string name = 3;
+}
+
+message PB_AttachEntityComponent {
+    string entityId = 1;
+    string name = 2;
+    string id = 3;
+}
+
+message PB_ComponentDisposed {
+    string id = 1;
+}
+
+message PB_ComponentUpdated {
+    string id = 1;
+    string json = 2; // TODO - review this
+}
+
+message PB_Ray {
+    PB_Vector3 origin = 1;
+    PB_Vector3 direction = 2;
+    float distance = 3;
+}
+
+message PB_RayQuery {
+    string queryId = 1;
+    string queryType = 2;
+    PB_Ray ray = 3;
+}
+
+message PB_Query {
+    string queryId = 1;
+    PB_RayQuery payload = 2;
+}
+
+message PB_SendSceneMessage {
+    string sceneId = 1;
+    string tag = 2;
+    oneof payload {
+        PB_CreateEntity createEntity = 3;
+        PB_RemoveEntity removeEntity = 4;
+        PB_SetEntityParent setEntityParent = 5;
+        PB_UpdateEntityComponent updateEntityComponent = 6;
+        PB_AttachEntityComponent attachEntityComponent  = 7;
+        PB_ComponentCreated componentCreated  = 8;
+        PB_ComponentDisposed componentDisposed = 9;
+        PB_ComponentRemoved componentRemoved = 10;
+        PB_ComponentUpdated componentUpdated = 11;
+        PB_Query query = 12;
+        google.protobuf.Empty sceneStarted = 13;
+    }
+}
+
+message PB_SetPosition {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message PB_ContentMapping {
+    string file = 1;
+    string hash = 2;
+}
+
+message PB_Position {
+    float x = 1;
+    float y = 2;
+}
+
+// export interface ILand {
+//   sceneId: string
+//   scene: IScene
+//   baseUrl: string
+//   mappingsResponse: MappingsResponse
+// }
+
+// export interface IScene {
+//   assets?: Record<any, string>
+//   main: string
+//   communications: ISceneCommunications | null
+//   scene: {
+//     base: string
+//     parcels: string[]
+//   }
+//   _mappings?: Record<string, string>
+// }
+
+// export interface ISceneCommunications {
+//   commServerUrl: string | null
+// }
+
+message PB_LoadParcelScenes {
+    string id = 1;
+    PB_Position basePosition = 2;
+    repeated PB_Position parcels = 3;
+    repeated PB_ContentMapping contents = 4;
+    string baseUrl = 5;
+    // ILand land = 6;
+}
+
+message PB_CreateUIScene {
+    string id = 1;
+    string baseUrl = 2;
+}
+
+message PB_UnloadScene {
+    string sceneId = 1;
+}
+
+message PB_DclMessage {
+    oneof message {
+        google.protobuf.Empty setDebug = 1;
+        google.protobuf.Empty setSceneDebugPanel = 2;
+        google.protobuf.Empty setEngineDebugPanel = 3;
+        PB_SendSceneMessage sendSceneMessage = 4;
+        PB_LoadParcelScenes loadParcelScenes = 5;
+        PB_UnloadScene unloadScene = 6;
+        PB_SetPosition setPosition = 7;
+        google.protobuf.Empty reset = 8;
+        PB_CreateUIScene createUIScene = 9;
+    }
+}
+

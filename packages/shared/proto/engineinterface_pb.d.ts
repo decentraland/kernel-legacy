@@ -350,6 +350,11 @@ export class PB_UpdateEntityComponent extends jspb.Message {
   getName(): string
   setName(value: string): void
 
+  hasTransform(): boolean
+  clearTransform(): void
+  getTransform(): PB_Transform | undefined
+  setTransform(value?: PB_Transform): void
+
   hasJson(): boolean
   clearJson(): void
   getJson(): string
@@ -374,12 +379,14 @@ export namespace PB_UpdateEntityComponent {
     entityid: string
     classid: number
     name: string
+    transform?: PB_Transform.AsObject
     json: string
   }
 
   export enum ModelCase {
     MODEL_NOT_SET = 0,
-    JSON = 4
+    TRANSFORM = 4,
+    JSON = 5
   }
 }
 
