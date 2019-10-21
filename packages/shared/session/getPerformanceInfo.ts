@@ -6,7 +6,7 @@ export function getPerformanceInfo(samples: string) {
     entries[i] = samples.charCodeAt(i)
     sum += entries[i]
   }
-  const sorted = entries.sort()
+  const sorted = entries.sort((a, b) => a - b)
 
   return {
     fps: (1000 * length) / sum,
