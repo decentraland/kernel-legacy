@@ -84,11 +84,7 @@ message PB_UpdateEntityComponent {
     string entityId = 1;
     int32 classId = 2;
     string name = 3;
-    oneof model {
-        // PB_TextShapeModel textShape = 4;
-        PB_Transform transform = 4;
-        string json = 5;
-    }
+    string data = 4;
 }
 
 message PB_ComponentCreated {

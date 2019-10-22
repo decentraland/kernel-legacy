@@ -62,12 +62,10 @@ import {
   PB_Query,
   PB_RayQuery,
   PB_Ray,
-  PB_Transform,
   PB_ComponentRemoved,
   PB_ComponentCreated,
   PB_ComponentDisposed,
-  PB_ComponentUpdated,
-  PB_Quaternion
+  PB_ComponentUpdated
 } from '../shared/proto/engineinterface_pb'
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 
@@ -309,39 +307,7 @@ class UnityScene<T> implements ParcelSceneAPI {
       let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
       updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
       updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
-      if (updateEntityComponentPayload.classId === 1) {
-        let transform: {
-          position: Vector3
-          rotation: Quaternion
-          scale: Vector3
-        } = JSON.parse(updateEntityComponentPayload.json)
-
-        let pbTransform: PB_Transform = new PB_Transform()
-        let pbPosition: PB_Vector3 = new PB_Vector3()
-        let pbRotation: PB_Quaternion = new PB_Quaternion()
-        let pbScale: PB_Vector3 = new PB_Vector3()
-
-        pbPosition.setX(transform.position.x)
-        pbPosition.setY(transform.position.y)
-        pbPosition.setZ(transform.position.z)
-
-        pbRotation.setX(transform.rotation.x)
-        pbRotation.setY(transform.rotation.y)
-        pbRotation.setZ(transform.rotation.z)
-        pbRotation.setW(transform.rotation.w)
-
-        pbScale.setX(transform.scale.x)
-        pbScale.setY(transform.scale.x)
-        pbScale.setZ(transform.scale.x)
-
-        pbTransform.setPosition(pbPosition)
-        pbTransform.setRotation(pbRotation)
-        pbTransform.setScale(pbScale)
-
-        updateEntityComponent.setTransform(pbTransform)
-      } else {
-        updateEntityComponent.setJson(updateEntityComponentPayload.json)
-      }
+      updateEntityComponent.setJson(updateEntityComponentPayload.json)
       message.setUpdateentitycomponent(updateEntityComponent)
     } else if (method === 'AttachEntityComponent') {
       let attachEntityPayload: AttachEntityComponentPayload = payload

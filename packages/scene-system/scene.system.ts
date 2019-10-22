@@ -19,7 +19,8 @@ import { defaultLogger } from 'shared/logger'
 import { customEval, getES5Context } from './sdk/sandbox'
 import { DevToolsAdapter } from './sdk/DevToolsAdapter'
 import { ScriptingTransport, ILogOpts } from 'decentraland-rpc/src/common/json-rpc/types'
-import { QueryType } from 'decentraland-ecs/src'
+import { QueryType, CLASS_ID, Vector3, Quaternion } from 'decentraland-ecs/src'
+import { PB_Transform, PB_Vector3, PB_Quaternion } from '../shared/proto/engineinterface_pb'
 
 // tslint:disable-next-line:whitespace
 type IEngineAPI = import('shared/apis/EngineAPI').IEngineAPI
@@ -239,7 +240,7 @@ export default class GamekitScene extends Script {
                 entityId,
                 classId,
                 name: componentName.replace(componentNameRE, ''),
-                json: json
+                json: that.generatePBObject(classId, json)
               } as UpdateEntityComponentPayload
             })
           }
@@ -478,5 +479,44 @@ export default class GamekitScene extends Script {
     }
 
     update()
+  }
+
+  private generatePBObject(classId: CLASS_ID, json: string): string {
+    let data: string = json
+
+    if (classId === CLASS_ID.TRANSFORM) {
+      let transform: {
+        position: Vector3
+        rotation: Quaternion
+        scale: Vector3
+      } = JSON.parse(json)
+
+      let pbTransform: PB_Transform = new PB_Transform()
+      let pbPosition: PB_Vector3 = new PB_Vector3()
+      let pbRotation: PB_Quaternion = new PB_Quaternion()
+      let pbScale: PB_Vector3 = new PB_Vector3()
+
+      pbPosition.setX(transform.position.x)
+      pbPosition.setY(transform.position.y)
+      pbPosition.setZ(transform.position.z)
+
+      pbRotation.setX(transform.rotation.x)
+      pbRotation.setY(transform.rotation.y)
+      pbRotation.setZ(transform.rotation.z)
+      pbRotation.setW(transform.rotation.w)
+
+      pbScale.setX(transform.scale.x)
+      pbScale.setY(transform.scale.y)
+      pbScale.setZ(transform.scale.z)
+
+      pbTransform.setPosition(pbPosition)
+      pbTransform.setRotation(pbRotation)
+      pbTransform.setScale(pbScale)
+
+      let arrayBuffer: Uint8Array = pbTransform.serializeBinary()
+      data = btoa(String.fromCharCode(...arrayBuffer))
+    }
+
+    return data
   }
 }
