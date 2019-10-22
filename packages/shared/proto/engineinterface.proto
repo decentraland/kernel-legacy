@@ -27,6 +27,7 @@ message PB_ComponentRemoved {
 message PB_Component {
     oneof model {
         PB_Transform transform = 1;
+        PB_UUIDCallback uuidCallback = 8;
 
         PB_BoxShape box = 16;
         PB_SphereShape sphere = 17;
@@ -591,24 +592,12 @@ message PB_UIImage {
   float paddingBottom = 19;
   float paddingLeft = 20;
   bool sizeInPixels = 21;
-  PB_OnClick onClick = 22;
+  PB_UUIDCallback onClick = 22;
 }
 
-message PB_OnClick {
+message PB_UUIDCallback {
   string type = 1;
   string uuid = 2;
-}
-message PB_OnBlur {
-  string type = 1;
-  string uuid = 2;
-}
-message PB_OnTextSubmit {
-  string type = 1;
-  string uuid = 2;
-}
-message PB_OnChanged {
-}
-message PB_OnFocus {
 }
 
 message PB_UIInputText {
@@ -648,10 +637,10 @@ message PB_UIInputText {
   float paddingRight = 34;
   float paddingBottom = 35;
   float paddingLeft = 36;
-  PB_OnTextSubmit onTextSubmit = 37;
-  PB_OnChanged onChanged = 38;
-  PB_OnFocus onFocus = 39;
-  PB_OnBlur onBlur = 40;
+  PB_UUIDCallback onTextSubmit = 37;
+  PB_UUIDCallback onChanged = 38;
+  PB_UUIDCallback onFocus = 39;
+  PB_UUIDCallback onBlur = 40;
 }
 
 message PB_UIScrollRect {
@@ -676,7 +665,7 @@ message PB_UIScrollRect {
   float paddingRight = 19;
   float paddingBottom = 20;
   float paddingLeft = 21;
-  PB_OnChanged onChanged = 22;
+  PB_UUIDCallback onChanged = 22;
 }
 
 message PB_UIShape {
