@@ -57,11 +57,10 @@ import './visualValidation/referenceCubes.test'
 
 import * as engine from 'engine'
 import * as renderer from 'engine/renderer'
-// declare var mocha: any
+declare var mocha: any
 declare var global: any
 
 global['engine'] = engine
 global['renderer'] = renderer
 
-// XXX - reenable tests before merging - moliva - 22/10/2019
-// mocha.run()
+mocha.run()
