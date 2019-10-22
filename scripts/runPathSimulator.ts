@@ -250,5 +250,5 @@ async function resume(position: any, path: () => Generator, ws: WebSocket, alias
 }
 
 server.listen(port, () => {
-  console.info('==>     Listening on port %s.', port)
+  console.info('==>     Path simulator listening on port %s.', port)
 })
