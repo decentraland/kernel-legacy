@@ -399,7 +399,7 @@ class UnityScene<T> implements ParcelSceneAPI {
       let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
       updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
       updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
-      updateEntityComponent.setJson(updateEntityComponentPayload.json)
+      updateEntityComponent.setData(updateEntityComponentPayload.json)
       message.setUpdateentitycomponent(updateEntityComponent)
     } else if (method === 'AttachEntityComponent') {
       let attachEntityPayload: AttachEntityComponentPayload = payload
@@ -439,8 +439,10 @@ class UnityScene<T> implements ParcelSceneAPI {
       rayQuery.setRay(ray)
       rayQuery.setQueryid(queryPayload.payload.queryId)
       rayQuery.setQuerytype(queryPayload.payload.queryType)
-      query.setPayload(rayQuery)
       query.setQueryid(queryPayload.queryId)
+      let arrayBuffer: Uint8Array = rayQuery.serializeBinary()
+      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
+      query.setPayload(base64)
       message.setQuery(query)
     } else if (method === 'ComponentCreated') {
       let componentCreatedPayload: ComponentCreatedPayload = payload

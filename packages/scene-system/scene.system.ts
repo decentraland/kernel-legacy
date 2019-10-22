@@ -19,7 +19,7 @@ import { defaultLogger } from 'shared/logger'
 import { customEval, getES5Context } from './sdk/sandbox'
 import { DevToolsAdapter } from './sdk/DevToolsAdapter'
 import { ScriptingTransport, ILogOpts } from 'decentraland-rpc/src/common/json-rpc/types'
-import { QueryType, CLASS_ID, Vector3, Quaternion } from 'decentraland-ecs/src'
+import { QueryType, CLASS_ID, Transform } from 'decentraland-ecs/src'
 import { PB_Transform, PB_Vector3, PB_Quaternion } from '../shared/proto/engineinterface_pb'
 
 // tslint:disable-next-line:whitespace
@@ -485,16 +485,11 @@ export default class GamekitScene extends Script {
     let data: string = json
 
     if (classId === CLASS_ID.TRANSFORM) {
-      let transform: {
-        position: Vector3
-        rotation: Quaternion
-        scale: Vector3
-      } = JSON.parse(json)
-
-      let pbTransform: PB_Transform = new PB_Transform()
-      let pbPosition: PB_Vector3 = new PB_Vector3()
-      let pbRotation: PB_Quaternion = new PB_Quaternion()
-      let pbScale: PB_Vector3 = new PB_Vector3()
+      const transform: Transform = JSON.parse(json)
+      const pbTransform: PB_Transform = new PB_Transform()
+      const pbPosition: PB_Vector3 = new PB_Vector3()
+      const pbRotation: PB_Quaternion = new PB_Quaternion()
+      const pbScale: PB_Vector3 = new PB_Vector3()
 
       pbPosition.setX(transform.position.x)
       pbPosition.setY(transform.position.y)
