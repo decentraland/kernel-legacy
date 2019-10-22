@@ -1,13 +1,15 @@
 declare var window: any
+declare var global: any
 
 type GameInstance = {
   SendMessage(object: string, method: string, ...args: (number | string)[]): void
 }
 
+import { IFuture } from 'fp-future'
 import { EventDispatcher } from 'decentraland-rpc/lib/common/core/EventDispatcher'
 import { Session } from 'shared/session'
 import { gridToWorld } from '../atomicHelpers/parcelScenePositions'
-import { DEBUG, ENGINE_DEBUG_PANEL, playerConfigurations, SCENE_DEBUG_PANEL } from '../config'
+import { DEBUG, ENGINE_DEBUG_PANEL, playerConfigurations, SCENE_DEBUG_PANEL, EDITOR } from '../config'
 import { Quaternion, ReadOnlyQuaternion, ReadOnlyVector3, Vector3 } from '../decentraland-ecs/src/decentraland/math'
 import { IEventNames, IEvents, ProfileForRenderer } from '../decentraland-ecs/src/decentraland/Types'
 import { sceneLifeCycleObservable } from '../decentraland-loader/lifecycle/controllers/scene'
@@ -23,6 +25,7 @@ import {
   HUDConfiguration,
   ILand,
   ILandToLoadableParcelScene,
+  ILandToLoadableParcelSceneUpdate,
   InstancedSpawnPoint,
   IScene,
   LoadableParcelScene,
@@ -41,14 +44,22 @@ import { positionObservable, teleportObservable } from '../shared/world/position
 import { hudWorkerUrl, SceneWorker } from '../shared/world/SceneWorker'
 import { ensureUiApis } from '../shared/world/uiSceneInitializer'
 import { worldRunningObservable } from '../shared/world/worldState'
+import { queueTrackingEvent } from '../shared/analytics'
+import { getPerformanceInfo } from '../shared/session/getPerformanceInfo'
+
+const rendererVersion = require('decentraland-renderer')
+window['console'].log('Renderer version: ' + rendererVersion)
 
 let gameInstance!: GameInstance
+
+export let futures: Record<string, IFuture<any>> = {}
 
 const positionEvent = {
   position: Vector3.Zero(),
   quaternion: Quaternion.Identity,
   rotation: Vector3.Zero(),
-  playerHeight: playerConfigurations.height
+  playerHeight: playerConfigurations.height,
+  mousePosition: Vector3.Zero()
 }
 
 /////////////////////////////////// HANDLERS ///////////////////////////////////
@@ -61,6 +72,12 @@ const browserInterface = {
     positionEvent.rotation.copyFrom(positionEvent.quaternion.eulerAngles)
     positionEvent.playerHeight = data.playerHeight || playerConfigurations.height
     positionObservable.notifyObservers(positionEvent)
+  },
+
+  ReportMousePosition(data: { id: string; mousePosition: ReadOnlyVector3 }) {
+    positionEvent.mousePosition.set(data.mousePosition.x, data.mousePosition.y, data.mousePosition.z)
+    positionObservable.notifyObservers(positionEvent)
+    futures[data.id].resolve(data.mousePosition)
   },
 
   SceneEvent(data: { sceneId: string; eventType: string; payload: any }) {
@@ -77,6 +94,11 @@ const browserInterface = {
     window.open(data.url, '_blank')
   },
 
+  PerformanceReport(samples: string) {
+    const perfReport = getPerformanceInfo(samples)
+    queueTrackingEvent('performance report', perfReport)
+  },
+
   PreloadFinished(data: { sceneId: string }) {
     // stub. there is no code about this in unity side yet
   },
@@ -86,7 +108,7 @@ const browserInterface = {
   },
 
   SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
-    ;(global as any).globalStore.dispatch(saveAvatarRequest(data))
+    global.globalStore.dispatch(saveAvatarRequest(data))
   },
 
   ControlEvent({ eventType, payload }: { eventType: string; payload: any }) {
@@ -105,6 +127,14 @@ const browserInterface = {
         break
       }
     }
+  },
+
+  SendScreenshot(data: { id: string; encodedTexture: string }) {
+    futures[data.id].resolve(data.encodedTexture)
+  },
+
+  ReportBuilderCameraTarget(data: { id: string; cameraTarget: ReadOnlyVector3 }) {
+    futures[data.id].resolve(data.cameraTarget)
   }
 }
 
@@ -126,7 +156,7 @@ function ensureTeleportAnimation() {
   )
 }
 
-const unityInterface = {
+export const unityInterface = {
   debug: false,
   SetDebug() {
     gameInstance.SendMessage('SceneController', 'SetDebug')
@@ -157,6 +187,12 @@ const unityInterface = {
     }
     gameInstance.SendMessage('SceneController', 'LoadParcelScenes', JSON.stringify(parcelsToLoad[0]))
   },
+  UpdateParcelScenes(parcelsToLoad: LoadableParcelScene[]) {
+    if (parcelsToLoad.length > 1) {
+      throw new Error('Only one scene at a time!')
+    }
+    gameInstance.SendMessage('SceneController', 'UpdateParcelScenes', JSON.stringify(parcelsToLoad[0]))
+  },
   UnloadScene(sceneId: string) {
     gameInstance.SendMessage('SceneController', 'UnloadScene', sceneId)
   },
@@ -166,13 +202,15 @@ const unityInterface = {
     }
     gameInstance.SendMessage(`SceneController`, `SendSceneMessage`, `${parcelSceneId}\t${method}\t${payload}\t${tag}`)
   },
-
   SetSceneDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetSceneDebugPanel')
   },
-
   SetEngineDebugPanel() {
     gameInstance.SendMessage('SceneController', 'SetEngineDebugPanel')
+  },
+  // @internal
+  SendBuilderMessage(method: string, payload: string = '') {
+    gameInstance.SendMessage(`BuilderController`, method, payload)
   },
   ActivateRendering() {
     gameInstance.SendMessage('SceneController', 'ActivateRendering')
@@ -182,6 +220,9 @@ const unityInterface = {
   },
   UnlockCursor() {
     gameInstance.SendMessage('MouseCatcher', 'UnlockCursor')
+  },
+  SetBuilderReady() {
+    gameInstance.SendMessage('SceneController', 'BuilderReady')
   },
   AddWearablesToCatalog(wearables: Wearable[]) {
     for (let wearable of wearables) {
@@ -194,8 +235,11 @@ const unityInterface = {
   ClearWearableCatalog() {
     gameInstance.SendMessage('SceneController', 'ClearWearableCatalog')
   },
+  ShowNewWearablesNotification(wearableNumber: number) {
+    gameInstance.SendMessage('HUDController', 'ShowNewWearablesNotification', wearableNumber.toString())
+  },
   ShowNotification(notification: Notification) {
-    gameInstance.SendMessage('HUDController', 'ShowNotification', JSON.stringify(notification))
+    gameInstance.SendMessage('HUDController', 'ShowNotificationFromJson', JSON.stringify(notification))
   },
   ConfigureMinimapHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureMinimapHUD', JSON.stringify(configuration))
@@ -205,6 +249,54 @@ const unityInterface = {
   },
   ConfigureNotificationHUD(configuration: HUDConfiguration) {
     gameInstance.SendMessage('HUDController', 'ConfigureNotificationHUD', JSON.stringify(configuration))
+  },
+  SelectGizmoBuilder(type: string) {
+    this.SendBuilderMessage('SelectGizmo', type)
+  },
+  ResetBuilderObject() {
+    this.SendBuilderMessage('ResetObject')
+  },
+  SetCameraZoomDeltaBuilder(delta: number) {
+    this.SendBuilderMessage('ZoomDelta', delta.toString())
+  },
+  GetCameraTargetBuilder(futureId: string) {
+    this.SendBuilderMessage('GetCameraTargetBuilder', futureId)
+  },
+  SetPlayModeBuilder(on: string) {
+    this.SendBuilderMessage('SetPlayMode', on)
+  },
+  PreloadFileBuilder(url: string) {
+    this.SendBuilderMessage('PreloadFile', url)
+  },
+  GetMousePositionBuilder(x: string, y: string, id: string) {
+    this.SendBuilderMessage('GetMousePosition', `{"x":"${x}", "y": "${y}", "id": "${id}" }`)
+  },
+  TakeScreenshotBuilder(id: string) {
+    this.SendBuilderMessage('TakeScreenshot', id)
+  },
+  SetCameraPositionBuilder(position: Vector3) {
+    this.SendBuilderMessage('SetBuilderCameraPosition', position.x + ',' + position.y + ',' + position.z)
+  },
+  SetCameraRotationBuilder(aplha: number, beta: number) {
+    this.SendBuilderMessage('SetBuilderCameraRotation', aplha + ',' + beta)
+  },
+  ResetCameraZoomBuilder() {
+    this.SendBuilderMessage('ResetBuilderCameraZoom')
+  },
+  SetBuilderGridResolution(position: number, rotation: number, scale: number) {
+    this.SendBuilderMessage(
+      'SetGridResolution',
+      JSON.stringify({ position: position, rotation: rotation, scale: scale })
+    )
+  },
+  SelectBuilderEntity(entityId: string) {
+    this.SendBuilderMessage('SelectEntity', entityId)
+  },
+  ResetBuilderScene() {
+    this.SendBuilderMessage('ResetBuilderScene')
+  },
+  OnBuilderKeyDown(key: string) {
+    this.SendBuilderMessage('OnBuilderKeyDown', key)
   }
 }
 
@@ -258,7 +350,7 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 }
 
-class UnityParcelScene extends UnityScene<LoadableParcelScene> {
+export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
   constructor(public data: EnvironmentData<LoadableParcelScene>) {
     super(data)
     this.logger = createLogger(data.data.basePosition.x + ',' + data.data.basePosition.y + ': ')
@@ -307,15 +399,15 @@ export async function initializeEngine(_gameInstance: GameInstance) {
   if (ENGINE_DEBUG_PANEL) {
     unityInterface.SetEngineDebugPanel()
   }
-
-  await initializeDecentralandUI()
-
+  if (!EDITOR) {
+    await initializeDecentralandUI()
+  }
   return {
     unityInterface,
     onMessage(type: string, message: any) {
       if (type in browserInterface) {
         // tslint:disable-next-line:semicolon
-        ;(browserInterface as any)[type](message)
+        ; (browserInterface as any)[type](message)
       } else {
         defaultLogger.info(`Unknown message (did you forget to add ${type} to unity-interface/dcl.ts?)`, message)
       }
@@ -376,7 +468,9 @@ async function initializeDecentralandUI() {
   unityInterface.CreateUIScene({ id: getParcelSceneID(scene), baseUrl: scene.data.baseUrl })
 }
 
-let currentLoadedScene: SceneWorker
+// Builder functions
+
+let currentLoadedScene: SceneWorker | null
 
 export async function loadPreviewScene() {
   const result = await fetch('/scene.json?nocache=' + Math.random())
@@ -423,6 +517,38 @@ export async function loadPreviewScene() {
     return defaultScene
   } else {
     throw new Error('Could not load scene.json')
+  }
+}
+
+export function loadBuilderScene(sceneData: ILand) {
+  unloadCurrentBuilderScene()
+
+  const parcelScene = new UnityParcelScene(ILandToLoadableParcelScene(sceneData))
+  currentLoadedScene = loadParcelScene(parcelScene)
+
+  const target: LoadableParcelScene = { ...ILandToLoadableParcelScene(sceneData).data }
+  delete target.land
+
+  unityInterface.LoadParcelScenes([target])
+  return parcelScene
+}
+
+export function unloadCurrentBuilderScene() {
+  if (currentLoadedScene) {
+    const parcelScene = currentLoadedScene.parcelScene as UnityParcelScene
+    parcelScene.emit('builderSceneUnloaded', {})
+
+    stopParcelSceneWorker(currentLoadedScene)
+    unityInterface.SendBuilderMessage('UnloadBuilderScene', parcelScene.data.sceneId)
+    currentLoadedScene = null
+  }
+}
+
+export function updateBuilderScene(sceneData: ILand) {
+  if (currentLoadedScene) {
+    const target: LoadableParcelScene = { ...ILandToLoadableParcelSceneUpdate(sceneData).data }
+    delete target.land
+    unityInterface.UpdateParcelScenes([target])
   }
 }
 
