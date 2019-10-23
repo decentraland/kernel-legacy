@@ -73,8 +73,7 @@ export class SceneDataDownloadManager {
     }
   }
 
-  createFakeILand(sceneId: string) {
-    const coordinates = sceneId.replace('empty-', '')
+  createFakeILand(sceneId: string, coordinates: string) {
     const pick = ((coordinates.split(',').reduce((prev, next) => prev + Math.abs(parseInt(next, 10)), 0) % 12) + 1)
       .toString()
       .padStart(2, '0')
@@ -115,12 +114,12 @@ export class SceneDataDownloadManager {
     const promised = future<ILand | null>()
     this.sceneIdToLandData.set(sceneId, promised)
 
-    if (sceneId.startsWith('empty-')) {
+    if (sceneId.endsWith('00000000000000000000')) {
       const promisedPos = future<string | null>()
-      const pos = sceneId.replace('empty-', '')
-      promisedPos.resolve(pos)
+      const pos = sceneId.replace('Qm', '').replace(/m0+/, '')
+      promisedPos.resolve(sceneId)
       this.positionToSceneId.set(pos, promisedPos)
-      const scene = this.createFakeILand(sceneId)
+      const scene = this.createFakeILand(sceneId, pos)
       promised.resolve(scene)
       return promised
     }
