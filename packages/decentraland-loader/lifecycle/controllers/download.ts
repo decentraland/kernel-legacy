@@ -4,8 +4,6 @@ import { ILand, IScene, ParcelInfoResponse } from 'shared/types'
 import { jsonFetch } from 'atomicHelpers/jsonFetch'
 import { createLogger } from 'shared/logger'
 
-const origin = globalThis.origin
-
 const emptyScenes = require('./emptyScenes.json')
 
 const logger = createLogger('loader')
@@ -82,14 +80,14 @@ export class SceneDataDownloadManager {
       .padStart(2, '0')
     return {
       sceneId: sceneId,
-      baseUrl: origin + '/loader/empty-scenes/Tile1M_' + pick + '/',
+      baseUrl: this.options.contentServer + '/contents/',
       name: 'Empty parcel',
       scene: {
         display: { title: 'Empty parcel' },
         owner: '',
         contact: {},
         name: 'Empty parcel',
-        main: 'bin/game.js',
+        main: `bin/${pick}.js`,
         tags: [],
         scene: { parcels: [coordinates], base: coordinates },
         policy: {},
@@ -100,13 +98,9 @@ export class SceneDataDownloadManager {
         contents: [
           {
             file: 'scene.json',
-            hash: 'scene.json'
-          },
-          {
-            file: 'bin/game.js',
-            hash: 'bin/game.js'
+            hash: 'QmRcgEd7iCWWqLijV78QDEEFQzTXac2htSP2WYCsV9ZC8N'
           }
-        ].concat(emptyScenes[pick]),
+        ].concat(emptyScenes),
         root_cid: sceneId,
         publisher: '0x13371b17ddb77893cd19e10ffa58461396ebcc19'
       }
