@@ -353,7 +353,7 @@ class UnityScene<T> implements ParcelSceneAPI {
     let messages = ''
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      messages += this.generateSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
+      messages += this.encodeSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
     }
 
     unityInterface.SendSceneMessage(messages)
@@ -375,7 +375,7 @@ class UnityScene<T> implements ParcelSceneAPI {
     this.eventDispatcher.emit(event, data)
   }
 
-  generateSceneMessage(parcelSceneId: string, method: string, payload: any, tag: string = ''): string {
+  encodeSceneMessage(parcelSceneId: string, method: string, payload: any, tag: string = ''): string {
     if (unityInterface.debug) {
       defaultLogger.info(parcelSceneId, method, payload, tag)
     }
@@ -384,90 +384,132 @@ class UnityScene<T> implements ParcelSceneAPI {
     message.setSceneid(parcelSceneId)
     message.setTag(tag)
 
-    if (method === 'CreateEntity') {
-      let createEntityPayload: CreateEntityPayload = payload
-      let createEntity: PB_CreateEntity = new PB_CreateEntity()
-      createEntity.setId(createEntityPayload.id)
-      message.setCreateentity(createEntity)
-    } else if (method === 'RemoveEntity') {
-      let removeEntityPayload: RemoveEntityPayload = payload
-      let removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
-      removeEntity.setId(removeEntityPayload.id)
-      message.setCreateentity(removeEntity)
-    } else if (method === 'UpdateEntityComponent') {
-      let updateEntityComponentPayload: UpdateEntityComponentPayload = payload
-      let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
-      updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
-      updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
-      updateEntityComponent.setData(updateEntityComponentPayload.json)
-      message.setUpdateentitycomponent(updateEntityComponent)
-    } else if (method === 'AttachEntityComponent') {
-      let attachEntityPayload: AttachEntityComponentPayload = payload
-      let attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
-      attachEntity.setEntityid(attachEntityPayload.entityId)
-      attachEntity.setName(attachEntityPayload.name)
-      attachEntity.setId(attachEntityPayload.id)
-      message.setAttachentitycomponent(attachEntity)
-    } else if (method === 'ComponentRemoved') {
-      let removeEntityComponentPayload: ComponentRemovedPayload = payload
-      let removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
-      removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
-      removeEntityComponent.setName(removeEntityComponentPayload.name)
-      message.setComponentremoved(removeEntityComponent)
-    } else if (method === 'SetEntityParent') {
-      let setEntityParentPayload: SetEntityParentPayload = payload
-      let setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
-      setEntityParent.setEntityid(setEntityParentPayload.entityId)
-      setEntityParent.setParentid(setEntityParentPayload.parentId)
-      message.setSetentityparent(setEntityParent)
-    } else if (method === 'Query') {
-      let queryPayload: QueryPayload = payload
-      let query: PB_Query = new PB_Query()
-      let rayQuery: PB_RayQuery = new PB_RayQuery()
-      let ray: PB_Ray = new PB_Ray()
-      let origin: PB_Vector3 = new PB_Vector3()
-      let direction: PB_Vector3 = new PB_Vector3()
-      origin.setX(queryPayload.payload.ray.origin.x)
-      origin.setY(queryPayload.payload.ray.origin.y)
-      origin.setZ(queryPayload.payload.ray.origin.z)
-      direction.setX(queryPayload.payload.ray.direction.x)
-      direction.setY(queryPayload.payload.ray.direction.y)
-      direction.setZ(queryPayload.payload.ray.direction.z)
-      ray.setOrigin(origin)
-      ray.setDirection(direction)
-      ray.setDistance(queryPayload.payload.ray.distance)
-      rayQuery.setRay(ray)
-      rayQuery.setQueryid(queryPayload.payload.queryId)
-      rayQuery.setQuerytype(queryPayload.payload.queryType)
-      query.setQueryid(queryPayload.queryId)
-      let arrayBuffer: Uint8Array = rayQuery.serializeBinary()
-      let base64: string = btoa(String.fromCharCode(...arrayBuffer))
-      query.setPayload(base64)
-      message.setQuery(query)
-    } else if (method === 'ComponentCreated') {
-      let componentCreatedPayload: ComponentCreatedPayload = payload
-      let componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
-      componentCreated.setId(componentCreatedPayload.id)
-      componentCreated.setClassid(componentCreatedPayload.classId)
-      componentCreated.setName(componentCreatedPayload.name)
-      message.setComponentcreated(componentCreated)
-    } else if (method === 'ComponentDisposed') {
-      let componentDisposedPayload: ComponentDisposedPayload = payload
-      let componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
-      componentDisposed.setId(componentDisposedPayload.id)
-      message.setComponentdisposed(componentDisposed)
-    } else if (method === 'ComponentUpdated') {
-      let componentUpdatedPayload: ComponentUpdatedPayload = payload
-      let componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
-      componentUpdated.setId(componentUpdatedPayload.id)
-      componentUpdated.setJson(componentUpdatedPayload.json)
-      message.setComponentupdated(componentUpdated)
-    } else if (method === 'InitMessagesFinished') {
-      message.setScenestarted(new Empty()) // don't know if this is necessary
+    switch (method) {
+      case 'CreateEntity':
+        message.setCreateentity(this.encodeCreateEntity(payload))
+        break
+      case 'RemoveEntity':
+        message.setRemoveentity(this.encodeRemoveEntity(payload))
+        break
+      case 'UpdateEntityComponent':
+        message.setUpdateentitycomponent(this.encodeUpdateEntityComponent(payload))
+        break
+      case 'AttachEntityComponent':
+        message.setAttachentitycomponent(this.encodeAttachEntityComponent(payload))
+        break
+      case 'ComponentRemoved':
+        message.setComponentremoved(this.encodeComponentRemoved(payload))
+        break
+      case 'SetEntityParent':
+        message.setSetentityparent(this.encodeSetEntityParent(payload))
+        break
+      case 'Query':
+        message.setQuery(this.encodeQuery(payload))
+        break
+      case 'ComponentCreated':
+        message.setComponentcreated(this.encodeComponentCreated(payload))
+        break
+      case 'ComponentDisposed':
+        message.setComponentdisposed(this.encodeComponentDisposed(payload))
+        break
+      case 'ComponentUpdated':
+        message.setComponentupdated(this.encodeComponentUpdated(payload))
+        break
+      case 'InitMessagesFinished':
+        message.setScenestarted(new Empty()) // don't know if this is necessary
+        break
     }
 
     let arrayBuffer: Uint8Array = message.serializeBinary()
     return btoa(String.fromCharCode(...arrayBuffer))
+  }
+
+  encodeCreateEntity(createEntityPayload: CreateEntityPayload): PB_CreateEntity {
+    let createEntity: PB_CreateEntity = new PB_CreateEntity()
+    createEntity.setId(createEntityPayload.id)
+    return createEntity
+  }
+
+  encodeRemoveEntity(removeEntityPayload: RemoveEntityPayload): PB_RemoveEntity {
+    let removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
+    removeEntity.setId(removeEntityPayload.id)
+    return removeEntity
+  }
+
+  encodeUpdateEntityComponent(updateEntityComponentPayload: UpdateEntityComponentPayload): PB_UpdateEntityComponent {
+    let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
+    updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
+    updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
+    updateEntityComponent.setData(updateEntityComponentPayload.json)
+    return updateEntityComponent
+  }
+
+  encodeAttachEntityComponent(attachEntityPayload: AttachEntityComponentPayload): PB_AttachEntityComponent {
+    let attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
+    attachEntity.setEntityid(attachEntityPayload.entityId)
+    attachEntity.setName(attachEntityPayload.name)
+    attachEntity.setId(attachEntityPayload.id)
+    return attachEntity
+  }
+
+  encodeComponentRemoved(removeEntityComponentPayload: ComponentRemovedPayload): PB_ComponentRemoved {
+    let removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
+    removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
+    removeEntityComponent.setName(removeEntityComponentPayload.name)
+    return removeEntityComponent
+  }
+
+  encodeSetEntityParent(setEntityParentPayload: SetEntityParentPayload): PB_SetEntityParent {
+    let setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
+    setEntityParent.setEntityid(setEntityParentPayload.entityId)
+    setEntityParent.setParentid(setEntityParentPayload.parentId)
+    return setEntityParent
+  }
+
+  encodeQuery(queryPayload: QueryPayload): PB_Query {
+    let query: PB_Query = new PB_Query()
+    let rayQuery: PB_RayQuery = new PB_RayQuery()
+    let ray: PB_Ray = new PB_Ray()
+    let origin: PB_Vector3 = new PB_Vector3()
+    let direction: PB_Vector3 = new PB_Vector3()
+    origin.setX(queryPayload.payload.ray.origin.x)
+    origin.setY(queryPayload.payload.ray.origin.y)
+    origin.setZ(queryPayload.payload.ray.origin.z)
+    direction.setX(queryPayload.payload.ray.direction.x)
+    direction.setY(queryPayload.payload.ray.direction.y)
+    direction.setZ(queryPayload.payload.ray.direction.z)
+    ray.setOrigin(origin)
+    ray.setDirection(direction)
+    ray.setDistance(queryPayload.payload.ray.distance)
+    rayQuery.setRay(ray)
+    rayQuery.setQueryid(queryPayload.payload.queryId)
+    rayQuery.setQuerytype(queryPayload.payload.queryType)
+    query.setQueryid(queryPayload.queryId)
+    let arrayBuffer: Uint8Array = rayQuery.serializeBinary()
+    let base64: string = btoa(String.fromCharCode(...arrayBuffer))
+    query.setPayload(base64)
+    return query
+  }
+
+  encodeComponentCreated(componentCreatedPayload: ComponentCreatedPayload): PB_ComponentCreated {
+    let componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
+    componentCreated.setId(componentCreatedPayload.id)
+    componentCreated.setClassid(componentCreatedPayload.classId)
+    componentCreated.setName(componentCreatedPayload.name)
+    return componentCreated
+  }
+
+  encodeComponentDisposed(componentDisposedPayload: ComponentDisposedPayload) {
+    let componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
+    componentDisposed.setId(componentDisposedPayload.id)
+    return componentDisposed
+  }
+
+  encodeComponentUpdated(componentUpdatedPayload: ComponentUpdatedPayload): PB_ComponentUpdated {
+    let componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
+    componentUpdated.setId(componentUpdatedPayload.id)
+    componentUpdated.setJson(componentUpdatedPayload.json)
+    return componentUpdated
   }
 }
 
