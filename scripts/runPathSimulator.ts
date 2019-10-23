@@ -20,7 +20,7 @@ const Sense = {
   }
 }
 
-function single(...moves) {
+function sequence(...moves) {
   return function*() {
     for (const move of moves) {
       yield* move()
@@ -48,11 +48,11 @@ function walkTo(x: number, z: number) {
   return function*() {
     let position = yield
 
-    const xSense = (x > position.x ? Sense.POSITIVE : Sense.NEGATIVE)(2)
-    const zSense = (z > position.z ? Sense.POSITIVE : Sense.NEGATIVE)(2)
+    const moveTowardsTargetX = (x > position.x ? Sense.POSITIVE : Sense.NEGATIVE)(2)
+    const moveTowardsTargetZ = (z > position.z ? Sense.POSITIVE : Sense.NEGATIVE)(2)
 
     while (position.x !== x || position.z !== z) {
-      position = yield { x: xSense(position.x, x), y: position.y, z: zSense(position.z, z) }
+      position = yield { x: moveTowardsTargetX(position.x, x), y: position.y, z: moveTowardsTargetZ(position.z, z) }
     }
   }
 }
@@ -82,7 +82,7 @@ const path = (name: string) => {
     case '/rloop':
       return loop(walk(0, 20), walk(20, 0), walk(0, -20), walk(-20, 0))
     case '/walk':
-      return single(
+      return sequence(
         walkTo(384, 320),
         walkTo(320, 384),
         walkTo(384, 320),
@@ -187,7 +187,6 @@ wss.on('connection', function connection(ws, req) {
         break
       }
       case 'Teleport': {
-        // ignore for the time being
         const teleport = JSON.parse(data.payload)
         currentPosition = teleport
         console.log(`${alias}: teleporting to ${JSON.stringify(teleport)}`)
