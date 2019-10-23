@@ -14,7 +14,6 @@ import {
 
 import { DecentralandInterface } from './Types'
 import { RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
-import { stableJson } from '../../../shared/stableJson'
 
 // This number is defined in the protocol ECS.SetEntityParent.3
 const ROOT_ENTITY_ID = '0'
@@ -98,7 +97,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
             // Send the attach component signal
             this.dcl.attachEntityComponent(entity.uuid, componentName, getComponentId(component))
           } else {
-            const componentJson: string = stableJson(component)
+            const componentJson: string = JSON.stringify(component)
 
             // Send the updated component
             this.dcl.updateEntityComponent(entityId, componentName, classId, componentJson)
@@ -141,7 +140,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
         const classId = getComponentClassId(component)
 
         if (classId !== null && !isDisposableComponent(component)) {
-          const componentJson: string = stableJson(component)
+          const componentJson: string = JSON.stringify(component)
 
           if (this.cachedComponents[entityId][componentName] !== componentJson) {
             // Send the updated component
@@ -175,7 +174,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
       if (isDisposableComponent(component)) {
         this.dcl.attachEntityComponent(event.entity.uuid, event.componentName, getComponentId(component))
       } else if (event.classId !== null) {
-        const componentJson: string = stableJson(component)
+        const componentJson: string = JSON.stringify(component)
 
         // Send the updated component
         this.dcl.updateEntityComponent(event.entity.uuid, event.componentName, event.classId, componentJson)
