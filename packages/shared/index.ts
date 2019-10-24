@@ -9,7 +9,7 @@ import {
   STATIC_WORLD,
   WORLD_EXPLORER
 } from '../config'
-import { initialize, queueTrackingEvent } from './analytics'
+import { initialize, queueTrackingEvent, identifyUser } from './analytics'
 import './apis/index'
 import { connect, disconnect } from './comms'
 import { persistCurrentUser } from './comms/index'
@@ -24,7 +24,9 @@ import {
   loadingStarted,
   authSuccessful,
   establishingComms,
-  commsEstablished
+  commsEstablished,
+  commsErrorRetrying,
+  notStarted
 } from './loading/types'
 import { defaultLogger } from './logger'
 import { PassportAsPromise } from './passports/PassportAsPromise'
@@ -35,31 +37,28 @@ import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { setWorldContext } from './protocol/actions'
 import { profileToRendererFormat } from './passports/transformations/profileToRendererFormat'
-import { commsErrorRetrying } from './loading/types'
 
 // TODO fill with segment keys and integrate identity server
-async function initializeAnalytics(userId: string) {
+function initializeAnalytics() {
   const TLD = getTLD()
   switch (TLD) {
     case 'org':
-      return initialize('1plAT9a2wOOgbPCrTaU8rgGUMzgUTJtU', userId)
+      return initialize('1plAT9a2wOOgbPCrTaU8rgGUMzgUTJtU')
     case 'today':
-      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc')
     case 'zone':
-      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc')
     default:
-      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc', userId)
+      return initialize('a4h4BC4dL1v7FhIQKKuPHEdZIiNRDVhc')
   }
 }
 
 export let globalStore: Store<RootState>
 
 export async function initShared(): Promise<Session | undefined> {
-  if (isMobile()) {
-    ReportFatalError(MOBILE_NOT_SUPPORTED)
-    return undefined
+  if (WORLD_EXPLORER) {
+    await initializeAnalytics()
   }
-  const session = new Session()
 
   const { store, startSagas, auth } = buildStore({
     ...getLoginConfigurationForCurrentDomain(),
@@ -67,25 +66,37 @@ export async function initShared(): Promise<Session | undefined> {
   })
   ;(window as any).globalStore = globalStore = store
 
+  if (WORLD_EXPLORER) {
+    startSagas()
+  }
+
+  if (isMobile()) {
+    ReportFatalError(MOBILE_NOT_SUPPORTED)
+    return undefined
+  }
+
+  store.dispatch(notStarted())
+
+  const session = new Session()
+
   let userId: string
 
   console['group']('connect#login')
   store.dispatch(loadingStarted())
 
-  if (!WORLD_EXPLORER) {
-    defaultLogger.log(`Using test user.`)
-    userId = 'email|5cdd68572d5f842a16d6cc17'
-  } else {
-    startSagas()
+  if (WORLD_EXPLORER) {
     try {
       userId = await auth.getUserId()
+      identifyUser(userId)
     } catch (e) {
       defaultLogger.error(e)
       console['groupEnd']()
       ReportFatalError(AUTH_ERROR_LOGGED_OUT)
       throw e
     }
-    await initializeAnalytics(userId)
+  } else {
+    defaultLogger.log(`Using test user.`)
+    userId = 'email|5cdd68572d5f842a16d6cc17'
   }
 
   defaultLogger.log(`User ${userId} logged in`)

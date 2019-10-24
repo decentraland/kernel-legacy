@@ -7,6 +7,7 @@ export const helpTexts = [
 ]
 
 export const NOT_STARTED = 'Not initialized'
+export const notStarted = () => action(NOT_STARTED)
 export const LOADING_STARTED = 'Loading started'
 export const loadingStarted = () => action(LOADING_STARTED)
 export const AUTH_SUCCESSFUL = 'Authentication successful'
