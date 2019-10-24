@@ -370,7 +370,8 @@ class UnityScene<T> implements ParcelSceneAPI {
     let messages = ''
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      messages += this.encodeSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
+      messages += this.encodeSceneMessage(sceneId, action.type, action.payload, action.tag)
+      messages += '\n'
     }
 
     unityInterface.SendSceneMessage(messages)
