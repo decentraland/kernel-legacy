@@ -7,7 +7,7 @@ import {
   PREVIEW,
   setNetwork,
   STATIC_WORLD,
-  EDITOR
+  WORLD_EXPLORER
 } from '../config'
 import { initialize, queueTrackingEvent } from './analytics'
 import './apis/index'
@@ -17,7 +17,15 @@ import { isMobile } from './comms/mobile'
 import { localProfileUUID } from './comms/peers'
 import './events'
 import { ReportFatalError } from './loading/ReportFatalError'
-import { AUTH_ERROR_LOGGED_OUT, COMMS_COULD_NOT_BE_ESTABLISHED, MOBILE_NOT_SUPPORTED } from './loading/types'
+import {
+  AUTH_ERROR_LOGGED_OUT,
+  COMMS_COULD_NOT_BE_ESTABLISHED,
+  MOBILE_NOT_SUPPORTED,
+  loadingStarted,
+  authSuccessful,
+  establishingComms,
+  commsEstablished
+} from './loading/types'
 import { defaultLogger } from './logger'
 import { PassportAsPromise } from './passports/PassportAsPromise'
 import { Session } from './session/index'
@@ -61,8 +69,9 @@ export async function initShared(): Promise<Session | undefined> {
   let userId: string
 
   console['group']('connect#login')
+  store.dispatch(loadingStarted())
 
-  if (PREVIEW || EDITOR) {
+  if (!WORLD_EXPLORER) {
     defaultLogger.log(`Using test user.`)
     userId = 'email|5cdd68572d5f842a16d6cc17'
   } else {
@@ -79,6 +88,7 @@ export async function initShared(): Promise<Session | undefined> {
   }
 
   defaultLogger.log(`User ${userId} logged in`)
+  store.dispatch(authSuccessful())
 
   console['groupEnd']()
 
@@ -107,6 +117,7 @@ export async function initShared(): Promise<Session | undefined> {
   }
 
   console['group']('connect#comms')
+  store.dispatch(establishingComms())
   const maxAttemps = 5
   for (let i = 1; ; ++i) {
     try {
@@ -130,6 +141,7 @@ export async function initShared(): Promise<Session | undefined> {
       }
     }
   }
+  store.dispatch(commsEstablished())
   console['groupEnd']()
 
   // initialize profile

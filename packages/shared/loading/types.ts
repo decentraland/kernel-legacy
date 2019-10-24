@@ -20,6 +20,11 @@ export const loadingScenes = () => action(LOADING_SCENES)
 export const WAITING_FOR_RENDERER = 'Waiting for renderer'
 export const waitingForRenderer = () => action(WAITING_FOR_RENDERER)
 
+export const ESTABLISHING_COMMS = 'Establishing comms'
+export const establishingComms = () => action(ESTABLISHING_COMMS)
+export const COMMS_ESTABLISHED = 'Comms established successfully'
+export const commsEstablished = () => action(COMMS_ESTABLISHED)
+
 export const EXPERIENCE_STARTED = 'Loading finished: Experience started'
 export const experienceStarted = () => action(EXPERIENCE_STARTED)
 
@@ -54,6 +59,7 @@ export const ExecutionLifecycleNotifications = {
   noWebglCouldBeCreated,
   unityClientLoaded,
   authSuccessful,
+  establishingComms,
   waitingForRenderer,
   experienceStarted,
   teleportTriggered,
@@ -73,6 +79,8 @@ export type ExecutionLifecycleEvent =
   | typeof LOADING_STARTED
   | typeof AUTH_SUCCESSFUL
   | typeof NOT_INVITED
+  | typeof ESTABLISHING_COMMS
+  | typeof COMMS_ESTABLISHED
   | typeof NO_WEBGL_COULD_BE_CREATED
   | typeof UNITY_CLIENT_LOADED
   | typeof LOADING_SCENES
@@ -81,6 +89,7 @@ export type ExecutionLifecycleEvent =
   | typeof TELEPORT_TRIGGERED
   | typeof SCENE_ENTERED
   | typeof UNEXPECTED_ERROR
+  | typeof UNEXPECTED_ERROR_LOADING_CATALOG
   | typeof AUTH_ERROR_LOGGED_OUT
   | typeof MOBILE_NOT_SUPPORTED
   | typeof CONTENT_SERVER_DOWN
@@ -88,12 +97,14 @@ export type ExecutionLifecycleEvent =
   | typeof COMMS_ERROR_RETRYING
   | typeof COMMS_COULD_NOT_BE_ESTABLISHED
 
-export const ExecutionLifecycleEventsList = [
+export const ExecutionLifecycleEventsList: ExecutionLifecycleEvent[] = [
   NOT_STARTED,
   LOADING_STARTED,
   AUTH_SUCCESSFUL,
   UNITY_CLIENT_LOADED,
   NOT_INVITED,
+  ESTABLISHING_COMMS,
+  COMMS_ESTABLISHED,
   NO_WEBGL_COULD_BE_CREATED,
   LOADING_SCENES,
   WAITING_FOR_RENDERER,
