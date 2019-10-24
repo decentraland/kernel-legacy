@@ -78,6 +78,11 @@ export default class GamekitScene extends Script {
   didStart = false
   provider: any = null
 
+  pbTransform: PB_Transform = new PB_Transform()
+  pbPosition: PB_Vector3 = new PB_Vector3()
+  pbRotation: PB_Quaternion = new PB_Quaternion()
+  pbScale: PB_Vector3 = new PB_Vector3()
+
   constructor(transport: ScriptingTransport, opt?: ILogOpts) {
     super(transport, opt)
   }
@@ -486,29 +491,25 @@ export default class GamekitScene extends Script {
 
     if (classId === CLASS_ID.TRANSFORM) {
       const transform: Transform = JSON.parse(json)
-      const pbTransform: PB_Transform = new PB_Transform()
-      const pbPosition: PB_Vector3 = new PB_Vector3()
-      const pbRotation: PB_Quaternion = new PB_Quaternion()
-      const pbScale: PB_Vector3 = new PB_Vector3()
 
-      pbPosition.setX(transform.position.x)
-      pbPosition.setY(transform.position.y)
-      pbPosition.setZ(transform.position.z)
+      this.pbPosition.setX(transform.position.x)
+      this.pbPosition.setY(transform.position.y)
+      this.pbPosition.setZ(transform.position.z)
 
-      pbRotation.setX(transform.rotation.x)
-      pbRotation.setY(transform.rotation.y)
-      pbRotation.setZ(transform.rotation.z)
-      pbRotation.setW(transform.rotation.w)
+      this.pbRotation.setX(transform.rotation.x)
+      this.pbRotation.setY(transform.rotation.y)
+      this.pbRotation.setZ(transform.rotation.z)
+      this.pbRotation.setW(transform.rotation.w)
 
-      pbScale.setX(transform.scale.x)
-      pbScale.setY(transform.scale.y)
-      pbScale.setZ(transform.scale.z)
+      this.pbScale.setX(transform.scale.x)
+      this.pbScale.setY(transform.scale.y)
+      this.pbScale.setZ(transform.scale.z)
 
-      pbTransform.setPosition(pbPosition)
-      pbTransform.setRotation(pbRotation)
-      pbTransform.setScale(pbScale)
+      this.pbTransform.setPosition(this.pbPosition)
+      this.pbTransform.setRotation(this.pbRotation)
+      this.pbTransform.setScale(this.pbScale)
 
-      let arrayBuffer: Uint8Array = pbTransform.serializeBinary()
+      let arrayBuffer: Uint8Array = this.pbTransform.serializeBinary()
       data = btoa(String.fromCharCode(...arrayBuffer))
     }
 
