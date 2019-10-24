@@ -19,7 +19,7 @@ import { RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
 const ROOT_ENTITY_ID = '0'
 
 export class DecentralandSynchronizationSystem implements ISystem {
-  cachedComponents: Record<string, Record<string, any>> = {}
+  cachedComponents: Record<string, Record<string, string>> = {}
   engine!: Engine
 
   constructor(public dcl: DecentralandInterface) {}
