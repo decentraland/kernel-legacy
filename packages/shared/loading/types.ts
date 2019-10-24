@@ -54,6 +54,7 @@ export const MOBILE_NOT_SUPPORTED = 'Mobile is not supported'
 export const mobileNotSupported = () => action(MOBILE_NOT_SUPPORTED)
 
 export const ExecutionLifecycleNotifications = {
+  notStarted,
   loadingStarted,
   loadingScenes,
   notInvited,
