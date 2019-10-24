@@ -340,25 +340,26 @@ window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// protobuf message instances
+const createEntity: PB_CreateEntity = new PB_CreateEntity()
+const removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
+const updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
+const attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
+const removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
+const setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
+const query: PB_Query = new PB_Query()
+const rayQuery: PB_RayQuery = new PB_RayQuery()
+const ray: PB_Ray = new PB_Ray()
+const origin: PB_Vector3 = new PB_Vector3()
+const direction: PB_Vector3 = new PB_Vector3()
+const componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
+const componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
+const componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
+
 class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
   worker!: SceneWorker
   logger: ILogger
-
-  createEntity: PB_CreateEntity = new PB_CreateEntity()
-  removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
-  updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
-  attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
-  removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
-  setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
-  query: PB_Query = new PB_Query()
-  rayQuery: PB_RayQuery = new PB_RayQuery()
-  ray: PB_Ray = new PB_Ray()
-  origin: PB_Vector3 = new PB_Vector3()
-  direction: PB_Vector3 = new PB_Vector3()
-  componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
-  componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
-  componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
 
   constructor(public data: EnvironmentData<T>) {
     this.logger = createLogger(getParcelSceneID(this) + ': ')
@@ -369,7 +370,8 @@ class UnityScene<T> implements ParcelSceneAPI {
     let messages = ''
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
-      messages += this.encodeSceneMessage(sceneId, action.type, action.payload, action.tag) + '\n'
+      messages += this.encodeSceneMessage(sceneId, action.type, action.payload, action.tag)
+      messages += '\n'
     }
 
     unityInterface.SendSceneMessage(messages)
@@ -441,77 +443,77 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeCreateEntity(createEntityPayload: CreateEntityPayload): PB_CreateEntity {
-    this.createEntity.setId(createEntityPayload.id)
-    return this.createEntity
+    createEntity.setId(createEntityPayload.id)
+    return createEntity
   }
 
   encodeRemoveEntity(removeEntityPayload: RemoveEntityPayload): PB_RemoveEntity {
-    this.removeEntity.setId(removeEntityPayload.id)
-    return this.removeEntity
+    removeEntity.setId(removeEntityPayload.id)
+    return removeEntity
   }
 
   encodeUpdateEntityComponent(updateEntityComponentPayload: UpdateEntityComponentPayload): PB_UpdateEntityComponent {
-    this.updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
-    this.updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
-    this.updateEntityComponent.setData(updateEntityComponentPayload.json)
-    return this.updateEntityComponent
+    updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
+    updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
+    updateEntityComponent.setData(updateEntityComponentPayload.json)
+    return updateEntityComponent
   }
 
   encodeAttachEntityComponent(attachEntityPayload: AttachEntityComponentPayload): PB_AttachEntityComponent {
-    this.attachEntity.setEntityid(attachEntityPayload.entityId)
-    this.attachEntity.setName(attachEntityPayload.name)
-    this.attachEntity.setId(attachEntityPayload.id)
-    return this.attachEntity
+    attachEntity.setEntityid(attachEntityPayload.entityId)
+    attachEntity.setName(attachEntityPayload.name)
+    attachEntity.setId(attachEntityPayload.id)
+    return attachEntity
   }
 
   encodeComponentRemoved(removeEntityComponentPayload: ComponentRemovedPayload): PB_ComponentRemoved {
-    this.removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
-    this.removeEntityComponent.setName(removeEntityComponentPayload.name)
-    return this.removeEntityComponent
+    removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
+    removeEntityComponent.setName(removeEntityComponentPayload.name)
+    return removeEntityComponent
   }
 
   encodeSetEntityParent(setEntityParentPayload: SetEntityParentPayload): PB_SetEntityParent {
-    this.setEntityParent.setEntityid(setEntityParentPayload.entityId)
-    this.setEntityParent.setParentid(setEntityParentPayload.parentId)
-    return this.setEntityParent
+    setEntityParent.setEntityid(setEntityParentPayload.entityId)
+    setEntityParent.setParentid(setEntityParentPayload.parentId)
+    return setEntityParent
   }
 
   encodeQuery(queryPayload: QueryPayload): PB_Query {
-    this.origin.setX(queryPayload.payload.ray.origin.x)
-    this.origin.setY(queryPayload.payload.ray.origin.y)
-    this.origin.setZ(queryPayload.payload.ray.origin.z)
-    this.direction.setX(queryPayload.payload.ray.direction.x)
-    this.direction.setY(queryPayload.payload.ray.direction.y)
-    this.direction.setZ(queryPayload.payload.ray.direction.z)
-    this.ray.setOrigin(this.origin)
-    this.ray.setDirection(this.direction)
-    this.ray.setDistance(queryPayload.payload.ray.distance)
-    this.rayQuery.setRay(this.ray)
-    this.rayQuery.setQueryid(queryPayload.payload.queryId)
-    this.rayQuery.setQuerytype(queryPayload.payload.queryType)
-    this.query.setQueryid(queryPayload.queryId)
-    let arrayBuffer: Uint8Array = this.rayQuery.serializeBinary()
+    origin.setX(queryPayload.payload.ray.origin.x)
+    origin.setY(queryPayload.payload.ray.origin.y)
+    origin.setZ(queryPayload.payload.ray.origin.z)
+    direction.setX(queryPayload.payload.ray.direction.x)
+    direction.setY(queryPayload.payload.ray.direction.y)
+    direction.setZ(queryPayload.payload.ray.direction.z)
+    ray.setOrigin(origin)
+    ray.setDirection(direction)
+    ray.setDistance(queryPayload.payload.ray.distance)
+    rayQuery.setRay(ray)
+    rayQuery.setQueryid(queryPayload.payload.queryId)
+    rayQuery.setQuerytype(queryPayload.payload.queryType)
+    query.setQueryid(queryPayload.queryId)
+    let arrayBuffer: Uint8Array = rayQuery.serializeBinary()
     let base64: string = btoa(String.fromCharCode(...arrayBuffer))
-    this.query.setPayload(base64)
-    return this.query
+    query.setPayload(base64)
+    return query
   }
 
   encodeComponentCreated(componentCreatedPayload: ComponentCreatedPayload): PB_ComponentCreated {
-    this.componentCreated.setId(componentCreatedPayload.id)
-    this.componentCreated.setClassid(componentCreatedPayload.classId)
-    this.componentCreated.setName(componentCreatedPayload.name)
-    return this.componentCreated
+    componentCreated.setId(componentCreatedPayload.id)
+    componentCreated.setClassid(componentCreatedPayload.classId)
+    componentCreated.setName(componentCreatedPayload.name)
+    return componentCreated
   }
 
   encodeComponentDisposed(componentDisposedPayload: ComponentDisposedPayload) {
-    this.componentDisposed.setId(componentDisposedPayload.id)
-    return this.componentDisposed
+    componentDisposed.setId(componentDisposedPayload.id)
+    return componentDisposed
   }
 
   encodeComponentUpdated(componentUpdatedPayload: ComponentUpdatedPayload): PB_ComponentUpdated {
-    this.componentUpdated.setId(componentUpdatedPayload.id)
-    this.componentUpdated.setJson(componentUpdatedPayload.json)
-    return this.componentUpdated
+    componentUpdated.setId(componentUpdatedPayload.id)
+    componentUpdated.setJson(componentUpdatedPayload.json)
+    return componentUpdated
   }
 }
 
