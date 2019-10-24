@@ -36,6 +36,11 @@ const blobRE = /^blob:http/
 const WEB3_PROVIDER = 'web3-provider'
 const PROVIDER_METHOD = 'getProvider'
 
+const pbTransform: PB_Transform = new PB_Transform()
+const pbPosition: PB_Vector3 = new PB_Vector3()
+const pbRotation: PB_Quaternion = new PB_Quaternion()
+const pbScale: PB_Vector3 = new PB_Vector3()
+
 function resolveMapping(mapping: string | undefined, mappingName: string, baseUrl: string) {
   let url = mappingName
 
@@ -486,10 +491,6 @@ export default class GamekitScene extends Script {
 
     if (classId === CLASS_ID.TRANSFORM) {
       const transform: Transform = JSON.parse(json)
-      const pbTransform: PB_Transform = new PB_Transform()
-      const pbPosition: PB_Vector3 = new PB_Vector3()
-      const pbRotation: PB_Quaternion = new PB_Quaternion()
-      const pbScale: PB_Vector3 = new PB_Vector3()
 
       pbPosition.setX(transform.position.x)
       pbPosition.setY(transform.position.y)

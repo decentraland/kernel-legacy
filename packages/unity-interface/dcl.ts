@@ -340,6 +340,22 @@ window['unityInterface'] = unityInterface
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// protobuf message instances
+const createEntity: PB_CreateEntity = new PB_CreateEntity()
+const removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
+const updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
+const attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
+const removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
+const setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
+const query: PB_Query = new PB_Query()
+const rayQuery: PB_RayQuery = new PB_RayQuery()
+const ray: PB_Ray = new PB_Ray()
+const origin: PB_Vector3 = new PB_Vector3()
+const direction: PB_Vector3 = new PB_Vector3()
+const componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
+const componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
+const componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
+
 class UnityScene<T> implements ParcelSceneAPI {
   eventDispatcher = new EventDispatcher()
   worker!: SceneWorker
@@ -426,19 +442,16 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeCreateEntity(createEntityPayload: CreateEntityPayload): PB_CreateEntity {
-    let createEntity: PB_CreateEntity = new PB_CreateEntity()
     createEntity.setId(createEntityPayload.id)
     return createEntity
   }
 
   encodeRemoveEntity(removeEntityPayload: RemoveEntityPayload): PB_RemoveEntity {
-    let removeEntity: PB_RemoveEntity = new PB_RemoveEntity()
     removeEntity.setId(removeEntityPayload.id)
     return removeEntity
   }
 
   encodeUpdateEntityComponent(updateEntityComponentPayload: UpdateEntityComponentPayload): PB_UpdateEntityComponent {
-    let updateEntityComponent: PB_UpdateEntityComponent = new PB_UpdateEntityComponent()
     updateEntityComponent.setClassid(updateEntityComponentPayload.classId)
     updateEntityComponent.setEntityid(updateEntityComponentPayload.entityId)
     updateEntityComponent.setData(updateEntityComponentPayload.json)
@@ -446,7 +459,6 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeAttachEntityComponent(attachEntityPayload: AttachEntityComponentPayload): PB_AttachEntityComponent {
-    let attachEntity: PB_AttachEntityComponent = new PB_AttachEntityComponent()
     attachEntity.setEntityid(attachEntityPayload.entityId)
     attachEntity.setName(attachEntityPayload.name)
     attachEntity.setId(attachEntityPayload.id)
@@ -454,25 +466,18 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeComponentRemoved(removeEntityComponentPayload: ComponentRemovedPayload): PB_ComponentRemoved {
-    let removeEntityComponent: PB_ComponentRemoved = new PB_ComponentRemoved()
     removeEntityComponent.setEntityid(removeEntityComponentPayload.entityId)
     removeEntityComponent.setName(removeEntityComponentPayload.name)
     return removeEntityComponent
   }
 
   encodeSetEntityParent(setEntityParentPayload: SetEntityParentPayload): PB_SetEntityParent {
-    let setEntityParent: PB_SetEntityParent = new PB_SetEntityParent()
     setEntityParent.setEntityid(setEntityParentPayload.entityId)
     setEntityParent.setParentid(setEntityParentPayload.parentId)
     return setEntityParent
   }
 
   encodeQuery(queryPayload: QueryPayload): PB_Query {
-    let query: PB_Query = new PB_Query()
-    let rayQuery: PB_RayQuery = new PB_RayQuery()
-    let ray: PB_Ray = new PB_Ray()
-    let origin: PB_Vector3 = new PB_Vector3()
-    let direction: PB_Vector3 = new PB_Vector3()
     origin.setX(queryPayload.payload.ray.origin.x)
     origin.setY(queryPayload.payload.ray.origin.y)
     origin.setZ(queryPayload.payload.ray.origin.z)
@@ -493,7 +498,6 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeComponentCreated(componentCreatedPayload: ComponentCreatedPayload): PB_ComponentCreated {
-    let componentCreated: PB_ComponentCreated = new PB_ComponentCreated()
     componentCreated.setId(componentCreatedPayload.id)
     componentCreated.setClassid(componentCreatedPayload.classId)
     componentCreated.setName(componentCreatedPayload.name)
@@ -501,13 +505,11 @@ class UnityScene<T> implements ParcelSceneAPI {
   }
 
   encodeComponentDisposed(componentDisposedPayload: ComponentDisposedPayload) {
-    let componentDisposed: PB_ComponentDisposed = new PB_ComponentDisposed()
     componentDisposed.setId(componentDisposedPayload.id)
     return componentDisposed
   }
 
   encodeComponentUpdated(componentUpdatedPayload: ComponentUpdatedPayload): PB_ComponentUpdated {
-    let componentUpdated: PB_ComponentUpdated = new PB_ComponentUpdated()
     componentUpdated.setId(componentUpdatedPayload.id)
     componentUpdated.setJson(componentUpdatedPayload.json)
     return componentUpdated
