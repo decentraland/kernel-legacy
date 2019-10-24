@@ -46,7 +46,7 @@ const trackingEvents: Record<ExecutionLifecycleEvent, string> = {
   [AUTH_ERROR_LOGGED_OUT]: 'error_authfail',
   [CONTENT_SERVER_DOWN]: 'error_contentdown',
   [FAILED_FETCHING_UNITY]: 'error_fetchengine',
-  [COMMS_ERROR_RETRYING]: 'error_comms',
+  [COMMS_ERROR_RETRYING]: 'error_comms_',
   [COMMS_COULD_NOT_BE_ESTABLISHED]: 'error_comms_failed',
   [MOBILE_NOT_SUPPORTED]: 'unsupported_mobile',
   [NOT_INVITED]: 'error_not_invited'
@@ -54,10 +54,16 @@ const trackingEvents: Record<ExecutionLifecycleEvent, string> = {
 
 export function* metricSaga() {
   for (const event of ExecutionLifecycleEventsList) {
-    yield takeEvery(event, action => queueTrackingEvent('lifecycle event', toTrackingEvent(event)))
+    yield takeEvery(event, action =>
+      queueTrackingEvent('lifecycle event', toTrackingEvent(event, (action as any).payload))
+    )
   }
 }
 
-function toTrackingEvent(event: ExecutionLifecycleEvent) {
-  return trackingEvents[event] || event
+function toTrackingEvent(event: ExecutionLifecycleEvent, payload: any) {
+  let result = trackingEvents[event]
+  if (event === COMMS_ERROR_RETRYING) {
+    result += payload
+  }
+  return result
 }

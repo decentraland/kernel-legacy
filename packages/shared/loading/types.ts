@@ -46,7 +46,7 @@ export const contentServerDown = () => action(CONTENT_SERVER_DOWN)
 export const FAILED_FETCHING_UNITY = 'Failed to fetch the rendering engine'
 export const failedFetchingUnity = () => action(FAILED_FETCHING_UNITY)
 export const COMMS_ERROR_RETRYING = 'Communications channel error (will retry)'
-export const commsErrorRetrying = () => action(COMMS_ERROR_RETRYING)
+export const commsErrorRetrying = (attempt: number) => action(COMMS_ERROR_RETRYING, attempt)
 export const COMMS_COULD_NOT_BE_ESTABLISHED = 'Communications channel error'
 export const commsCouldNotBeEstablished = () => action(COMMS_COULD_NOT_BE_ESTABLISHED)
 export const MOBILE_NOT_SUPPORTED = 'Mobile is not supported'

@@ -35,6 +35,7 @@ import { getAppNetwork, getNetworkFromTLD, initWeb3 } from './web3'
 import { initializeUrlPositionObserver } from './world/positionThings'
 import { setWorldContext } from './protocol/actions'
 import { profileToRendererFormat } from './passports/transformations/profileToRendererFormat'
+import { commsErrorRetrying } from './loading/types'
 
 // TODO fill with segment keys and integrate identity server
 async function initializeAnalytics(userId: string) {
@@ -132,12 +133,16 @@ export async function initShared(): Promise<Session | undefined> {
       }
       break
     } catch (e) {
-      if (!e.message.startsWith('Communications link') || i >= maxAttemps) {
-        // max number of attemps reached, rethrow error
-        defaultLogger.info(`Max number of attemps reached (${maxAttemps}), unsuccessful connection`)
-        disconnect()
-        ReportFatalError(COMMS_COULD_NOT_BE_ESTABLISHED)
-        throw e
+      if (!e.message.startsWith('Communications link')) {
+        if (i >= maxAttemps) {
+          // max number of attemps reached, rethrow error
+          defaultLogger.info(`Max number of attemps reached (${maxAttemps}), unsuccessful connection`)
+          disconnect()
+          ReportFatalError(COMMS_COULD_NOT_BE_ESTABLISHED)
+          throw e
+        } else {
+          store.dispatch(commsErrorRetrying(i))
+        }
       }
     }
   }
