@@ -73,6 +73,7 @@ import {
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import { queueTrackingEvent } from '../shared/analytics'
 import { getPerformanceInfo } from '../shared/session/getPerformanceInfo'
+import { unityClientLoaded, loadingScenes } from '../shared/loading/types'
 
 const rendererVersion = require('decentraland-renderer')
 window['console'].log('Renderer version: ' + rendererVersion)
@@ -551,6 +552,7 @@ export class UnityParcelScene extends UnityScene<LoadableParcelScene> {
 export async function initializeEngine(_gameInstance: GameInstance) {
   gameInstance = _gameInstance
 
+  global['globalStore'].dispatch(unityClientLoaded())
   setLoadingScreenVisible(true)
 
   unityInterface.DeactivateRendering()
@@ -583,6 +585,7 @@ export async function initializeEngine(_gameInstance: GameInstance) {
 }
 
 export async function startUnityParcelLoading() {
+  global['globalStore'].dispatch(loadingScenes())
   await enableParcelSceneLoading({
     parcelSceneClass: UnityParcelScene,
     preloadScene: async _land => {

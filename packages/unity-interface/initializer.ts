@@ -5,6 +5,7 @@ import { ReportFatalError } from '../shared/loading/ReportFatalError'
 import { defaultLogger } from '../shared/logger'
 import { initializeEngine } from './dcl'
 import { Session } from '../shared/session'
+import { waitingForRenderer } from '../shared/loading/types'
 const queryString = require('query-string')
 
 declare var global: any
@@ -53,6 +54,7 @@ export async function initializeUnity(container: HTMLElement): Promise<Initializ
     _gameInstance = await UnityLoader.instantiate(container, 'unity/Build/unity.json')
   }
 
+  global['globalStore'].dispatch(waitingForRenderer())
   await engineInitialized
 
   return {
