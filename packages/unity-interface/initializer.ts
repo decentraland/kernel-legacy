@@ -82,13 +82,11 @@ namespace DCL {
   export function MessageFromEngine(type: string, jsonEncodedMessage: string) {
     if (_instancedJS) {
       if (type === 'PerformanceReport') {
-        _instancedJS
-          .then($ => $.onMessage(type, jsonEncodedMessage))                     
-          .catch(e => defaultLogger.error(e.message))
+        _instancedJS.then($ => $.onMessage(type, jsonEncodedMessage)).catch(e => defaultLogger.error(e.message))
         return
       }
       _instancedJS
-        .then($ => $.onMessage(type, JSON.parse(jsonEncodedMessage)))                     
+        .then($ => $.onMessage(type, JSON.parse(jsonEncodedMessage)))
         .catch(e => defaultLogger.error(e.message))
     } else {
       defaultLogger.error('Message received without initializing engine', type, jsonEncodedMessage)
