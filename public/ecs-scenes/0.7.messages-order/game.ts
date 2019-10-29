@@ -16,6 +16,6 @@ cube.addComponentOrReplace(text)
 engine.addEntity(cube)
 
 executeTask(async () => {
-  const { x, y, land, cid } = await getParcel()
+  const { land } = await getParcel()
   text.value = `Scene with parcels ${JSON.stringify(land.scene.scene.parcels)}`
 })
