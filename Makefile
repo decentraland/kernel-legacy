@@ -57,7 +57,7 @@ RENDERER_BUILD := static/unity/Build/unity.data.unityweb static/unity/Build/unit
 
 node_modules/decentraland-renderer/%.unityweb: package.json package-lock.json
 	@npm install
-	@cp node_modules/decentraland-renderer/`basename $@` static/unity/Build/
+	@cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/
 
 build-essentials: $(COMPILED_SUPPORT_JS_FILES) $(DECENTRALAND_ECS_TYPEDEF_FILE) $(BUILD_ECS) $(SCENE_SYSTEM) $(INTERNAL_SCENES) $(DECENTRALAND_LOADER) $(RENDERER_BUILD) generate-mocks ## Build the basic required files for the explorer
 
