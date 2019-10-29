@@ -55,7 +55,7 @@ docs: $(DECENTRALAND_ECS_TYPEDEF_FILE) ## Generate `decentraland-ecs` documentat
 
 RENDERER_BUILD := static/unity/Build/unity.data.unityweb static/unity/Build/unity.wasm.framework.unityweb static/unity/Build/unity.wasm.code.unityweb
 
-node_modules/decentraland-renderer/%.unityweb: package.json package-lock.json
+static/unity/Build/%.unityweb: package.json package-lock.json
 	@npm install
 	@cp node_modules/decentraland-renderer/*.unityweb static/unity/Build/
 
