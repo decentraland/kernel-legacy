@@ -24,7 +24,7 @@ describe('fetchProfile behavior', () => {
 
 describe('notifications behavior', () => {
   const getReturnsNull = (_: any) => undefined
-  const getReturnsYes = (_: any) => 'sent'
+  const getReturnsYes = (_: any) => 'notified'
   const noopSave = (_: any, __: any) => undefined
   const profile = {}
   const userId = 'userId'
