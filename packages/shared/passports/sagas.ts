@@ -377,14 +377,18 @@ export function* compareInventoriesAndTriggerNotification(
       (cumm: Record<WearableId, boolean>, id: string) => ({ ...cumm, [id]: true }),
       {}
     )
+    let shouldSendNotification = false
     for (let item of newInventory) {
       if (!oldItemsDict[item]) {
         const storeKey = '__notified_' + item
         if (!getFromDb(storeKey)) {
           saveToDb(storeKey, 'notified')
-          yield put(notifyNewInventoryItem())
+          shouldSendNotification = true
         }
       }
+    }
+    if (shouldSendNotification) {
+      yield put(notifyNewInventoryItem())
     }
     yield call(sendLoadProfile, yield select(getProfile, userId))
   }

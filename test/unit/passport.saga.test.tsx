@@ -40,4 +40,11 @@ describe('notifications behavior', () => {
       .not.put(notifyNewInventoryItem())
       .run()
   })
+  it('does not trigger multiple notifications if more than one item', () => {
+    expectSaga(compareInventoriesAndTriggerNotification, userId, [], ['newItem', 'newItem2'], getReturnsYes, noopSave)
+      .provide([[select(getProfile, userId), profile]])
+      .put(notifyNewInventoryItem())
+      .not.put(notifyNewInventoryItem())
+      .run()
+  })
 })
