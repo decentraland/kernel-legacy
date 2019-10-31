@@ -369,7 +369,7 @@ export function* compareInventoriesAndTriggerNotification(
   userId: string,
   oldInventory: string[],
   newInventory: string[],
-  getFromDb = getFromLocalStorage,
+  fetchFromDb = getFromLocalStorage,
   saveToDb = saveToLocalStorage
 ) {
   if (areInventoriesDifferent(oldInventory, newInventory)) {
