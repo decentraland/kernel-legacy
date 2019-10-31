@@ -381,7 +381,7 @@ export function* compareInventoriesAndTriggerNotification(
     for (let item of newInventory) {
       if (!oldItemsDict[item]) {
         const storeKey = '__notified_' + item
-        if (!getFromDb(storeKey)) {
+        if (!fetchFromDb(storeKey)) {
           saveToDb(storeKey, 'notified')
           shouldSendNotification = true
         }
