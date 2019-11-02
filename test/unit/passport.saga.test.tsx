@@ -13,9 +13,15 @@ import { getCurrentUserId } from '../../packages/shared/auth/selectors'
 import { processServerProfile } from '../../packages/shared/passports/transformations/processServerProfile'
 import { dynamic } from 'redux-saga-test-plan/providers'
 
+const profile = { data: 'profile' }
+
+const delayedProfile = dynamic(async () => {
+  await delay(1) // yield control, so that the next event is received and takeLatest cancels the previous
+  return profile
+})
+
 describe('fetchProfile behavior', () => {
   it('behaves normally', () => {
-    const profile = { data: 'profile' }
     return expectSaga(handleFetchProfile, passportRequest('userId'))
       .put(passportSuccess('userId', 'passport' as any))
       .provide([
@@ -29,7 +35,6 @@ describe('fetchProfile behavior', () => {
   })
 
   it('completes once for more than one request of same user', () => {
-    const profile = { data: 'profile' }
     return expectSaga(passportSaga)
       .put(passportSuccess('user|1', 'passport' as any))
       .not.put(passportSuccess('user|1', 'passport' as any))
@@ -39,13 +44,7 @@ describe('fetchProfile behavior', () => {
       .provide([
         [select(getProfileDownloadServer), 'server'],
         [select(getAccessToken), 'access-token'],
-        [
-          call(profileServerRequest, 'server', 'user|1', 'access-token'),
-          dynamic(async () => {
-            await delay(1) // yield control, so that the next event is received and takeLatest cancels the previous
-            return profile
-          })
-        ],
+        [call(profileServerRequest, 'server', 'user|1', 'access-token'), delayedProfile],
         [select(getCurrentUserId), 'myid'],
         [call(processServerProfile, 'user|1', profile), 'passport']
       ])
@@ -53,7 +52,6 @@ describe('fetchProfile behavior', () => {
   })
 
   it('runs one request for each user', () => {
-    const profile = { data: 'profile' }
     return expectSaga(passportSaga)
       .put(passportSuccess('user|1', 'passport1' as any))
       .put(passportSuccess('user|2', 'passport2' as any))
@@ -66,22 +64,10 @@ describe('fetchProfile behavior', () => {
       .provide([
         [select(getProfileDownloadServer), 'server'],
         [select(getAccessToken), 'access-token'],
-        [
-          call(profileServerRequest, 'server', 'user|1', 'access-token'),
-          dynamic(async () => {
-            await delay(1) // yield control, so that the next event is received and takeLatest cancels the previous
-            return profile
-          })
-        ],
+        [call(profileServerRequest, 'server', 'user|1', 'access-token'), delayedProfile],
         [select(getCurrentUserId), 'myid'],
         [call(processServerProfile, 'user|1', profile), 'passport1'],
-        [
-          call(profileServerRequest, 'server', 'user|2', 'access-token'),
-          dynamic(async () => {
-            await delay(1) // yield control, so that the next event is received and takeLatest cancels the previous
-            return profile
-          })
-        ],
+        [call(profileServerRequest, 'server', 'user|2', 'access-token'), delayedProfile],
         [call(processServerProfile, 'user|2', profile), 'passport2']
       ])
       .run()
