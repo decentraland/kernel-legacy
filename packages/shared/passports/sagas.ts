@@ -131,7 +131,7 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     } else {
       profile.inventory = []
     }
-    const passport = processServerProfile(userId, profile)
+    const passport = yield call(processServerProfile, userId, profile)
     yield put(passportSuccess(userId, passport))
   } catch (error) {
     const randomizedUserProfile = yield call(generateRandomUserProfile, userId)
