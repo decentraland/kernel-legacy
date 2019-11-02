@@ -57,6 +57,8 @@ describe('fetchProfile behavior', () => {
     return expectSaga(passportSaga)
       .put(passportSuccess('user|1', 'passport1' as any))
       .put(passportSuccess('user|2', 'passport2' as any))
+      .not.put(passportSuccess('user|1', 'passport1' as any))
+      .not.put(passportSuccess('user|2', 'passport2' as any))
       .dispatch(passportRequest('user|1'))
       .dispatch(passportRequest('user|1'))
       .dispatch(passportRequest('user|2'))
