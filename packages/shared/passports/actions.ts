@@ -10,7 +10,7 @@ export const SET_PROFILE_SERVER = 'Set avatar profile server'
 export const setProfileServer = (url: string) => action(SET_PROFILE_SERVER, { url })
 export type SetProfileServerAction = ReturnType<typeof setProfileServer>
 
-export const passportRequest = (userId: string) => action(PASSPORT_REQUEST, { userId })
+export const passportRequest = (userId: string) => action(PASSPORT_REQUEST + ' - ' + userId, { userId })
 export const passportSuccess = (userId: string, profile: Profile) => action(PASSPORT_SUCCESS, { userId, profile })
 export const passportFailure = (userId: string, error: any) => action(PASSPORT_FAILURE, { userId, error })
 export const passportRandom = (userId: string, profile: Profile) => action(PASSPORT_RANDOM, { userId, profile })

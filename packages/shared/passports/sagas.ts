@@ -1,5 +1,5 @@
 import { getFromLocalStorage, saveToLocalStorage } from 'atomicHelpers/localStorage'
-import { call, fork, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { call, fork, put, race, select, take, takeEvery, takeLatest, cancel, ForkEffect } from 'redux-saga/effects'
 import { NotificationType } from 'shared/types'
 import { getServerConfigurations } from '../../config'
 import { getAccessToken, getCurrentUserId, getEmail } from '../auth/selectors'
@@ -43,6 +43,7 @@ import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
 import { Avatar, Catalog, Profile, WearableId } from './types'
+import { Action } from 'redux'
 
 /**
  * This saga handles both passports and assets required for the renderer to show the
@@ -64,7 +65,7 @@ export function* passportSaga(): any {
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
 
-  yield takeLatest(PASSPORT_REQUEST, handleFetchProfile)
+  yield takeLatestCorresponding((action: any) => action.type.startsWith(PASSPORT_REQUEST), handleFetchProfile)
   yield takeLatest(PASSPORT_SUCCESS, submitPassportToRenderer)
   yield takeLatest(PASSPORT_RANDOM, handleRandomAsSuccess)
 
@@ -75,6 +76,21 @@ export function* passportSaga(): any {
   yield takeLatest(NOTIFY_NEW_INVENTORY_ITEM, handleNewInventoryItem)
 
   yield fork(queryInventoryEveryMinute)
+}
+
+function takeLatestCorresponding(patternOrChannel: any, saga: any, ...args: any): ForkEffect<never> {
+  return fork(function*() {
+    let lastTasks = new Map<any, any>()
+    while (true) {
+      const action: Action = yield take(patternOrChannel)
+      const task = lastTasks.get(action.type)
+      if (task) {
+        lastTasks.delete(action.type)
+        yield cancel(task) // cancel is no-op if the task has already terminated
+      }
+      lastTasks.set(action.type, yield fork(saga, ...args.concat(action)))
+    }
+  })
 }
 
 export function* initialLoad() {
