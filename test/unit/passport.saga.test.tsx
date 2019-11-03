@@ -1,5 +1,5 @@
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select, fork } from 'redux-saga/effects'
+import { call, fork, select } from 'redux-saga/effects'
 import { getAccessToken } from 'shared/auth/selectors'
 import { notifyNewInventoryItem, passportFetch, passportQuery, passportSuccess } from 'shared/passports/actions'
 import {

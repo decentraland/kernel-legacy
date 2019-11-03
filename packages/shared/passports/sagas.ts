@@ -24,6 +24,7 @@ import {
   NOTIFY_NEW_INVENTORY_ITEM,
   passportFetch,
   PassportFetchAction,
+  passportQuery,
   PassportQueryAction,
   passportRandom,
   PassportRandomAction,
@@ -36,8 +37,7 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer,
-  passportQuery
+  setProfileServer
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getEthereumAddress, getInventory, getProfile, getProfileDownloadServer } from './selectors'
@@ -99,7 +99,7 @@ export function* handlePassportQuery(action: PassportQueryAction): any {
   if (!passport || (action.payload.version && passport.version < action.payload.version)) {
     const fetchAction = passportFetch(userId)
     yield put(action)
-    yield fork(() => handleFetchProfile(fetchAction))
+    yield fork(handleFetchProfile, fetchAction)
   }
 }
 
