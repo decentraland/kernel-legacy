@@ -22,20 +22,22 @@ import {
   INVENTORY_SUCCESS,
   notifyNewInventoryItem,
   NOTIFY_NEW_INVENTORY_ITEM,
+  passportFetch,
+  PassportFetchAction,
+  PassportQueryAction,
   passportRandom,
   PassportRandomAction,
-  passportRequest,
-  PassportRequestAction,
   passportSuccess,
   PassportSuccessAction,
+  PASSPORT_QUERY,
   PASSPORT_RANDOM,
-  PASSPORT_REQUEST,
   PASSPORT_SUCCESS,
   saveAvatarFailure,
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer
+  setProfileServer,
+  passportQuery
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getEthereumAddress, getInventory, getProfile, getProfileDownloadServer } from './selectors'
@@ -64,7 +66,7 @@ export function* passportSaga(): any {
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
 
-  yield takeLatest(PASSPORT_REQUEST, handleFetchProfile)
+  yield takeEvery(PASSPORT_QUERY, handlePassportQuery)
   yield takeLatest(PASSPORT_SUCCESS, submitPassportToRenderer)
   yield takeLatest(PASSPORT_RANDOM, handleRandomAsSuccess)
 
@@ -91,7 +93,17 @@ export function* initialLoad() {
   }
 }
 
-export function* handleFetchProfile(action: PassportRequestAction): any {
+export function* handlePassportQuery(action: PassportQueryAction): any {
+  const userId = action.payload.userId
+  const passport = yield select(getProfile, userId)
+  if (!passport || (action.payload.version && passport.version < action.payload.version)) {
+    const fetchAction = passportFetch(userId)
+    yield put(action)
+    yield fork(() => handleFetchProfile(fetchAction))
+  }
+}
+
+export function* handleFetchProfile(action: PassportFetchAction): any {
   const userId = action.payload.userId
   try {
     const serverUrl = yield select(getProfileDownloadServer)
@@ -255,7 +267,7 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
     })
     const { version } = result
     yield put(saveAvatarSuccess(userId, version, profile))
-    yield put(passportRequest(userId))
+    yield put(passportQuery(userId, version))
   } catch (error) {
     yield put(saveAvatarFailure(userId, 'unknown reason'))
   }

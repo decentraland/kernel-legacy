@@ -1,17 +1,34 @@
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select } from 'redux-saga/effects'
+import { call, select, fork } from 'redux-saga/effects'
 import { getAccessToken } from 'shared/auth/selectors'
-import { notifyNewInventoryItem, passportRequest, passportSuccess } from 'shared/passports/actions'
+import { notifyNewInventoryItem, passportFetch, passportQuery, passportSuccess } from 'shared/passports/actions'
 import {
   compareInventoriesAndTriggerNotification,
   handleFetchProfile,
+  handlePassportQuery,
   profileServerRequest
 } from 'shared/passports/sagas'
 import { getProfile, getProfileDownloadServer } from 'shared/passports/selectors'
 
 describe('fetchProfile behavior', () => {
+  it('behaves normally', async () => {
+    const result = await expectSaga(handlePassportQuery, passportQuery('userId'))
+      .provide([
+        [select(getProfile, 'userId'), undefined],
+        [select(getProfileDownloadServer), 'server'],
+        [select(getAccessToken), 'access-token'],
+        [call(profileServerRequest, 'server', 'userId', 'access-token'), { data: 'profile' }],
+        [fork(handleFetchProfile, passportFetch('userId')), undefined]
+      ])
+      .put(passportQuery('userId'))
+      .run()
+    console.log(result)
+  })
+})
+
+describe('sequential queries', () => {
   it('behaves normally', () => {
-    expectSaga(handleFetchProfile, passportRequest('userId'))
+    expectSaga(handleFetchProfile, passportFetch('userId'))
       .provide([
         [select(getProfileDownloadServer), 'server'],
         [select(getAccessToken), 'access-token'],

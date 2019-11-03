@@ -11,7 +11,8 @@ import {
   INVENTORY_FAILURE,
   InventoryRequest,
   InventoryFailure,
-  INVENTORY_REQUEST
+  INVENTORY_REQUEST,
+  PASSPORT_FETCH
 } from './actions'
 export function passportsReducer(state?: PassportState, action?: AnyAction): PassportState {
   if (!state) {
@@ -86,10 +87,13 @@ export function passportsReducer(state?: PassportState, action?: AnyAction): Pas
         ...state,
         profileServer: action.payload.url
       }
-    case '[Request] Passport fetch':
+    case PASSPORT_FETCH:
       return {
         ...state,
-        userInfo: { ...state.userInfo, [action.payload.userId]: { status: 'loading' } }
+        userInfo: {
+          ...state.userInfo,
+          [action.payload.userId]: { ...state.userInfo[action.payload.userId], status: 'loading' }
+        }
       }
     case '[Success] Passport fetch':
       return {

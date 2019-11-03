@@ -1,39 +1,37 @@
-import { future, IFuture } from 'fp-future'
 import * as chai from 'chai'
-import * as sinon from 'sinon'
-import * as sinonChai from 'sinon-chai'
-
 import { parcelLimits } from 'config'
-import {
-  WebRtcMessage,
-  ConnectMessage,
-  WelcomeMessage,
-  AuthMessage,
-  TopicMessage,
-  TopicFWMessage,
-  PingMessage,
-  SubscriptionMessage,
-  MessageType,
-  Role,
-  Format,
-  TopicIdentityMessage
-} from '../../packages/shared/comms/proto/broker'
-import { AuthData } from '../../packages/shared/comms/proto/comms'
-import { PositionData, ProfileData, ChatData, Category } from '../../packages/shared/comms/proto/comms'
-import { Position, CommunicationArea, Parcel, position2parcel } from 'shared/comms/utils'
-import { WorldInstanceConnection, SocketReadyState, positionHash } from 'shared/comms/worldInstanceConnection'
+import { Observable } from 'decentraland-ecs/src'
+import { future, IFuture } from 'fp-future'
 import {
   Context,
+  onPositionUpdate,
+  PeerTrackingInfo,
   processChatMessage,
   processPositionMessage,
-  processProfileMessage,
-  PeerTrackingInfo,
-  onPositionUpdate
+  processProfileMessage
 } from 'shared/comms'
 import { BrokerConnection } from 'shared/comms/BrokerConnection'
-import { IBrokerConnection, BrokerMessage } from 'shared/comms/IBrokerConnection'
-import { Observable } from 'decentraland-ecs/src'
-import { TopicIdentityFWMessage } from '../../packages/shared/comms/proto/broker'
+import { BrokerMessage, IBrokerConnection } from 'shared/comms/IBrokerConnection'
+import { CommunicationArea, Parcel, Position, position2parcel } from 'shared/comms/utils'
+import { positionHash, SocketReadyState, WorldInstanceConnection } from 'shared/comms/worldInstanceConnection'
+import * as sinon from 'sinon'
+import * as sinonChai from 'sinon-chai'
+import {
+  AuthMessage,
+  ConnectMessage,
+  Format,
+  MessageType,
+  PingMessage,
+  Role,
+  SubscriptionMessage,
+  TopicFWMessage,
+  TopicIdentityFWMessage,
+  TopicIdentityMessage,
+  TopicMessage,
+  WebRtcMessage,
+  WelcomeMessage
+} from '../../packages/shared/comms/proto/broker'
+import { AuthData, Category, ChatData, PositionData, ProfileData } from '../../packages/shared/comms/proto/comms'
 
 chai.use(sinonChai)
 
@@ -49,7 +47,7 @@ class MockWebSocket {
   }
 }
 
-describe('Communications', function () {
+describe('Communications', function() {
   describe('CommunicationArea', () => {
     function makePosition(x: number, z: number): Position {
       return [x, 0, z, 0, 0, 0, 0]
@@ -84,7 +82,7 @@ describe('Communications', function () {
 
     before(() => {
       // NOTE: little hack to be able to mock websocket requests
-      ; (window as any)['WebSocket'] = MockWebSocket
+      ;(window as any)['WebSocket'] = MockWebSocket
     })
 
     let connection: BrokerConnection
@@ -116,13 +114,13 @@ describe('Communications', function () {
         ondatachannel: connection.webRtcConn!.ondatachannel
       }
       connection.webRtcConn = mockWebRtc
-        ; (webSocket as any).readyState = SocketReadyState.OPEN
+      ;(webSocket as any).readyState = SocketReadyState.OPEN
 
       webSocket.send = sinon.stub()
     })
 
     after(() => {
-      ; (window as any)['WebSocket'] = ORIGINAL_WEB_SOCKET
+      ;(window as any)['WebSocket'] = ORIGINAL_WEB_SOCKET
     })
 
     describe('coordinator messages', () => {
@@ -181,7 +179,7 @@ describe('Communications', function () {
         connection.commServerAlias = 1
 
         const answer = { sdp: 'answer-sdp', type: 'answer' }
-          ; (connection.webRtcConn!.createAnswer as any).resolves(answer)
+        ;(connection.webRtcConn!.createAnswer as any).resolves(answer)
 
         const offer = { sdp: 'offer-sdp', type: 'offer' }
 
@@ -190,7 +188,7 @@ describe('Communications', function () {
         msg.setFromAlias(1)
         const encoder = new TextEncoder()
         msg.setData(encoder.encode(JSON.stringify(offer)))
-          ; (connection.webRtcConn! as any)['localDescription'] = answer
+        ;(connection.webRtcConn! as any)['localDescription'] = answer
         connection.gotCandidatesFuture.resolve(answer as any)
 
         const event = new MessageEvent('websocket', { data: msg.serializeBinary() })
@@ -523,7 +521,7 @@ describe('Communications', function () {
 
     describe('profile handler', () => {
       beforeEach(() => {
-        (global as any).globalStore = {
+        ;(global as any).globalStore = {
           getState: () => ({
             passports: {
               userInfo: {

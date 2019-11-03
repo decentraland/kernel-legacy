@@ -1,7 +1,7 @@
-import { RootState } from '../store/rootTypes'
 import { Store } from 'redux'
+import { RootState } from '../store/rootTypes'
+import { passportQuery } from './actions'
 import { getProfile } from './selectors'
-import { passportRequest } from './actions'
 import { Profile } from './types'
 
 export function PassportAsPromise(userId: string, version?: number): Promise<Profile> {
@@ -20,6 +20,6 @@ export function PassportAsPromise(userId: string, version?: number): Promise<Pro
       }
       // TODO (eordano, 16/Sep/2019): Timeout or catch errors
     })
-    store.dispatch(passportRequest(userId))
+    store.dispatch(passportQuery(userId))
   })
 }
