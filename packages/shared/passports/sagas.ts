@@ -43,7 +43,9 @@ import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
 import { Avatar, Catalog, Profile, WearableId } from './types'
-import { Action } from 'redux'
+
+const isActionFor = (type: string, userId: string) => (action: any) =>
+  action.type === type && action.payload.userId === userId
 
 /**
  * This saga handles both passports and assets required for the renderer to show the
@@ -65,7 +67,7 @@ export function* passportSaga(): any {
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
 
-  yield takeLatestCorresponding((action: any) => action.type.startsWith(PASSPORT_REQUEST), handleFetchProfile)
+  yield takeLatestByUserId(PASSPORT_REQUEST, handleFetchProfile)
   yield takeLatest(PASSPORT_SUCCESS, submitPassportToRenderer)
   yield takeLatest(PASSPORT_RANDOM, handleRandomAsSuccess)
 
@@ -78,17 +80,18 @@ export function* passportSaga(): any {
   yield fork(queryInventoryEveryMinute)
 }
 
-function takeLatestCorresponding(patternOrChannel: any, saga: any, ...args: any): ForkEffect<never> {
+function takeLatestByUserId(patternOrChannel: any, saga: any, ...args: any): ForkEffect<never> {
   return fork(function*() {
     let lastTasks = new Map<any, any>()
     while (true) {
-      const action: Action = yield take(patternOrChannel)
-      const task = lastTasks.get(action.type)
+      const action: PassportRequestAction = yield take(patternOrChannel)
+      const key = action.type + action.payload.userId
+      const task = lastTasks.get(key)
       if (task) {
-        lastTasks.delete(action.type)
+        lastTasks.delete(key)
         yield cancel(task) // cancel is no-op if the task has already terminated
       }
-      lastTasks.set(action.type, yield fork(saga, ...args.concat(action)))
+      lastTasks.set(key, yield fork(saga, ...args.concat(action)))
     }
   })
 }
@@ -106,9 +109,6 @@ export function* initialLoad() {
     defaultLogger.error('[FATAL]: Could not load catalog!', error)
   }
 }
-
-const isActionFor = (type: string, userId: string) => (action: any) =>
-  action.type === type && action.payload.userId === userId
 
 export function* handleFetchProfile(action: PassportRequestAction): any {
   const userId = action.payload.userId
