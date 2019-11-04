@@ -112,7 +112,8 @@ describe('fetchProfile behavior', () => {
 
   it('ignores inventory for another user', () => {
     const profile1 = { ...profile, ethAddress: 'eth1' }
-    return expectSaga(handleFetchProfile, passportSuccess('user|1', 'passport1' as any))
+    return expectSaga(handleFetchProfile, passportRequest('user|1'))
+      .put(passportSuccess('user|1', 'passport1' as any))
       .dispatch(inventorySuccess('user|2', ['dcl://base-exclusive/wearable2/2']))
       .dispatch(inventorySuccess('user|1', ['dcl://base-exclusive/wearable1/1']))
       .provide([

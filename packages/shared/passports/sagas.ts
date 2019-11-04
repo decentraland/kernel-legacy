@@ -43,6 +43,7 @@ import { processServerProfile } from './transformations/processServerProfile'
 import { profileToRendererFormat } from './transformations/profileToRendererFormat'
 import { ensureServerFormat } from './transformations/profileToServerFormat'
 import { Avatar, Catalog, Profile, WearableId } from './types'
+import { Action } from 'redux'
 
 const isActionFor = (type: string, userId: string) => (action: any) =>
   action.type === type && action.payload.userId === userId
@@ -67,7 +68,11 @@ export function* passportSaga(): any {
 
   yield takeLatest(ADD_CATALOG, handleAddCatalog)
 
-  yield takeLatestByUserId(PASSPORT_REQUEST, handleFetchProfile)
+  yield takeLatestById(
+    PASSPORT_REQUEST,
+    (action: PassportRequestAction) => action.type + action.payload.userId,
+    handleFetchProfile
+  )
   yield takeLatest(PASSPORT_SUCCESS, submitPassportToRenderer)
   yield takeLatest(PASSPORT_RANDOM, handleRandomAsSuccess)
 
@@ -80,12 +85,17 @@ export function* passportSaga(): any {
   yield fork(queryInventoryEveryMinute)
 }
 
-function takeLatestByUserId(patternOrChannel: any, saga: any, ...args: any): ForkEffect<never> {
+function takeLatestById<T extends Action>(
+  patternOrChannel: any,
+  keyFunction: (action: T) => string,
+  saga: any,
+  ...args: any
+): ForkEffect<never> {
   return fork(function*() {
     let lastTasks = new Map<any, any>()
     while (true) {
-      const action: PassportRequestAction = yield take(patternOrChannel)
-      const key = action.type + action.payload.userId
+      const action = yield take(patternOrChannel)
+      const key = keyFunction(action)
       const task = lastTasks.get(key)
       if (task) {
         lastTasks.delete(key)
