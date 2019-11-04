@@ -1,3 +1,4 @@
+import { getFromLocalStorage, saveToLocalStorage } from 'atomicHelpers/localStorage'
 import { call, fork, put, race, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { NotificationType } from 'shared/types'
 import { getServerConfigurations } from '../../config'
@@ -243,16 +244,17 @@ export function* handleSaveAvatar(saveAvatar: SaveAvatarRequest) {
     const currentVersion = (yield select(getProfile, userId)).version || 0
     const accessToken = yield select(getAccessToken)
     const url = getServerConfigurations().profile + '/profile/' + userId + '/avatar'
+    const profile = saveAvatar.payload.profile
     const result = yield call(modifyAvatar, {
       url,
       method: 'PUT',
       userId,
       currentVersion,
       accessToken,
-      profile: saveAvatar.payload.profile
+      profile
     })
     const { version } = result
-    yield put(saveAvatarSuccess(userId, version))
+    yield put(saveAvatarSuccess(userId, version, profile))
     yield put(passportRequest(userId))
   } catch (error) {
     yield put(saveAvatarFailure(userId, 'unknown reason'))
@@ -339,27 +341,57 @@ export function delay(time: number) {
 export function* queryInventoryEveryMinute() {
   while (true) {
     yield delay(ONE_MINUTE)
-    const userId = yield select(getCurrentUserId)
-    if (!userId) {
-      continue
-    }
-    const ethAddress = yield select(getEthereumAddress, userId)
-    const inventory = yield select(getInventory, userId)
-    if (!inventory) {
-      continue
-    }
-    yield put(inventoryRequest(userId, ethAddress))
-    const fetchNewInventory = yield race({
-      success: take(INVENTORY_SUCCESS),
-      fail: take(INVENTORY_FAILURE)
-    })
-    if (fetchNewInventory.success) {
-      const newInventory = yield select(getInventory, userId)
-      if (areInventoriesDifferent(inventory, newInventory)) {
-        yield put(notifyNewInventoryItem())
-        yield call(sendLoadProfile, yield select(getProfile, userId))
+    yield call(checkInventoryForUpdates)
+  }
+}
+
+export function* checkInventoryForUpdates() {
+  const userId = yield select(getCurrentUserId)
+  if (!userId) {
+    return
+  }
+  const ethAddress = yield select(getEthereumAddress, userId)
+  const inventory = yield select(getInventory, userId)
+  if (!inventory || (Array.isArray(inventory) && inventory.length === 0)) {
+    return
+  }
+  yield put(inventoryRequest(userId, ethAddress))
+  const fetchNewInventory = yield race({
+    success: take(INVENTORY_SUCCESS),
+    fail: take(INVENTORY_FAILURE)
+  })
+  if (fetchNewInventory.success) {
+    const newInventory: string[] = (fetchNewInventory.success as InventorySuccess).payload.inventory
+    yield call(compareInventoriesAndTriggerNotification, userId, inventory, newInventory)
+  }
+}
+
+export function* compareInventoriesAndTriggerNotification(
+  userId: string,
+  oldInventory: string[],
+  newInventory: string[],
+  fetchFromDb = getFromLocalStorage,
+  saveToDb = saveToLocalStorage
+) {
+  if (areInventoriesDifferent(oldInventory, newInventory)) {
+    const oldItemsDict = oldInventory.reduce(
+      (cumm: Record<WearableId, boolean>, id: string) => ({ ...cumm, [id]: true }),
+      {}
+    )
+    let shouldSendNotification = false
+    for (let item of newInventory) {
+      if (!oldItemsDict[item]) {
+        const storeKey = '__notified_' + item
+        if (!fetchFromDb(storeKey)) {
+          saveToDb(storeKey, 'notified')
+          shouldSendNotification = true
+        }
       }
     }
+    if (shouldSendNotification) {
+      yield put(notifyNewInventoryItem())
+    }
+    yield call(sendLoadProfile, yield select(getProfile, userId))
   }
 }
 
