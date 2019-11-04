@@ -16,7 +16,6 @@ import {
   InventoryRequest,
   inventoryRequest,
   inventorySuccess,
-  InventorySuccess,
   INVENTORY_FAILURE,
   INVENTORY_REQUEST,
   INVENTORY_SUCCESS,
@@ -35,7 +34,8 @@ import {
   SaveAvatarRequest,
   saveAvatarSuccess,
   SAVE_AVATAR_REQUEST,
-  setProfileServer
+  setProfileServer,
+  InventorySuccess
 } from './actions'
 import { generateRandomUserProfile } from './generateRandomUserProfile'
 import { baseCatalogsLoaded, getEthereumAddress, getInventory, getProfile, getProfileDownloadServer } from './selectors'
@@ -107,6 +107,9 @@ export function* initialLoad() {
   }
 }
 
+const isActionFor = (type: string, userId: string) => (action: any) =>
+  action.type === type && action.payload.userId === userId
+
 export function* handleFetchProfile(action: PassportRequestAction): any {
   const userId = action.payload.userId
   try {
@@ -120,8 +123,8 @@ export function* handleFetchProfile(action: PassportRequestAction): any {
     if (profile.ethAddress) {
       yield put(inventoryRequest(userId, profile.ethAddress))
       const inventoryResult = yield race({
-        success: take(INVENTORY_SUCCESS),
-        failure: take(INVENTORY_FAILURE)
+        success: take(isActionFor(INVENTORY_SUCCESS, userId)),
+        failure: take(isActionFor(INVENTORY_FAILURE, userId))
       })
       if (inventoryResult.failure) {
         defaultLogger.error(`Unable to fetch inventory for ${userId}:`, inventoryResult.failure)

@@ -5,20 +5,26 @@ import { notifyNewInventoryItem, passportRequest, passportSuccess } from 'shared
 import {
   compareInventoriesAndTriggerNotification,
   handleFetchProfile,
-  profileServerRequest
+  profileServerRequest,
+  fetchInventoryItemsByAddress
 } from 'shared/passports/sagas'
 import { getProfile, getProfileDownloadServer } from 'shared/passports/selectors'
 import { passportSaga, delay } from '../../packages/shared/passports/sagas'
 import { getCurrentUserId } from '../../packages/shared/auth/selectors'
 import { processServerProfile } from '../../packages/shared/passports/transformations/processServerProfile'
 import { dynamic } from 'redux-saga-test-plan/providers'
+import { expect } from 'chai'
+import { inventorySuccess } from '../../packages/shared/passports/actions'
 
 const profile = { data: 'profile' }
 
-const delayedProfile = dynamic(async () => {
-  await delay(1) // yield control, so that the next event is received and takeLatest cancels the previous
-  return profile
-})
+const delayed = (result: any) =>
+  dynamic(async () => {
+    await delay(1)
+    return result
+  })
+
+const delayedProfile = delayed(profile)
 
 describe('fetchProfile behavior', () => {
   it('behaves normally', () => {
@@ -71,6 +77,57 @@ describe('fetchProfile behavior', () => {
         [call(processServerProfile, 'user|2', profile), 'passport2']
       ])
       .run()
+  })
+
+  it('fetches inventory for corresponding user', () => {
+    const profile1 = { ...profile, ethAddress: 'eth1' }
+    const profile2 = { ...profile, ethAddress: 'eth2' }
+    return expectSaga(passportSaga)
+      .put(passportSuccess('user|1', 'passport1' as any))
+      .put(passportSuccess('user|2', 'passport2' as any))
+      .dispatch(passportRequest('user|1'))
+      .dispatch(passportRequest('user|2'))
+      .provide([
+        [select(getCurrentUserId), 'myid'],
+        [select(getProfileDownloadServer), 'server'],
+        [select(getAccessToken), 'access-token'],
+        [call(profileServerRequest, 'server', 'user|1', 'access-token'), delayed(profile1)],
+        [call(profileServerRequest, 'server', 'user|2', 'access-token'), delayed(profile2)],
+        [call(fetchInventoryItemsByAddress, 'eth1'), ['dcl://base-exclusive/wearable1/1']],
+        [call(fetchInventoryItemsByAddress, 'eth2'), ['dcl://base-exclusive/wearable2/2']],
+        [call(processServerProfile, 'user|1', profile1), 'passport1'],
+        [call(processServerProfile, 'user|2', profile2), 'passport2']
+      ])
+      .run()
+      .then(result => {
+        const inventory1 = (profile1 as any).inventory
+        expect(inventory1).to.have.length(1)
+        expect(inventory1[0]).to.equal('dcl://base-exclusive/wearable1')
+
+        const inventory2 = (profile2 as any).inventory
+        expect(inventory2).to.have.length(1)
+        expect(inventory2[0]).to.equal('dcl://base-exclusive/wearable2')
+      })
+  })
+
+  it('ignores inventory for another user', () => {
+    const profile1 = { ...profile, ethAddress: 'eth1' }
+    return expectSaga(handleFetchProfile, passportSuccess('user|1', 'passport1' as any))
+      .dispatch(inventorySuccess('user|2', ['dcl://base-exclusive/wearable2/2']))
+      .dispatch(inventorySuccess('user|1', ['dcl://base-exclusive/wearable1/1']))
+      .provide([
+        [select(getCurrentUserId), 'myid'],
+        [select(getProfileDownloadServer), 'server'],
+        [select(getAccessToken), 'access-token'],
+        [call(profileServerRequest, 'server', 'user|1', 'access-token'), delayed(profile1)],
+        [call(processServerProfile, 'user|1', profile1), 'passport1']
+      ])
+      .run()
+      .then(result => {
+        const inventory1 = (profile1 as any).inventory
+        expect(inventory1).to.have.length(1)
+        expect(inventory1[0]).to.equal('dcl://base-exclusive/wearable1')
+      })
   })
 })
 
