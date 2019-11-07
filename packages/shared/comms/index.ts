@@ -315,7 +315,7 @@ export function onPositionUpdate(context: Context, p: Position) {
   const parcelSceneCommsTopics = parcelSceneSubscriptions.join(' ')
 
   const topics =
-    (context.userInfo.userId + ' ' || '') +
+    (context.userInfo.userId ? context.userInfo.userId + ' ' : '') +
     currentParcelTopics +
     (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
 
