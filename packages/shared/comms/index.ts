@@ -31,6 +31,7 @@ import { CommunicationArea, Position, position2parcel, sameParcel, squareDistanc
 import { WorldInstanceConnection } from './worldInstanceConnection'
 import { profileToRendererFormat } from 'shared/passports/transformations/profileToRendererFormat'
 import { ProfileForRenderer } from 'decentraland-ecs/src'
+import { Session } from '../session/index'
 
 type Timestamp = number
 type PeerAlias = string
@@ -220,6 +221,8 @@ export function processChatMessage(context: Context, fromAlias: string, data: Ch
 }
 
 export function processProfileMessage(context: Context, fromAlias: string, identity: string, data: ProfileData) {
+  processNewLogin(identity, context, fromAlias)
+
   const msgTimestamp = data.getTime()
 
   const peerTrackingInfo = ensurePeerTrackingInfo(context, fromAlias)
@@ -232,6 +235,12 @@ export function processProfileMessage(context: Context, fromAlias: string, ident
 
     peerTrackingInfo.lastProfileUpdate = msgTimestamp
     peerTrackingInfo.lastUpdate = Date.now()
+  }
+}
+
+function processNewLogin(identity: string, context: Context, fromAlias: string) {
+  if (identity === context.userInfo.userId && fromAlias !== getCurrentPeer()!.uuid) {
+    Session.current.then(s => s.logout()).catch(e => defaultLogger.error('error while signing out', e))
   }
 }
 
@@ -305,7 +314,10 @@ export function onPositionUpdate(context: Context, p: Position) {
 
   const parcelSceneCommsTopics = parcelSceneSubscriptions.join(' ')
 
-  const topics = currentParcelTopics + (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
+  const topics =
+    (context.userInfo.userId + ' ' || '') +
+    currentParcelTopics +
+    (parcelSceneCommsTopics.length ? ' ' + parcelSceneCommsTopics : '')
 
   if (topics !== previousTopics) {
     worldConnection.updateSubscriptions(topics)
@@ -503,6 +515,9 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
       collectInfo(context)
     }
   }, 100)
+
+  connection.updateSubscriptions(userId)
+  connection.sendInitialMessage(userInfo)
 
   return context
 }

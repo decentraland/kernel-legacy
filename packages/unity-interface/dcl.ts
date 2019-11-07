@@ -132,7 +132,7 @@ const browserInterface = {
   },
 
   LogOut() {
-    Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
+    Session.current.then(s => s.logout()).catch(e => defaultLogger.error('error while logging out', e))
   },
 
   SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
