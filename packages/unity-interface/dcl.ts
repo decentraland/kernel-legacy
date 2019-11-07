@@ -74,6 +74,7 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import { queueTrackingEvent } from '../shared/analytics'
 import { getPerformanceInfo } from '../shared/session/getPerformanceInfo'
 import { unityClientLoaded, loadingScenes } from '../shared/loading/types'
+import { aborted } from '../shared/loading/ReportFatalError'
 
 const rendererVersion = require('decentraland-renderer')
 window['console'].log('Renderer version: ' + rendererVersion)
@@ -147,7 +148,9 @@ const browserInterface = {
         break
       }
       case 'ActivateRenderingACK': {
-        worldRunningObservable.notifyObservers(true)
+        if (!aborted) {
+          worldRunningObservable.notifyObservers(true)
+        }
         break
       }
       default: {
@@ -618,8 +621,10 @@ export async function startUnityParcelLoading() {
       })
     },
     onPositionSettled: spawnPoint => {
-      unityInterface.Teleport(spawnPoint)
-      unityInterface.ActivateRendering()
+      if (!aborted) {
+        unityInterface.Teleport(spawnPoint)
+        unityInterface.ActivateRendering()
+      }
     },
     onPositionUnsettled: () => {
       unityInterface.DeactivateRendering()

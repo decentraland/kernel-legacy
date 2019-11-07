@@ -240,7 +240,7 @@ export function processProfileMessage(context: Context, fromAlias: string, ident
 
 function processNewLogin(identity: string, context: Context, fromAlias: string) {
   if (identity === context.userInfo.userId && fromAlias !== getCurrentPeer()!.uuid) {
-    Session.current.then(s => s.logout()).catch(e => defaultLogger.error('error while signing out', e))
+    Session.current.then(s => s.disable()).catch(e => defaultLogger.error('error while signing out', e))
   }
 }
 
@@ -504,11 +504,7 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
     }
   })
 
-  window.addEventListener('beforeunload', event => {
-    if (context && context.worldInstanceConnection && context.currentPosition) {
-      context.worldInstanceConnection.sendParcelUpdateMessage(context.currentPosition, UNREACHABLE_POSITION)
-    }
-  })
+  window.addEventListener('beforeunload', event => sendToMordor())
 
   context.infoCollecterInterval = setInterval(() => {
     if (context) {
@@ -520,6 +516,12 @@ export async function connect(userId: string, network: ETHEREUM_NETWORK, auth: A
   connection.sendInitialMessage(userInfo)
 
   return context
+}
+
+export function sendToMordor() {
+  if (context && context.worldInstanceConnection && context.currentPosition) {
+    context.worldInstanceConnection.sendParcelUpdateMessage(context.currentPosition, UNREACHABLE_POSITION)
+  }
 }
 
 export function disconnect() {
