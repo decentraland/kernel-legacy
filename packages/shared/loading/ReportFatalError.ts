@@ -46,4 +46,4 @@ export function ReportFatalError(event: ExecutionLifecycleEvent) {
   global['globalStore'] && global['globalStore'].dispatch(action(event))
 }
 
-;(global as any).ReportFatalError = ReportFatalError
+global.ReportFatalError = ReportFatalError
