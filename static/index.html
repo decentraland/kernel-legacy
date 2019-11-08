@@ -155,11 +155,25 @@
         width: 100%;
       }
     }
+    #messages {
+      bottom: 10%;
+      position: fixed;
+      color: white;
+      padding-left: 20%;
+      padding-right: 20%;
+      text-align: center;
+      font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 13px;
+      font-stretch: 125%;
+      font-weight: 600;
+    }
   </style>
 </head>
 
 <body class="dcl-loading">
-  <div id="overlay"></div>
+    <div id="messages"></div>
+  <div id="overlay">
+  </div>
   <div id="progress-bar" class="progress ingame">
     <div class="full"></div>
   </div>

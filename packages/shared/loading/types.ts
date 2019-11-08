@@ -6,6 +6,9 @@ export const helpTexts = [
   `Decentraland is made up of over 90,000 LANDs, virtual spaces backed by cryptographic tokens. Only landowners determine the content that sits on their LAND.`
 ]
 
+export const ROTATE_HELP_TEXT = 'Set Help Text'
+export const rotateHelpText = () => action(ROTATE_HELP_TEXT)
+
 export const NOT_STARTED = 'Not initialized'
 export const notStarted = () => action(NOT_STARTED)
 export const LOADING_STARTED = 'Loading started'
