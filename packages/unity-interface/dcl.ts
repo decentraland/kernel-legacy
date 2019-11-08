@@ -73,7 +73,7 @@ import {
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import { queueTrackingEvent } from '../shared/analytics'
 import { getPerformanceInfo } from '../shared/session/getPerformanceInfo'
-import { unityClientLoaded, loadingScenes } from '../shared/loading/types'
+import { unityClientLoaded, loadingScenes, teleportTriggered } from '../shared/loading/types'
 
 const rendererVersion = require('decentraland-renderer')
 window['console'].log('Renderer version: ' + rendererVersion)
@@ -168,6 +168,7 @@ const browserInterface = {
 
 export function setLoadingScreenVisible(shouldShow: boolean) {
   document.getElementById('overlay')!.style.display = shouldShow ? 'block' : 'none'
+  document.getElementById('load-messages-wrapper')!.style.display = shouldShow ? 'block' : 'none'
   document.getElementById('progress-bar')!.style.display = shouldShow ? 'block' : 'none'
 }
 
@@ -734,6 +735,7 @@ export function updateBuilderScene(sceneData: ILand) {
 teleportObservable.add((position: { x: number; y: number }) => {
   // before setting the new position, show loading screen to avoid showing an empty world
   setLoadingScreenVisible(true)
+  ;(global as any)['globalStore'].dispatch(teleportTriggered())
 })
 
 worldRunningObservable.add(isRunning => {

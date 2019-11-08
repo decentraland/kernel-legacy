@@ -10,20 +10,30 @@ import {
 export type LoadingState = {
   status: ExecutionLifecycleEvent
   helpText: number
+  pendingScenes: number
 }
 export function loadingReducer(state?: LoadingState, action?: AnyAction) {
   if (!state) {
-    return { status: NOT_STARTED, helpText: 0 }
+    return { status: NOT_STARTED, helpText: 0, pendingScenes: 0 }
   }
   if (!action) {
     return state
   }
-  if (action.type in ExecutionLifecycleEventsList) {
-    return { status: action.type, helpText: state.helpText }
+  if (action.type === 'Loading scene') {
+    return { ...state, pendingScenes: state.pendingScenes + 1 }
+  }
+  if (action.type === 'Failed scene') {
+    return { ...state, pendingScenes: state.pendingScenes - 1 }
+  }
+  if (action.type === 'Started scene') {
+    return { ...state, pendingScenes: state.pendingScenes - 1 }
+  }
+  if (ExecutionLifecycleEventsList.includes(action.type)) {
+    return { ...state, status: action.type }
   }
   if (action.type === ROTATE_HELP_TEXT) {
     const newValue = state.helpText + 1
-    return { status: state.status, helpText: newValue >= helpTexts.length ? 0 : newValue }
+    return { ...state, helpText: newValue >= helpTexts.length ? 0 : newValue }
   }
   return state
 }
