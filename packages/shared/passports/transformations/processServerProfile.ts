@@ -19,6 +19,7 @@ export function dropDeprecatedWearables(wearableId: string): boolean {
 }
 export function noExclusiveMismatches(inventory: WearableId[]) {
   return function(wearableId: WearableId) {
+    debugger
     return wearableId.startsWith('dcl://base-avatars') || inventory.indexOf(wearableId) !== -1
   }
 }
@@ -54,7 +55,10 @@ export function processServerProfile(userId: string, receivedProfile: any): Prof
       hairColor: colorString(receivedProfile.avatar.hair.color),
       skinColor: colorString(receivedProfile.avatar.skin.color),
       bodyShape: fixWearableIds(receivedProfile.avatar.bodyShape),
-      wearables: receivedProfile.avatar.wearables.map(fixWearableIds).filter(dropDeprecatedWearables)
+      wearables: receivedProfile.avatar.wearables
+        .map(fixWearableIds)
+        .filter(dropDeprecatedWearables)
+        .filter(noExclusiveMismatches)
     },
     inventory: receivedProfile.inventory || []
   }

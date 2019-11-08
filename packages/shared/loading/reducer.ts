@@ -1,4 +1,5 @@
 import { AnyAction } from 'redux'
+import { SCENE_FAIL, SCENE_LOAD, SCENE_START } from './actions'
 import {
   ExecutionLifecycleEvent,
   ExecutionLifecycleEventsList,
@@ -19,13 +20,13 @@ export function loadingReducer(state?: LoadingState, action?: AnyAction) {
   if (!action) {
     return state
   }
-  if (action.type === 'Loading scene') {
+  if (action.type === SCENE_LOAD) {
     return { ...state, pendingScenes: state.pendingScenes + 1 }
   }
-  if (action.type === 'Failed scene') {
+  if (action.type === SCENE_FAIL) {
     return { ...state, pendingScenes: state.pendingScenes - 1 }
   }
-  if (action.type === 'Started scene') {
+  if (action.type === SCENE_START) {
     return { ...state, pendingScenes: state.pendingScenes - 1 }
   }
   if (ExecutionLifecycleEventsList.includes(action.type)) {

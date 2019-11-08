@@ -1,6 +1,11 @@
-import { fork, race, delay, put, select, call, take, takeLatest } from 'redux-saga/effects'
-import { rotateHelpText, helpTexts, EXPERIENCE_STARTED, TELEPORT_TRIGGERED } from './types'
+import { call, delay, fork, put, race, select, take, takeLatest } from 'redux-saga/effects'
+import { SCENE_FAIL, SCENE_START } from './actions'
 import { LoadingState } from './reducer'
+import { EXPERIENCE_STARTED, helpTexts, rotateHelpText, TELEPORT_TRIGGERED } from './types'
+
+const SECONDS = 1000
+
+export const DELAY_BETWEEN_MESSAGES = 10 * SECONDS
 
 export function* loadingSaga() {
   yield fork(changeSubtext)
@@ -12,7 +17,7 @@ export function* changeSubtext() {
     refresh: call(function*() {
       while (true) {
         yield put(rotateHelpText())
-        yield delay(8000)
+        yield delay(DELAY_BETWEEN_MESSAGES)
       }
     }),
     textInScreen: call(function*() {
@@ -27,8 +32,8 @@ export function* changeSubtext() {
       yield take('Loading scene')
       while (true) {
         yield race({
-          started: take('Started scene'),
-          failed: take('Failed scene')
+          started: take(SCENE_START),
+          failed: take(SCENE_FAIL)
         })
         if (yield select(state => state.loading.pendingScenes === 0)) {
           break
