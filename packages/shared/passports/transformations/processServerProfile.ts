@@ -58,7 +58,7 @@ export function processServerProfile(userId: string, receivedProfile: any): Prof
       hairColor: colorString(receivedProfile.avatar.hair.color),
       skinColor: colorString(receivedProfile.avatar.skin.color),
       bodyShape: fixWearableIds(receivedProfile.avatar.bodyShape),
-      wearables: wearables
+      wearables
     },
     inventory: receivedProfile.inventory || []
   }
