@@ -109,7 +109,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
       const worker = getSceneWorkerBySceneID(sceneId)
       if (worker && !worker.sceneStarted) {
         sceneLifeCycleObservable.remove(observer)
-        ;(global as any)['globalStore'].dispatch({ type: 'Failed scene', sceneId })
+        globalSignalSceneFail(sceneId)
         ret.notify('Scene.status', { sceneId, status: 'failed' })
       }
     }, 60000)
