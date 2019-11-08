@@ -4,6 +4,7 @@ import { initParcelSceneWorker } from 'decentraland-loader/lifecycle/manager'
 import { ScriptingTransport } from 'decentraland-rpc/lib/common/json-rpc/types'
 import { sceneLifeCycleObservable } from '../../decentraland-loader/lifecycle/controllers/scene'
 import { queueTrackingEvent } from '../analytics'
+import { globalSignalSceneFail, globalSignalSceneLoad, globalSignalSceneStart } from '../loading/actions'
 import { clearForegroundTimeout, setForegroundTimeout } from '../timers/index'
 import { EnvironmentData, ILand, ILandToLoadableParcelScene, InstancedSpawnPoint, LoadableParcelScene } from '../types'
 import { ParcelSceneAPI } from './ParcelSceneAPI'
@@ -122,7 +123,8 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
     }
     stopParcelSceneWorker(worker)
     if (options.onUnloadParcelScenes) {
-      ;(global as any)['globalStore'].dispatch({ type: 'Unloaded scene', sceneId: opts.sceneId })
+      const globalStore = (global as any)['globalStore']
+      globalStore.dispatch({ type: 'Unloaded scene', sceneId: opts.sceneId })
       options.onUnloadParcelScenes([await ret.getParcelData(opts.sceneId)])
     }
   })

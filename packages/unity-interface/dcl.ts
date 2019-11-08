@@ -17,6 +17,7 @@ import { queueTrackingEvent } from '../shared/analytics'
 import { DevTools } from '../shared/apis/DevTools'
 import { ParcelIdentity } from '../shared/apis/ParcelIdentity'
 import { chatObservable } from '../shared/comms/chat'
+import { aborted } from '../shared/loading/ReportFatalError'
 import { loadingScenes, teleportTriggered, unityClientLoaded } from '../shared/loading/types'
 import { createLogger, defaultLogger, ILogger } from '../shared/logger'
 import { saveAvatarRequest } from '../shared/passports/actions'
@@ -132,7 +133,7 @@ const browserInterface = {
   },
 
   LogOut() {
-    Session.current.logout().catch(e => defaultLogger.error('error while logging out', e))
+    Session.current.then(s => s.logout()).catch(e => defaultLogger.error('error while logging out', e))
   },
 
   SaveUserAvatar(data: { face: string; body: string; avatar: Avatar }) {
@@ -147,7 +148,9 @@ const browserInterface = {
         break
       }
       case 'ActivateRenderingACK': {
-        worldRunningObservable.notifyObservers(true)
+        if (!aborted) {
+          worldRunningObservable.notifyObservers(true)
+        }
         break
       }
       default: {
@@ -619,8 +622,10 @@ export async function startUnityParcelLoading() {
       })
     },
     onPositionSettled: spawnPoint => {
-      unityInterface.Teleport(spawnPoint)
-      unityInterface.ActivateRendering()
+      if (!aborted) {
+        unityInterface.Teleport(spawnPoint)
+        unityInterface.ActivateRendering()
+      }
     },
     onPositionUnsettled: () => {
       unityInterface.DeactivateRendering()
@@ -736,7 +741,8 @@ teleportObservable.add((position: { x: number; y: number }) => {
   // before setting the new position, show loading screen to avoid showing an empty world
   setLoadingScreenVisible(true)
   if (document.getElementById('overlay')!.style.display === 'none') {
-    ;(global as any)['globalStore'].dispatch(teleportTriggered())
+    const globalStore = global['globalStore']
+    globalStore.dispatch(teleportTriggered())
   }
 })
 
