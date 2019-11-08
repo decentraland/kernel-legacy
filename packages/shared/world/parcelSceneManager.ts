@@ -82,7 +82,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
   ret.on('Scene.shouldStart', async (opts: { sceneId: string }) => {
     const sceneId = opts.sceneId
     const parcelSceneToStart = await ret.getParcelData(sceneId)
-    ;(global as any)['globalStore'].dispatch({ type: 'Loading scene', sceneId })
+    globalSignalSceneLoad(sceneId)
     // create the worker if don't exist
     if (!getSceneWorkerBySceneID(sceneId)) {
       const parcelScene = new options.parcelSceneClass(ILandToLoadableParcelScene(parcelSceneToStart))
