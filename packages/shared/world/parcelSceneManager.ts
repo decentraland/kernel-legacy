@@ -96,7 +96,7 @@ export async function enableParcelSceneLoading(options: EnableParcelSceneLoading
         sceneLifeCycleObservable.remove(observer)
         clearForegroundTimeout(timer)
         ret.notify('Scene.status', sceneStatus)
-        ;(global as any)['globalStore'].dispatch({ type: 'Started scene', sceneId })
+        globalSignalSceneStart(sceneId)
       }
     })
 
