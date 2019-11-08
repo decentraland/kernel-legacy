@@ -2,7 +2,7 @@ import { action } from 'typesafe-actions'
 
 export const SCENE_LOAD = 'Loading scene'
 export const SCENE_START = 'Started scene'
-export const SCENE_FAIL = 'Loading scene'
+export const SCENE_FAIL = 'Failed scene'
 
 export const signalSceneLoad = (sceneId: string) => action(SCENE_LOAD, sceneId)
 export const signalSceneStart = (sceneId: string) => action(SCENE_START, sceneId)
